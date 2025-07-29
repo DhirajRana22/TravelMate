@@ -1,5 +1,5 @@
 {% extends 'base.html' %} {% load static %} {% block title %}Confirm Booking -
-{{ schedule.route.origin }} to {{ schedule.route.destination }}{% endblock %} {%
+{{ schedule.route.source }} to {{ schedule.route.destination }}{% endblock %} {%
 block extra_css %}
 <style>
   .booking-container {
@@ -209,7 +209,7 @@ block extra_css %}
 
           <div class="route-display">
             <div class="route-point">
-              <h6 class="mb-1">{{ schedule.route.origin }}</h6>
+              <h6 class="mb-1">{{ schedule.route.source }}</h6>
               <small class="text-muted">Departure</small>
               <div class="mt-1">
                 <strong>{{ schedule.departure_time }}</strong>

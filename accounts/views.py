@@ -85,9 +85,9 @@ def profile(request):
     favorite_route = None
     if total_bookings > 0:
         from django.db.models import Count
-        route_counts = Booking.objects.filter(user=request.user).values('bus_schedule__route__origin', 'bus_schedule__route__destination').annotate(count=Count('id')).order_by('-count').first()
+        route_counts = Booking.objects.filter(user=request.user).values('bus_schedule__route__source', 'bus_schedule__route__destination').annotate(count=Count('id')).order_by('-count').first()
         if route_counts:
-            favorite_route = f"{route_counts['bus_schedule__route__origin']} to {route_counts['bus_schedule__route__destination']}"
+            favorite_route = f"{route_counts['bus_schedule__route__source']} to {route_counts['bus_schedule__route__destination']}"
     
     context = {
         'recent_bookings': recent_bookings,

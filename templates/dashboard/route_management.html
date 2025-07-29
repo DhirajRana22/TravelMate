@@ -392,15 +392,15 @@
                 <div class="form-group">
                     <label class="form-label">Search</label>
                     <input type="text" name="search" class="form-control" 
-                           placeholder="Origin, destination, route name..." 
+                           placeholder="Source, destination, route name..." 
                            value="{{ form.search.value|default:'' }}">
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Origin</label>
-                    <input type="text" name="origin" class="form-control" 
-                           placeholder="Starting city" 
-                           value="{{ form.origin.value|default:'' }}">
+                    <label class="form-label">Source</label>
+                    <input type="text" name="source" class="form-control"
+                           placeholder="Enter source location"
+                           value="{{ form.source.value|default:'' }}">
                 </div>
                 
                 <div class="form-group">
@@ -444,7 +444,7 @@
                     
                     <div class="route-info">
                         <div class="route-name">
-                            {{ route.origin }} → {{ route.destination }}
+                            {{ route.source }} → {{ route.destination }}
                             <span class="status-badge status-{{ route.is_active|yesno:'active,inactive' }}">
                                 {% if route.is_active %}Active{% else %}Inactive{% endif %}
                             </span>
@@ -452,7 +452,7 @@
                         
                         <div class="route-path">
                             <i class="fas fa-map-marker-alt me-1"></i>
-                            {{ route.origin }} 
+                            {{ route.source }} 
                             <i class="fas fa-arrow-right mx-2"></i>
                             {{ route.destination }}
                         </div>
@@ -540,7 +540,7 @@
                         <i class="fas fa-bus me-1"></i>Manage Buses
                     </button>
                     
-                    <button class="btn-action btn-danger" onclick="deleteRoute({{ route.id }}, '{{ route.origin }} → {{ route.destination }}')">
+                    <button class="btn-action btn-danger" onclick="deleteRoute({{ route.id }}, '{{ route.source }} → {{ route.destination }}')">
                         <i class="fas fa-trash me-1"></i>Delete
                     </button>
                 </div>
@@ -554,10 +554,10 @@
                     <ul class="pagination">
                         {% if page_obj.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.origin %}&origin={{ request.GET.origin }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">&laquo; First</a>
+                                <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.source %}&source={{ request.GET.source }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">&laquo; First</a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.origin %}&origin={{ request.GET.origin }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">&lsaquo; Previous</a>
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.source %}&source={{ request.GET.source }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">&lsaquo; Previous</a>
                             </li>
                         {% endif %}
                         
@@ -567,10 +567,10 @@
                         
                         {% if page_obj.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.origin %}&origin={{ request.GET.origin }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Next &rsaquo;</a>
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.source %}&source={{ request.GET.source }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Next &rsaquo;</a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.origin %}&origin={{ request.GET.origin }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Last &raquo;</a>
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.source %}&source={{ request.GET.source }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Last &raquo;</a>
                             </li>
                         {% endif %}
                     </ul>
@@ -585,13 +585,13 @@
                 </div>
                 <h3>No Routes Found</h3>
                 <p class="text-muted">
-                    {% if request.GET.search or request.GET.origin or request.GET.destination or request.GET.status %}
+                    {% if request.GET.search or request.GET.source or request.GET.destination or request.GET.status %}
                         No routes match your search criteria. Try adjusting your filters.
                     {% else %}
                         No routes are configured in the system yet.
                     {% endif %}
                 </p>
-                {% if request.GET.search or request.GET.origin or request.GET.destination or request.GET.status %}
+                {% if request.GET.search or request.GET.source or request.GET.destination or request.GET.status %}
                 <a href="{% url 'dashboard:route_management' %}" class="btn-action btn-primary">
                     <i class="fas fa-times me-2"></i>Clear Filters
                 </a>
@@ -696,7 +696,7 @@
         }
         
         // Auto-submit search form on Enter
-        const searchInputs = document.querySelectorAll('input[name="search"], input[name="origin"], input[name="destination"]');
+        const searchInputs = document.querySelectorAll('input[name="search"], input[name="source"], input[name="destination"]');
         searchInputs.forEach(input => {
             input.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {

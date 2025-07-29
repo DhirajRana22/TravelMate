@@ -621,7 +621,7 @@
                         <div class="route-item">
                             <div class="route-info">
                                 <div class="route-name">
-                                    {{ route.origin }} → {{ route.destination }}
+                                    {{ route.source }} → {{ route.destination }}
                                 </div>
                                 <div class="route-details">
                                     <span><i class="fas fa-clock me-1"></i>{{ route.departure_time }} - {{ route.arrival_time }}</span>
@@ -665,7 +665,7 @@
                         <div class="booking-item">
                             <div class="booking-info">
                                 <div class="booking-route">
-                                    {{ booking.route.origin }} → {{ booking.route.destination }}
+                                    {{ booking.route.source }} → {{ booking.route.destination }}
                                 </div>
                                 <div class="booking-details">
                                     <span><i class="fas fa-calendar me-1"></i>{{ booking.travel_date|date:"M d, Y" }}</span>
