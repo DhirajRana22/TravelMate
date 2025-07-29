@@ -36,17 +36,20 @@ A comprehensive Django-based bus booking system that allows users to search for 
 ### Setup Instructions
 
 1. **Clone the repository**
+
    ```bash
-   git clone <repository-url>
+   git clone <https://github.com/DhirajRana22/TravelMate>
    cd TravelMate
    ```
 
 2. **Create a virtual environment**
+
    ```bash
    python -m venv venv
    ```
 
 3. **Activate the virtual environment**
+
    - On Windows:
      ```bash
      venv\Scripts\activate
@@ -57,27 +60,32 @@ A comprehensive Django-based bus booking system that allows users to search for 
      ```
 
 4. **Install dependencies**
+
    ```bash
    pip install -r requirements.txt
    ```
 
 5. **Run database migrations**
+
    ```bash
    python manage.py makemigrations
    python manage.py migrate
    ```
 
 6. **Create a superuser (optional)**
+
    ```bash
    python manage.py createsuperuser
    ```
 
 7. **Collect static files**
+
    ```bash
    python manage.py collectstatic
    ```
 
 8. **Run the development server**
+
    ```bash
    python manage.py runserver
    ```
@@ -109,33 +117,39 @@ TravelMate/
 ## Key Applications
 
 ### Accounts
+
 - User registration and authentication
 - Custom authentication backend for email/phone login
 - User profile management
 - Booking and payment history
 
 ### Buses
+
 - Bus information management
 - Bus schedules and availability
 - Bus image uploads
 
 ### Routes
+
 - Route creation and management
 - Location management
 - Route search functionality
 
 ### Bookings
+
 - Ticket booking system
 - Seat selection
 - Booking confirmation
 - QR code generation for tickets
 
 ### Payments
+
 - Payment processing
 - Payment history
 - Payment status tracking
 
 ### Dashboard
+
 - Admin interface for system management
 - Analytics and reporting
 - User and booking management
@@ -160,6 +174,7 @@ The project uses SQLite by default for development. For production, configure Po
 ## Usage
 
 ### For Users
+
 1. Register an account using email or phone number
 2. Search for bus routes between locations
 3. Select a bus and book tickets
@@ -168,6 +183,7 @@ The project uses SQLite by default for development. For production, configure Po
 6. Manage bookings through user profile
 
 ### For Administrators
+
 1. Access admin dashboard at `/admin/`
 2. Manage buses, routes, and schedules
 3. View booking analytics and reports
