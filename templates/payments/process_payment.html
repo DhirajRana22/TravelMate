@@ -580,7 +580,7 @@
                             </div>
                             <div class="detail-item">
                                 <div class="detail-label">Bus Type</div>
-                                <div class="detail-value">{{ booking.bus_schedule.bus.get_bus_type_display }}</div>
+                                <div class="detail-value">{{ booking.bus_schedule.bus.bus_type.name }}</div>
                             </div>
                             <div class="detail-item">
                                 <div class="detail-label">Seats</div>
@@ -602,22 +602,8 @@
                         
                         <div class="fare-item">
                             <span class="fare-label">Base Fare ({{ booking.seats.count }} seat{{ booking.seats.count|pluralize }})</span>
-                            <span class="fare-value">रू {{ booking.base_fare|floatformat:2 }}</span>
+                            <span class="fare-value">रू {{ booking.bus_schedule.base_fare|floatformat:2 }} × {{ booking.seats.count }}</span>
                         </div>
-                        
-                        {% if booking.service_fee %}
-                            <div class="fare-item">
-                                <span class="fare-label">Service Fee</span>
-                                <span class="fare-value">रू {{ booking.service_fee|floatformat:2 }}</span>
-                            </div>
-                        {% endif %}
-                        
-                        {% if booking.taxes %}
-                            <div class="fare-item">
-                                <span class="fare-label">Taxes & Fees</span>
-                                <span class="fare-value">रू {{ booking.taxes|floatformat:2 }}</span>
-                            </div>
-                        {% endif %}
                         
                         {% if booking.discount %}
                             <div class="fare-item">
@@ -786,7 +772,7 @@
                     
                     <!-- Payment Actions -->
                     <div class="payment-actions">
-                        <a href="{% url 'bookings:passenger_details' booking.booking_id %}" class="btn-back">
+                        <a href="{% url 'bookings:booking_detail' booking.booking_id %}" class="btn-back">
                             <i class="fas fa-arrow-left"></i>
                             Back to Details
                         </a>

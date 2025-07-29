@@ -737,7 +737,7 @@
                                 </div>
                                 <div class="booking-date">
                                     <i class="fas fa-calendar-alt me-1"></i>
-                                    Booked on ${formatDate(booking.booking_date)}
+                                    Booked on ${formatDate(booking.created_at)}
                                 </div>
                             </div>
                             <div class="booking-status status-${booking.booking_status.toLowerCase()}">
@@ -784,10 +784,14 @@
                                 View Details
                             </a>
                             ${booking.booking_status === 'confirmed' ? `
-                                <a href="/bookings/${booking.booking_id}/ticket/" class="btn-action btn-success">
-                                    <i class="fas fa-download"></i>
-                                    Download Ticket
-                                </a>
+                                <a href="/bookings/ticket/${booking.booking_id}/" class="btn-action btn-primary">
+                            <i class="fas fa-eye me-1"></i>
+                            View Ticket
+                        </a>
+                        <a href="/bookings/ticket/${booking.booking_id}/download/" class="btn-action btn-success">
+                            <i class="fas fa-download me-1"></i>
+                            Download PDF
+                        </a>
                             ` : ''}
                         </div>
                     </div>

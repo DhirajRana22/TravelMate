@@ -13,6 +13,13 @@ from payments.models import Payment
 import qrcode
 from io import BytesIO
 import uuid
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+from django.core.files.base import ContentFile
 
 @login_required
 def seat_selection(request, schedule_id):
@@ -110,6 +117,15 @@ def seat_selection(request, schedule_id):
         }
         seat_layout.append(row)
     
+    # Handle pre-selected seats from URL (for form validation errors)
+    preselected_seat_ids = []
+    selected_seats_param = request.GET.get('selected_seats')
+    if selected_seats_param:
+        try:
+            preselected_seat_ids = [int(sid) for sid in selected_seats_param.split(',') if sid.strip().isdigit()]
+        except ValueError:
+            pass
+    
     if request.method == 'POST':
         selected_seat_ids = request.POST.get('selected_seats', '').split(',')
         selected_seat_ids = [sid for sid in selected_seat_ids if sid.strip()]
@@ -126,6 +142,7 @@ def seat_selection(request, schedule_id):
         'travel_date': travel_date,
         'seat_layout': seat_layout,
         'seats': seats,
+        'preselected_seat_ids': preselected_seat_ids,
     }
     
     return render(request, 'bookings/seat_selection.html', context)
@@ -324,7 +341,18 @@ def create_booking(request, schedule_id):
         # Recalculate total fare
         total_fare = schedule.base_fare * len(selected_seats)
         
-        booking_form = BookingForm(request.POST)
+        # Map the form data to match BookingForm fields
+        form_data = request.POST.copy()
+        
+        # Use the first passenger's name as the primary passenger name
+        if 'passenger_0_name' in form_data:
+            form_data['passenger_name'] = form_data['passenger_0_name']
+        
+        # Use contact_phone as passenger_phone
+        if 'contact_phone' in form_data:
+            form_data['passenger_phone'] = form_data['contact_phone']
+        
+        booking_form = BookingForm(form_data)
         print(f"DEBUG: Form created with data: {booking_form.data}")
         print(f"DEBUG: Form fields: {list(booking_form.fields.keys())}")
         print(f"DEBUG: Form is bound: {booking_form.is_bound}")
@@ -364,8 +392,9 @@ def create_booking(request, schedule_id):
                         payment_status='pending'
                     )
                     
-                    # Redirect to payment page
-                    return redirect('payments:payment_page', booking_id=booking.booking_id)
+                    # Clear localStorage by redirecting with success parameter first
+                    # Then redirect to payment page
+                    return redirect('payments:process_payment', payment_id=payment.payment_id)
                     
             except Exception as e:
                 print(f"DEBUG: Exception occurred during booking creation: {str(e)}")
@@ -376,7 +405,10 @@ def create_booking(request, schedule_id):
                 return redirect(reverse('bookings:seat_selection', args=[schedule_id]) + f'?date={travel_date}')
         else:
             print(f"DEBUG: Form is invalid. Errors: {booking_form.errors}")
-            messages.error(request, 'Please correct the form errors.')
+            messages.error(request, 'Please correct the form errors and try again.')
+            # Preserve selected seats when form is invalid
+            selected_seats_param = ','.join(str(seat.id) for seat in selected_seats)
+            return redirect(reverse('bookings:seat_selection', args=[schedule_id]) + f'?date={travel_date}&selected_seats={selected_seats_param}')
     else:
         booking_form = BookingForm()
     
@@ -407,12 +439,20 @@ def cancel_booking(request, booking_id):
     # Check if booking can be cancelled
     if booking.booking_status == 'cancelled':
         messages.error(request, 'This booking is already cancelled.')
-        return redirect('booking_detail', booking_id=booking_id)
+        return redirect('bookings:booking_detail', booking_id=booking_id)
     
     # Check if departure time is within 24 hours
-    if booking.bus_schedule.departure_time - timezone.now() < timezone.timedelta(hours=24):
+    from datetime import datetime, timedelta
+    current_time = timezone.now()
+    departure_datetime = datetime.combine(booking.booking_date, booking.bus_schedule.departure_time)
+    
+    # Make departure_datetime timezone aware
+    if timezone.is_naive(departure_datetime):
+        departure_datetime = timezone.make_aware(departure_datetime)
+    
+    if departure_datetime - current_time < timedelta(hours=24):
         messages.error(request, 'Bookings cannot be cancelled within 24 hours of departure.')
-        return redirect('booking_detail', booking_id=booking_id)
+        return redirect('bookings:booking_detail', booking_id=booking_id)
     
     if request.method == 'POST':
         form = BookingCancellationForm(request.POST)
@@ -448,7 +488,7 @@ def cancel_booking(request, booking_id):
             
             except Exception as e:
                 messages.error(request, f'Error cancelling booking: {str(e)}')
-                return redirect('booking_detail', booking_id=booking_id)
+                return redirect('bookings:booking_detail', booking_id=booking_id)
     else:
         form = BookingCancellationForm()
     
@@ -459,6 +499,185 @@ def cancel_booking(request, booking_id):
     
     return render(request, 'bookings/cancel_booking.html', context)
 
+def generate_ticket_pdf(booking):
+    """Generate PDF ticket for a booking"""
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=18)
+    
+    # Container for the 'Flowable' objects
+    elements = []
+    
+    # Define styles
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=24,
+        spaceAfter=30,
+        alignment=TA_CENTER,
+        textColor=colors.HexColor('#007bff')
+    )
+    
+    header_style = ParagraphStyle(
+        'CustomHeader',
+        parent=styles['Heading2'],
+        fontSize=16,
+        spaceAfter=12,
+        alignment=TA_LEFT,
+        textColor=colors.HexColor('#333333')
+    )
+    
+    normal_style = ParagraphStyle(
+        'CustomNormal',
+        parent=styles['Normal'],
+        fontSize=12,
+        spaceAfter=6,
+        alignment=TA_LEFT
+    )
+    
+    # Title
+    title = Paragraph("TravelMate Bus Ticket", title_style)
+    elements.append(title)
+    elements.append(Spacer(1, 12))
+    
+    # Booking Information
+    booking_info = [
+        ['Booking ID:', booking.booking_id],
+        ['Booking Date:', booking.created_at.strftime('%B %d, %Y at %I:%M %p')],
+        ['Status:', booking.get_booking_status_display()],
+        ['Payment Status:', booking.get_payment_status_display()]
+    ]
+    
+    booking_table = Table(booking_info, colWidths=[2*inch, 3*inch])
+    booking_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+    
+    elements.append(Paragraph("Booking Details", header_style))
+    elements.append(booking_table)
+    elements.append(Spacer(1, 20))
+    
+    # Journey Information
+    journey_info = [
+        ['Route:', f"{booking.bus_schedule.route.source.name} → {booking.bus_schedule.route.destination.name}"],
+        ['Travel Date:', booking.booking_date.strftime('%B %d, %Y')],
+        ['Departure Time:', booking.bus_schedule.departure_time.strftime('%I:%M %p')],
+        ['Arrival Time:', booking.bus_schedule.arrival_time.strftime('%I:%M %p')],
+        ['Bus:', f"{booking.bus_schedule.bus.bus_name} ({booking.bus_schedule.bus.bus_number})"],
+        ['Bus Type:', booking.bus_schedule.bus.bus_type.name]
+    ]
+    
+    journey_table = Table(journey_info, colWidths=[2*inch, 3*inch])
+    journey_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+    
+    elements.append(Paragraph("Journey Details", header_style))
+    elements.append(journey_table)
+    elements.append(Spacer(1, 20))
+    
+    # Passenger Information
+    elements.append(Paragraph("Passenger Details", header_style))
+    
+    passenger_data = [['Name', 'Phone', 'Seat Numbers']]
+    seat_numbers = ', '.join([seat.seat_number for seat in booking.seats.all()])
+    passenger_data.append([
+        booking.passenger_name,
+        booking.passenger_phone,
+        seat_numbers
+    ])
+    
+    passenger_table = Table(passenger_data, colWidths=[2*inch, 1.5*inch, 2*inch])
+    passenger_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#007bff')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8f9fa')])
+    ]))
+    
+    elements.append(passenger_table)
+    elements.append(Spacer(1, 20))
+    
+    # Fare Breakdown
+    fare_info = [
+        ['Total Amount:', f"रू {booking.total_fare:.2f}"],
+        ['Payment Status:', booking.get_payment_status_display()],
+        ['Payment Method:', booking.get_payment_method_display() if booking.payment_method else 'Not specified']
+    ]
+    
+    fare_table = Table(fare_info, colWidths=[2*inch, 2*inch])
+    fare_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -2), colors.HexColor('#f8f9fa')),
+        ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#007bff')),
+        ('TEXTCOLOR', (0, 0), (-1, -2), colors.black),
+        ('TEXTCOLOR', (0, -1), (-1, -1), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTNAME', (1, 0), (1, -2), 'Helvetica'),
+        ('FONTNAME', (1, -1), (1, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+    
+    elements.append(Paragraph("Fare Breakdown", header_style))
+    elements.append(fare_table)
+    elements.append(Spacer(1, 20))
+    
+    # QR Code (if available)
+    if booking.qr_code:
+        try:
+            qr_img = Image(booking.qr_code.path, width=1.5*inch, height=1.5*inch)
+            qr_data = [['QR Code:', qr_img]]
+            qr_table = Table(qr_data, colWidths=[1*inch, 2*inch])
+            qr_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 12),
+            ]))
+            elements.append(qr_table)
+            elements.append(Spacer(1, 20))
+        except:
+            pass  # Skip QR code if file not found
+    
+    # Important Notes
+    notes_text = """
+    <b>Important Instructions:</b><br/>
+    • Please arrive at the boarding point at least 15 minutes before departure<br/>
+    • Carry a valid government-issued photo ID for verification<br/>
+    • Show this ticket (digital or printed) to the bus conductor<br/>
+    • Cancellation is allowed up to 2 hours before departure time<br/>
+    • Contact customer support for any assistance: +977-1-4567890
+    """
+    
+    notes = Paragraph(notes_text, normal_style)
+    elements.append(notes)
+    
+    # Build PDF
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer
+
 @login_required
 def download_ticket(request, booking_id):
     booking = get_object_or_404(Booking, booking_id=booking_id, user=request.user)
@@ -466,12 +685,12 @@ def download_ticket(request, booking_id):
     # Check if booking is confirmed
     if booking.booking_status != 'confirmed':
         messages.error(request, 'Cannot download ticket for unconfirmed or cancelled booking.')
-        return redirect('booking_detail', booking_id=booking_id)
+        return redirect('bookings:booking_detail', booking_id=booking_id)
     
     # Check if payment is completed
     if booking.payment_status != 'paid':
         messages.error(request, 'Cannot download ticket until payment is completed.')
-        return redirect('booking_detail', booking_id=booking_id)
+        return redirect('bookings:booking_detail', booking_id=booking_id)
     
     # Generate QR code if not already generated
     if not booking.qr_code:
@@ -489,8 +708,50 @@ def download_ticket(request, booking_id):
         img.save(buffer, format="PNG")
         
         # Save QR code to booking
-        from django.core.files.base import ContentFile
         booking.qr_code.save(f"{booking.booking_id}_qr.png", ContentFile(buffer.getvalue()), save=True)
+    
+    # Generate PDF ticket
+    pdf_buffer = generate_ticket_pdf(booking)
+    
+    # Create HTTP response with PDF
+    response = HttpResponse(pdf_buffer.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="ticket_{booking.booking_id}.pdf"'
+    
+    return response
+
+@login_required
+def view_ticket(request, booking_id):
+    """View ticket in HTML format for preview"""
+    booking = get_object_or_404(Booking, booking_id=booking_id, user=request.user)
+    
+    # Check if booking is confirmed
+    if booking.booking_status != 'confirmed':
+        messages.error(request, 'Cannot view ticket for unconfirmed or cancelled booking.')
+        return redirect('bookings:booking_detail', booking_id=booking_id)
+    
+    # Check if payment is completed
+    if booking.payment_status != 'paid':
+        messages.error(request, 'Cannot view ticket until payment is completed.')
+        return redirect('bookings:booking_detail', booking_id=booking_id)
+    
+    # Generate QR code if not already generated
+    if not booking.qr_code:
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(f"Booking ID: {booking.booking_id}\nUser: {booking.user.username}\nDate: {booking.booking_date}\nBus: {booking.bus_schedule.bus.bus_name}\nRoute: {booking.bus_schedule.route}")
+        qr.make(fit=True)
+        
+        img = qr.make_image(fill_color="black", back_color="white")
+        buffer = BytesIO()
+        img.save(buffer, format="PNG")
+        
+        # Save QR code to booking
+        booking.qr_code.save(f"{booking.booking_id}_qr.png", ContentFile(buffer.getvalue()), save=True)
+        buffer.close()
     
     # Render ticket template
     context = {

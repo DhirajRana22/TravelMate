@@ -325,7 +325,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <h6 class="mb-1">Booking ID: <strong>{{ booking.booking_id }}</strong></h6>
-                            <small class="text-muted">Created on {{ booking.booking_date|date:"F d, Y g:i A" }}</small>
+                            <small class="text-muted">Created on {{ booking.created_at|date:"F d, Y g:i A" }}</small>
                         </div>
                         <div class="text-end">
                             <div class="status-badge status-{{ booking.booking_status }}">{{ booking.get_booking_status_display }}</div>
@@ -567,20 +567,10 @@
                     <div class="info-item">
                         <div class="info-label">
                             <i class="fas fa-money-bill"></i>
-                            Base Fare
+                            Base Fare ({{ booking.seats.count }} seats)
                         </div>
-                        <div class="info-value">रू {{ booking.base_fare }}</div>
+                        <div class="info-value">रू {{ booking.bus_schedule.base_fare|floatformat:2 }} × {{ booking.seats.count }}</div>
                     </div>
-                    
-                    {% if booking.service_fee %}
-                    <div class="info-item">
-                        <div class="info-label">
-                            <i class="fas fa-plus"></i>
-                            Service Fee
-                        </div>
-                        <div class="info-value">रू {{ booking.service_fee }}</div>
-                    </div>
-                    {% endif %}
                     
                     <div class="info-item" style="border-left-color: #28a745; background: #d4edda;">
                         <div class="info-label">
@@ -600,7 +590,7 @@
                     <div class="timeline">
                         <div class="timeline-item">
                             <div class="timeline-content">
-                                <div class="timeline-time">{{ booking.booking_date|date:"M d, Y g:i A" }}</div>
+                                <div class="timeline-time">{{ booking.created_at|date:"M d, Y g:i A" }}</div>
                                 <div class="timeline-title">Booking Created</div>
                             </div>
                         </div>

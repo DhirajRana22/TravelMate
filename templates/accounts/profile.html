@@ -181,7 +181,7 @@
                                         <tr>
                                             <td><strong>{{ booking.booking_id }}</strong></td>
                                             <td>{{ booking.bus_schedule.route }}</td>
-                                            <td>{{ booking.booking_date|date:"M d, Y" }}</td>
+                                            <td>{{ booking.created_at|date:"M d, Y" }}</td>
                                             <td>
                                                 <span class="badge bg-{% if booking.booking_status == 'confirmed' %}success{% elif booking.booking_status == 'pending' %}warning{% else %}danger{% endif %}">
                                                     {{ booking.get_booking_status_display }}

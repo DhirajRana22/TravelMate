@@ -526,15 +526,15 @@
                         
                         <div class="route-info">
                             <div class="route-location">
-                                <div class="location-name">{{ booking.schedule.route.source.name }}</div>
-                                <div class="location-time">{{ booking.schedule.departure_time|time:"H:i" }}</div>
+                                <div class="location-name">{{ booking.bus_schedule.route.source.name }}</div>
+                <div class="location-time">{{ booking.bus_schedule.departure_time|time:"H:i" }}</div>
                             </div>
                             <div class="route-arrow">
                                 <i class="fas fa-arrow-right"></i>
                             </div>
                             <div class="route-location">
-                                <div class="location-name">{{ booking.schedule.route.destination.name }}</div>
-                                <div class="location-time">{{ booking.schedule.arrival_time|time:"H:i" }}</div>
+                                <div class="location-name">{{ booking.bus_schedule.route.destination.name }}</div>
+                <div class="location-time">{{ booking.bus_schedule.arrival_time|time:"H:i" }}</div>
                             </div>
                         </div>
                     </div>
@@ -669,7 +669,7 @@
                             </div>
                             
                             <div class="checkbox-group">
-                                <input type="checkbox" id="confirm-cancellation" class="checkbox-input" required>
+                                <input type="checkbox" id="confirm-cancellation" name="confirm_cancellation" class="checkbox-input" required>
                                 <label for="confirm-cancellation" class="checkbox-label">
                                     I understand that this booking will be cancelled permanently and cannot be restored. 
                                     I have read and agree to the cancellation policy and refund terms.
@@ -679,7 +679,7 @@
                         
                         <!-- Cancel Actions -->
                         <div class="cancel-actions">
-                            <a href="{% url 'bookings:booking_detail' booking.id %}" class="btn-back">
+                            <a href="{% url 'bookings:booking_detail' booking.booking_id %}" class="btn-back">
                                 <i class="fas fa-arrow-left"></i>
                                 Back to Booking
                             </a>

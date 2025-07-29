@@ -157,7 +157,7 @@ def request_refund(request, payment_id):
     # Check if booking is cancelled
     if booking.booking_status != 'cancelled':
         messages.error(request, 'You must cancel your booking before requesting a refund.')
-        return redirect('booking_detail', booking_id=booking.booking_id)
+        return redirect('bookings:booking_detail', booking_id=booking.booking_id)
     
     if request.method == 'POST':
         form = RefundRequestForm(request.POST)

@@ -505,7 +505,7 @@
                 <div class="action-buttons">
                     {% if payment.status == 'success' %}
                         {% if payment.booking %}
-                            <a href="{% url 'bookings:booking_detail' payment.booking.id %}" class="btn-primary">
+                            <a href="{% url 'bookings:booking_detail' payment.booking.booking_id %}" class="btn-primary">
                                 <i class="fas fa-ticket-alt mr-2"></i>View Booking
                             </a>
                         {% endif %}

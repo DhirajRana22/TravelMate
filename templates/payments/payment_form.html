@@ -444,11 +444,7 @@
                         </div>
                         <div class="fare-item">
                             <span>Base Fare ({{ booking.selected_seats.count }} × रू {{ booking.bus_schedule.base_fare }}):</span>
-                            <span>रू {{ booking.base_fare }}</span>
-                        </div>
-                        <div class="fare-item">
-                            <span>Service Fee (2%):</span>
-                            <span>रू {{ booking.service_fee }}</span>
+                            <span>रू {% widthratio booking.bus_schedule.base_fare 1 booking.selected_seats.count %}</span>
                         </div>
                         <div class="fare-item">
                             <span>Total Amount:</span>

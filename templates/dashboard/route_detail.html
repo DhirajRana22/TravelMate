@@ -793,10 +793,10 @@
                 <div class="booking-list">
                     {% for booking in route.recent_bookings %}
                     <div class="booking-item">
-                        <div class="booking-icon {{ booking.status }}">
-                            {% if booking.status == 'confirmed' %}
+                        <div class="booking-icon {{ booking.booking_status }}">
+                            {% if booking.booking_status == 'confirmed' %}
                                 <i class="fas fa-check"></i>
-                            {% elif booking.status == 'pending' %}
+                            {% elif booking.booking_status == 'pending' %}
                                 <i class="fas fa-clock"></i>
                             {% else %}
                                 <i class="fas fa-times"></i>
@@ -819,7 +819,7 @@
                             रू {{ booking.total_fare }}
                         </div>
                         
-                        <a href="{% url 'dashboard:booking_detail' booking.id %}" class="btn-action btn-outline btn-sm ms-2">
+                        <a href="{% url 'dashboard:booking_detail' booking.booking_id %}" class="btn-action btn-outline btn-sm ms-2">
                             <i class="fas fa-eye"></i>
                         </a>
                     </div>

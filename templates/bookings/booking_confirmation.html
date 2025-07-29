@@ -325,7 +325,7 @@
                             <div class="journey-details">
                                 <div class="detail-item">
                                     <div class="detail-label">Travel Date</div>
-                                    <div class="detail-value">{{ booking.travel_date|date:"M d, Y" }}</div>
+                                    <div class="detail-value">{{ booking.booking_date|date:"M d, Y" }}</div>
                                 </div>
                                 <div class="detail-item">
                                     <div class="detail-label">Departure Time</div>
@@ -362,7 +362,7 @@
                                 </div>
                                 {% endif %}
                                 <div class="col-md-6 mt-2">
-                                    <strong>Booking Date:</strong> {{ booking.booking_date|date:"M d, Y g:i A" }}
+                                    <strong>Booking Date:</strong> {{ booking.created_at|date:"M d, Y g:i A" }}
                                 </div>
                             </div>
                         </div>
@@ -424,12 +424,8 @@
                                 <div class="col-md-6">
                                     <div class="fare-breakdown">
                                         <div class="fare-item">
-                                            <span>Base Fare ({{ booking.selected_seats.count }} seats):</span>
-                                            <span>रू {{ booking.base_fare }}</span>
-                                        </div>
-                                        <div class="fare-item">
-                                            <span>Service Fee:</span>
-                                            <span>रू {{ booking.service_fee }}</span>
+                                            <span>Base Fare ({{ booking.seats.count }} seats):</span>
+                                            <span>रू {{ booking.bus_schedule.base_fare|floatformat:2 }} × {{ booking.seats.count }}</span>
                                         </div>
                                         <div class="fare-item">
                                             <span>Total Amount:</span>
@@ -463,7 +459,7 @@
                             <a href="{% url 'home:home' %}" class="btn-action btn-home">
                                 <i class="fas fa-home me-2"></i>Back to Home
                             </a>
-                            <a href="{% url 'accounts:user_bookings' %}" class="btn-action btn-bookings">
+                            <a href="{% url 'accounts:booking_history' %}" class="btn-action btn-bookings">
                                 <i class="fas fa-list me-2"></i>My Bookings
                             </a>
                         </div>

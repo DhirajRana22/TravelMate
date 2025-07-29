@@ -519,16 +519,8 @@
                             Amount Breakdown
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Base Fare</span>
-                            <span class="detail-value">रू{{ booking.base_fare|default:payment.amount|floatformat:2 }}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Service Fee</span>
-                            <span class="detail-value">रू{{ booking.service_fee|default:"0.00"|floatformat:2 }}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Taxes</span>
-                            <span class="detail-value">रू{{ booking.taxes|default:"0.00"|floatformat:2 }}</span>
+                            <span class="detail-label">Base Fare ({{ booking.seats.count }} seats)</span>
+                            <span class="detail-value">रू{{ booking.bus_schedule.base_fare|floatformat:2 }} × {{ booking.seats.count }}</span>
                         </div>
                         <div class="detail-row" style="border-top: 2px solid #667eea; font-weight: 700;">
                             <span class="detail-label">Total Amount</span>

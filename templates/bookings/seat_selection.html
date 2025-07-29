@@ -481,16 +481,30 @@
         const seatId = seatElement.getAttribute('data-seat-id');
         const seatNumber = seatElement.getAttribute('data-seat-number');
         
+        // Check if seat is booked or reserved
+        if (seatElement.classList.contains('booked') || seatElement.classList.contains('reserved')) {
+            return;
+        }
+        
         if (seatElement.classList.contains('selected')) {
             // Deselect seat
             seatElement.classList.remove('selected');
+            seatElement.classList.add('available');
             selectedSeats = selectedSeats.filter(seat => seat.id !== seatId);
         } else {
+            // Check if seat is already selected (prevent duplicates)
+            const alreadySelected = selectedSeats.find(seat => seat.id === seatId);
+            if (alreadySelected) {
+                return;
+            }
+            
             // Select seat (limit to 6 seats)
             if (selectedSeats.length >= 6) {
                 alert('You can select maximum 6 seats at a time.');
                 return;
             }
+            
+            seatElement.classList.remove('available');
             seatElement.classList.add('selected');
             selectedSeats.push({
                 id: seatId,
@@ -548,10 +562,16 @@
             return;
         }
         
+        // Ensure the hidden input is updated with latest selection
+        document.getElementById('selectedSeatsInput').value = selectedSeats.map(seat => seat.id).join(',');
+        
         // Add loading state
         const proceedBtn = document.getElementById('proceedBtn');
         proceedBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
         proceedBtn.disabled = true;
+        
+        // Save current selection to localStorage
+        saveToLocalStorage();
     });
     
     // Auto-save selected seats to localStorage
@@ -565,8 +585,9 @@
             const savedSeats = JSON.parse(saved);
             savedSeats.forEach(seat => {
                 const seatElement = document.querySelector(`[data-seat-id="${seat.id}"]`);
-                if (seatElement && seatElement.classList.contains('available')) {
+                if (seatElement && !seatElement.classList.contains('booked') && !seatElement.classList.contains('reserved')) {
                     seatElement.classList.add('selected');
+                    seatElement.classList.remove('available');
                     selectedSeats.push(seat);
                 }
             });
@@ -576,7 +597,27 @@
     
     // Load saved seats on page load
     document.addEventListener('DOMContentLoaded', function() {
-        loadFromLocalStorage();
+        // First, handle preselected seats from backend (form validation errors)
+        const preselectedSeatIds = {{ preselected_seat_ids|default:'[]' }};
+        if (preselectedSeatIds.length > 0) {
+            preselectedSeatIds.forEach(seatId => {
+                const seatElement = document.querySelector(`[data-seat-id="${seatId}"]`);
+                if (seatElement && !seatElement.classList.contains('booked') && !seatElement.classList.contains('reserved')) {
+                    const seatNumber = seatElement.getAttribute('data-seat-number');
+                    seatElement.classList.remove('available');
+                    seatElement.classList.add('selected');
+                    selectedSeats.push({
+                        id: seatId.toString(),
+                        number: seatNumber
+                    });
+                }
+            });
+            updateBookingSummary();
+            saveToLocalStorage();
+        } else {
+            // If no preselected seats, load from localStorage
+            loadFromLocalStorage();
+        }
         
         // Save seats whenever selection changes
         const originalToggleSeat = toggleSeat;
@@ -586,12 +627,23 @@
         };
     });
     
-    // Clear localStorage on successful booking
+    // Clear localStorage on successful booking or when no seats selected
     window.addEventListener('beforeunload', function() {
         if (selectedSeats.length === 0) {
             localStorage.removeItem('selectedSeats_{{ schedule.id }}');
         }
     });
+    
+    // Function to clear localStorage (can be called from other pages)
+    window.clearSeatSelection = function() {
+        localStorage.removeItem('selectedSeats_{{ schedule.id }}');
+    };
+    
+    // Clear localStorage if coming from a successful booking
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('booking_success') === 'true') {
+        localStorage.removeItem('selectedSeats_{{ schedule.id }}');
+    }
     
     // Add keyboard navigation
     document.addEventListener('keydown', function(e) {

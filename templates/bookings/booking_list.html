@@ -400,7 +400,7 @@
                     </button>
                 </div>
                 <div class="form-group">
-                    <a href="{% url 'accounts:user_bookings' %}" class="btn-clear">
+                    <a href="{% url 'accounts:booking_history' %}" class="btn-clear">
                         <i class="fas fa-times me-2"></i>Clear
                     </a>
                 </div>
@@ -431,7 +431,7 @@
                             <span class="route-city">{{ booking.bus_schedule.route.destination }}</span>
                         </div>
                         <div class="journey-date">
-                            <i class="fas fa-calendar me-1"></i>{{ booking.travel_date|date:"M d, Y" }}
+                            <i class="fas fa-calendar me-1"></i>{{ booking.booking_date|date:"M d, Y" }}
                         </div>
                     </div>
                     
@@ -455,7 +455,7 @@
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Booking Date</div>
-                            <div class="detail-value">{{ booking.booking_date|date:"M d, Y" }}</div>
+                            <div class="detail-value">{{ booking.created_at|date:"M d, Y" }}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Payment Status</div>
@@ -550,7 +550,7 @@
                         <i class="fas fa-search me-2"></i>Book Your First Ticket
                     </a>
                     {% if request.GET.status or request.GET.from_date or request.GET.to_date or request.GET.search %}
-                    <a href="{% url 'accounts:user_bookings' %}" class="btn btn-outline-secondary btn-lg">
+                    <a href="{% url 'accounts:booking_history' %}" class="btn btn-outline-secondary btn-lg">
                         <i class="fas fa-times me-2"></i>Clear Filters
                     </a>
                     {% endif %}

@@ -321,6 +321,18 @@ def route_detail(request, route_id):
         'data': [item['count'] for item in bookings_by_month],
     }
     
+    # Get recent bookings for this route
+    recent_bookings = Booking.objects.filter(
+        bus_schedule__route=route
+    ).select_related('user', 'bus_schedule__bus').prefetch_related('seats').annotate(
+        bus_number=F('bus_schedule__bus__bus_number'),
+        seats_count=Count('seats'),
+        status=F('booking_status')
+    ).order_by('-created_at')[:10]
+    
+    # Add recent_bookings to route object for template access
+    route.recent_bookings = recent_bookings
+    
     context = {
         'route': route,
         'schedules': schedules,

@@ -357,7 +357,7 @@
                             <i class="fas fa-calendar"></i>
                             Travel Date
                         </div>
-                        <div class="info-value">{{ booking.travel_date|date:"l, F d, Y" }}</div>
+                        <div class="info-value">{{ booking.booking_date|date:"l, F d, Y" }}</div>
                     </div>
                     
                     <div class="info-row">
@@ -516,26 +516,16 @@
                             <i class="fas fa-calendar-plus"></i>
                             Booking Date
                         </div>
-                        <div class="info-value">{{ booking.booking_date|date:"M d, Y" }}</div>
+                        <div class="info-value">{{ booking.created_at|date:"M d, Y" }}</div>
                     </div>
                     
                     <div class="info-row">
                         <div class="info-label">
                             <i class="fas fa-money-bill"></i>
-                            Base Fare
+                            Base Fare ({{ booking.seats.count }} seats)
                         </div>
-                        <div class="info-value">रू {{ booking.base_fare }}</div>
+                        <div class="info-value">रू {{ booking.bus_schedule.base_fare|floatformat:2 }} × {{ booking.seats.count }}</div>
                     </div>
-                    
-                    {% if booking.service_fee %}
-                    <div class="info-row">
-                        <div class="info-label">
-                            <i class="fas fa-plus"></i>
-                            Service Fee
-                        </div>
-                        <div class="info-value">रू {{ booking.service_fee }}</div>
-                    </div>
-                    {% endif %}
                     
                     <div class="info-row" style="border-top: 2px solid #e9ecef; margin-top: 1rem; padding-top: 1rem;">
                         <div class="info-label">
@@ -566,7 +556,7 @@
                     <div class="timeline">
                         <div class="timeline-item">
                             <div class="timeline-content">
-                                <div class="timeline-time">{{ booking.booking_date|date:"M d, Y g:i A" }}</div>
+                                <div class="timeline-time">{{ booking.created_at|date:"M d, Y g:i A" }}</div>
                                 <div class="timeline-title">Booking Created</div>
                                 <p class="timeline-desc">Your booking was successfully created</p>
                             </div>
@@ -575,7 +565,7 @@
                         {% if booking.payment_status == 'paid' %}
                         <div class="timeline-item">
                             <div class="timeline-content">
-                                <div class="timeline-time">{{ booking.booking_date|date:"M d, Y g:i A" }}</div>
+                                <div class="timeline-time">{{ booking.created_at|date:"M d, Y g:i A" }}</div>
                                 <div class="timeline-title">Payment Completed</div>
                                 <p class="timeline-desc">Payment of रू {{ booking.total_fare }} was successful</p>
                             </div>
@@ -585,7 +575,7 @@
                         {% if booking.booking_status == 'confirmed' %}
                         <div class="timeline-item">
                             <div class="timeline-content">
-                                <div class="timeline-time">{{ booking.booking_date|date:"M d, Y g:i A" }}</div>
+                                <div class="timeline-time">{{ booking.created_at|date:"M d, Y g:i A" }}</div>
                                 <div class="timeline-title">Booking Confirmed</div>
                                 <p class="timeline-desc">Your seats have been confirmed</p>
                             </div>
@@ -606,9 +596,12 @@
                 
                 <!-- Action Buttons -->
                 <div class="action-buttons">
-                    {% if booking.booking_status == 'confirmed' %}
-                        <a href="{% url 'download_ticket' booking.booking_id %}" class="btn-action btn-success">
-                            <i class="fas fa-download me-2"></i>Download Ticket
+                    {% if booking.booking_status == 'confirmed' and booking.payment_status == 'paid' %}
+                        <a href="{% url 'bookings:view_ticket' booking.booking_id %}" class="btn-action btn-primary">
+                            <i class="fas fa-eye me-2"></i>View Ticket
+                        </a>
+                        <a href="{% url 'bookings:download_ticket' booking.booking_id %}" class="btn-action btn-success">
+                            <i class="fas fa-download me-2"></i>Download PDF
                         </a>
                         <button onclick="window.print()" class="btn-action btn-outline">
                             <i class="fas fa-print me-2"></i>Print Ticket
@@ -616,13 +609,13 @@
                     {% endif %}
                     
                     {% if booking.booking_status == 'pending' or booking.booking_status == 'confirmed' %}
-                        <a href="{% url 'cancel_booking' booking.booking_id %}" class="btn-action btn-danger" 
+                        <a href="{% url 'bookings:cancel_booking' booking.booking_id %}" class="btn-action btn-danger" 
                            onclick="return confirm('Are you sure you want to cancel this booking?')">
                             <i class="fas fa-times me-2"></i>Cancel Booking
                         </a>
                     {% endif %}
                     
-                    <a href="{% url 'accounts:user_bookings' %}" class="btn-action btn-outline">
+                    <a href="{% url 'accounts:booking_history' %}" class="btn-action btn-outline">
                         <i class="fas fa-list me-2"></i>My Bookings
                     </a>
                     
@@ -637,7 +630,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Generate QR Code
@@ -646,7 +639,7 @@
             bookingId: '{{ booking.booking_id }}',
             passengerName: '{{ booking.passenger_name }}',
             route: '{{ booking.bus_schedule.route.source.name }} to {{ booking.bus_schedule.route.destination.name }}',
-            travelDate: '{{ booking.travel_date|date:"Y-m-d" }}',
+            travelDate: '{{ booking.booking_date|date:"Y-m-d" }}',
             busNumber: '{{ booking.bus_schedule.bus.bus_number }}',
             seats: [{% for seat in booking.seats.all %}'{{ seat.seat_number }}'{% if not forloop.last %},{% endif %}{% endfor %}],
             departureTime: '{{ booking.bus_schedule.departure_time|time:"H:i" }}'

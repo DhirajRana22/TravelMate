@@ -1,5 +1,9 @@
-{% extends 'base.html' %} {% load static %} {% block title %}Create Booking{%
-endblock %} {% block extra_css %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Booking{% endblock %}
+
+{% block extra_css %}
 <style>
   .booking-header {
     background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
@@ -528,14 +532,13 @@ endblock %} {% block extra_css %}
               <div class="detail-item">
                 <div class="detail-label">Bus Type</div>
                 <div class="detail-value">
-                  {{ schedule.bus.get_bus_type_display }}
+                  {{ schedule.bus.bus_type.name }}
                 </div>
               </div>
               <div class="detail-item">
                 <div class="detail-label">Selected Seats</div>
                 <div class="detail-value">
-                  {% for seat in selected_seats %} {{ seat }}{% if not
-                  forloop.last %}, {% endif %} {% endfor %}
+                  {% for seat in selected_seats %}{{ seat }}{% if not forloop.last %}, {% endif %}{% endfor %}
                 </div>
               </div>
             </div>
@@ -553,7 +556,7 @@ endblock %} {% block extra_css %}
             <input
               type="hidden"
               name="selected_seats"
-              value="{{ selected_seats|join:',' }}"
+              value="{% for seat in selected_seats %}{{ seat.id }}{% if not forloop.last %},{% endif %}{% endfor %}"
             />
 
             <div class="passenger-form">
@@ -736,19 +739,7 @@ endblock %} {% block extra_css %}
                   >Base Fare ({{ selected_seats|length }} seat{{
                   selected_seats|length|pluralize }})</span
                 >
-                <span class="fare-value">रू{{ base_fare|floatformat:2 }}</span>
-              </div>
-
-              <div class="fare-item">
-                <span class="fare-label">Service Fee</span>
-                <span class="fare-value"
-                  >रू{{ service_fee|floatformat:2 }}</span
-                >
-              </div>
-
-              <div class="fare-item">
-                <span class="fare-label">Taxes & Fees</span>
-                <span class="fare-value">रू{{ taxes|floatformat:2 }}</span>
+                <span class="fare-value">रू{{ schedule.base_fare|floatformat:2 }} × {{ selected_seats|length }}</span>
               </div>
 
               <div class="fare-item">
@@ -780,6 +771,14 @@ endblock %} {% block extra_css %}
 </section>
 {% endblock %} {% block extra_js %}
 <script>
+  // Clear seat selection localStorage when booking form loads
+  if (window.clearSeatSelection) {
+    window.clearSeatSelection();
+  } else {
+    // Fallback if function not available
+    localStorage.removeItem('selectedSeats_{{ schedule.id }}');
+  }
+  
   document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("booking-form");
     const continueBtn = document.getElementById("continue-btn");

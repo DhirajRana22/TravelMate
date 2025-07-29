@@ -377,6 +377,13 @@
         color: #6c757d;
     }
     
+    .qr-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 6px;
+    }
+    
     .qr-text {
         font-size: 0.875rem;
         color: #6c757d;
@@ -598,7 +605,7 @@
         <div class="ticket-container">
             <div class="ticket-card">
                 <!-- Status Badge -->
-                <div class="status-badge status-{{ booking.status|lower }}">
+                <div class="status-badge status-{{ booking.booking_status|lower }}">
                     {{ booking.get_status_display }}
                 </div>
                 
@@ -621,20 +628,20 @@
                     <div class="route-section">
                         <div class="route-info">
                             <div class="route-location">
-                                <div class="location-code">{{ booking.schedule.route.source.code|default:booking.schedule.route.source.name|slice:":3"|upper }}</div>
-                                <div class="location-name">{{ booking.schedule.route.source.name }}</div>
-                                <div class="location-time">{{ booking.schedule.departure_time|time:"H:i" }}</div>
+                                <div class="location-code">{{ booking.bus_schedule.route.source.code|default:booking.bus_schedule.route.source.name|slice:":3"|upper }}</div>
+                                <div class="location-name">{{ booking.bus_schedule.route.source.name }}</div>
+                                <div class="location-time">{{ booking.bus_schedule.departure_time|time:"H:i" }}</div>
                             </div>
                             
                             <div class="route-connector">
-                                <div class="route-duration">{{ booking.schedule.duration }}</div>
+                                <div class="route-duration">{{ booking.bus_schedule.journey_duration }}</div>
                                 <div class="route-line"></div>
                             </div>
                             
                             <div class="route-location">
-                                <div class="location-code">{{ booking.schedule.route.destination.code|default:booking.schedule.route.destination.name|slice:":3"|upper }}</div>
-                                <div class="location-name">{{ booking.schedule.route.destination.name }}</div>
-                                <div class="location-time">{{ booking.schedule.arrival_time|time:"H:i" }}</div>
+                                <div class="location-code">{{ booking.bus_schedule.route.destination.code|default:booking.bus_schedule.route.destination.name|slice:":3"|upper }}</div>
+                                <div class="location-name">{{ booking.bus_schedule.route.destination.name }}</div>
+                                <div class="location-time">{{ booking.bus_schedule.arrival_time|time:"H:i" }}</div>
                             </div>
                         </div>
                     </div>
@@ -646,7 +653,7 @@
                                 <i class="fas fa-calendar-alt"></i>
                             </div>
                             <div class="detail-label">Travel Date</div>
-                            <div class="detail-value">{{ booking.travel_date|date:"M d, Y" }}</div>
+                            <div class="detail-value">{{ booking.booking_date|date:"M d, Y" }}</div>
                         </div>
                         
                         <div class="detail-card">
@@ -654,7 +661,7 @@
                                 <i class="fas fa-bus"></i>
                             </div>
                             <div class="detail-label">Bus Number</div>
-                            <div class="detail-value">{{ booking.schedule.bus.bus_number }}</div>
+                            <div class="detail-value">{{ booking.bus_schedule.bus.bus_number }}</div>
                         </div>
                         
                         <div class="detail-card">
@@ -662,7 +669,7 @@
                                 <i class="fas fa-cogs"></i>
                             </div>
                             <div class="detail-label">Bus Type</div>
-                            <div class="detail-value">{{ booking.schedule.bus.get_bus_type_display }}</div>
+                            <div class="detail-value">{{ booking.bus_schedule.bus.bus_type.name }}</div>
                         </div>
                         
                         <div class="detail-card">
@@ -670,7 +677,7 @@
                                 <i class="fas fa-chair"></i>
                             </div>
                             <div class="detail-label">Total Seats</div>
-                            <div class="detail-value">{{ booking.passengers.count }}</div>
+                            <div class="detail-value">{{ booking.seats.count }}</div>
                         </div>
                     </div>
                     
@@ -682,26 +689,23 @@
                         </div>
                         
                         <div class="passengers-grid">
-                            {% for passenger in booking.passengers.all %}
-                                <div class="passenger-card">
-                                    <div class="passenger-header">
-                                        <div class="passenger-name">{{ passenger.name }}</div>
-                                        <div class="seat-badge">Seat {{ passenger.seat_number }}</div>
-                                    </div>
-                                    
-                                    <div class="passenger-details">
-                                        <div class="passenger-detail">
-                                            <div class="passenger-detail-label">Age</div>
-                                            <div class="passenger-detail-value">{{ passenger.age }} years</div>
-                                        </div>
-                                        
-                                        <div class="passenger-detail">
-                                            <div class="passenger-detail-label">Gender</div>
-                                            <div class="passenger-detail-value">{{ passenger.get_gender_display }}</div>
-                                        </div>
+                            <div class="passenger-card">
+                                <div class="passenger-header">
+                                    <div class="passenger-name">{{ booking.passenger_name }}</div>
+                                    <div class="seat-badge">
+                                        {% for seat in booking.seats.all %}
+                                            Seat {{ seat.seat_number }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
                                     </div>
                                 </div>
-                            {% endfor %}
+                                
+                                <div class="passenger-details">
+                                    <div class="passenger-detail">
+                                        <div class="passenger-detail-label">Phone</div>
+                                        <div class="passenger-detail-value">{{ booking.passenger_phone }}</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -714,18 +718,8 @@
                         
                         <div class="fare-breakdown">
                             <div class="fare-item">
-                                <div class="fare-item-label">Base Fare</div>
-                                <div class="fare-item-value">रू{{ booking.base_fare|floatformat:2 }}</div>
-                            </div>
-                            
-                            <div class="fare-item">
-                                <div class="fare-item-label">Service Fee</div>
-                                <div class="fare-item-value">रू{{ booking.service_fee|floatformat:2 }}</div>
-                            </div>
-                            
-                            <div class="fare-item">
-                                <div class="fare-item-label">Taxes</div>
-                                <div class="fare-item-value">रू{{ booking.taxes|floatformat:2 }}</div>
+                                <div class="fare-item-label">Base Fare ({{ booking.seats.count }} seats)</div>
+                                <div class="fare-item-value">रू{{ booking.bus_schedule.base_fare|floatformat:2 }} × {{ booking.seats.count }}</div>
                             </div>
                             
                             {% if booking.discount_amount %}
@@ -746,7 +740,11 @@
                     <div class="qr-section">
                         <div class="qr-title">Scan for Quick Verification</div>
                         <div class="qr-code">
-                            <i class="fas fa-qrcode"></i>
+                            {% if qr_code_url %}
+                                <img src="{{ qr_code_url }}" alt="QR Code for {{ booking.booking_id }}" class="qr-image" style="display: block; max-width: 100%; height: auto;">
+                            {% else %}
+                                <i class="fas fa-qrcode"></i>
+                            {% endif %}
                         </div>
                         <p class="qr-text">Show this QR code to the conductor for quick ticket verification</p>
                     </div>
@@ -789,18 +787,18 @@
                             Print Ticket
                         </button>
                         
-                        <a href="{% url 'bookings:download_ticket' booking.id %}" class="btn-action">
+                        <a href="{% url 'bookings:download_ticket' booking.booking_id %}" class="btn-action">
                             <i class="fas fa-download"></i>
                             Download PDF
                         </a>
                         
-                        <a href="{% url 'bookings:booking_detail' booking.id %}" class="btn-action btn-secondary">
+                        <a href="{% url 'bookings:booking_detail' booking.booking_id %}" class="btn-action btn-secondary">
                             <i class="fas fa-eye"></i>
                             View Booking
                         </a>
                         
-                        {% if booking.status == 'confirmed' and booking.can_cancel %}
-                            <a href="{% url 'bookings:cancel_booking' booking.id %}" class="btn-action btn-danger">
+                        {% if booking.booking_status == 'confirmed' and booking.can_cancel %}
+                            <a href="{% url 'bookings:cancel_booking' booking.booking_id %}" class="btn-action btn-danger">
                                 <i class="fas fa-times-circle"></i>
                                 Cancel Booking
                             </a>
@@ -816,11 +814,11 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Generate QR code (placeholder implementation)
+        // Only show QR icon if no actual QR code image exists
         const qrCode = document.querySelector('.qr-code');
-        if (qrCode) {
-            // In a real implementation, you would use a QR code library
-            // For now, we'll just show the QR icon
+        const qrImage = document.querySelector('.qr-image');
+        if (qrCode && !qrImage) {
+            // Show QR icon only when no actual QR code image is present
             qrCode.innerHTML = '<i class="fas fa-qrcode"></i>';
         }
         

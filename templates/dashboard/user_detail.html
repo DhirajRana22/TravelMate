@@ -495,18 +495,18 @@
                                 </div>
                                 <div class="booking-details">
                                     <span><i class="fas fa-calendar me-1"></i>{{ booking.travel_date|date:"M d, Y" }}</span>
-                                    <span><i class="fas fa-bus me-1"></i>{{ booking.bus.bus_number }}</span>
+                                    <span><i class="fas fa-bus me-1"></i>{{ booking.bus_schedule.bus.bus_number }}</span>
                                     <span><i class="fas fa-chair me-1"></i>{{ booking.selected_seats }}</span>
                                     <span><i class="fas fa-money-bill me-1"></i>रू {{ booking.total_fare }}</span>
                                 </div>
                             </div>
                             
                             <div class="d-flex align-items-center gap-2">
-                                <span class="booking-status status-{{ booking.status|lower }}">
+                                <span class="booking-status status-{{ booking.booking_status|lower }}">
                                     {{ booking.get_status_display }}
                                 </span>
                                 
-                                <a href="{% url 'dashboard:booking_detail' booking.id %}" class="btn-action btn-primary btn-sm">
+                                <a href="{% url 'dashboard:booking_detail' booking.booking_id %}" class="btn-action btn-primary btn-sm">
                                     <i class="fas fa-eye"></i>
                                 </a>
                             </div>

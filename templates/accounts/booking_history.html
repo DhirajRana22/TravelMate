@@ -759,7 +759,7 @@
                                 </div>
                                 <div class="booking-date">
                                     <i class="fas fa-calendar-alt me-1"></i>
-                                    Booked on {{ booking.booking_date|date:"M d, Y" }}
+                                    Booked on {{ booking.created_at|date:"M d, Y" }}
                                 </div>
                             </div>
                             <div class="booking-status status-{{ booking.booking_status|lower }}">
@@ -791,7 +791,7 @@
                         <div class="booking-details">
                             <div class="detail-item">
                                 <div class="detail-label">Travel Date</div>
-                                <div class="detail-value">{{ booking.travel_date|date:"M d, Y" }}</div>
+                                <div class="detail-value">{{ booking.booking_date|date:"M d, Y" }}</div>
                             </div>
                             <div class="detail-item">
                                 <div class="detail-label">Bus Number</div>
@@ -799,7 +799,7 @@
                             </div>
                             <div class="detail-item">
                                 <div class="detail-label">Bus Type</div>
-                                <div class="detail-value">{{ booking.bus_schedule.bus.get_bus_type_display }}</div>
+                                <div class="detail-value">{{ booking.bus_schedule.bus.bus_type.name }}</div>
                             </div>
                             <div class="detail-item">
                                 <div class="detail-label">Seats</div>
@@ -831,10 +831,14 @@
                             </a>
                             
                             {% if booking.booking_status == 'confirmed' %}
-                                <a href="{% url 'bookings:download_ticket' booking.booking_id %}" class="btn-action btn-success">
-                                    <i class="fas fa-download"></i>
-                                    Download Ticket
-                                </a>
+                                <a href="{% url 'bookings:view_ticket' booking.booking_id %}" class="btn-action btn-primary">
+                            <i class="fas fa-eye me-1"></i>
+                            View Ticket
+                        </a>
+                        <a href="{% url 'bookings:download_ticket' booking.booking_id %}" class="btn-action btn-success">
+                            <i class="fas fa-download me-1"></i>
+                            Download PDF
+                        </a>
                                 
                                 {% if booking.can_cancel %}
                                     <button class="btn-action btn-danger" onclick="cancelBooking('{{ booking.booking_id }}')">
