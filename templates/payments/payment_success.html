@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Successful - TravelMate{% endblock %}
+
+{% block extra_css %}
+<style>
+    .success-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .success-icon {
+        font-size: 4rem;
+        color: #28a745;
+        animation: bounce 1s ease-in-out;
+    }
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-10px);
+        }
+        60% {
+            transform: translateY(-5px);
+        }
+    }
+    .payment-details {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+    .action-buttons .btn {
+        margin: 5px;
+        min-width: 150px;
+    }
+    .transaction-id {
+        font-family: 'Courier New', monospace;
+        background: #e9ecef;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="success-container">
+        <!-- Success Header -->
+        <div class="text-center mb-4">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1 class="h2 text-success mt-3">Payment Successful!</h1>
+            <p class="text-muted">Your booking has been confirmed and payment processed successfully.</p>
+        </div>
+
+        <!-- Payment Details Card -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-receipt"></i> Payment Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="payment-details">
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Booking ID:</strong></div>
+                        <div class="col-sm-8">{{ booking.booking_id }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Transaction ID:</strong></div>
+                        <div class="col-sm-8">
+                            <span class="transaction-id">{{ payment.transaction_id }}</span>
+                            <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyTransactionId()" title="Copy Transaction ID">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Payment Method:</strong></div>
+                        <div class="col-sm-8">
+                            <span class="badge bg-primary">{{ payment.get_payment_method_display }}</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Amount Paid:</strong></div>
+                        <div class="col-sm-8">
+                            <span class="h5 text-success">NPR {{ payment.amount|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Payment Date:</strong></div>
+                        <div class="col-sm-8">{{ payment.payment_date|date:"M d, Y H:i" }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Status:</strong></div>
+                        <div class="col-sm-8">
+                            <span class="badge bg-success">{{ payment.get_payment_status_display }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Journey Details -->
+                <div class="border-top pt-3">
+                    <h6 class="text-muted mb-3"><i class="fas fa-route"></i> Journey Details</h6>
+                    <div class="row mb-2">
+                        <div class="col-sm-4"><strong>Route:</strong></div>
+                        <div class="col-sm-8">{{ booking.bus_schedule.route.source }} → {{ booking.bus_schedule.route.destination }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4"><strong>Travel Date:</strong></div>
+                        <div class="col-sm-8">{{ booking.travel_date|date:"M d, Y" }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4"><strong>Departure:</strong></div>
+                        <div class="col-sm-8">{{ booking.bus_schedule.departure_time|time:"H:i" }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4"><strong>Bus:</strong></div>
+                        <div class="col-sm-8">{{ booking.bus_schedule.bus.bus_name }} ({{ booking.bus_schedule.bus.bus_number }})</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4"><strong>Seats:</strong></div>
+                        <div class="col-sm-8">
+                            {% for seat in booking.selected_seats.all %}
+                                <span class="badge bg-info me-1">{{ seat.seat_number }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons text-center mt-4">
+            <a href="{% url 'booking_detail' booking.booking_id %}" class="btn btn-primary">
+                <i class="fas fa-eye"></i> View Booking Details
+            </a>
+            <a href="{% url 'download_ticket' booking.booking_id %}" class="btn btn-success">
+                <i class="fas fa-download"></i> Download Ticket
+            </a>
+            <button class="btn btn-info" onclick="printTicket()">
+                <i class="fas fa-print"></i> Print Ticket
+            </button>
+        </div>
+
+        <!-- Additional Actions -->
+        <div class="text-center mt-3">
+            <a href="{% url 'routes:route_search' %}" class="btn btn-outline-primary">
+                <i class="fas fa-search"></i> Book Another Trip
+            </a>
+            <a href="{% url 'accounts:booking_history' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-history"></i> My Bookings
+            </a>
+            <a href="{% url 'home:home' %}" class="btn btn-outline-dark">
+                <i class="fas fa-home"></i> Go Home
+            </a>
+        </div>
+
+        <!-- Important Notes -->
+        <div class="alert alert-info mt-4">
+            <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Important Notes:</h6>
+            <ul class="mb-0">
+                <li>Please arrive at the boarding point at least 15 minutes before departure time.</li>
+                <li>Carry a valid ID proof during your journey.</li>
+                <li>Keep your ticket and transaction ID safe for future reference.</li>
+                <li>For any queries, contact our customer support at +977-1-234-5678.</li>
+            </ul>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="text-center mt-4">
+            <p class="text-muted">
+                <i class="fas fa-phone"></i> Need help? Call us at 
+                <a href="tel:+9771234567890" class="text-decoration-none">+977-1-234-5678</a>
+                or email 
+                <a href="mailto:support@travelmate.com" class="text-decoration-none">support@travelmate.com</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Copy transaction ID to clipboard
+    function copyTransactionId() {
+        const transactionId = '{{ payment.transaction_id }}';
+        navigator.clipboard.writeText(transactionId).then(function() {
+            // Show success message
+            const btn = event.target.closest('button');
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            btn.classList.add('btn-success');
+            btn.classList.remove('btn-outline-secondary');
+            
+            setTimeout(function() {
+                btn.innerHTML = originalIcon;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-secondary');
+            }, 2000);
+            
+            // Show toast notification
+            showToast('Transaction ID copied to clipboard!', 'success');
+        }).catch(function(err) {
+            console.error('Could not copy text: ', err);
+            showToast('Failed to copy transaction ID', 'error');
+        });
+    }
+
+    // Print ticket function
+    function printTicket() {
+        window.open('{% url "print_ticket" booking.booking_id %}', '_blank');
+    }
+
+    // Show toast notification
+    function showToast(message, type) {
+        const toastContainer = document.getElementById('toast-container') || createToastContainer();
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        // Remove toast after it's hidden
+        toast.addEventListener('hidden.bs.toast', function() {
+            toast.remove();
+        });
+    }
+
+    // Create toast container if it doesn't exist
+    function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container position-fixed top-0 end-0 p-3';
+        container.style.zIndex = '1055';
+        document.body.appendChild(container);
+        return container;
+    }
+
+    // Auto-redirect after 30 seconds (optional)
+    setTimeout(function() {
+        if (confirm('Would you like to go to your bookings page?')) {
+            window.location.href = '{% url "booking_history" %}';
+        }
+    }, 30000);
+
+    // Prevent accidental page refresh
+    window.addEventListener('beforeunload', function(e) {
+        e.preventDefault();
+        e.returnValue = '';
+    });
+
+    // Remove the beforeunload listener after 5 minutes
+    setTimeout(function() {
+        window.removeEventListener('beforeunload', function() {});
+    }, 300000);
+</script>
+{% endblock %}

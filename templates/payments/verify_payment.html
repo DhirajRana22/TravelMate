@@ -1,0 +1,616 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verify Payment - TravelMate{% endblock %}
+
+{% block extra_css %}
+<style>
+    .verify-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 2rem 0;
+    }
+    
+    .verify-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+        max-width: 600px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .card-header h2 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.8rem;
+    }
+    
+    .card-header p {
+        margin: 0.5rem 0 0;
+        opacity: 0.9;
+    }
+    
+    .card-body {
+        padding: 2.5rem;
+    }
+    
+    .verification-status {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .status-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2.5rem;
+        color: white;
+    }
+    
+    .status-icon.pending {
+        background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
+        animation: pulse 2s infinite;
+    }
+    
+    .status-icon.success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    }
+    
+    .status-icon.failed {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    }
+    
+    .status-icon.processing {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        animation: spin 2s linear infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .status-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .status-title.pending {
+        color: #ffc107;
+    }
+    
+    .status-title.success {
+        color: #28a745;
+    }
+    
+    .status-title.failed {
+        color: #dc3545;
+    }
+    
+    .status-title.processing {
+        color: #667eea;
+    }
+    
+    .status-message {
+        color: #6c757d;
+        font-size: 1.1rem;
+        line-height: 1.5;
+    }
+    
+    .payment-details {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-label {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .detail-value {
+        color: #6c757d;
+        font-weight: 500;
+    }
+    
+    .detail-value.amount {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+    
+    .verification-steps {
+        margin: 2rem 0;
+    }
+    
+    .step {
+        display: flex;
+        align-items: center;
+        padding: 1rem 0;
+        position: relative;
+    }
+    
+    .step:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 60px;
+        width: 2px;
+        height: 40px;
+        background: #e9ecef;
+    }
+    
+    .step.completed::after {
+        background: #28a745;
+    }
+    
+    .step.active::after {
+        background: #667eea;
+    }
+    
+    .step-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.2rem;
+        color: white;
+        background: #e9ecef;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .step.completed .step-icon {
+        background: #28a745;
+    }
+    
+    .step.active .step-icon {
+        background: #667eea;
+        animation: pulse 2s infinite;
+    }
+    
+    .step.failed .step-icon {
+        background: #dc3545;
+    }
+    
+    .step-content h6 {
+        margin: 0;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .step-content p {
+        margin: 0;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        flex: 1;
+        text-align: center;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        flex: 1;
+        text-align: center;
+    }
+    
+    .btn-secondary:hover {
+        background: #5a6268;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .retry-section {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        text-align: center;
+    }
+    
+    .retry-section h6 {
+        color: #856404;
+        margin-bottom: 1rem;
+    }
+    
+    .retry-section p {
+        color: #856404;
+        margin-bottom: 1.5rem;
+    }
+    
+    .btn-retry {
+        background: #ffc107;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        color: #212529;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-retry:hover {
+        background: #e0a800;
+        transform: translateY(-1px);
+    }
+    
+    .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: #e9ecef;
+        border-radius: 3px;
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 3px;
+        transition: width 0.5s ease;
+    }
+    
+    @media (max-width: 576px) {
+        .verify-container {
+            padding: 1rem;
+        }
+        
+        .card-header {
+            padding: 1.5rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .detail-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="verify-container">
+    <div class="container">
+        <div class="verify-card">
+            <div class="card-header">
+                <h2><i class="fas fa-shield-alt mr-2"></i>Payment Verification</h2>
+                <p>We're verifying your payment with the bank</p>
+            </div>
+            
+            <div class="card-body">
+                <!-- Verification Status -->
+                <div class="verification-status">
+                    {% if payment.status == 'pending' %}
+                        <div class="status-icon pending">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3 class="status-title pending">Payment Pending</h3>
+                        <p class="status-message">Your payment is being processed. Please wait while we verify the transaction with your bank.</p>
+                    {% elif payment.status == 'processing' %}
+                        <div class="status-icon processing">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        <h3 class="status-title processing">Verifying Payment</h3>
+                        <p class="status-message">We're currently verifying your payment with the bank. This usually takes a few moments.</p>
+                    {% elif payment.status == 'success' %}
+                        <div class="status-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h3 class="status-title success">Payment Verified</h3>
+                        <p class="status-message">Great! Your payment has been successfully verified and your booking is confirmed.</p>
+                    {% elif payment.status == 'failed' %}
+                        <div class="status-icon failed">
+                            <i class="fas fa-times"></i>
+                        </div>
+                        <h3 class="status-title failed">Payment Failed</h3>
+                        <p class="status-message">Unfortunately, your payment could not be verified. Please try again or use a different payment method.</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Progress Bar -->
+                {% if payment.status == 'pending' or payment.status == 'processing' %}
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {% if payment.status == 'pending' %}30%{% else %}70%{% endif %}"></div>
+                </div>
+                {% endif %}
+                
+                <!-- Payment Details -->
+                <div class="payment-details">
+                    <h5 class="mb-3"><i class="fas fa-receipt mr-2"></i>Payment Details</h5>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Transaction ID:</span>
+                        <span class="detail-value">{{ payment.transaction_id }}</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Payment Method:</span>
+                        <span class="detail-value">{{ payment.get_payment_method_display }}</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Amount:</span>
+                        <span class="detail-value amount">रू {{ payment.amount }}</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Payment Date:</span>
+                        <span class="detail-value">{{ payment.created_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    
+                    {% if payment.booking %}
+                    <div class="detail-row">
+                        <span class="detail-label">Booking ID:</span>
+                        <span class="detail-value">{{ payment.booking.booking_id }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if payment.gateway_response %}
+                    <div class="detail-row">
+                        <span class="detail-label">Gateway Reference:</span>
+                        <span class="detail-value">{{ payment.gateway_response }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Verification Steps -->
+                <div class="verification-steps">
+                    <h5 class="mb-3"><i class="fas fa-list-ol mr-2"></i>Verification Process</h5>
+                    
+                    <div class="step completed">
+                        <div class="step-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="step-content">
+                            <h6>Payment Initiated</h6>
+                            <p>Payment request sent to your bank</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step {% if payment.status != 'pending' %}completed{% else %}active{% endif %}">
+                        <div class="step-icon">
+                            {% if payment.status == 'pending' %}
+                                <i class="fas fa-clock"></i>
+                            {% else %}
+                                <i class="fas fa-check"></i>
+                            {% endif %}
+                        </div>
+                        <div class="step-content">
+                            <h6>Bank Authorization</h6>
+                            <p>Waiting for bank to authorize the transaction</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step {% if payment.status == 'success' %}completed{% elif payment.status == 'processing' %}active{% elif payment.status == 'failed' %}failed{% endif %}">
+                        <div class="step-icon">
+                            {% if payment.status == 'success' %}
+                                <i class="fas fa-check"></i>
+                            {% elif payment.status == 'processing' %}
+                                <i class="fas fa-spinner fa-spin"></i>
+                            {% elif payment.status == 'failed' %}
+                                <i class="fas fa-times"></i>
+                            {% else %}
+                                <i class="fas fa-clock"></i>
+                            {% endif %}
+                        </div>
+                        <div class="step-content">
+                            <h6>Payment Verification</h6>
+                            <p>Confirming payment with bank and updating records</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step {% if payment.status == 'success' %}completed{% endif %}">
+                        <div class="step-icon">
+                            {% if payment.status == 'success' %}
+                                <i class="fas fa-check"></i>
+                            {% else %}
+                                <i class="fas fa-clock"></i>
+                            {% endif %}
+                        </div>
+                        <div class="step-content">
+                            <h6>Booking Confirmation</h6>
+                            <p>Finalizing your booking and sending confirmation</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Retry Section for Failed Payments -->
+                {% if payment.status == 'failed' %}
+                <div class="retry-section">
+                    <h6><i class="fas fa-exclamation-triangle mr-2"></i>Payment Failed</h6>
+                    <p>{{ payment.failure_reason|default:"The payment could not be processed. Please try again with a different payment method." }}</p>
+                    <button class="btn btn-retry" onclick="retryPayment()">
+                        <i class="fas fa-redo mr-2"></i>Retry Payment
+                    </button>
+                </div>
+                {% endif %}
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    {% if payment.status == 'success' %}
+                        {% if payment.booking %}
+                            <a href="{% url 'bookings:booking_detail' payment.booking.id %}" class="btn-primary">
+                                <i class="fas fa-ticket-alt mr-2"></i>View Booking
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'home:home' %}" class="btn-secondary">
+                            <i class="fas fa-home mr-2"></i>Go Home
+                        </a>
+                    {% elif payment.status == 'failed' %}
+                        <a href="{% url 'payments:process_payment' %}" class="btn-primary">
+                            <i class="fas fa-redo mr-2"></i>Try Again
+                        </a>
+                        <a href="{% url 'home:home' %}" class="btn-secondary">
+                            <i class="fas fa-home mr-2"></i>Go Home
+                        </a>
+                    {% else %}
+                        <button class="btn-primary" onclick="checkStatus()">
+                            <i class="fas fa-sync mr-2"></i>Check Status
+                        </button>
+                        <a href="{% url 'home:home' %}" class="btn-secondary">
+                            <i class="fas fa-home mr-2"></i>Go Home
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentStatus = '{{ payment.status }}';
+        
+        // Auto-refresh for pending/processing payments
+        if (paymentStatus === 'pending' || paymentStatus === 'processing') {
+            setTimeout(() => {
+                window.location.reload();
+            }, 10000); // Refresh every 10 seconds
+        }
+        
+        // Show notification based on status
+        if (paymentStatus === 'success') {
+            showNotification('Payment verified successfully!', 'success');
+        } else if (paymentStatus === 'failed') {
+            showNotification('Payment verification failed. Please try again.', 'error');
+        }
+    });
+    
+    function checkStatus() {
+        // Show loading state
+        const button = event.target;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Checking...';
+        button.disabled = true;
+        
+        // Reload page after a short delay
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
+    }
+    
+    function retryPayment() {
+        // Redirect to payment page
+        window.location.href = '{% url "payments:process_payment" %}';
+    }
+    
+    function showNotification(message, type) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} mr-2"></i>
+            ${message}
+            <button type="button" class="close ml-2" onclick="this.parentElement.remove()">
+                <span>&times;</span>
+            </button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+    
+    // Copy transaction ID to clipboard
+    function copyTransactionId() {
+        const transactionId = '{{ payment.transaction_id }}';
+        navigator.clipboard.writeText(transactionId).then(() => {
+            showNotification('Transaction ID copied to clipboard!', 'success');
+        });
+    }
+    
+    // Add click handler to transaction ID
+    document.addEventListener('DOMContentLoaded', function() {
+        const transactionIdElement = document.querySelector('.detail-row .detail-value');
+        if (transactionIdElement) {
+            transactionIdElement.style.cursor = 'pointer';
+            transactionIdElement.title = 'Click to copy';
+            transactionIdElement.addEventListener('click', copyTransactionId);
+        }
+    });
+</script>
+{% endblock %}

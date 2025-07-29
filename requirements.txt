@@ -1,0 +1,16 @@
+asgiref==3.9.1
+colorama==0.4.6
+Django==5.2.4
+django-crispy-forms==2.4
+gunicorn==21.2.0
+joblib==1.5.1
+numpy==2.3.2
+pillow==11.3.0
+psycopg2-binary==2.9.7
+qrcode==8.2
+scikit-learn==1.7.1
+scipy==1.16.0
+sqlparse==0.5.3
+threadpoolctl==3.6.0
+tzdata==2025.2
+whitenoise==6.5.0

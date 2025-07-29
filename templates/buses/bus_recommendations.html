@@ -1,0 +1,561 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bus Recommendations{% endblock %}
+
+{% block extra_css %}
+<style>
+    .recommendations-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .recommendation-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #e9ecef;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .recommendation-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    }
+    
+    .recommendation-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .bus-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .bus-info {
+        flex: 1;
+    }
+    
+    .bus-number {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .bus-type {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .recommendation-score {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-align: center;
+        min-width: 80px;
+    }
+    
+    .bus-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .detail-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+    }
+    
+    .detail-item i {
+        color: #667eea;
+        margin-right: 0.5rem;
+        width: 16px;
+    }
+    
+    .amenities {
+        margin-bottom: 1.5rem;
+    }
+    
+    .amenities-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.75rem;
+    }
+    
+    .amenity-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .amenity-tag {
+        background: #f8f9fa;
+        color: #495057;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        border: 1px solid #e9ecef;
+    }
+    
+    .recommendation-reason {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #667eea;
+    }
+    
+    .reason-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .reason-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        line-height: 1.5;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 0.5rem 1.5rem;
+        border-radius: 6px;
+        color: white;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #667eea;
+        padding: 0.5rem 1.5rem;
+        border-radius: 6px;
+        color: #667eea;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .btn-outline:hover {
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn i {
+        margin-right: 0.5rem;
+    }
+    
+    .no-recommendations {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .no-recommendations i {
+        font-size: 3rem;
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+    
+    .no-recommendations h3 {
+        color: #495057;
+        margin-bottom: 1rem;
+    }
+    
+    .no-recommendations p {
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+    
+    .filter-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .filter-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 1rem;
+    }
+    
+    .filter-options {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .filter-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-select {
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        min-width: 150px;
+    }
+    
+    .filter-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    @media (max-width: 768px) {
+        .bus-header {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .recommendation-score {
+            align-self: flex-start;
+        }
+        
+        .bus-details {
+            grid-template-columns: 1fr;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .filter-options {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .filter-group {
+            width: 100%;
+        }
+        
+        .filter-select {
+            min-width: auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="recommendations-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2"><i class="fas fa-magic me-2"></i>Bus Recommendations</h1>
+                <p class="mb-0">Personalized bus suggestions based on your preferences and travel history</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'buses:bus_list' %}" class="btn btn-light me-2">
+                    <i class="fas fa-list me-2"></i>All Buses
+                </a>
+                <a href="{% url 'buses:bus_preference' %}" class="btn btn-success">
+                    <i class="fas fa-cog me-2"></i>Preferences
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recommendations Content -->
+<section class="py-4">
+    <div class="container">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h3 class="filter-title"><i class="fas fa-filter me-2"></i>Filter Recommendations</h3>
+            <div class="filter-options">
+                <div class="filter-group">
+                    <label class="filter-label">Bus Type</label>
+                    <select class="filter-select" id="busTypeFilter">
+                        <option value="">All Types</option>
+                        <option value="AC">AC</option>
+                        <option value="Non-AC">Non-AC</option>
+                        <option value="Sleeper">Sleeper</option>
+                        <option value="Semi-Sleeper">Semi-Sleeper</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Minimum Score</label>
+                    <select class="filter-select" id="scoreFilter">
+                        <option value="">Any Score</option>
+                        <option value="90">90% and above</option>
+                        <option value="80">80% and above</option>
+                        <option value="70">70% and above</option>
+                        <option value="60">60% and above</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Sort By</label>
+                    <select class="filter-select" id="sortFilter">
+                        <option value="score">Recommendation Score</option>
+                        <option value="price">Price</option>
+                        <option value="rating">Rating</option>
+                        <option value="capacity">Capacity</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recommendations List -->
+        {% if recommendations %}
+            <div id="recommendationsList">
+                {% for recommendation in recommendations %}
+                <div class="recommendation-card" data-bus-type="{{ recommendation.bus.bus_type.name }}" data-score="{{ recommendation.recommendation_score }}">
+                    <div class="bus-header">
+                        <div class="bus-info">
+                            <div class="bus-number">{{ recommendation.bus.bus_number }}</div>
+                            <div class="bus-type">{{ recommendation.bus.bus_type.name }}</div>
+                        </div>
+                        <div class="recommendation-score">
+                            {{ recommendation.recommendation_score|floatformat:0 }}%
+                        </div>
+                    </div>
+                    
+                    <div class="bus-details">
+                        <div class="detail-item">
+                            <i class="fas fa-users"></i>
+                            <span>{{ recommendation.bus.capacity }} seats</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-user"></i>
+                            <span>{{ recommendation.bus.driver_name|default:"Driver TBA" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-phone"></i>
+                            <span>{{ recommendation.bus.driver_contact|default:"Contact TBA" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-star"></i>
+                            <span>{{ recommendation.bus.rating|default:"No rating" }}</span>
+                        </div>
+                    </div>
+                    
+                    {% if recommendation.bus.amenities.exists %}
+                    <div class="amenities">
+                        <div class="amenities-title">Amenities</div>
+                        <div class="amenity-tags">
+                            {% for amenity in recommendation.bus.amenities.all %}
+                            <span class="amenity-tag">{{ amenity.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="recommendation-reason">
+                        <div class="reason-title">Why this bus is recommended for you:</div>
+                        <div class="reason-text">
+                            {% if recommendation.recommendation_score >= 90 %}
+                                This bus perfectly matches your preferences with excellent amenities and high user ratings.
+                            {% elif recommendation.recommendation_score >= 80 %}
+                                This bus closely matches your travel preferences and has good user feedback.
+                            {% elif recommendation.recommendation_score >= 70 %}
+                                This bus matches most of your preferences and offers good value for money.
+                            {% else %}
+                                This bus offers some features you prefer and is available for your routes.
+                            {% endif %}
+                            
+                            {% if recommendation.bus.bus_type.name in user.profile.preferred_bus_types %}
+                                It's your preferred bus type ({{ recommendation.bus.bus_type.name }}).
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <a href="{% url 'buses:bus_detail' recommendation.bus.id %}" class="btn-primary">
+                            <i class="fas fa-eye"></i>View Details
+                        </a>
+                        <a href="{% url 'routes:route_search' %}?bus_type={{ recommendation.bus.bus_type.id }}" class="btn-outline">
+                            <i class="fas fa-search"></i>Find Routes
+                        </a>
+                        <button class="btn-outline" onclick="saveForLater({{ recommendation.bus.id }})">
+                            <i class="fas fa-bookmark"></i>Save for Later
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-recommendations">
+                <i class="fas fa-robot"></i>
+                <h3>No Recommendations Yet</h3>
+                <p>We need to learn more about your preferences to provide personalized recommendations.</p>
+                <a href="{% url 'buses:bus_preference' %}" class="btn-primary">
+                    <i class="fas fa-cog me-2"></i>Set Your Preferences
+                </a>
+                <a href="{% url 'buses:bus_list' %}" class="btn-outline">
+                    <i class="fas fa-list me-2"></i>Browse All Buses
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setupFilters();
+    });
+    
+    function setupFilters() {
+        const busTypeFilter = document.getElementById('busTypeFilter');
+        const scoreFilter = document.getElementById('scoreFilter');
+        const sortFilter = document.getElementById('sortFilter');
+        
+        [busTypeFilter, scoreFilter, sortFilter].forEach(filter => {
+            filter.addEventListener('change', applyFilters);
+        });
+    }
+    
+    function applyFilters() {
+        const busTypeFilter = document.getElementById('busTypeFilter').value;
+        const scoreFilter = parseInt(document.getElementById('scoreFilter').value) || 0;
+        const sortFilter = document.getElementById('sortFilter').value;
+        
+        const cards = Array.from(document.querySelectorAll('.recommendation-card'));
+        
+        // Filter cards
+        cards.forEach(card => {
+            const busType = card.dataset.busType;
+            const score = parseInt(card.dataset.score);
+            
+            let show = true;
+            
+            if (busTypeFilter && !busType.toLowerCase().includes(busTypeFilter.toLowerCase())) {
+                show = false;
+            }
+            
+            if (scoreFilter && score < scoreFilter) {
+                show = false;
+            }
+            
+            card.style.display = show ? 'block' : 'none';
+        });
+        
+        // Sort visible cards
+        const visibleCards = cards.filter(card => card.style.display !== 'none');
+        const container = document.getElementById('recommendationsList');
+        
+        visibleCards.sort((a, b) => {
+            switch(sortFilter) {
+                case 'score':
+                    return parseInt(b.dataset.score) - parseInt(a.dataset.score);
+                case 'price':
+                    // Would need price data in dataset
+                    return 0;
+                case 'rating':
+                    // Would need rating data in dataset
+                    return 0;
+                case 'capacity':
+                    // Would need capacity data in dataset
+                    return 0;
+                default:
+                    return 0;
+            }
+        });
+        
+        // Reorder cards in DOM
+        visibleCards.forEach(card => {
+            container.appendChild(card);
+        });
+    }
+    
+    function saveForLater(busId) {
+        // This would typically make an AJAX call to save the bus
+        fetch(`/buses/save/${busId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Bus saved for later!', 'success');
+            } else {
+                showToast('Error saving bus. Please try again.', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Error saving bus. Please try again.', 'error');
+        });
+    }
+    
+    function showToast(message, type) {
+        // Simple toast notification
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+        toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+</script>
+{% endblock %}

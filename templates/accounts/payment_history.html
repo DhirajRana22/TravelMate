@@ -1,0 +1,1042 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment History{% endblock %}
+
+{% block extra_css %}
+<style>
+    .history-header {
+        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+    }
+    
+    .stat-card.total::before {
+        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+    }
+    
+    .stat-card.successful::before {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    }
+    
+    .stat-card.failed::before {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    }
+    
+    .stat-card.refunded::before {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    }
+    
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-card.total .stat-icon {
+        background: rgba(111, 66, 193, 0.1);
+        color: #6f42c1;
+    }
+    
+    .stat-card.successful .stat-icon {
+        background: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+    
+    .stat-card.failed .stat-icon {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+    
+    .stat-card.refunded .stat-icon {
+        background: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .filters-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+    }
+    
+    .filters-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .filters-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+    
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .filter-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-control {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+    
+    .filter-control:focus {
+        border-color: #6f42c1;
+        box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+        background: white;
+        outline: none;
+    }
+    
+    .filter-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .btn-filter {
+        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        color: white;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-filter:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(111, 66, 193, 0.3);
+    }
+    
+    .btn-clear {
+        background: transparent;
+        border: 1px solid #6c757d;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        color: #6c757d;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+    
+    .btn-clear:hover {
+        background: #6c757d;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .payments-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .results-count {
+        font-size: 0.875rem;
+        color: #6c757d;
+        background: #f8f9fa;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+    }
+    
+    .payment-card {
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .payment-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-1px);
+    }
+    
+    .payment-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 4px;
+    }
+    
+    .payment-card.successful::before {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    }
+    
+    .payment-card.pending::before {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    }
+    
+    .payment-card.failed::before {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    }
+    
+    .payment-card.refunded::before {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    }
+    
+    .payment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .payment-id {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .copy-btn {
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+    
+    .copy-btn:hover {
+        background: #f8f9fa;
+        color: #495057;
+    }
+    
+    .payment-date {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .payment-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-successful {
+        background: rgba(40, 167, 69, 0.1);
+        color: #155724;
+        border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+    
+    .status-pending {
+        background: rgba(255, 193, 7, 0.1);
+        color: #856404;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+    
+    .status-failed {
+        background: rgba(220, 53, 69, 0.1);
+        color: #721c24;
+        border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+    
+    .status-refunded {
+        background: rgba(23, 162, 184, 0.1);
+        color: #0c5460;
+        border: 1px solid rgba(23, 162, 184, 0.3);
+    }
+    
+    .payment-amount {
+        text-align: center;
+        padding: 1rem;
+        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        color: white;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .amount-label {
+        font-size: 0.75rem;
+        opacity: 0.9;
+        margin-bottom: 0.25rem;
+    }
+    
+    .amount-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    
+    .payment-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .detail-item {
+        text-align: center;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .detail-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+    }
+    
+    .detail-value {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .booking-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .booking-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .booking-route {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .route-arrow {
+        color: #6f42c1;
+    }
+    
+    .payment-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        text-decoration: none;
+    }
+    
+    .btn-primary {
+        background: #6f42c1;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #5a32a3;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+    
+    .btn-success:hover {
+        background: #1e7e34;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #c82333;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background: #545b62;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-warning {
+        background: #ffc107;
+        color: #212529;
+    }
+    
+    .btn-warning:hover {
+        background: #e0a800;
+        color: #212529;
+        text-decoration: none;
+    }
+    
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .pagination {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .page-link {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        color: #6c757d;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .page-link:hover {
+        background: #f8f9fa;
+        color: #495057;
+        text-decoration: none;
+    }
+    
+    .page-link.active {
+        background: #6f42c1;
+        border-color: #6f42c1;
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6c757d;
+    }
+    
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .empty-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-text {
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .btn-book-now {
+        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        color: white;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+    
+    .btn-book-now:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(111, 66, 193, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 1000;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .toast.show {
+        transform: translateX(0);
+    }
+    
+    @media (max-width: 768px) {
+        .stats-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .filters-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .payment-header {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+        
+        .payment-details {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .payment-actions {
+            justify-content: center;
+        }
+        
+        .section-header {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .payment-details {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="history-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2"><i class="fas fa-credit-card me-2"></i>Payment History</h1>
+                <p class="mb-0">View and manage all your payment transactions</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'accounts:profile' %}" class="btn btn-light">
+                    <i class="fas fa-user me-2"></i>Back to Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Content -->
+<section class="py-4">
+    <div class="container">
+        <!-- Statistics -->
+        <div class="stats-container">
+            <div class="stat-card total">
+                <div class="stat-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="stat-value">{{ stats.total_payments|default:0 }}</div>
+                <div class="stat-label">Total Payments</div>
+            </div>
+            
+            <div class="stat-card successful">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-value">{{ stats.successful_payments|default:0 }}</div>
+                <div class="stat-label">Successful</div>
+            </div>
+            
+            <div class="stat-card failed">
+                <div class="stat-icon">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stat-value">{{ stats.failed_payments|default:0 }}</div>
+                <div class="stat-label">Failed</div>
+            </div>
+            
+            <div class="stat-card refunded">
+                <div class="stat-icon">
+                    <i class="fas fa-undo"></i>
+                </div>
+                <div class="stat-value">रू{{ stats.total_refunded|default:0|floatformat:0 }}</div>
+                <div class="stat-label">Total Refunded</div>
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="filters-section">
+            <div class="filters-header">
+                <div class="filters-title">
+                    <i class="fas fa-filter"></i>
+                    Filter Payments
+                </div>
+            </div>
+            
+            <form method="GET" id="filterForm">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Search</label>
+                        <input type="text" name="search" class="filter-control" 
+                               placeholder="Payment ID, Transaction ID..." 
+                               value="{{ request.GET.search }}">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Status</label>
+                        <select name="status" class="filter-control">
+                            <option value="">All Statuses</option>
+                            <option value="successful" {% if request.GET.status == 'successful' %}selected{% endif %}>Successful</option>
+                            <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="failed" {% if request.GET.status == 'failed' %}selected{% endif %}>Failed</option>
+                            <option value="refunded" {% if request.GET.status == 'refunded' %}selected{% endif %}>Refunded</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Payment Method</label>
+                        <select name="method" class="filter-control">
+                            <option value="">All Methods</option>
+                            <option value="credit_card" {% if request.GET.method == 'credit_card' %}selected{% endif %}>Credit Card</option>
+                            <option value="debit_card" {% if request.GET.method == 'debit_card' %}selected{% endif %}>Debit Card</option>
+                            <option value="upi" {% if request.GET.method == 'upi' %}selected{% endif %}>UPI</option>
+                            <option value="net_banking" {% if request.GET.method == 'net_banking' %}selected{% endif %}>Net Banking</option>
+                            <option value="wallet" {% if request.GET.method == 'wallet' %}selected{% endif %}>Wallet</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Date From</label>
+                        <input type="date" name="date_from" class="filter-control" 
+                               value="{{ request.GET.date_from }}">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Date To</label>
+                        <input type="date" name="date_to" class="filter-control" 
+                               value="{{ request.GET.date_to }}">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">&nbsp;</label>
+                        <div class="filter-actions">
+                            <button type="submit" class="btn-filter">
+                                <i class="fas fa-search"></i>
+                                Filter
+                            </button>
+                            <a href="{% url 'accounts:payment_history' %}" class="btn-clear">
+                                <i class="fas fa-times"></i>
+                                Clear
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Payments List -->
+        <div class="payments-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-list"></i>
+                    Your Payments
+                </div>
+                <div class="results-count">
+                    {{ payments|length }} of {{ total_count|default:0 }} payments
+                </div>
+            </div>
+            
+            {% if payments %}
+                {% for payment in payments %}
+                    <div class="payment-card {{ payment.payment_status|lower }}">
+                        <div class="payment-header">
+                            <div>
+                                <div class="payment-id">
+                                    <i class="fas fa-hashtag me-1"></i>
+                                    {{ payment.payment_id }}
+                                    <button class="copy-btn" onclick="copyToClipboard('{{ payment.payment_id }}')" title="Copy Payment ID">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <div class="payment-date">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    {{ payment.payment_date|date:"M d, Y H:i" }}
+                                </div>
+                            </div>
+                            <div class="payment-status status-{{ payment.payment_status|lower }}">
+                                {{ payment.get_payment_status_display }}
+                            </div>
+                        </div>
+                        
+                        <div class="payment-amount">
+                            <div class="amount-label">Amount</div>
+                            <div class="amount-value">रू{{ payment.amount|floatformat:2 }}</div>
+                        </div>
+                        
+                        <div class="payment-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Method</div>
+                                <div class="detail-value">{{ payment.get_payment_method_display }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Transaction ID</div>
+                                <div class="detail-value">{{ payment.transaction_id|default:"N/A" }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Gateway</div>
+                                <div class="detail-value">{{ payment.payment_gateway|default:"N/A" }}</div>
+                            </div>
+                            {% if payment.payment_status == 'failed' and payment.failure_reason %}
+                                <div class="detail-item">
+                                    <div class="detail-label">Failure Reason</div>
+                                    <div class="detail-value">{{ payment.failure_reason }}</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if payment.booking %}
+                            <div class="booking-info">
+                                <div class="booking-title">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    Booking Details
+                                </div>
+                                <div class="booking-route">
+                                    <span>{{ payment.booking.bus_schedule.route.source.name }}</span>
+                                    <i class="fas fa-arrow-right route-arrow"></i>
+                                    <span>{{ payment.booking.bus_schedule.route.destination.name }}</span>
+                                    <span class="ms-2">•</span>
+                                    <span class="ms-2">{{ payment.booking.travel_date|date:"M d, Y" }}</span>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="payment-actions">
+                            <a href="{% url 'payments:payment_detail' payment.payment_id %}" class="btn-action btn-primary">
+                                <i class="fas fa-eye"></i>
+                                View Details
+                            </a>
+                            
+                            {% if payment.payment_status == 'successful' %}
+                                <button class="btn-action btn-success" onclick="downloadReceipt('{{ payment.payment_id }}')">
+                                    <i class="fas fa-download"></i>
+                                    Download Receipt
+                                </button>
+                                
+                                {% if payment.can_request_refund %}
+                                    <a href="{% url 'payments:request_refund' payment.payment_id %}" class="btn-action btn-warning">
+                                        <i class="fas fa-undo"></i>
+                                        Request Refund
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                            
+                            {% if payment.payment_status == 'failed' %}
+                                <button class="btn-action btn-danger" onclick="retryPayment('{{ payment.payment_id }}')">
+                                    <i class="fas fa-redo"></i>
+                                    Retry Payment
+                                </button>
+                            {% endif %}
+                            
+                            {% if payment.booking %}
+                                <a href="{% url 'bookings:booking_detail' payment.booking.booking_id %}" class="btn-action btn-secondary">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    View Booking
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                <!-- Pagination -->
+                {% if is_paginated %}
+                    <div class="pagination-container">
+                        <div class="pagination">
+                            {% if page_obj.has_previous %}
+                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1" class="page-link">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" class="page-link">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <span class="page-link active">{{ num }}</span>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}" class="page-link">{{ num }}</a>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" class="page-link">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}" class="page-link">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="empty-title">No Payments Found</div>
+                    <div class="empty-text">
+                        {% if request.GET.search or request.GET.status or request.GET.method or request.GET.date_from or request.GET.date_to %}
+                            No payments match your current filters. Try adjusting your search criteria.
+                        {% else %}
+                            You haven't made any payments yet. Start booking your journey!
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'routes:route_search' %}" class="btn-book-now">
+                        <i class="fas fa-search"></i>
+                        Search Routes
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-submit form on filter change
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterForm = document.getElementById('filterForm');
+        const filterInputs = filterForm.querySelectorAll('select, input[type="date"]');
+        
+        filterInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        });
+    });
+    
+    // Copy to clipboard function
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            showToast('Payment ID copied to clipboard!');
+        }).catch(function(err) {
+            console.error('Could not copy text: ', err);
+        });
+    }
+    
+    // Download receipt function
+    function downloadReceipt(paymentId) {
+        window.open(`/payments/${paymentId}/receipt/`, '_blank');
+    }
+    
+    // Retry payment function
+    function retryPayment(paymentId) {
+        if (!confirm('Are you sure you want to retry this payment?')) {
+            return;
+        }
+        
+        fetch(`/payments/${paymentId}/retry/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    showToast('Payment retry initiated successfully!');
+                    location.reload();
+                }
+            } else {
+                alert('Error retrying payment: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error retrying payment. Please try again.');
+        });
+    }
+    
+    // Show toast notification
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 100);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+    
+    // Get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

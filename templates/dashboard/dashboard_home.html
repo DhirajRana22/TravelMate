@@ -1,0 +1,368 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - TravelMate{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-card {
+        transition: transform 0.2s;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .stat-icon {
+        font-size: 2.5rem;
+        opacity: 0.8;
+    }
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+    .quick-action-btn {
+        border-radius: 10px;
+        padding: 15px;
+        margin: 5px;
+        transition: all 0.3s;
+    }
+    .quick-action-btn:hover {
+        transform: scale(1.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Dashboard Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">Admin Dashboard</h1>
+                    <p class="text-muted">Welcome back, {{ user.get_full_name|default:user.username }}!</p>
+                </div>
+                <div class="text-end">
+                    <small class="text-muted">Last updated: <span id="last-updated">{{ current_time|date:"M d, Y H:i" }}</span></small>
+                    <br>
+                    <button class="btn btn-outline-primary btn-sm" onclick="refreshDashboard()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card dashboard-card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ total_bookings|default:0 }}</h4>
+                            <p class="mb-0">Total Bookings</p>
+                            <small class="opacity-75">+{{ today_bookings|default:0 }} today</small>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card dashboard-card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">NPR {{ total_revenue|default:0|floatformat:0 }}</h4>
+                            <p class="mb-0">Total Revenue</p>
+                            <small class="opacity-75">+NPR {{ today_revenue|default:0|floatformat:0 }} today</small>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card dashboard-card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ total_buses|default:0 }}</h4>
+                            <p class="mb-0">Active Buses</p>
+                            <small class="opacity-75">{{ running_buses|default:0 }} running now</small>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-bus"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card dashboard-card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ total_users|default:0 }}</h4>
+                            <p class="mb-0">Registered Users</p>
+                            <small class="opacity-75">+{{ new_users_today|default:0 }} today</small>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                            <a href="{% url 'dashboard:admin_bookings' %}" class="btn btn-outline-primary quick-action-btn w-100">
+                                <i class="fas fa-ticket-alt d-block mb-2"></i>
+                                Manage Bookings
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                            <a href="{% url 'dashboard:admin_buses' %}" class="btn btn-outline-success quick-action-btn w-100">
+                                <i class="fas fa-bus d-block mb-2"></i>
+                                Manage Buses
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                            <a href="{% url 'dashboard:admin_routes' %}" class="btn btn-outline-info quick-action-btn w-100">
+                                <i class="fas fa-route d-block mb-2"></i>
+                                Manage Routes
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                            <a href="{% url 'dashboard:admin_users' %}" class="btn btn-outline-warning quick-action-btn w-100">
+                                <i class="fas fa-users d-block mb-2"></i>
+                                Manage Users
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                            <a href="{% url 'dashboard:admin_payments' %}" class="btn btn-outline-danger quick-action-btn w-100">
+                                <i class="fas fa-credit-card d-block mb-2"></i>
+                                Payments
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                            <a href="{% url 'dashboard:admin_reports' %}" class="btn btn-outline-secondary quick-action-btn w-100">
+                                <i class="fas fa-chart-bar d-block mb-2"></i>
+                                Reports
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts and Recent Activity -->
+    <div class="row">
+        <!-- Revenue Chart -->
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Revenue Trend (Last 30 Days)</h5>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-primary active" onclick="changeChartPeriod('30days')">30 Days</button>
+                        <button type="button" class="btn btn-outline-primary" onclick="changeChartPeriod('7days')">7 Days</button>
+                        <button type="button" class="btn btn-outline-primary" onclick="changeChartPeriod('today')">Today</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-clock"></i> Recent Bookings</h5>
+                    <a href="{% url 'dashboard:admin_bookings' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for booking in recent_booking_list|slice:":5" %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ booking.booking_id }}</h6>
+                                    <p class="mb-1 small text-muted">{{ booking.user.get_full_name|default:booking.user.username }}</p>
+                                    <small class="text-muted">{{ booking.bus_schedule.route.source }} → {{ booking.bus_schedule.route.destination }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-{{ booking.booking_status }}">{{ booking.get_booking_status_display }}</span>
+                                    <br>
+                                    <small class="text-muted">NPR {{ booking.total_fare }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item text-center text-muted">
+                            <i class="fas fa-inbox fa-2x mb-2"></i>
+                            <p class="mb-0">No recent bookings</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-server"></i> System Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-database fa-2x text-success"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Database</h6>
+                                    <small class="text-success">Online</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-credit-card fa-2x text-success"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Payment Gateway</h6>
+                                    <small class="text-success">Active</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-envelope fa-2x text-success"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Email Service</h6>
+                                    <small class="text-success">Running</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-bell fa-2x text-warning"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Notifications</h6>
+                                    <small class="text-warning">{{ pending_notifications|default:0 }} pending</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Revenue Chart
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    const revenueChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: JSON.parse('{{ revenue_chart_data|safe }}').labels,
+            datasets: [{
+                label: 'Revenue (NPR)',
+                data: JSON.parse('{{ revenue_chart_data|safe }}').data,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                tension: 0.1,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'NPR ' + value.toLocaleString();
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Revenue: NPR ' + context.parsed.y.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Refresh Dashboard
+    function refreshDashboard() {
+        location.reload();
+    }
+
+    // Change Chart Period
+    function changeChartPeriod(period) {
+        // Remove active class from all buttons
+        document.querySelectorAll('.btn-group .btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Add active class to clicked button
+        event.target.classList.add('active');
+        
+        // Here you would typically make an AJAX call to update the chart data
+        console.log('Changing chart period to:', period);
+    }
+
+    // Auto-refresh every 5 minutes
+    setInterval(function() {
+        document.getElementById('last-updated').textContent = new Date().toLocaleString();
+    }, 300000);
+
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+</script>
+{% endblock %}

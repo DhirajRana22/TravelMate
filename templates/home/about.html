@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us - TravelMate{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-hero {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{% static "img/about-hero.jpg" %}') no-repeat center center;
+        background-size: cover;
+        color: white;
+        padding: 80px 0;
+        margin-top: -1.5rem;
+    }
+    .team-member {
+        transition: transform 0.3s;
+    }
+    .team-member:hover {
+        transform: translateY(-5px);
+    }
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 2px;
+        background-color: #0d6efd;
+    }
+    .timeline-item {
+        position: relative;
+        margin-bottom: 30px;
+    }
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -34px;
+        top: 0;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #0d6efd;
+    }
+    .value-icon {
+        font-size: 2.5rem;
+        color: #0d6efd;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="about-hero">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-4">About TravelMate</h1>
+        <p class="lead mb-0">Your Trusted Partner for Safe and Comfortable Bus Travel</p>
+    </div>
+</section>
+
+<!-- Our Story -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <img src="{% static 'img/about-story.jpg' %}" alt="Our Story" class="img-fluid rounded">
+            </div>
+            <div class="col-lg-6">
+                <h2 class="mb-4">Our Story</h2>
+                <p>TravelMate was founded in 2020 with a simple mission: to make bus travel more accessible, comfortable, and enjoyable for everyone. What started as a small startup with just a handful of bus partners has now grown into one of the country's leading bus booking platforms.</p>
+                <p>Our journey began when our founders experienced firsthand the challenges of booking bus tickets - long queues, lack of information about bus amenities, and uncertainty about schedules. They envisioned a platform that would eliminate these pain points and provide travelers with a seamless booking experience.</p>
+                <p>Today, TravelMate connects thousands of travelers with hundreds of bus operators across the country, offering a wide range of options to suit every budget and preference. We continue to innovate and improve our services to ensure that our customers have the best possible travel experience.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Mission & Vision -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-bullseye fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="text-center mb-4">Our Mission</h3>
+                        <p>To revolutionize the bus travel industry by providing a transparent, reliable, and user-friendly platform that connects travelers with quality bus services. We aim to make bus travel the preferred mode of transportation by enhancing the booking experience and ensuring customer satisfaction at every step.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-eye fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="text-center mb-4">Our Vision</h3>
+                        <p>To be the world's most trusted bus booking platform, known for our commitment to quality, innovation, and customer service. We envision a future where bus travel is not just a necessity but a pleasant experience that people look forward to. Through continuous improvement and adaptation to changing needs, we aim to set new standards in the industry.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Values -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Our Core Values</h2>
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="value-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h4>Customer First</h4>
+                <p>We prioritize our customers' needs and strive to exceed their expectations in every interaction. Our decisions are guided by what's best for our users.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="value-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h4>Trust & Reliability</h4>
+                <p>We build trust through transparency, honesty, and consistent delivery of our promises. Reliability is at the core of our service.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="value-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h4>Innovation</h4>
+                <p>We continuously seek new ways to improve our platform and services. We embrace change and are not afraid to challenge the status quo.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="value-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h4>Collaboration</h4>
+                <p>We believe in the power of partnerships. We work closely with bus operators, technology partners, and other stakeholders to create a better travel ecosystem.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="value-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <h4>Sustainability</h4>
+                <p>We are committed to promoting sustainable travel options and reducing the environmental impact of transportation.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="value-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h4>Passion</h4>
+                <p>We are passionate about what we do and are dedicated to making a positive difference in the travel industry.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Journey -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Our Journey</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <h4>2020: The Beginning</h4>
+                <p>TravelMate was founded with a vision to transform the bus booking experience. We launched our platform with 10 bus operators and 50 routes.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>2021: Expansion</h4>
+                <p>We expanded our network to include 100+ bus operators and 500+ routes. We also introduced our mobile app, making it easier for users to book tickets on the go.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>2022: Innovation</h4>
+                <p>We implemented advanced features like seat selection, real-time tracking, and personalized recommendations. Our user base grew to 100,000+ active users.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>2023: Recognition</h4>
+                <p>TravelMate was recognized as one of the top travel tech startups. We received funding to further expand our operations and improve our technology.</p>
+            </div>
+            <div class="timeline-item">
+                <h4>2024: Present Day</h4>
+                <p>Today, TravelMate connects millions of travelers with hundreds of bus operators across the country. We continue to innovate and improve our services to provide the best possible travel experience.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Team -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Meet Our Team</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card team-member h-100">
+                    <img src="{% static 'img/team-placeholder.jpg' %}" class="card-img-top" alt="Team Member">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">John Smith</h5>
+                        <p class="text-muted">Co-Founder & CEO</p>
+                        <p class="card-text">John has over 15 years of experience in the travel industry and is passionate about creating innovative solutions for travelers.</p>
+                        <div class="social-icons">
+                            <a href="#" class="text-primary me-2"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="text-primary me-2"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="text-primary"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card team-member h-100">
+                    <img src="{% static 'img/team-placeholder.jpg' %}" class="card-img-top" alt="Team Member">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Emily Johnson</h5>
+                        <p class="text-muted">Co-Founder & CTO</p>
+                        <p class="card-text">Emily is a tech enthusiast with a background in software development. She leads our technology initiatives and ensures a seamless user experience.</p>
+                        <div class="social-icons">
+                            <a href="#" class="text-primary me-2"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="text-primary me-2"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="text-primary"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card team-member h-100">
+                    <img src="{% static 'img/team-placeholder.jpg' %}" class="card-img-top" alt="Team Member">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Michael Brown</h5>
+                        <p class="text-muted">Chief Marketing Officer</p>
+                        <p class="card-text">Michael brings his marketing expertise to TravelMate, helping us reach more travelers and build a strong brand presence.</p>
+                        <div class="social-icons">
+                            <a href="#" class="text-primary me-2"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="text-primary me-2"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="text-primary"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Join Us -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="mb-4">Join Our Journey</h2>
+        <p class="lead mb-4">We're always looking for talented individuals who share our passion for transforming the travel industry. Check out our current openings and become part of our growing team.</p>
+        <a href="#" class="btn btn-light btn-lg">View Career Opportunities</a>
+    </div>
+</section>
+{% endblock %}

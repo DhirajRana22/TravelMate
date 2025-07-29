@@ -1,0 +1,495 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment History - TravelMate{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .payment-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+    .payment-status {
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    .payment-amount {
+        font-size: 1.25rem;
+        font-weight: bold;
+    }
+    .filter-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .transaction-id {
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        background: #e9ecef;
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+    .payment-method-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: white;
+        margin-right: 8px;
+    }
+    .loading-spinner {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">Payment History</h1>
+                    <p class="text-muted">Track all your payments and transactions</p>
+                </div>
+                <div>
+                    <button class="btn btn-outline-primary" onclick="exportPayments()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="btn btn-primary" onclick="refreshPayments()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">{{ total_payments|default:0 }}</h4>
+                        <small>Total Payments</small>
+                    </div>
+                    <i class="fas fa-credit-card fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white" style="border-radius: 15px; padding: 20px;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">NPR {{ total_amount|default:0|floatformat:0 }}</h4>
+                        <small>Total Spent</small>
+                    </div>
+                    <i class="fas fa-rupee-sign fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white" style="border-radius: 15px; padding: 20px;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">{{ successful_payments|default:0 }}</h4>
+                        <small>Successful</small>
+                    </div>
+                    <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white" style="border-radius: 15px; padding: 20px;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">{{ pending_refunds|default:0 }}</h4>
+                        <small>Pending Refunds</small>
+                    </div>
+                    <i class="fas fa-undo fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-section">
+        <form method="get" id="filter-form">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="payment_method" class="form-label">Payment Method</label>
+                    <select name="payment_method" id="payment_method" class="form-select">
+                        <option value="">All Methods</option>
+                        <option value="esewa" {% if request.GET.payment_method == 'esewa' %}selected{% endif %}>eSewa</option>
+                        <option value="khalti" {% if request.GET.payment_method == 'khalti' %}selected{% endif %}>Khalti</option>
+                        <option value="ime_pay" {% if request.GET.payment_method == 'ime_pay' %}selected{% endif %}>IME Pay</option>
+                        <option value="fone_pay" {% if request.GET.payment_method == 'fone_pay' %}selected{% endif %}>FonePay</option>
+                        <option value="mobile_banking" {% if request.GET.payment_method == 'mobile_banking' %}selected{% endif %}>Mobile Banking</option>
+                        <option value="cash" {% if request.GET.payment_method == 'cash' %}selected{% endif %}>Cash</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="failed" {% if request.GET.status == 'failed' %}selected{% endif %}>Failed</option>
+                        <option value="refunded" {% if request.GET.status == 'refunded' %}selected{% endif %}>Refunded</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="date_from" class="form-label">From Date</label>
+                    <input type="date" name="date_from" id="date_from" class="form-control" value="{{ request.GET.date_from }}">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="date_to" class="form-label">To Date</label>
+                    <input type="date" name="date_to" id="date_to" class="form-control" value="{{ request.GET.date_to }}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="search" class="form-label">Search</label>
+                    <input type="text" name="search" id="search" class="form-control" placeholder="Search by transaction ID, booking ID..." value="{{ request.GET.search }}">
+                </div>
+                <div class="col-md-6 mb-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search"></i> Filter
+                    </button>
+                    <a href="{% url 'accounts:payment_history' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="text-center loading-spinner" id="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 text-muted">Loading payments...</p>
+    </div>
+
+    <!-- Payment List -->
+    <div id="payment-list">
+        {% if payments %}
+            <div class="row">
+                {% for payment in payments %}
+                <div class="col-lg-6 mb-4">
+                    <div class="card payment-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h6 class="card-title mb-1">
+                                        <span class="payment-method-icon bg-primary">
+                                            {% if payment.payment_method == 'esewa' %}
+                                                <i class="fas fa-wallet"></i>
+                                            {% elif payment.payment_method == 'khalti' %}
+                                                <i class="fas fa-mobile-alt"></i>
+                                            {% elif payment.payment_method == 'ime_pay' %}
+                                                <i class="fas fa-credit-card"></i>
+                                            {% elif payment.payment_method == 'fone_pay' %}
+                                                <i class="fas fa-phone"></i>
+                                            {% elif payment.payment_method == 'mobile_banking' %}
+                                                <i class="fas fa-university"></i>
+                                            {% else %}
+                                                <i class="fas fa-money-bill"></i>
+                                            {% endif %}
+                                        </span>
+                                        {{ payment.get_payment_method_display }}
+                                    </h6>
+                                    <p class="text-muted mb-0 small">{{ payment.payment_date|date:"M d, Y H:i" }}</p>
+                                </div>
+                                <div class="text-end">
+                                    <div class="payment-amount text-success">NPR {{ payment.amount|floatformat:2 }}</div>
+                                    <span class="badge bg-{% if payment.payment_status == 'completed' %}success{% elif payment.payment_status == 'pending' %}warning{% elif payment.payment_status == 'failed' %}danger{% else %}secondary{% endif %} payment-status">
+                                        {{ payment.get_payment_status_display }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-2">
+                                <div class="col-sm-4"><small class="text-muted">Transaction ID:</small></div>
+                                <div class="col-sm-8">
+                                    <span class="transaction-id">{{ payment.transaction_id }}</span>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="copyToClipboard('{{ payment.transaction_id }}')" title="Copy">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-2">
+                                <div class="col-sm-4"><small class="text-muted">Booking ID:</small></div>
+                                <div class="col-sm-8">
+                                    <a href="{% url 'booking_detail' payment.booking.booking_id %}" class="text-decoration-none">
+                                        {{ payment.booking.booking_id }}
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><small class="text-muted">Route:</small></div>
+                                <div class="col-sm-8">
+                                    <small>{{ payment.booking.bus_schedule.route.source }} → {{ payment.booking.bus_schedule.route.destination }}</small>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% if payment.payment_status == 'completed' %}
+                                        <button class="btn btn-sm btn-outline-primary" onclick="downloadReceipt('{{ payment.id }}')">
+                                            <i class="fas fa-download"></i> Receipt
+                                        </button>
+                                    {% elif payment.payment_status == 'failed' %}
+                                        <button class="btn btn-sm btn-outline-warning" onclick="retryPayment('{{ payment.booking.booking_id }}')">
+                                            <i class="fas fa-redo"></i> Retry
+                                        </button>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {% if payment.payment_status == 'completed' and payment.booking.booking_status == 'confirmed' %}
+                                        <button class="btn btn-sm btn-outline-danger" onclick="requestRefund('{{ payment.id }}')">
+                                            <i class="fas fa-undo"></i> Refund
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="Payment pagination">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">&laquo; First</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">&lsaquo; Previous</a>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next &rsaquo;</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-credit-card fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">No Payments Found</h4>
+                <p class="text-muted">You haven't made any payments yet or no payments match your filters.</p>
+                <a href="{% url 'routes:route_search' %}" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Book Your First Trip
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Refund Request Modal -->
+<div class="modal fade" id="refundModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Request Refund</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="refund-form">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="refund_reason" class="form-label">Reason for Refund</label>
+                        <select class="form-select" id="refund_reason" name="reason" required>
+                            <option value="">Select a reason</option>
+                            <option value="trip_cancelled">Trip Cancelled</option>
+                            <option value="emergency">Emergency</option>
+                            <option value="schedule_change">Schedule Change</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="refund_details" class="form-label">Additional Details</label>
+                        <textarea class="form-control" id="refund_details" name="details" rows="3" placeholder="Please provide additional details about your refund request..."></textarea>
+                    </div>
+                    <div class="alert alert-info">
+                        <small><i class="fas fa-info-circle"></i> Refund processing may take 3-5 business days. Refund amount may be subject to cancellation charges as per our policy.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Submit Refund Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-submit form on filter change
+    document.querySelectorAll('#filter-form select').forEach(select => {
+        select.addEventListener('change', function() {
+            document.getElementById('filter-form').submit();
+        });
+    });
+
+    // Copy to clipboard function
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            showToast('Copied to clipboard!', 'success');
+        }).catch(function(err) {
+            console.error('Could not copy text: ', err);
+            showToast('Failed to copy', 'error');
+        });
+    }
+
+    // Download receipt
+    function downloadReceipt(paymentId) {
+        window.open(`/payments/receipt/${paymentId}/`, '_blank');
+    }
+
+    // Retry payment
+    function retryPayment(bookingId) {
+        if (confirm('Do you want to retry the payment for this booking?')) {
+            window.location.href = `/payments/retry/${bookingId}/`;
+        }
+    }
+
+    // Request refund
+    function requestRefund(paymentId) {
+        document.getElementById('refund-form').setAttribute('data-payment-id', paymentId);
+        new bootstrap.Modal(document.getElementById('refundModal')).show();
+    }
+
+    // Handle refund form submission
+    document.getElementById('refund-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const paymentId = this.getAttribute('data-payment-id');
+        const formData = new FormData(this);
+        
+        // Here you would typically make an AJAX call to submit the refund request
+        fetch(`/payments/refund/${paymentId}/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Refund request submitted successfully!', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('refundModal')).hide();
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                showToast(data.message || 'Failed to submit refund request', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('An error occurred. Please try again.', 'error');
+        });
+    });
+
+    // Export payments
+    function exportPayments() {
+        const params = new URLSearchParams(window.location.search);
+        params.set('export', 'csv');
+        window.location.href = `${window.location.pathname}?${params.toString()}`;
+    }
+
+    // Refresh payments
+    function refreshPayments() {
+        showLoading();
+        location.reload();
+    }
+
+    // Show loading spinner
+    function showLoading() {
+        document.getElementById('loading-spinner').style.display = 'block';
+        document.getElementById('payment-list').style.opacity = '0.5';
+    }
+
+    // Show toast notification
+    function showToast(message, type) {
+        const toastContainer = document.getElementById('toast-container') || createToastContainer();
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        toast.addEventListener('hidden.bs.toast', function() {
+            toast.remove();
+        });
+    }
+
+    // Create toast container
+    function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container position-fixed top-0 end-0 p-3';
+        container.style.zIndex = '1055';
+        document.body.appendChild(container);
+        return container;
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey || e.metaKey) {
+            switch(e.key) {
+                case 'f':
+                    e.preventDefault();
+                    document.getElementById('search').focus();
+                    break;
+                case 'r':
+                    e.preventDefault();
+                    refreshPayments();
+                    break;
+            }
+        }
+    });
+</script>
+{% endblock %}

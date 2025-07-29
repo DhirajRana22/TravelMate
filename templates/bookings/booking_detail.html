@@ -1,0 +1,727 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking Details - {{ booking.booking_id }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .booking-detail-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .booking-status {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.875rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-confirmed {
+        background: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+        border: 2px solid #28a745;
+    }
+    
+    .status-pending {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+        border: 2px solid #ffc107;
+    }
+    
+    .status-cancelled {
+        background: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+        border: 2px solid #dc3545;
+    }
+    
+    .detail-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e9ecef;
+    }
+    
+    .detail-card h5 {
+        color: #495057;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+        font-weight: 600;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 500;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+    }
+    
+    .info-label i {
+        margin-right: 0.5rem;
+        width: 20px;
+        color: #667eea;
+    }
+    
+    .info-value {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .route-display {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .route-cities {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    
+    .route-arrow {
+        font-size: 1.5rem;
+        margin: 0 1rem;
+    }
+    
+    .seat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .seat-item {
+        background: #28a745;
+        color: white;
+        padding: 0.5rem;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+    
+    .btn-action {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+        background: #667eea;
+        color: white;
+        border: 2px solid #667eea;
+    }
+    
+    .btn-primary:hover {
+        background: #5a6fd8;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-success {
+        background: #28a745;
+        color: white;
+        border: 2px solid #28a745;
+    }
+    
+    .btn-success:hover {
+        background: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    }
+    
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+        border: 2px solid #dc3545;
+    }
+    
+    .btn-danger:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+    }
+    
+    .btn-outline {
+        background: transparent;
+        color: #667eea;
+        border: 2px solid #667eea;
+    }
+    
+    .btn-outline:hover {
+        background: #667eea;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .payment-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .payment-completed {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .payment-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .payment-failed {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .qr-code {
+        text-align: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        margin-top: 1rem;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0.5rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -1.75rem;
+        top: 0.25rem;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #667eea;
+    }
+    
+    .timeline-content {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 3px solid #667eea;
+    }
+    
+    .timeline-time {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+    
+    .timeline-title {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .timeline-desc {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin: 0;
+    }
+    
+    @media (max-width: 768px) {
+        .booking-detail-header {
+            padding: 2rem 0;
+        }
+        
+        .detail-card {
+            padding: 1.5rem;
+        }
+        
+        .route-cities {
+            font-size: 1rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .route-arrow {
+            transform: rotate(90deg);
+            margin: 0.5rem 0;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-action {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Booking Detail Header -->
+<section class="booking-detail-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2"><i class="fas fa-ticket-alt me-2"></i>Booking Details</h1>
+                <p class="mb-3">Booking ID: <strong>{{ booking.booking_id }}</strong></p>
+                <div class="booking-status status-{{ booking.booking_status }}">
+                    {{ booking.get_booking_status_display }}
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="payment-status payment-{{ booking.payment_status|lower }}">
+                    Payment: {{ booking.get_payment_status_display }}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Booking Details Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Journey Information -->
+            <div class="col-lg-8">
+                <!-- Route Information -->
+                <div class="detail-card">
+                    <h5><i class="fas fa-route me-2"></i>Journey Information</h5>
+                    
+                    <div class="route-display">
+                        <div class="route-cities">
+                            <span>{{ booking.bus_schedule.route.source.name }}</span>
+                            <i class="fas fa-arrow-right route-arrow"></i>
+                            <span>{{ booking.bus_schedule.route.destination.name }}</span>
+                        </div>
+                        <div class="mt-2">
+                            <small>{{ booking.bus_schedule.route.distance }} km • {{ booking.bus_schedule.journey_duration }}</small>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-calendar"></i>
+                            Travel Date
+                        </div>
+                        <div class="info-value">{{ booking.travel_date|date:"l, F d, Y" }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-clock"></i>
+                            Departure Time
+                        </div>
+                        <div class="info-value">{{ booking.bus_schedule.departure_time|time:"g:i A" }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-clock"></i>
+                            Arrival Time
+                        </div>
+                        <div class="info-value">{{ booking.bus_schedule.arrival_time|time:"g:i A" }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-hourglass-half"></i>
+                            Journey Duration
+                        </div>
+                        <div class="info-value">{{ booking.bus_schedule.journey_duration }}</div>
+                    </div>
+                </div>
+                
+                <!-- Bus Information -->
+                <div class="detail-card">
+                    <h5><i class="fas fa-bus me-2"></i>Bus Information</h5>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-hashtag"></i>
+                            Bus Number
+                        </div>
+                        <div class="info-value">{{ booking.bus_schedule.bus.bus_number }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-tag"></i>
+                            Bus Type
+                        </div>
+                        <div class="info-value">{{ booking.bus_schedule.bus.bus_type.name }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-users"></i>
+                            Total Capacity
+                        </div>
+                        <div class="info-value">{{ booking.bus_schedule.bus.capacity }} seats</div>
+                    </div>
+                    
+                    {% if booking.bus_schedule.bus.driver %}
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-user"></i>
+                            Driver
+                        </div>
+                        <div class="info-value">{{ booking.bus_schedule.bus.driver.get_full_name }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if booking.bus_schedule.bus.amenities.exists %}
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-star"></i>
+                            Amenities
+                        </div>
+                        <div class="info-value">
+                            {% for amenity in booking.bus_schedule.bus.amenities.all %}
+                                <span class="badge bg-light text-dark me-1">{{ amenity.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Seat Information -->
+                <div class="detail-card">
+                    <h5><i class="fas fa-chair me-2"></i>Seat Information</h5>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-hashtag"></i>
+                            Number of Seats
+                        </div>
+                        <div class="info-value">{{ booking.seats.count }} seat{{ booking.seats.count|pluralize }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-chair"></i>
+                            Selected Seats
+                        </div>
+                        <div class="info-value">
+                            <div class="seat-grid">
+                                {% for seat in booking.seats.all %}
+                                    <div class="seat-item">{{ seat.seat_number }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Passenger Information -->
+                <div class="detail-card">
+                    <h5><i class="fas fa-user me-2"></i>Passenger Information</h5>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-user"></i>
+                            Name
+                        </div>
+                        <div class="info-value">{{ booking.passenger_name }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-envelope"></i>
+                            Email
+                        </div>
+                        <div class="info-value">{{ booking.passenger_email }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-phone"></i>
+                            Phone
+                        </div>
+                        <div class="info-value">{{ booking.passenger_phone }}</div>
+                    </div>
+                    
+                    {% if booking.passenger_age %}
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-birthday-cake"></i>
+                            Age
+                        </div>
+                        <div class="info-value">{{ booking.passenger_age }} years</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Booking Summary & Actions -->
+            <div class="col-lg-4">
+                <!-- Booking Summary -->
+                <div class="detail-card">
+                    <h5><i class="fas fa-receipt me-2"></i>Booking Summary</h5>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-calendar-plus"></i>
+                            Booking Date
+                        </div>
+                        <div class="info-value">{{ booking.booking_date|date:"M d, Y" }}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-money-bill"></i>
+                            Base Fare
+                        </div>
+                        <div class="info-value">रू {{ booking.base_fare }}</div>
+                    </div>
+                    
+                    {% if booking.service_fee %}
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-plus"></i>
+                            Service Fee
+                        </div>
+                        <div class="info-value">रू {{ booking.service_fee }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="info-row" style="border-top: 2px solid #e9ecef; margin-top: 1rem; padding-top: 1rem;">
+                        <div class="info-label">
+                            <i class="fas fa-calculator"></i>
+                            <strong>Total Fare</strong>
+                        </div>
+                        <div class="info-value">
+                            <strong style="font-size: 1.25rem; color: #28a745;">रू {{ booking.total_fare }}</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- QR Code -->
+                {% if booking.booking_status == 'confirmed' %}
+                <div class="detail-card">
+                    <h5><i class="fas fa-qrcode me-2"></i>Digital Ticket</h5>
+                    <div class="qr-code">
+                        <div id="qrcode"></div>
+                        <p class="mt-2 mb-0 small text-muted">Show this QR code to the conductor</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Booking Timeline -->
+                <div class="detail-card">
+                    <h5><i class="fas fa-history me-2"></i>Booking Timeline</h5>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-time">{{ booking.booking_date|date:"M d, Y g:i A" }}</div>
+                                <div class="timeline-title">Booking Created</div>
+                                <p class="timeline-desc">Your booking was successfully created</p>
+                            </div>
+                        </div>
+                        
+                        {% if booking.payment_status == 'paid' %}
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-time">{{ booking.booking_date|date:"M d, Y g:i A" }}</div>
+                                <div class="timeline-title">Payment Completed</div>
+                                <p class="timeline-desc">Payment of रू {{ booking.total_fare }} was successful</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if booking.booking_status == 'confirmed' %}
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-time">{{ booking.booking_date|date:"M d, Y g:i A" }}</div>
+                                <div class="timeline-title">Booking Confirmed</div>
+                                <p class="timeline-desc">Your seats have been confirmed</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if booking.booking_status == 'cancelled' %}
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-time">{{ booking.updated_at|date:"M d, Y g:i A" }}</div>
+                                <div class="timeline-title">Booking Cancelled</div>
+                                <p class="timeline-desc">This booking has been cancelled</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    {% if booking.booking_status == 'confirmed' %}
+                        <a href="{% url 'download_ticket' booking.booking_id %}" class="btn-action btn-success">
+                            <i class="fas fa-download me-2"></i>Download Ticket
+                        </a>
+                        <button onclick="window.print()" class="btn-action btn-outline">
+                            <i class="fas fa-print me-2"></i>Print Ticket
+                        </button>
+                    {% endif %}
+                    
+                    {% if booking.booking_status == 'pending' or booking.booking_status == 'confirmed' %}
+                        <a href="{% url 'cancel_booking' booking.booking_id %}" class="btn-action btn-danger" 
+                           onclick="return confirm('Are you sure you want to cancel this booking?')">
+                            <i class="fas fa-times me-2"></i>Cancel Booking
+                        </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'accounts:user_bookings' %}" class="btn-action btn-outline">
+                        <i class="fas fa-list me-2"></i>My Bookings
+                    </a>
+                    
+                    <a href="{% url 'routes:route_search' %}" class="btn-action btn-primary">
+                        <i class="fas fa-search me-2"></i>Book Another Trip
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Generate QR Code
+        {% if booking.booking_status == 'confirmed' %}
+        const qrData = {
+            bookingId: '{{ booking.booking_id }}',
+            passengerName: '{{ booking.passenger_name }}',
+            route: '{{ booking.bus_schedule.route.source.name }} to {{ booking.bus_schedule.route.destination.name }}',
+            travelDate: '{{ booking.travel_date|date:"Y-m-d" }}',
+            busNumber: '{{ booking.bus_schedule.bus.bus_number }}',
+            seats: [{% for seat in booking.seats.all %}'{{ seat.seat_number }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            departureTime: '{{ booking.bus_schedule.departure_time|time:"H:i" }}'
+        };
+        
+        QRCode.toCanvas(document.getElementById('qrcode'), JSON.stringify(qrData), {
+            width: 200,
+            height: 200,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+        }, function (error) {
+            if (error) console.error(error);
+        });
+        {% endif %}
+        
+        // Copy booking ID functionality
+        function copyBookingId() {
+            const bookingId = '{{ booking.booking_id }}';
+            navigator.clipboard.writeText(bookingId).then(function() {
+                // Show toast notification
+                showToast('Booking ID copied to clipboard!', 'success');
+            });
+        }
+        
+        // Add click event to booking ID
+        const bookingIdElement = document.querySelector('strong');
+        if (bookingIdElement && bookingIdElement.textContent.includes('{{ booking.booking_id }}')) {
+            bookingIdElement.style.cursor = 'pointer';
+            bookingIdElement.title = 'Click to copy';
+            bookingIdElement.addEventListener('click', copyBookingId);
+        }
+        
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-${type === 'success' ? 'check' : 'info'}-circle me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 3000);
+        }
+        
+        // Print styles
+        const printStyles = `
+            @media print {
+                .booking-detail-header {
+                    background: #667eea !important;
+                    -webkit-print-color-adjust: exact;
+                }
+                .action-buttons {
+                    display: none !important;
+                }
+                .timeline {
+                    page-break-inside: avoid;
+                }
+            }
+        `;
+        
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = printStyles;
+        document.head.appendChild(styleSheet);
+    });
+</script>
+{% endblock %}

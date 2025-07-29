@@ -1,0 +1,900 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin - Booking Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .search-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .booking-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .booking-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    }
+    
+    .booking-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .booking-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .booking-icon.confirmed {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    }
+    
+    .booking-icon.pending {
+        background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        color: #212529;
+    }
+    
+    .booking-icon.cancelled {
+        background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+    }
+    
+    .booking-icon.refunded {
+        background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+    }
+    
+    .booking-info {
+        flex: 1;
+    }
+    
+    .booking-id {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .booking-route {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .booking-meta {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.875rem;
+        color: #6c757d;
+        flex-wrap: wrap;
+    }
+    
+    .booking-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .detail-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .detail-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: #667eea;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.75rem;
+        flex-shrink: 0;
+        font-size: 0.875rem;
+    }
+    
+    .detail-content {
+        flex: 1;
+    }
+    
+    .detail-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .detail-value {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.875rem;
+    }
+    
+    .booking-actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+    
+    .btn-action {
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #5a6fd8;
+        color: white;
+    }
+    
+    .btn-outline {
+        background: transparent;
+        color: #667eea;
+        border: 1px solid #667eea;
+    }
+    
+    .btn-outline:hover {
+        background: #667eea;
+        color: white;
+    }
+    
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+    
+    .btn-success:hover {
+        background: #218838;
+        color: white;
+    }
+    
+    .btn-warning {
+        background: #ffc107;
+        color: #212529;
+    }
+    
+    .btn-warning:hover {
+        background: #e0a800;
+        color: #212529;
+    }
+    
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #c82333;
+        color: white;
+    }
+    
+    .btn-info {
+        background: #17a2b8;
+        color: white;
+    }
+    
+    .btn-info:hover {
+        background: #138496;
+        color: white;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+    
+    .status-confirmed {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .status-refunded {
+        background: #e2e3f1;
+        color: #6f42c1;
+    }
+    
+    .search-form {
+        display: flex;
+        gap: 1rem;
+        align-items: end;
+        flex-wrap: wrap;
+    }
+    
+    .form-group {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control {
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        padding: 0.5rem 0.75rem;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .pagination-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .pagination {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .page-item {
+        list-style: none;
+    }
+    
+    .page-link {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        color: #667eea;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .page-link:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+    
+    .page-item.active .page-link {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6c757d;
+    }
+    
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .payment-status {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+    }
+    
+    .payment-paid {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .payment-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .payment-failed {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .payment-refunded {
+        background: #e2e3f1;
+        color: #6f42c1;
+    }
+    
+    @media (max-width: 768px) {
+        .booking-card {
+            padding: 1rem;
+        }
+        
+        .booking-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .booking-icon {
+            margin-right: 0;
+            margin-bottom: 1rem;
+        }
+        
+        .booking-details {
+            grid-template-columns: 1fr;
+        }
+        
+        .booking-actions {
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .btn-action {
+            justify-content: center;
+        }
+        
+        .search-form {
+            flex-direction: column;
+        }
+        
+        .form-group {
+            min-width: auto;
+        }
+        
+        .status-badge {
+            position: static;
+            margin-top: 1rem;
+        }
+        
+        .stats-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Admin Header -->
+<section class="admin-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2"><i class="fas fa-ticket-alt me-2"></i>Booking Management</h1>
+                <p class="mb-0">Manage and monitor all bus bookings</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'dashboard:dashboard_home' %}" class="btn btn-light me-2">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+                <button class="btn btn-success" onclick="exportBookings()">
+                    <i class="fas fa-download me-2"></i>Export
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Booking Management Content -->
+<section class="py-4">
+    <div class="container">
+        <!-- Statistics -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value">{{ total_bookings }}</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ confirmed_bookings }}</div>
+                <div class="stat-label">Confirmed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ pending_bookings }}</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ cancelled_bookings }}</div>
+                <div class="stat-label">Cancelled</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">रू {{ total_revenue|floatformat:0 }}</div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
+        </div>
+        
+        <!-- Search and Filters -->
+        <div class="search-card">
+            <h5 class="mb-3"><i class="fas fa-search me-2"></i>Search Bookings</h5>
+            
+            <form method="get" class="search-form">
+                <div class="form-group">
+                    <label class="form-label">Search</label>
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Booking ID, passenger name, email..." 
+                           value="{{ form.search.value|default:'' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Booking Status</label>
+                    <select name="booking_status" class="form-control">
+                        <option value="">All Status</option>
+                        <option value="confirmed" {% if form.booking_status.value == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                        <option value="pending" {% if form.booking_status.value == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="cancelled" {% if form.booking_status.value == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        <option value="refunded" {% if form.booking_status.value == 'refunded' %}selected{% endif %}>Refunded</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Payment Status</label>
+                    <select name="payment_status" class="form-control">
+                        <option value="">All Payments</option>
+                        <option value="paid" {% if form.payment_status.value == 'paid' %}selected{% endif %}>Paid</option>
+                        <option value="pending" {% if form.payment_status.value == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="failed" {% if form.payment_status.value == 'failed' %}selected{% endif %}>Failed</option>
+                        <option value="refunded" {% if form.payment_status.value == 'refunded' %}selected{% endif %}>Refunded</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Date Range</label>
+                    <select name="date_range" class="form-control">
+                        <option value="">All Time</option>
+                        <option value="today" {% if form.date_range.value == 'today' %}selected{% endif %}>Today</option>
+                        <option value="week" {% if form.date_range.value == 'week' %}selected{% endif %}>This Week</option>
+                        <option value="month" {% if form.date_range.value == 'month' %}selected{% endif %}>This Month</option>
+                        <option value="custom" {% if form.date_range.value == 'custom' %}selected{% endif %}>Custom Range</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" style="flex: 0 0 auto;">
+                    <button type="submit" class="btn-action btn-primary">
+                        <i class="fas fa-search me-2"></i>Search
+                    </button>
+                </div>
+                
+                <div class="form-group" style="flex: 0 0 auto;">
+                    <a href="{% url 'dashboard:booking_management' %}" class="btn-action btn-outline">
+                        <i class="fas fa-times me-2"></i>Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Bookings List -->
+        {% if bookings %}
+            {% for booking in bookings %}
+            <div class="booking-card">
+                <span class="status-badge status-{{ booking.status }}">
+                    {{ booking.status|title }}
+                </span>
+                
+                <div class="booking-header">
+                    <div class="booking-icon {{ booking.status }}">
+                        {% if booking.status == 'confirmed' %}
+                            <i class="fas fa-check"></i>
+                        {% elif booking.status == 'pending' %}
+                            <i class="fas fa-clock"></i>
+                        {% elif booking.status == 'cancelled' %}
+                            <i class="fas fa-times"></i>
+                        {% else %}
+                            <i class="fas fa-undo"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="booking-info">
+                        <div class="booking-id">
+                            Booking #{{ booking.booking_id }}
+                            <span class="payment-status payment-{{ booking.payment_status }}">
+                                {{ booking.payment_status|title }}
+                            </span>
+                        </div>
+                        
+                        <div class="booking-route">
+                            <i class="fas fa-route me-1"></i>
+                            {{ booking.route.origin }} 
+                            <i class="fas fa-arrow-right mx-2"></i>
+                            {{ booking.route.destination }}
+                        </div>
+                        
+                        <div class="booking-meta">
+                            <span><i class="fas fa-user me-1"></i>{{ booking.passenger_name }}</span>
+                            <span><i class="fas fa-calendar me-1"></i>{{ booking.travel_date|date:"M d, Y" }}</span>
+                            <span><i class="fas fa-clock me-1"></i>{{ booking.route.departure_time }}</span>
+                            <span><i class="fas fa-bus me-1"></i>{{ booking.bus.bus_number }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="booking-details">
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="detail-content">
+                            <div class="detail-label">Email</div>
+                            <div class="detail-value">{{ booking.passenger_email }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="detail-content">
+                            <div class="detail-label">Phone</div>
+                            <div class="detail-value">{{ booking.passenger_phone }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-chair"></i>
+                        </div>
+                        <div class="detail-content">
+                            <div class="detail-label">Seats</div>
+                            <div class="detail-value">{{ booking.selected_seats }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-money-bill"></i>
+                        </div>
+                        <div class="detail-content">
+                            <div class="detail-label">Total Fare</div>
+                            <div class="detail-value">रू {{ booking.total_fare }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-calendar-plus"></i>
+                        </div>
+                        <div class="detail-content">
+                            <div class="detail-label">Booked On</div>
+                            <div class="detail-value">{{ booking.created_at|date:"M d, Y H:i" }}</div>
+                        </div>
+                    </div>
+                    
+                    {% if booking.payment_method %}
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div class="detail-content">
+                            <div class="detail-label">Payment Method</div>
+                            <div class="detail-value">{{ booking.payment_method|title }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="booking-actions">
+                    <a href="{% url 'dashboard:booking_detail' booking.id %}" class="btn-action btn-primary">
+                        <i class="fas fa-eye me-1"></i>View Details
+                    </a>
+                    
+                    {% if booking.status == 'pending' %}
+                        <button class="btn-action btn-success" onclick="confirmBooking({{ booking.id }})">
+                            <i class="fas fa-check me-1"></i>Confirm
+                        </button>
+                        
+                        <button class="btn-action btn-danger" onclick="cancelBooking({{ booking.id }})">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </button>
+                    {% endif %}
+                    
+                    {% if booking.status == 'confirmed' and booking.payment_status == 'paid' %}
+                        <button class="btn-action btn-warning" onclick="initiateRefund({{ booking.id }})">
+                            <i class="fas fa-undo me-1"></i>Refund
+                        </button>
+                    {% endif %}
+                    
+                    {% if booking.user %}
+                        <a href="{% url 'dashboard:user_detail' booking.user.id %}" class="btn-action btn-outline">
+                            <i class="fas fa-user me-1"></i>View User
+                        </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'dashboard:bus_detail' booking.bus.id %}" class="btn-action btn-outline">
+                        <i class="fas fa-bus me-1"></i>View Bus
+                    </a>
+                    
+                    <button class="btn-action btn-info" onclick="sendNotification({{ booking.id }})">
+                        <i class="fas fa-bell me-1"></i>Notify
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <div class="pagination-wrapper">
+                <nav aria-label="Bookings pagination">
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.booking_status %}&booking_status={{ request.GET.booking_status }}{% endif %}{% if request.GET.payment_status %}&payment_status={{ request.GET.payment_status }}{% endif %}{% if request.GET.date_range %}&date_range={{ request.GET.date_range }}{% endif %}">&laquo; First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.booking_status %}&booking_status={{ request.GET.booking_status }}{% endif %}{% if request.GET.payment_status %}&payment_status={{ request.GET.payment_status }}{% endif %}{% if request.GET.date_range %}&date_range={{ request.GET.date_range }}{% endif %}">&lsaquo; Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.booking_status %}&booking_status={{ request.GET.booking_status }}{% endif %}{% if request.GET.payment_status %}&payment_status={{ request.GET.payment_status }}{% endif %}{% if request.GET.date_range %}&date_range={{ request.GET.date_range }}{% endif %}">Next &rsaquo;</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.booking_status %}&booking_status={{ request.GET.booking_status }}{% endif %}{% if request.GET.payment_status %}&payment_status={{ request.GET.payment_status }}{% endif %}{% if request.GET.date_range %}&date_range={{ request.GET.date_range }}{% endif %}">Last &raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+                <h3>No Bookings Found</h3>
+                <p class="text-muted">
+                    {% if request.GET.search or request.GET.booking_status or request.GET.payment_status or request.GET.date_range %}
+                        No bookings match your search criteria. Try adjusting your filters.
+                    {% else %}
+                        No bookings have been made yet.
+                    {% endif %}
+                </p>
+                {% if request.GET.search or request.GET.booking_status or request.GET.payment_status or request.GET.date_range %}
+                <a href="{% url 'dashboard:booking_management' %}" class="btn-action btn-primary">
+                    <i class="fas fa-times me-2"></i>Clear Filters
+                </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function confirmBooking(bookingId) {
+        if (confirm('Are you sure you want to confirm this booking?')) {
+            fetch(`/dashboard/bookings/${bookingId}/confirm/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error confirming booking: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while confirming the booking.');
+            });
+        }
+    }
+    
+    function cancelBooking(bookingId) {
+        const reason = prompt('Please enter a reason for cancellation:');
+        if (reason) {
+            fetch(`/dashboard/bookings/${bookingId}/cancel/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ reason: reason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error cancelling booking: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while cancelling the booking.');
+            });
+        }
+    }
+    
+    function initiateRefund(bookingId) {
+        const reason = prompt('Please enter a reason for refund:');
+        if (reason) {
+            fetch(`/dashboard/bookings/${bookingId}/refund/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ reason: reason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Refund initiated successfully.');
+                    location.reload();
+                } else {
+                    alert('Error initiating refund: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while initiating the refund.');
+            });
+        }
+    }
+    
+    function sendNotification(bookingId) {
+        const message = prompt('Enter notification message:');
+        if (message) {
+            fetch(`/dashboard/bookings/${bookingId}/notify/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Notification sent successfully.');
+                } else {
+                    alert('Error sending notification: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while sending the notification.');
+            });
+        }
+    }
+    
+    function exportBookings() {
+        const params = new URLSearchParams(window.location.search);
+        params.set('export', 'csv');
+        window.location.href = `${window.location.pathname}?${params.toString()}`;
+    }
+    
+    function getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}';
+    }
+    
+    // Add CSRF token to page if not present
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!document.querySelector('[name=csrfmiddlewaretoken]')) {
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = 'csrfmiddlewaretoken';
+            csrfToken.value = '{{ csrf_token }}';
+            document.body.appendChild(csrfToken);
+        }
+        
+        // Auto-submit search form on Enter
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    this.form.submit();
+                }
+            });
+        }
+        
+        // Auto-submit form on select change
+        const selectElements = document.querySelectorAll('select[name="booking_status"], select[name="payment_status"], select[name="date_range"]');
+        selectElements.forEach(select => {
+            select.addEventListener('change', function() {
+                this.form.submit();
+            });
+        });
+    });
+</script>
+{% endblock %}

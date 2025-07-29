@@ -1,0 +1,484 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Frequently Asked Questions - TravelMate{% endblock %}
+
+{% block extra_css %}
+<style>
+    .faq-hero {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{% static "img/faq-hero.jpg" %}') no-repeat center center;
+        background-size: cover;
+        color: white;
+        padding: 80px 0;
+        margin-top: -1.5rem;
+    }
+    .faq-category {
+        transition: transform 0.3s;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .faq-category:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .category-icon {
+        font-size: 2.5rem;
+        color: #0d6efd;
+        margin-bottom: 1rem;
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: #e7f1ff;
+        color: #0d6efd;
+    }
+    .accordion-button:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .search-container {
+        max-width: 600px;
+        margin: 0 auto 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="faq-hero">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-4">Frequently Asked Questions</h1>
+        <p class="lead mb-0">Find answers to common questions about TravelMate services</p>
+    </div>
+</section>
+
+<!-- Search Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="search-container">
+            <div class="input-group">
+                <input type="text" id="faqSearch" class="form-control form-control-lg" placeholder="Search for questions...">
+                <button class="btn btn-primary" type="button"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card faq-category h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="category-icon">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <h4>Booking & Tickets</h4>
+                        <p>Questions about the booking process, ticket confirmation, and cancellations.</p>
+                        <a href="#bookingFAQ" class="btn btn-outline-primary">View Questions</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card faq-category h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="category-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h4>Payments & Refunds</h4>
+                        <p>Information about payment methods, refund policies, and processing times.</p>
+                        <a href="#paymentFAQ" class="btn btn-outline-primary">View Questions</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card faq-category h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="category-icon">
+                            <i class="fas fa-bus"></i>
+                        </div>
+                        <h4>Bus Services</h4>
+                        <p>Details about bus types, amenities, schedules, and routes.</p>
+                        <a href="#busFAQ" class="btn btn-outline-primary">View Questions</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card faq-category h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="category-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h4>Account & Profile</h4>
+                        <p>Help with account creation, login issues, and profile management.</p>
+                        <a href="#accountFAQ" class="btn btn-outline-primary">View Questions</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card faq-category h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="category-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h4>Mobile App</h4>
+                        <p>Information about our mobile application features and troubleshooting.</p>
+                        <a href="#appFAQ" class="btn btn-outline-primary">View Questions</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card faq-category h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="category-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h4>Customer Support</h4>
+                        <p>Questions about contacting support, response times, and issue resolution.</p>
+                        <a href="#supportFAQ" class="btn btn-outline-primary">View Questions</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Sections -->
+<section class="py-5">
+    <div class="container">
+        <!-- Booking & Tickets -->
+        <div id="bookingFAQ" class="mb-5">
+            <h2 class="mb-4">Booking & Tickets</h2>
+            <div class="accordion" id="accordionBooking">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="bookingHeading1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#bookingCollapse1" aria-expanded="true" aria-controls="bookingCollapse1">
+                            How do I book a bus ticket on TravelMate?
+                        </button>
+                    </h2>
+                    <div id="bookingCollapse1" class="accordion-collapse collapse show" aria-labelledby="bookingHeading1" data-bs-parent="#accordionBooking">
+                        <div class="accordion-body">
+                            <p>Booking a bus ticket on TravelMate is simple:</p>
+                            <ol>
+                                <li>Enter your source, destination, and travel date in the search form</li>
+                                <li>Browse the available buses and select one that suits your preferences</li>
+                                <li>Choose your preferred seat(s)</li>
+                                <li>Enter passenger details</li>
+                                <li>Select a payment method and complete the payment</li>
+                                <li>Receive your e-ticket via email and SMS</li>
+                            </ol>
+                            <p>You can book tickets through our website or mobile app.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="bookingHeading2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bookingCollapse2" aria-expanded="false" aria-controls="bookingCollapse2">
+                            Can I book tickets for someone else?
+                        </button>
+                    </h2>
+                    <div id="bookingCollapse2" class="accordion-collapse collapse" aria-labelledby="bookingHeading2" data-bs-parent="#accordionBooking">
+                        <div class="accordion-body">
+                            <p>Yes, you can book tickets for friends, family members, or anyone else. During the booking process, you'll need to enter the passenger details including their name, age, gender, and contact information. The e-ticket will be issued in the passenger's name, but the booking confirmation will be sent to your email address and phone number.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="bookingHeading3">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bookingCollapse3" aria-expanded="false" aria-controls="bookingCollapse3">
+                            How do I receive my ticket after booking?
+                        </button>
+                    </h2>
+                    <div id="bookingCollapse3" class="accordion-collapse collapse" aria-labelledby="bookingHeading3" data-bs-parent="#accordionBooking">
+                        <div class="accordion-body">
+                            <p>After completing your booking and payment, you will receive:</p>
+                            <ul>
+                                <li>An immediate booking confirmation on the website/app</li>
+                                <li>An e-ticket sent to your registered email address</li>
+                                <li>A text message with booking details and a ticket link to your registered mobile number</li>
+                            </ul>
+                            <p>You can also access your tickets anytime by logging into your TravelMate account and going to the "My Bookings" section.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="bookingHeading4">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bookingCollapse4" aria-expanded="false" aria-controls="bookingCollapse4">
+                            How do I cancel my booking?
+                        </button>
+                    </h2>
+                    <div id="bookingCollapse4" class="accordion-collapse collapse" aria-labelledby="bookingHeading4" data-bs-parent="#accordionBooking">
+                        <div class="accordion-body">
+                            <p>To cancel your booking:</p>
+                            <ol>
+                                <li>Log in to your TravelMate account</li>
+                                <li>Go to "My Bookings"</li>
+                                <li>Select the booking you wish to cancel</li>
+                                <li>Click on the "Cancel Booking" button</li>
+                                <li>Confirm the cancellation</li>
+                                <li>Select a reason for cancellation</li>
+                                <li>Submit the cancellation request</li>
+                            </ol>
+                            <p>The refund amount will be calculated based on the cancellation policy of the bus operator and how close to the departure time you are cancelling. The refund will be processed to your original payment method.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="bookingHeading5">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bookingCollapse5" aria-expanded="false" aria-controls="bookingCollapse5">
+                            Can I modify my booking after confirmation?
+                        </button>
+                    </h2>
+                    <div id="bookingCollapse5" class="accordion-collapse collapse" aria-labelledby="bookingHeading5" data-bs-parent="#accordionBooking">
+                        <div class="accordion-body">
+                            <p>Partial modifications to bookings are not supported. If you need to change any details of your booking (such as travel date, passenger information, or seat selection), you will need to cancel your current booking and make a new one with the updated information. Please note that cancellation charges may apply based on the bus operator's policy.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Payments & Refunds -->
+        <div id="paymentFAQ" class="mb-5">
+            <h2 class="mb-4">Payments & Refunds</h2>
+            <div class="accordion" id="accordionPayment">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="paymentHeading1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#paymentCollapse1" aria-expanded="true" aria-controls="paymentCollapse1">
+                            What payment methods are accepted?
+                        </button>
+                    </h2>
+                    <div id="paymentCollapse1" class="accordion-collapse collapse show" aria-labelledby="paymentHeading1" data-bs-parent="#accordionPayment">
+                        <div class="accordion-body">
+                            <p>TravelMate accepts various payment methods including:</p>
+                            <ul>
+                                <li>Credit Cards (Visa, MasterCard)</li>
+                                <li>Debit Cards (Local and International)</li>
+                                <li>Online Banking (Nepal Bank, Rastriya Banijya Bank, NIC Asia Bank, etc.)</li>
+                                <li>Mobile Banking (Connect IPS, Mobile Banking)</li>
+                                <li>Digital Wallets (eSewa, Khalti, IME Pay, Prabhu Pay)</li>
+                                <li>TravelMate Wallet</li>
+                                <li>Cash on Delivery (Selected routes only)</li>
+                            </ul>
+                            <p>All payment transactions are secure and encrypted to ensure your financial information is protected.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="paymentHeading2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#paymentCollapse2" aria-expanded="false" aria-controls="paymentCollapse2">
+                            What is the refund policy?
+                        </button>
+                    </h2>
+                    <div id="paymentCollapse2" class="accordion-collapse collapse" aria-labelledby="paymentHeading2" data-bs-parent="#accordionPayment">
+                        <div class="accordion-body">
+                            <p>The refund policy varies depending on the bus operator and how close to the departure time you are cancelling. Generally:</p>
+                            <ul>
+                                <li>Cancellations made more than 48 hours before departure: 90% refund</li>
+                                <li>Cancellations made 24-48 hours before departure: 75% refund</li>
+                                <li>Cancellations made 12-24 hours before departure: 50% refund</li>
+                                <li>Cancellations made less than 12 hours before departure: 25% refund or no refund (depending on the operator)</li>
+                            </ul>
+                            <p>The exact refund amount will be displayed at the time of cancellation. TravelMate service fee is non-refundable in most cases.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="paymentHeading3">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#paymentCollapse3" aria-expanded="false" aria-controls="paymentCollapse3">
+                            How long does it take to process refunds?
+                        </button>
+                    </h2>
+                    <div id="paymentCollapse3" class="accordion-collapse collapse" aria-labelledby="paymentHeading3" data-bs-parent="#accordionPayment">
+                        <div class="accordion-body">
+                            <p>Once your cancellation request is approved, the refund process begins immediately. The time it takes for the refund to reflect in your account depends on your payment method:</p>
+                            <ul>
+                                <li>TravelMate Wallet: Instant</li>
+                                <li>Credit/Debit Cards: 5-7 business days</li>
+                                <li>Online Banking: 3-5 business days</li>
+                                <li>Mobile Banking: 1-3 business days</li>
+                                <li>Digital Wallets (eSewa, Khalti, IME Pay): 1-3 business days</li>
+                            </ul>
+                            <p>If you haven't received your refund after the expected timeframe, please contact our customer support team.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="paymentHeading4">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#paymentCollapse4" aria-expanded="false" aria-controls="paymentCollapse4">
+                            Is there a service fee for bookings?
+                        </button>
+                    </h2>
+                    <div id="paymentCollapse4" class="accordion-collapse collapse" aria-labelledby="paymentHeading4" data-bs-parent="#accordionPayment">
+                        <div class="accordion-body">
+                            <p>Yes, TravelMate charges a small service fee for each booking. The service fee varies depending on the ticket price and is clearly displayed during the booking process before payment. This fee helps us maintain and improve our platform to provide you with the best booking experience.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="paymentHeading5">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#paymentCollapse5" aria-expanded="false" aria-controls="paymentCollapse5">
+                            What happens if my payment fails?
+                        </button>
+                    </h2>
+                    <div id="paymentCollapse5" class="accordion-collapse collapse" aria-labelledby="paymentHeading5" data-bs-parent="#accordionPayment">
+                        <div class="accordion-body">
+                            <p>If your payment fails during the booking process, your booking will not be confirmed. You can try the following:</p>
+                            <ol>
+                                <li>Check your internet connection and try again</li>
+                                <li>Try a different payment method</li>
+                                <li>Ensure you have sufficient funds in your account</li>
+                                <li>Check if your card is enabled for online transactions</li>
+                                <li>Contact your bank if the issue persists</li>
+                            </ol>
+                            <p>If money was deducted from your account but the booking was not confirmed, the amount will be automatically refunded within 5-7 business days. You can also contact our customer support team for assistance.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bus Services -->
+        <div id="busFAQ" class="mb-5">
+            <h2 class="mb-4">Bus Services</h2>
+            <div class="accordion" id="accordionBus">
+                <!-- Add bus service FAQs here -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="busHeading1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#busCollapse1" aria-expanded="true" aria-controls="busCollapse1">
+                            What types of buses are available on TravelMate?
+                        </button>
+                    </h2>
+                    <div id="busCollapse1" class="accordion-collapse collapse show" aria-labelledby="busHeading1" data-bs-parent="#accordionBus">
+                        <div class="accordion-body">
+                            <p>TravelMate offers various types of buses to suit different preferences and budgets:</p>
+                            <ul>
+                                <li><strong>Standard Buses:</strong> Basic comfortable seating with essential amenities</li>
+                                <li><strong>Deluxe Buses:</strong> Enhanced comfort with extra legroom and better amenities</li>
+                                <li><strong>Luxury Buses:</strong> Premium experience with plush seating, entertainment systems, and premium amenities</li>
+                                <li><strong>Sleeper Buses:</strong> Buses with berths for overnight journeys</li>
+                                <li><strong>Semi-Sleeper Buses:</strong> Reclining seats for comfortable overnight travel</li>
+                                <li><strong>AC Buses:</strong> Air-conditioned buses for comfortable travel in hot weather</li>
+                                <li><strong>Non-AC Buses:</strong> More economical option for short journeys</li>
+                            </ul>
+                            <p>You can filter buses by type during the search process to find the one that best suits your needs.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- More bus service FAQs -->
+            </div>
+        </div>
+        
+        <!-- Account & Profile -->
+        <div id="accountFAQ" class="mb-5">
+            <h2 class="mb-4">Account & Profile</h2>
+            <div class="accordion" id="accordionAccount">
+                <!-- Add account FAQs here -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="accountHeading1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accountCollapse1" aria-expanded="true" aria-controls="accountCollapse1">
+                            How do I create an account on TravelMate?
+                        </button>
+                    </h2>
+                    <div id="accountCollapse1" class="accordion-collapse collapse show" aria-labelledby="accountHeading1" data-bs-parent="#accordionAccount">
+                        <div class="accordion-body">
+                            <p>Creating an account on TravelMate is simple:</p>
+                            <ol>
+                                <li>Click on the "Sign Up" or "Register" button on the top right corner of the website or app</li>
+                                <li>Enter your email address, phone number, and create a password</li>
+                                <li>Verify your email address and/or phone number</li>
+                                <li>Complete your profile by adding your name and other details</li>
+                                <li>Start booking your bus tickets!</li>
+                            </ol>
+                            <p>You can also sign up using your Google, Facebook, or Apple account for quicker registration.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- More account FAQs -->
+            </div>
+        </div>
+        
+        <!-- Mobile App -->
+        <div id="appFAQ" class="mb-5">
+            <h2 class="mb-4">Mobile App</h2>
+            <div class="accordion" id="accordionApp">
+                <!-- Add mobile app FAQs here -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="appHeading1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#appCollapse1" aria-expanded="true" aria-controls="appCollapse1">
+                            Where can I download the TravelMate mobile app?
+                        </button>
+                    </h2>
+                    <div id="appCollapse1" class="accordion-collapse collapse show" aria-labelledby="appHeading1" data-bs-parent="#accordionApp">
+                        <div class="accordion-body">
+                            <p>The TravelMate mobile app is available for both Android and iOS devices:</p>
+                            <ul>
+                                <li>For Android devices: Download from the Google Play Store</li>
+                                <li>For iOS devices: Download from the Apple App Store</li>
+                            </ul>
+                            <p>You can also scan the QR code on our website to directly download the app on your device.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- More mobile app FAQs -->
+            </div>
+        </div>
+        
+        <!-- Customer Support -->
+        <div id="supportFAQ" class="mb-5">
+            <h2 class="mb-4">Customer Support</h2>
+            <div class="accordion" id="accordionSupport">
+                <!-- Add customer support FAQs here -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="supportHeading1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#supportCollapse1" aria-expanded="true" aria-controls="supportCollapse1">
+                            How can I contact TravelMate customer support?
+                        </button>
+                    </h2>
+                    <div id="supportCollapse1" class="accordion-collapse collapse show" aria-labelledby="supportHeading1" data-bs-parent="#accordionSupport">
+                        <div class="accordion-body">
+                            <p>You can contact our customer support team through multiple channels:</p>
+                            <ul>
+                                <li><strong>Phone:</strong> Call us at +1 (800) 123-4567 (available 24/7)</li>
+                                <li><strong>Email:</strong> Send an email to support@travelmate.com</li>
+                                <li><strong>Live Chat:</strong> Use the chat feature on our website or mobile app</li>
+                                <li><strong>Contact Form:</strong> Fill out the contact form on our Contact Us page</li>
+                                <li><strong>Social Media:</strong> Message us on Facebook, Twitter, or Instagram</li>
+                            </ul>
+                            <p>Our customer support team is available 24/7 to assist you with any queries or issues.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- More customer support FAQs -->
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Still Have Questions -->
+<section class="py-5 bg-light">
+    <div class="container text-center">
+        <h2 class="mb-4">Still Have Questions?</h2>
+        <p class="lead mb-4">If you couldn't find the answer to your question, please don't hesitate to contact our customer support team. We're here to help!</p>
+        <a href="{% url 'home:contact' %}" class="btn btn-primary btn-lg">Contact Us</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // FAQ search functionality
+        $('#faqSearch').on('keyup', function() {
+            var value = $(this).val().toLowerCase();
+            $('.accordion-item').filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+        
+        // Smooth scroll to FAQ sections
+        $('a[href^="#"]').on('click', function(e) {
+            e.preventDefault();
+            var target = $(this.hash);
+            if (target.length) {
+                $('html, body').animate({
+                    scrollTop: target.offset().top - 100
+                }, 500);
+            }
+        });
+    });
+</script>
+{% endblock %}

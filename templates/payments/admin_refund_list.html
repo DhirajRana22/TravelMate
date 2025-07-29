@@ -1,0 +1,905 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Refund Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+    }
+    
+    .stat-card.pending::before {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    }
+    
+    .stat-card.approved::before {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    }
+    
+    .stat-card.rejected::before {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    }
+    
+    .stat-card.processed::before {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    }
+    
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-card.pending .stat-icon {
+        background: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+    
+    .stat-card.approved .stat-icon {
+        background: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+    
+    .stat-card.rejected .stat-icon {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+    
+    .stat-card.processed .stat-icon {
+        background: rgba(23, 162, 184, 0.1);
+        color: #17a2b8;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .filters-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+    }
+    
+    .filters-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .filters-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+    
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .filter-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-control {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+    
+    .filter-control:focus {
+        border-color: #6f42c1;
+        box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+        background: white;
+        outline: none;
+    }
+    
+    .filter-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .btn-filter {
+        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        color: white;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-filter:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(111, 66, 193, 0.3);
+    }
+    
+    .btn-clear {
+        background: transparent;
+        border: 1px solid #6c757d;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        color: #6c757d;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-clear:hover {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .refunds-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .results-count {
+        font-size: 0.875rem;
+        color: #6c757d;
+        background: #f8f9fa;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+    }
+    
+    .refund-card {
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .refund-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-1px);
+    }
+    
+    .refund-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 4px;
+    }
+    
+    .refund-card.pending::before {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    }
+    
+    .refund-card.approved::before {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    }
+    
+    .refund-card.rejected::before {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    }
+    
+    .refund-card.processed::before {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    }
+    
+    .refund-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .refund-id {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .refund-amount {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #28a745;
+    }
+    
+    .refund-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .detail-item {
+        text-align: center;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .detail-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+    }
+    
+    .detail-value {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .refund-reason {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .reason-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .reason-text {
+        font-size: 0.875rem;
+        color: #495057;
+        line-height: 1.5;
+    }
+    
+    .refund-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        text-decoration: none;
+    }
+    
+    .btn-approve {
+        background: #28a745;
+        color: white;
+    }
+    
+    .btn-approve:hover {
+        background: #1e7e34;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-reject {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-reject:hover {
+        background: #c82333;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-process {
+        background: #17a2b8;
+        color: white;
+    }
+    
+    .btn-process:hover {
+        background: #138496;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-view {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-view:hover {
+        background: #545b62;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-pending {
+        background: rgba(255, 193, 7, 0.1);
+        color: #856404;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+    
+    .status-approved {
+        background: rgba(40, 167, 69, 0.1);
+        color: #155724;
+        border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+    
+    .status-rejected {
+        background: rgba(220, 53, 69, 0.1);
+        color: #721c24;
+        border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+    
+    .status-processed {
+        background: rgba(23, 162, 184, 0.1);
+        color: #0c5460;
+        border: 1px solid rgba(23, 162, 184, 0.3);
+    }
+    
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .pagination {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .page-link {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        color: #6c757d;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .page-link:hover {
+        background: #f8f9fa;
+        color: #495057;
+        text-decoration: none;
+    }
+    
+    .page-link.active {
+        background: #6f42c1;
+        border-color: #6f42c1;
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6c757d;
+    }
+    
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .empty-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-text {
+        font-size: 0.875rem;
+    }
+    
+    @media (max-width: 768px) {
+        .stats-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .filters-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .refund-header {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+        
+        .refund-details {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .refund-actions {
+            justify-content: center;
+        }
+        
+        .section-header {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .refund-details {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="admin-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2"><i class="fas fa-undo me-2"></i>Refund Management</h1>
+                <p class="mb-0">Manage and process customer refund requests</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'dashboard:dashboard_home' %}" class="btn btn-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Content -->
+<section class="py-4">
+    <div class="container">
+        <!-- Statistics -->
+        <div class="stats-container">
+            <div class="stat-card pending">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-value">{{ stats.pending_count|default:0 }}</div>
+                <div class="stat-label">Pending Requests</div>
+            </div>
+            
+            <div class="stat-card approved">
+                <div class="stat-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="stat-value">{{ stats.approved_count|default:0 }}</div>
+                <div class="stat-label">Approved</div>
+            </div>
+            
+            <div class="stat-card rejected">
+                <div class="stat-icon">
+                    <i class="fas fa-times"></i>
+                </div>
+                <div class="stat-value">{{ stats.rejected_count|default:0 }}</div>
+                <div class="stat-label">Rejected</div>
+            </div>
+            
+            <div class="stat-card processed">
+                <div class="stat-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="stat-value">रू{{ stats.total_refunded|default:0|floatformat:0 }}</div>
+                <div class="stat-label">Total Refunded</div>
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="filters-section">
+            <div class="filters-header">
+                <div class="filters-title">
+                    <i class="fas fa-filter"></i>
+                    Filter Refunds
+                </div>
+            </div>
+            
+            <form method="GET" id="filterForm">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">Search</label>
+                        <input type="text" name="search" class="filter-control" 
+                               placeholder="Refund ID, Payment ID, Customer..." 
+                               value="{{ request.GET.search }}">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Status</label>
+                        <select name="status" class="filter-control">
+                            <option value="">All Statuses</option>
+                            <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="approved" {% if request.GET.status == 'approved' %}selected{% endif %}>Approved</option>
+                            <option value="rejected" {% if request.GET.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                            <option value="processed" {% if request.GET.status == 'processed' %}selected{% endif %}>Processed</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Date From</label>
+                        <input type="date" name="date_from" class="filter-control" 
+                               value="{{ request.GET.date_from }}">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Date To</label>
+                        <input type="date" name="date_to" class="filter-control" 
+                               value="{{ request.GET.date_to }}">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">&nbsp;</label>
+                        <div class="filter-actions">
+                            <button type="submit" class="btn-filter">
+                                <i class="fas fa-search"></i>
+                                Filter
+                            </button>
+                            <a href="{% url 'payments:admin_refund_list' %}" class="btn-clear">
+                                <i class="fas fa-times"></i>
+                                Clear
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Refunds List -->
+        <div class="refunds-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-list"></i>
+                    Refund Requests
+                </div>
+                <div class="results-count">
+                    {{ refunds|length }} of {{ total_count|default:0 }} refunds
+                </div>
+            </div>
+            
+            {% if refunds %}
+                {% for refund in refunds %}
+                    <div class="refund-card {{ refund.status|lower }}">
+                        <div class="refund-header">
+                            <div>
+                                <div class="refund-id">
+                                    <i class="fas fa-hashtag me-1"></i>
+                                    {{ refund.refund_id }}
+                                </div>
+                                <div class="status-badge status-{{ refund.status|lower }}">
+                                    {{ refund.get_status_display }}
+                                </div>
+                            </div>
+                            <div class="refund-amount">रू{{ refund.amount|floatformat:2 }}</div>
+                        </div>
+                        
+                        <div class="refund-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Customer</div>
+                                <div class="detail-value">{{ refund.payment.booking.user.get_full_name|default:refund.payment.booking.user.username }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Payment ID</div>
+                                <div class="detail-value">{{ refund.payment.payment_id }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Booking ID</div>
+                                <div class="detail-value">{{ refund.payment.booking.booking_id }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Request Date</div>
+                                <div class="detail-value">{{ refund.created_at|date:"M d, Y" }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Route</div>
+                                <div class="detail-value">
+                                    {{ refund.payment.booking.bus_schedule.route.source.name }} → 
+                                    {{ refund.payment.booking.bus_schedule.route.destination.name }}
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Travel Date</div>
+                                <div class="detail-value">{{ refund.payment.booking.travel_date|date:"M d, Y" }}</div>
+                            </div>
+                        </div>
+                        
+                        {% if refund.reason %}
+                            <div class="refund-reason">
+                                <div class="reason-label">Reason</div>
+                                <div class="reason-text">{{ refund.get_reason_display }}</div>
+                                {% if refund.description %}
+                                    <div class="reason-text mt-2">{{ refund.description }}</div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="refund-actions">
+                            {% if refund.status == 'pending' %}
+                                <button class="btn-action btn-approve" onclick="updateRefundStatus('{{ refund.id }}', 'approved')">
+                                    <i class="fas fa-check"></i>
+                                    Approve
+                                </button>
+                                <button class="btn-action btn-reject" onclick="updateRefundStatus('{{ refund.id }}', 'rejected')">
+                                    <i class="fas fa-times"></i>
+                                    Reject
+                                </button>
+                            {% elif refund.status == 'approved' %}
+                                <button class="btn-action btn-process" onclick="processRefund('{{ refund.id }}')">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    Process Payment
+                                </button>
+                            {% endif %}
+                            
+                            <a href="{% url 'payments:payment_detail' refund.payment.payment_id %}" class="btn-action btn-view">
+                                <i class="fas fa-eye"></i>
+                                View Payment
+                            </a>
+                            
+                            <a href="{% url 'bookings:booking_detail' refund.payment.booking.booking_id %}" class="btn-action btn-view">
+                                <i class="fas fa-ticket-alt"></i>
+                                View Booking
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                <!-- Pagination -->
+                {% if is_paginated %}
+                    <div class="pagination-container">
+                        <div class="pagination">
+                            {% if page_obj.has_previous %}
+                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1" class="page-link">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" class="page-link">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <span class="page-link active">{{ num }}</span>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}" class="page-link">{{ num }}</a>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" class="page-link">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}" class="page-link">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <div class="empty-title">No Refund Requests Found</div>
+                    <div class="empty-text">
+                        {% if request.GET.search or request.GET.status or request.GET.date_from or request.GET.date_to %}
+                            No refund requests match your current filters. Try adjusting your search criteria.
+                        {% else %}
+                            There are no refund requests to display at the moment.
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-submit form on filter change
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterForm = document.getElementById('filterForm');
+        const filterInputs = filterForm.querySelectorAll('select, input[type="date"]');
+        
+        filterInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        });
+    });
+    
+    // Update refund status
+    function updateRefundStatus(refundId, status) {
+        const action = status === 'approved' ? 'approve' : 'reject';
+        
+        if (!confirm(`Are you sure you want to ${action} this refund request?`)) {
+            return;
+        }
+        
+        fetch(`/payments/admin/refunds/${refundId}/update-status/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                status: status
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error updating refund status: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating refund status. Please try again.');
+        });
+    }
+    
+    // Process refund
+    function processRefund(refundId) {
+        if (!confirm('Are you sure you want to process this refund? This will initiate the payment to the customer.')) {
+            return;
+        }
+        
+        fetch(`/payments/admin/refunds/${refundId}/process/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Refund processed successfully!');
+                location.reload();
+            } else {
+                alert('Error processing refund: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error processing refund. Please try again.');
+        });
+    }
+    
+    // Get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

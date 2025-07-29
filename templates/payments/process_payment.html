@@ -1,0 +1,989 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Process Payment{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-header {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .payment-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .payment-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+        overflow: hidden;
+    }
+    
+    .payment-steps {
+        display: flex;
+        background: #f8f9fa;
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+        padding: 0.5rem;
+    }
+    
+    .step::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: -1px;
+        width: 2px;
+        height: 20px;
+        background: #dee2e6;
+        transform: translateY(-50%);
+    }
+    
+    .step:last-child::after {
+        display: none;
+    }
+    
+    .step-number {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #dee2e6;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin: 0 auto 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .step.active .step-number {
+        background: #28a745;
+        color: white;
+    }
+    
+    .step.completed .step-number {
+        background: #007bff;
+        color: white;
+    }
+    
+    .step-title {
+        font-size: 0.75rem;
+        color: #6c757d;
+        font-weight: 600;
+    }
+    
+    .step.active .step-title {
+        color: #28a745;
+    }
+    
+    .step.completed .step-title {
+        color: #007bff;
+    }
+    
+    .payment-content {
+        padding: 2rem;
+    }
+    
+    .booking-summary {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e9ecef;
+    }
+    
+    .summary-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .route-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+    }
+    
+    .route-location {
+        text-align: center;
+        flex: 1;
+    }
+    
+    .location-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .location-time {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .route-arrow {
+        color: #28a745;
+        font-size: 1.25rem;
+    }
+    
+    .booking-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+    
+    .detail-item {
+        text-align: center;
+        padding: 0.75rem;
+        background: white;
+        border-radius: 8px;
+    }
+    
+    .detail-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+    }
+    
+    .detail-value {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .fare-breakdown {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e9ecef;
+    }
+    
+    .breakdown-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .fare-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .fare-item:last-child {
+        border-bottom: none;
+        padding-top: 1rem;
+        margin-top: 0.5rem;
+        border-top: 2px solid #28a745;
+        font-weight: 600;
+        font-size: 1.125rem;
+    }
+    
+    .fare-label {
+        color: #495057;
+    }
+    
+    .fare-value {
+        color: #495057;
+        font-weight: 600;
+    }
+    
+    .payment-methods {
+        margin-bottom: 2rem;
+    }
+    
+    .methods-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .methods-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .method-card {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+    }
+    
+    .method-card:hover {
+        border-color: #28a745;
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15);
+    }
+    
+    .method-card.selected {
+        border-color: #28a745;
+        background: rgba(40, 167, 69, 0.05);
+    }
+    
+    .method-card.selected::before {
+        content: '✓';
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        width: 20px;
+        height: 20px;
+        background: #28a745;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .method-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin: 0 auto 0.75rem;
+    }
+    
+    .method-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .method-description {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+    
+    .payment-form {
+        display: none;
+        margin-bottom: 2rem;
+    }
+    
+    .payment-form.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .form-control {
+        width: 100%;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.875rem 1rem;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+    
+    .form-control:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        background: white;
+        outline: none;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1rem;
+    }
+    
+    .security-info {
+        background: rgba(40, 167, 69, 0.1);
+        border: 1px solid rgba(40, 167, 69, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .security-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #155724;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .security-text {
+        font-size: 0.75rem;
+        color: #155724;
+        margin: 0;
+    }
+    
+    .payment-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .btn-back {
+        background: transparent;
+        border: 1px solid #6c757d;
+        padding: 0.875rem 1.5rem;
+        border-radius: 8px;
+        color: #6c757d;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+    
+    .btn-back:hover {
+        background: #6c757d;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-pay {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        border: none;
+        padding: 0.875rem 2rem;
+        border-radius: 8px;
+        color: white;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-pay:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+    
+    .btn-pay:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .total-amount {
+        text-align: center;
+        padding: 1rem;
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        color: white;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .amount-label {
+        font-size: 0.875rem;
+        opacity: 0.9;
+        margin-bottom: 0.25rem;
+    }
+    
+    .amount-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    
+    @media (max-width: 768px) {
+        .payment-steps {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .step::after {
+            display: none;
+        }
+        
+        .route-info {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .route-arrow {
+            transform: rotate(90deg);
+        }
+        
+        .booking-details {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .methods-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .payment-actions {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .btn-back,
+        .btn-pay {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .payment-content {
+            padding: 1rem;
+        }
+        
+        .booking-details {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="payment-header">
+    <div class="container">
+        <div class="text-center">
+            <h1 class="mb-2"><i class="fas fa-credit-card me-2"></i>Process Payment</h1>
+            <p class="mb-0">Complete your booking by making the payment</p>
+        </div>
+    </div>
+</section>
+
+<!-- Content -->
+<section class="py-4">
+    <div class="container">
+        <div class="payment-container">
+            <div class="payment-card">
+                <!-- Payment Steps -->
+                <div class="payment-steps">
+                    <div class="step completed">
+                        <div class="step-number">1</div>
+                        <div class="step-title">Select Seats</div>
+                    </div>
+                    <div class="step completed">
+                        <div class="step-number">2</div>
+                        <div class="step-title">Passenger Details</div>
+                    </div>
+                    <div class="step active">
+                        <div class="step-number">3</div>
+                        <div class="step-title">Payment</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-title">Confirmation</div>
+                    </div>
+                </div>
+                
+                <div class="payment-content">
+                    <!-- Booking Summary -->
+                    <div class="booking-summary">
+                        <div class="summary-title">
+                            <i class="fas fa-ticket-alt"></i>
+                            Booking Summary
+                        </div>
+                        
+                        <div class="route-info">
+                            <div class="route-location">
+                                <div class="location-name">{{ booking.bus_schedule.route.source.name }}</div>
+                                <div class="location-time">{{ booking.bus_schedule.departure_time|time:"H:i" }}</div>
+                            </div>
+                            <div class="route-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                            <div class="route-location">
+                                <div class="location-name">{{ booking.bus_schedule.route.destination.name }}</div>
+                                <div class="location-time">{{ booking.bus_schedule.arrival_time|time:"H:i" }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="booking-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Travel Date</div>
+                                <div class="detail-value">{{ booking.travel_date|date:"M d, Y" }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Bus Number</div>
+                                <div class="detail-value">{{ booking.bus_schedule.bus.bus_number }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Bus Type</div>
+                                <div class="detail-value">{{ booking.bus_schedule.bus.get_bus_type_display }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Seats</div>
+                                <div class="detail-value">
+                                    {% for seat in booking.seats.all %}
+                                        {{ seat.seat_number }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Fare Breakdown -->
+                    <div class="fare-breakdown">
+                        <div class="breakdown-title">
+                            <i class="fas fa-calculator"></i>
+                            Fare Breakdown
+                        </div>
+                        
+                        <div class="fare-item">
+                            <span class="fare-label">Base Fare ({{ booking.seats.count }} seat{{ booking.seats.count|pluralize }})</span>
+                            <span class="fare-value">रू {{ booking.base_fare|floatformat:2 }}</span>
+                        </div>
+                        
+                        {% if booking.service_fee %}
+                            <div class="fare-item">
+                                <span class="fare-label">Service Fee</span>
+                                <span class="fare-value">रू {{ booking.service_fee|floatformat:2 }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        {% if booking.taxes %}
+                            <div class="fare-item">
+                                <span class="fare-label">Taxes & Fees</span>
+                                <span class="fare-value">रू {{ booking.taxes|floatformat:2 }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        {% if booking.discount %}
+                            <div class="fare-item">
+                                <span class="fare-label">Discount</span>
+                                <span class="fare-value">-रू {{ booking.discount|floatformat:2 }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="fare-item">
+                            <span class="fare-label">Total Amount</span>
+                            <span class="fare-value">रू {{ booking.total_fare|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Methods -->
+                    <div class="payment-methods">
+                        <div class="methods-title">
+                            <i class="fas fa-credit-card"></i>
+                            Select Payment Method
+                        </div>
+                        
+                        <div class="methods-grid">
+                            <div class="method-card" data-method="credit_card">
+                                <div class="method-icon">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <div class="method-name">Credit Card</div>
+                                <div class="method-description">Visa, MasterCard, American Express</div>
+                            </div>
+                            
+                            <div class="method-card" data-method="debit_card">
+                                <div class="method-icon">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <div class="method-name">Debit Card</div>
+                                <div class="method-description">All major debit cards accepted</div>
+                            </div>
+                            
+                            <div class="method-card" data-method="upi">
+                                <div class="method-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="method-name">UPI</div>
+                                <div class="method-description">PhonePe, Google Pay, Paytm</div>
+                            </div>
+                            
+                            <div class="method-card" data-method="net_banking">
+                                <div class="method-icon">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <div class="method-name">Net Banking</div>
+                                <div class="method-description">All major banks supported</div>
+                            </div>
+                            
+                            <div class="method-card" data-method="wallet">
+                                <div class="method-icon">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <div class="method-name">Digital Wallet</div>
+                                <div class="method-description">Paytm, PhonePe, Amazon Pay</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Forms -->
+                    <form class="payment-form" id="card-form" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="payment_method" value="credit_card">
+                        <input type="hidden" name="booking_id" value="{{ booking.booking_id }}">
+                        
+                        <div class="form-group">
+                            <label class="form-label">Card Number</label>
+                            <input type="text" name="card_number" class="form-control" 
+                                   placeholder="1234 5678 9012 3456" 
+                                   maxlength="19" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Expiry Date</label>
+                                <input type="text" name="expiry_date" class="form-control" 
+                                       placeholder="MM/YY" 
+                                       maxlength="5" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">CVV</label>
+                                <input type="text" name="cvv" class="form-control" 
+                                       placeholder="123" 
+                                       maxlength="4" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Cardholder Name</label>
+                            <input type="text" name="cardholder_name" class="form-control" 
+                                   placeholder="Enter name as on card" required>
+                        </div>
+                    </form>
+                    
+                    <form class="payment-form" id="upi-form" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="payment_method" value="upi">
+                        <input type="hidden" name="booking_id" value="{{ booking.booking_id }}">
+                        
+                        <div class="form-group">
+                            <label class="form-label">UPI ID</label>
+                            <input type="text" name="upi_id" class="form-control" 
+                                   placeholder="yourname@paytm" required>
+                        </div>
+                    </form>
+                    
+                    <form class="payment-form" id="netbanking-form" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="payment_method" value="net_banking">
+                        <input type="hidden" name="booking_id" value="{{ booking.booking_id }}">
+                        
+                        <div class="form-group">
+                            <label class="form-label">Select Bank</label>
+                            <select name="bank" class="form-control" required>
+                                <option value="">Choose your bank</option>
+                                <option value="sbi">State Bank of India</option>
+                                <option value="hdfc">HDFC Bank</option>
+                                <option value="icici">ICICI Bank</option>
+                                <option value="axis">Axis Bank</option>
+                                <option value="kotak">Kotak Mahindra Bank</option>
+                                <option value="pnb">Punjab National Bank</option>
+                                <option value="other">Other Banks</option>
+                            </select>
+                        </div>
+                    </form>
+                    
+                    <form class="payment-form" id="wallet-form" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="payment_method" value="wallet">
+                        <input type="hidden" name="booking_id" value="{{ booking.booking_id }}">
+                        
+                        <div class="form-group">
+                            <label class="form-label">Select Wallet</label>
+                            <select name="wallet_provider" class="form-control" required>
+                                <option value="">Choose your wallet</option>
+                                <option value="paytm">Paytm</option>
+                                <option value="phonepe">PhonePe</option>
+                                <option value="amazonpay">Amazon Pay</option>
+                                <option value="googlepay">Google Pay</option>
+                                <option value="mobikwik">MobiKwik</option>
+                            </select>
+                        </div>
+                    </form>
+                    
+                    <!-- Security Info -->
+                    <div class="security-info">
+                        <div class="security-title">
+                            <i class="fas fa-shield-alt"></i>
+                            Secure Payment
+                        </div>
+                        <p class="security-text">
+                            Your payment information is encrypted and secure. We use industry-standard SSL encryption to protect your data.
+                        </p>
+                    </div>
+                    
+                    <!-- Total Amount -->
+                    <div class="total-amount">
+                        <div class="amount-label">Total Amount to Pay</div>
+                        <div class="amount-value">रू {{ booking.total_fare|floatformat:2 }}</div>
+                    </div>
+                    
+                    <!-- Payment Actions -->
+                    <div class="payment-actions">
+                        <a href="{% url 'bookings:passenger_details' booking.booking_id %}" class="btn-back">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Details
+                        </a>
+                        
+                        <button type="button" class="btn-pay" id="pay-button" disabled>
+                            <i class="fas fa-lock"></i>
+                            Pay रू {{ booking.total_fare|floatformat:2 }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const methodCards = document.querySelectorAll('.method-card');
+        const paymentForms = document.querySelectorAll('.payment-form');
+        const payButton = document.getElementById('pay-button');
+        let selectedMethod = null;
+        
+        // Payment method selection
+        methodCards.forEach(card => {
+            card.addEventListener('click', function() {
+                const method = this.dataset.method;
+                
+                // Update selected state
+                methodCards.forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                // Show corresponding form
+                paymentForms.forEach(form => {
+                    form.classList.remove('active');
+                    if (form.id === getFormId(method)) {
+                        form.classList.add('active');
+                    }
+                });
+                
+                selectedMethod = method;
+                updatePayButton();
+            });
+        });
+        
+        // Form validation
+        paymentForms.forEach(form => {
+            const inputs = form.querySelectorAll('input[required], select[required]');
+            inputs.forEach(input => {
+                input.addEventListener('input', updatePayButton);
+                input.addEventListener('change', updatePayButton);
+            });
+        });
+        
+        // Pay button click
+        payButton.addEventListener('click', function() {
+            if (!selectedMethod) {
+                alert('Please select a payment method');
+                return;
+            }
+            
+            const activeForm = document.querySelector('.payment-form.active');
+            if (!activeForm) {
+                alert('Please select a payment method');
+                return;
+            }
+            
+            if (!validateForm(activeForm)) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            processPayment(activeForm);
+        });
+        
+        // Card number formatting
+        const cardNumberInput = document.querySelector('input[name="card_number"]');
+        if (cardNumberInput) {
+            cardNumberInput.addEventListener('input', function() {
+                let value = this.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+                let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                this.value = formattedValue;
+            });
+        }
+        
+        // Expiry date formatting
+        const expiryInput = document.querySelector('input[name="expiry_date"]');
+        if (expiryInput) {
+            expiryInput.addEventListener('input', function() {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+                this.value = value;
+            });
+        }
+        
+        // CVV validation
+        const cvvInput = document.querySelector('input[name="cvv"]');
+        if (cvvInput) {
+            cvvInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
+        
+        function getFormId(method) {
+            const formMap = {
+                'credit_card': 'card-form',
+                'debit_card': 'card-form',
+                'upi': 'upi-form',
+                'net_banking': 'netbanking-form',
+                'wallet': 'wallet-form'
+            };
+            return formMap[method] || 'card-form';
+        }
+        
+        function updatePayButton() {
+            if (!selectedMethod) {
+                payButton.disabled = true;
+                return;
+            }
+            
+            const activeForm = document.querySelector('.payment-form.active');
+            if (!activeForm) {
+                payButton.disabled = true;
+                return;
+            }
+            
+            const isValid = validateForm(activeForm);
+            payButton.disabled = !isValid;
+        }
+        
+        function validateForm(form) {
+            const requiredInputs = form.querySelectorAll('input[required], select[required]');
+            for (let input of requiredInputs) {
+                if (!input.value.trim()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        function processPayment(form) {
+            const formData = new FormData(form);
+            
+            // Show loading state
+            payButton.disabled = true;
+            payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            fetch('{% url "payments:process_payment" payment.payment_id %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        window.location.href = '{% url "bookings:booking_confirmation" booking.booking_id %}';
+                    }
+                } else {
+                    alert('Payment failed: ' + (data.error || 'Unknown error'));
+                    // Reset button
+                    payButton.disabled = false;
+                    payButton.innerHTML = '<i class="fas fa-lock"></i> Pay रू {{ booking.total_fare|floatformat:2 }}';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Payment processing failed. Please try again.');
+                // Reset button
+                payButton.disabled = false;
+                payButton.innerHTML = '<i class="fas fa-lock"></i> Pay रू {{ booking.total_fare|floatformat:2 }}';
+            });
+        }
+        
+        // Get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock %}

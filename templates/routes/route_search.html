@@ -1,0 +1,477 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search Routes - TravelMate{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4rem 0;
+        margin-top: -1.5rem;
+    }
+    .search-form-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-top: -3rem;
+        position: relative;
+        z-index: 10;
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    .form-label i {
+        margin-right: 0.5rem;
+        color: #667eea;
+    }
+    .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .btn-search {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    .btn-search:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+    .swap-btn {
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #667eea;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin: 0 auto;
+    }
+    .swap-btn:hover {
+        background: #667eea;
+        color: white;
+        transform: rotate(180deg);
+    }
+    .popular-routes {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-top: 3rem;
+    }
+    .route-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .route-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    .route-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .route-cities {
+        font-weight: 600;
+        color: #495057;
+        font-size: 1.1rem;
+    }
+    .route-arrow {
+        color: #667eea;
+        margin: 0 1rem;
+    }
+    .route-details {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+    .route-price {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    .features-section {
+        padding: 4rem 0;
+        background: white;
+    }
+    .feature-card {
+        text-align: center;
+        padding: 2rem;
+        border-radius: 15px;
+        background: #f8f9fa;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+        background: white;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transform: translateY(-5px);
+    }
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+    }
+    .quick-search {
+        background: #e3f2fd;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    .quick-search-btn {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        margin: 0.25rem;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+    .quick-search-btn:hover {
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+    }
+    .location-suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+    }
+    .suggestion-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        border-bottom: 1px solid #f8f9fa;
+        transition: background-color 0.2s ease;
+    }
+    .suggestion-item:hover {
+        background: #f8f9fa;
+    }
+    .suggestion-item:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Search Header -->
+<section class="search-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="mb-3"><i class="fas fa-route me-2"></i>Find Your Perfect Journey</h1>
+                <p class="lead mb-0">Search and book bus tickets across Nepal with ease</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search Form -->
+<section class="pb-5">
+    <div class="container">
+        <div class="search-form-card">
+            <form method="get" action="{% url 'routes:route_results' %}" id="searchForm">
+                <div class="row align-items-end">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="source" class="form-label">
+                                <i class="fas fa-map-marker-alt"></i>From
+                            </label>
+                            <div class="position-relative">
+                                <input type="text" name="source" id="source" class="form-control" 
+                                       placeholder="Enter departure city" value="{{ request.GET.source }}" required>
+                                <div class="location-suggestions" id="sourceSuggestions"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-1 text-center">
+                        <div class="swap-btn" id="swapBtn" title="Swap cities">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="destination" class="form-label">
+                                <i class="fas fa-flag-checkered"></i>To
+                            </label>
+                            <div class="position-relative">
+                                <input type="text" name="destination" id="destination" class="form-control" 
+                                       placeholder="Enter destination city" value="{{ request.GET.destination }}" required>
+                                <div class="location-suggestions" id="destinationSuggestions"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="travel_date" class="form-label">
+                                <i class="fas fa-calendar-alt"></i>Travel Date
+                            </label>
+                            <input type="date" name="travel_date" id="travel_date" class="form-control" 
+                                   value="{{ request.GET.travel_date|default:today }}" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-search">
+                            <i class="fas fa-search me-2"></i>Search Buses
+                        </button>
+                    </div>
+                </div>
+            </form>
+            
+            <!-- Quick Search Options -->
+            <div class="quick-search">
+                <h6 class="mb-2"><i class="fas fa-bolt me-1"></i>Quick Search:</h6>
+                <a href="?source=Kathmandu&destination=Pokhara&travel_date={{ today }}" class="quick-search-btn">Kathmandu → Pokhara</a>
+                <a href="?source=Kathmandu&destination=Chitwan&travel_date={{ today }}" class="quick-search-btn">Kathmandu → Chitwan</a>
+                <a href="?source=Pokhara&destination=Kathmandu&travel_date={{ today }}" class="quick-search-btn">Pokhara → Kathmandu</a>
+                <a href="?source=Kathmandu&destination=Butwal&travel_date={{ today }}" class="quick-search-btn">Kathmandu → Butwal</a>
+                <a href="?source=Kathmandu&destination=Dharan&travel_date={{ today }}" class="quick-search-btn">Kathmandu → Dharan</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Popular Routes -->
+<section class="pb-5">
+    <div class="container">
+        <div class="popular-routes">
+            <h3 class="text-center mb-4"><i class="fas fa-star me-2"></i>Popular Routes</h3>
+            <div class="row">
+                {% for route in popular_routes %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="route-card" onclick="selectRoute('{{ route.source }}', '{{ route.destination }}')">
+                        <div class="route-info">
+                            <div>
+                                <div class="route-cities">
+                                    {{ route.source }}
+                                    <span class="route-arrow"><i class="fas fa-arrow-right"></i></span>
+                                    {{ route.destination }}
+                                </div>
+                                <div class="route-details">
+                                    <i class="fas fa-road me-1"></i>{{ route.distance }} km
+                                    {% if route.busschedule_set.count %}
+                                        • {{ route.busschedule_set.count }} bus{{ route.busschedule_set.count|pluralize:"es" }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if route.min_fare %}
+                            <div class="route-price">
+                                From रू {{ route.min_fare }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center">
+                    <p class="text-muted">No popular routes available at the moment.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2>Why Choose TravelMate?</h2>
+                <p class="text-muted">Experience the best bus booking service in Nepal</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h5>Real-time Booking</h5>
+                    <p class="text-muted">Book your tickets instantly with real-time seat availability and instant confirmation.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h5>Secure Payments</h5>
+                    <p class="text-muted">Multiple payment options including eSewa, Khalti, and other popular Nepali payment methods.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h5>24/7 Support</h5>
+                    <p class="text-muted">Round-the-clock customer support to help you with any queries or issues.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        $('#travel_date').attr('min', today);
+        
+        // If no date is set, set it to today
+        if (!$('#travel_date').val()) {
+            $('#travel_date').val(today);
+        }
+        
+        // Swap cities functionality
+        $('#swapBtn').click(function() {
+            const source = $('#source').val();
+            const destination = $('#destination').val();
+            $('#source').val(destination);
+            $('#destination').val(source);
+        });
+        
+        // Location suggestions (mock data - replace with actual API)
+        const nepaliCities = [
+            'Kathmandu', 'Pokhara', 'Chitwan', 'Butwal', 'Dharan', 'Biratnagar',
+            'Janakpur', 'Nepalgunj', 'Bhairahawa', 'Hetauda', 'Itahari', 'Birgunj',
+            'Dhangadhi', 'Tulsipur', 'Gorkha', 'Palpa', 'Syangja', 'Baglung',
+            'Mustang', 'Manang', 'Solukhumbu', 'Taplejung', 'Ilam', 'Jhapa'
+        ];
+        
+        function showSuggestions(input, suggestionsDiv) {
+            const value = input.val().toLowerCase();
+            if (value.length < 2) {
+                suggestionsDiv.hide();
+                return;
+            }
+            
+            const matches = nepaliCities.filter(city => 
+                city.toLowerCase().includes(value)
+            ).slice(0, 5);
+            
+            if (matches.length > 0) {
+                const html = matches.map(city => 
+                    `<div class="suggestion-item" data-city="${city}">${city}</div>`
+                ).join('');
+                suggestionsDiv.html(html).show();
+            } else {
+                suggestionsDiv.hide();
+            }
+        }
+        
+        // Source input suggestions
+        $('#source').on('input', function() {
+            showSuggestions($(this), $('#sourceSuggestions'));
+        });
+        
+        // Destination input suggestions
+        $('#destination').on('input', function() {
+            showSuggestions($(this), $('#destinationSuggestions'));
+        });
+        
+        // Handle suggestion clicks
+        $(document).on('click', '.suggestion-item', function() {
+            const city = $(this).data('city');
+            const input = $(this).closest('.position-relative').find('input');
+            input.val(city);
+            $(this).parent().hide();
+        });
+        
+        // Hide suggestions when clicking outside
+        $(document).click(function(e) {
+            if (!$(e.target).closest('.position-relative').length) {
+                $('.location-suggestions').hide();
+            }
+        });
+        
+        // Form validation
+        $('#searchForm').submit(function(e) {
+            const source = $('#source').val().trim();
+            const destination = $('#destination').val().trim();
+            
+            if (source === destination) {
+                e.preventDefault();
+                alert('Source and destination cannot be the same!');
+                return false;
+            }
+            
+            // Add loading state
+            $('.btn-search').html('<i class="fas fa-spinner fa-spin me-2"></i>Searching...');
+        });
+        
+        // Auto-focus on source input
+        $('#source').focus();
+    });
+    
+    // Function to select route from popular routes
+    function selectRoute(source, destination) {
+        $('#source').val(source);
+        $('#destination').val(destination);
+        $('html, body').animate({
+            scrollTop: $('.search-form-card').offset().top - 100
+        }, 500);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,933 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin - Route Details{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .route-profile {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .route-profile::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .route-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .route-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        margin-right: 1.5rem;
+        flex-shrink: 0;
+    }
+    
+    .route-info {
+        flex: 1;
+    }
+    
+    .route-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .route-path {
+        color: #6c757d;
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .route-meta {
+        display: flex;
+        gap: 1.5rem;
+        font-size: 0.875rem;
+        color: #6c757d;
+        flex-wrap: wrap;
+    }
+    
+    .route-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 0.375rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-inactive {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .stat-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+        margin-right: 1rem;
+    }
+    
+    .stat-icon.bookings {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .stat-icon.revenue {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stat-icon.buses {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .stat-icon.distance {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    
+    .stat-content {
+        flex: 1;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+        font-weight: 500;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #495057;
+    }
+    
+    .info-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-title i {
+        margin-right: 0.5rem;
+        color: #667eea;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #667eea;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .info-content {
+        flex: 1;
+    }
+    
+    .info-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+    
+    .info-value {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.875rem;
+    }
+    
+    .bus-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1rem;
+    }
+    
+    .bus-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .bus-card:hover {
+        background: white;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .bus-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+    
+    .bus-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: #667eea;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.75rem;
+    }
+    
+    .bus-info {
+        flex: 1;
+    }
+    
+    .bus-number {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .bus-type {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+    
+    .bus-status {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+    
+    .bus-status.active {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .bus-status.maintenance {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .bus-status.inactive {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .bus-details {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+    
+    .booking-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .booking-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .booking-item:hover {
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .booking-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .booking-icon.confirmed {
+        background: #28a745;
+    }
+    
+    .booking-icon.pending {
+        background: #ffc107;
+        color: #212529;
+    }
+    
+    .booking-icon.cancelled {
+        background: #dc3545;
+    }
+    
+    .booking-info {
+        flex: 1;
+    }
+    
+    .booking-id {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .booking-details {
+        font-size: 0.875rem;
+        color: #6c757d;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .booking-amount {
+        font-weight: 600;
+        color: #495057;
+        font-size: 1rem;
+    }
+    
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #5a6fd8;
+        color: white;
+    }
+    
+    .btn-outline {
+        background: transparent;
+        color: #667eea;
+        border: 1px solid #667eea;
+    }
+    
+    .btn-outline:hover {
+        background: #667eea;
+        color: white;
+    }
+    
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+    
+    .btn-success:hover {
+        background: #218838;
+        color: white;
+    }
+    
+    .btn-warning {
+        background: #ffc107;
+        color: #212529;
+    }
+    
+    .btn-warning:hover {
+        background: #e0a800;
+        color: #212529;
+    }
+    
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #c82333;
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    @media (max-width: 768px) {
+        .route-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .route-icon {
+            margin-right: 0;
+            margin-bottom: 1rem;
+        }
+        
+        .route-actions {
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .btn-action {
+            justify-content: center;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .bus-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .booking-details {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Admin Header -->
+<section class="admin-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2"><i class="fas fa-route me-2"></i>Route Details</h1>
+                <p class="mb-0">{{ route.origin }} → {{ route.destination }}</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'dashboard:route_management' %}" class="btn btn-light me-2">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Routes
+                </a>
+                <button class="btn btn-success" onclick="editRoute({{ route.id }})">
+                    <i class="fas fa-edit me-2"></i>Edit Route
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Route Details Content -->
+<section class="py-4">
+    <div class="container">
+        <!-- Route Profile -->
+        <div class="route-profile">
+            <div class="route-header">
+                <div class="route-icon">
+                    <i class="fas fa-route"></i>
+                </div>
+                
+                <div class="route-info">
+                    <div class="route-name">
+                        {{ route.origin }} → {{ route.destination }}
+                        <span class="status-badge status-{{ route.is_active|yesno:'active,inactive' }}">
+                            {% if route.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="route-path">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        {{ route.origin }} 
+                        <i class="fas fa-arrow-right mx-2"></i>
+                        {{ route.destination }}
+                    </div>
+                    
+                    <div class="route-meta">
+                        <span><i class="fas fa-clock me-1"></i>{{ route.departure_time }} - {{ route.arrival_time }}</span>
+                        <span><i class="fas fa-road me-1"></i>{{ route.distance }} km</span>
+                        <span><i class="fas fa-hourglass-half me-1"></i>{{ route.duration }}</span>
+                        <span><i class="fas fa-money-bill me-1"></i>रू {{ route.base_fare }}</span>
+                    </div>
+                </div>
+                
+                <div class="route-actions">
+                    <button class="btn-action btn-outline" onclick="editRoute({{ route.id }})">
+                        <i class="fas fa-edit me-1"></i>Edit
+                    </button>
+                    
+                    {% if route.is_active %}
+                        <button class="btn-action btn-warning" onclick="toggleRouteStatus({{ route.id }}, false)">
+                            <i class="fas fa-ban me-1"></i>Deactivate
+                        </button>
+                    {% else %}
+                        <button class="btn-action btn-success" onclick="toggleRouteStatus({{ route.id }}, true)">
+                            <i class="fas fa-check me-1"></i>Activate
+                        </button>
+                    {% endif %}
+                    
+                    <button class="btn-action btn-outline" onclick="manageBuses({{ route.id }})">
+                        <i class="fas fa-bus me-1"></i>Manage Buses
+                    </button>
+                    
+                    <button class="btn-action btn-danger" onclick="deleteRoute({{ route.id }}, '{{ route.origin }} → {{ route.destination }}')">
+                        <i class="fas fa-trash me-1"></i>Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon bookings">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Total Bookings</div>
+                        <div class="stat-value">{{ route.total_bookings }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon revenue">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Total Revenue</div>
+                        <div class="stat-value">रू {{ route.total_revenue|floatformat:0 }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon buses">
+                        <i class="fas fa-bus"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Assigned Buses</div>
+                        <div class="stat-value">{{ route.buses_count }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon distance">
+                        <i class="fas fa-road"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Distance</div>
+                        <div class="stat-value">{{ route.distance }} km</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Route Information -->
+        <div class="info-section">
+            <h3 class="section-title">
+                <i class="fas fa-info-circle"></i>
+                Route Information
+            </h3>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-label">Origin</div>
+                        <div class="info-value">{{ route.origin }}</div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-flag-checkered"></i>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-label">Destination</div>
+                        <div class="info-value">{{ route.destination }}</div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-label">Departure Time</div>
+                        <div class="info-value">{{ route.departure_time }}</div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-label">Arrival Time</div>
+                        <div class="info-value">{{ route.arrival_time }}</div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-label">Duration</div>
+                        <div class="info-value">{{ route.duration }}</div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-money-bill"></i>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-label">Base Fare</div>
+                        <div class="info-value">रू {{ route.base_fare }}</div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-road"></i>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-label">Distance</div>
+                        <div class="info-value">{{ route.distance }} km</div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-label">Created Date</div>
+                        <div class="info-value">{{ route.created_at|date:"M d, Y" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Assigned Buses -->
+        <div class="info-section">
+            <h3 class="section-title">
+                <i class="fas fa-bus"></i>
+                Assigned Buses ({{ route.buses_count }})
+            </h3>
+            
+            {% if route.assigned_buses %}
+                <div class="bus-grid">
+                    {% for bus in route.assigned_buses %}
+                    <div class="bus-card">
+                        <div class="bus-header">
+                            <div class="bus-icon">
+                                <i class="fas fa-bus"></i>
+                            </div>
+                            <div class="bus-info">
+                                <div class="bus-number">{{ bus.bus_number }}</div>
+                                <div class="bus-type">{{ bus.bus_type }}</div>
+                            </div>
+                            <div class="bus-status {{ bus.status }}">
+                                {{ bus.status|title }}
+                            </div>
+                        </div>
+                        
+                        <div class="bus-details">
+                            <span><i class="fas fa-users me-1"></i>{{ bus.capacity }} seats</span>
+                            <span><i class="fas fa-user-tie me-1"></i>{{ bus.driver_name|default:"No driver" }}</span>
+                            <a href="{% url 'dashboard:bus_detail' bus.id %}" class="text-primary">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-bus"></i>
+                    </div>
+                    <h5>No Buses Assigned</h5>
+                    <p class="text-muted">No buses are currently assigned to this route.</p>
+                    <button class="btn-action btn-primary" onclick="manageBuses({{ route.id }})">
+                        <i class="fas fa-plus me-2"></i>Assign Buses
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Recent Bookings -->
+        <div class="info-section">
+            <h3 class="section-title">
+                <i class="fas fa-ticket-alt"></i>
+                Recent Bookings
+            </h3>
+            
+            {% if route.recent_bookings %}
+                <div class="booking-list">
+                    {% for booking in route.recent_bookings %}
+                    <div class="booking-item">
+                        <div class="booking-icon {{ booking.status }}">
+                            {% if booking.status == 'confirmed' %}
+                                <i class="fas fa-check"></i>
+                            {% elif booking.status == 'pending' %}
+                                <i class="fas fa-clock"></i>
+                            {% else %}
+                                <i class="fas fa-times"></i>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="booking-info">
+                            <div class="booking-id">
+                                Booking #{{ booking.booking_id }}
+                            </div>
+                            <div class="booking-details">
+                                <span><i class="fas fa-user me-1"></i>{{ booking.passenger_name }}</span>
+                                <span><i class="fas fa-calendar me-1"></i>{{ booking.travel_date|date:"M d, Y" }}</span>
+                                <span><i class="fas fa-chair me-1"></i>{{ booking.seats_count }} seat{{ booking.seats_count|pluralize }}</span>
+                                <span><i class="fas fa-bus me-1"></i>{{ booking.bus_number }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="booking-amount">
+                            रू {{ booking.total_fare }}
+                        </div>
+                        
+                        <a href="{% url 'dashboard:booking_detail' booking.id %}" class="btn-action btn-outline btn-sm ms-2">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="text-center mt-3">
+                    <a href="{% url 'dashboard:booking_management' %}?route={{ route.id }}" class="btn-action btn-primary">
+                        <i class="fas fa-list me-2"></i>View All Bookings
+                    </a>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <h5>No Recent Bookings</h5>
+                    <p class="text-muted">No bookings have been made for this route yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function editRoute(routeId) {
+        // Redirect to edit route form
+        window.location.href = `/dashboard/routes/${routeId}/edit/`;
+    }
+    
+    function manageBuses(routeId) {
+        // Redirect to manage buses for route
+        window.location.href = `/dashboard/routes/${routeId}/buses/`;
+    }
+    
+    function toggleRouteStatus(routeId, activate) {
+        const action = activate ? 'activate' : 'deactivate';
+        const message = `Are you sure you want to ${action} this route?`;
+        
+        if (confirm(message)) {
+            fetch(`/dashboard/routes/${routeId}/toggle-status/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ active: activate })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error updating route status: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating route status.');
+            });
+        }
+    }
+    
+    function deleteRoute(routeId, routeName) {
+        const message = `Are you sure you want to delete route "${routeName}"? This action cannot be undone and will affect all associated bookings.`;
+        
+        if (confirm(message)) {
+            const reason = prompt('Please enter a reason for deletion:');
+            if (reason) {
+                fetch(`/dashboard/routes/${routeId}/delete/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': getCsrfToken(),
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ reason: reason })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '/dashboard/routes/';
+                    } else {
+                        alert('Error deleting route: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the route.');
+                });
+            }
+        }
+    }
+    
+    function getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}';
+    }
+    
+    // Add CSRF token to page if not present
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!document.querySelector('[name=csrfmiddlewaretoken]')) {
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = 'csrfmiddlewaretoken';
+            csrfToken.value = '{{ csrf_token }}';
+            document.body.appendChild(csrfToken);
+        }
+    });
+</script>
+{% endblock %}

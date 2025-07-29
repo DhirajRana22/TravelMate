@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Management - Admin Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-card {
+        border-left: 4px solid #007bff;
+        transition: all 0.3s ease;
+    }
+    .payment-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .status-completed { border-left-color: #28a745; }
+    .status-pending { border-left-color: #ffc107; }
+    .status-failed { border-left-color: #dc3545; }
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2><i class="fas fa-credit-card"></i> Payment Management</h2>
+                    <p class="text-muted">Manage payments, refunds, and financial transactions</p>
+                </div>
+                <div>
+                    <a href="{% url 'dashboard:dashboard_home' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-money-bill-wave fa-2x"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">NPR {{ total_revenue|floatformat:0 }}</h4>
+                            <small>Total Revenue</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">{{ completed_payments }}</h4>
+                            <small>Completed Payments</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">{{ pending_payments }}</h4>
+                            <small>Pending Payments</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-times-circle fa-2x"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">{{ failed_payments }}</h4>
+                            <small>Failed Payments</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-filter"></i> Filters</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Payment Status</label>
+                            <select name="status" id="status" class="form-select">
+                                <option value="">All Statuses</option>
+                                {% for status_code, status_name in payment_statuses %}
+                                    <option value="{{ status_code }}" {% if request.GET.status == status_code %}selected{% endif %}>
+                                        {{ status_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request.GET.start_date }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" name="end_date" id="end_date" class="form-control" value="{{ request.GET.end_date }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Filter
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payments List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list"></i> Recent Payments</h5>
+                    <span class="badge bg-primary">{{ total_payments }} total</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Payment ID</th>
+                                    <th>User</th>
+                                    <th>Booking</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Method</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                <tr>
+                                    <td>
+                                        <code>{{ payment.payment_id }}</code>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ payment.booking.user.get_full_name|default:payment.booking.user.username }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ payment.booking.user.email }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'booking_detail' payment.booking.booking_id %}" class="text-decoration-none">
+                                            {{ payment.booking.booking_id }}
+                                        </a>
+                                        <br>
+                                        <small class="text-muted">
+                                            {{ payment.booking.bus_schedule.route.source }} → {{ payment.booking.bus_schedule.route.destination }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <strong>NPR {{ payment.amount }}</strong>
+                                    </td>
+                                    <td>
+                                        {% if payment.payment_status == 'completed' %}
+                                            <span class="badge bg-success">{{ payment.get_payment_status_display }}</span>
+                                        {% elif payment.payment_status == 'pending' %}
+                                            <span class="badge bg-warning">{{ payment.get_payment_status_display }}</span>
+                                        {% elif payment.payment_status == 'failed' %}
+                                            <span class="badge bg-danger">{{ payment.get_payment_status_display }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ payment.get_payment_status_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ payment.get_payment_method_display }}</span>
+                                    </td>
+                                    <td>
+                                        {{ payment.payment_date|date:"M d, Y H:i" }}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#paymentModal{{ payment.id }}">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No payments found</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refunds Section -->
+    {% if refunds %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-undo"></i> Recent Refunds</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Refund ID</th>
+                                    <th>User</th>
+                                    <th>Original Payment</th>
+                                    <th>Refund Amount</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for refund in refunds|slice:":10" %}
+                                <tr>
+                                    <td><code>{{ refund.refund_id }}</code></td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ refund.payment.booking.user.get_full_name|default:refund.payment.booking.user.username }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ refund.payment.booking.user.email }}</small>
+                                        </div>
+                                    </td>
+                                    <td><code>{{ refund.payment.payment_id }}</code></td>
+                                    <td><strong>NPR {{ refund.refund_amount }}</strong></td>
+                                    <td>
+                                        {% if refund.refund_status == 'completed' %}
+                                            <span class="badge bg-success">{{ refund.get_refund_status_display }}</span>
+                                        {% elif refund.refund_status == 'pending' %}
+                                            <span class="badge bg-warning">{{ refund.get_refund_status_display }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ refund.get_refund_status_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ refund.refund_date|date:"M d, Y H:i" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Payment Detail Modals -->
+{% for payment in payments %}
+<div class="modal fade" id="paymentModal{{ payment.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Details - {{ payment.payment_id }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Payment Information</h6>
+                        <table class="table table-sm">
+                            <tr><td><strong>Payment ID:</strong></td><td>{{ payment.payment_id }}</td></tr>
+                            <tr><td><strong>Amount:</strong></td><td>NPR {{ payment.amount }}</td></tr>
+                            <tr><td><strong>Status:</strong></td><td>{{ payment.get_payment_status_display }}</td></tr>
+                            <tr><td><strong>Method:</strong></td><td>{{ payment.get_payment_method_display }}</td></tr>
+                            <tr><td><strong>Date:</strong></td><td>{{ payment.payment_date }}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Booking Information</h6>
+                        <table class="table table-sm">
+                            <tr><td><strong>Booking ID:</strong></td><td>{{ payment.booking.booking_id }}</td></tr>
+                            <tr><td><strong>User:</strong></td><td>{{ payment.booking.user.get_full_name|default:payment.booking.user.username }}</td></tr>
+                            <tr><td><strong>Route:</strong></td><td>{{ payment.booking.bus_schedule.route }}</td></tr>
+                            <tr><td><strong>Travel Date:</strong></td><td>{{ payment.booking.travel_date }}</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

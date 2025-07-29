@@ -1,0 +1,396 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Buses - {{ route.source.name }} to {{ route.destination.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .bus-assignment-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .route-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .bus-schedule-card {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .bus-schedule-card:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .bus-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .bus-icon {
+        width: 50px;
+        height: 50px;
+        background: #007bff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+    
+    .schedule-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .detail-item {
+        text-align: center;
+    }
+    
+    .detail-label {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+    
+    .detail-value {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .assign-form {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .btn-remove {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+    
+    .btn-remove:hover {
+        background: #c82333;
+    }
+    
+    .btn-assign {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+    
+    .btn-assign:hover {
+        background: #218838;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .alert {
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Admin Header -->
+<section class="admin-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">
+                    <i class="fas fa-bus me-2"></i>
+                    Manage Buses for Route
+                </h1>
+                <p class="mb-0">{{ route.source.name }} → {{ route.destination.name }}</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'dashboard:route_detail' route.id %}" class="btn btn-light me-2">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Route
+                </a>
+                <a href="{% url 'dashboard:route_management' %}" class="btn btn-outline-light">
+                    <i class="fas fa-list me-2"></i>All Routes
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bus Assignment Content -->
+<section class="py-4">
+    <div class="container">
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <!-- Route Information -->
+        <div class="route-info">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="detail-item">
+                        <div class="detail-label">Distance</div>
+                        <div class="detail-value">{{ route.distance }} km</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="detail-item">
+                        <div class="detail-label">Travel Time</div>
+                        <div class="detail-value">{{ route.travel_time }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="detail-item">
+                        <div class="detail-label">Status</div>
+                        <div class="detail-value">
+                            {% if route.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="detail-item">
+                        <div class="detail-label">Assigned Buses</div>
+                        <div class="detail-value">{{ current_schedules.count }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Currently Assigned Buses -->
+        <div class="bus-assignment-card">
+            <h4 class="mb-3">
+                <i class="fas fa-bus me-2"></i>
+                Currently Assigned Buses ({{ current_schedules.count }})
+            </h4>
+            
+            {% if current_schedules %}
+                {% for schedule in current_schedules %}
+                    <div class="bus-schedule-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="bus-info">
+                                <div class="bus-icon">
+                                    <i class="fas fa-bus"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">{{ schedule.bus.bus_number }}</h6>
+                                    <p class="mb-0 text-muted">{{ schedule.bus.bus_type }} • {{ schedule.bus.total_seats }} seats</p>
+                                </div>
+                            </div>
+                            <form method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="remove_bus">
+                                <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
+                                <button type="submit" class="btn-remove" 
+                                        onclick="return confirm('Are you sure you want to remove this bus from the route?')">
+                                    <i class="fas fa-times me-1"></i>Remove
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div class="schedule-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Departure Time</div>
+                                <div class="detail-value">{{ schedule.departure_time }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Arrival Time</div>
+                                <div class="detail-value">{{ schedule.arrival_time }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Journey Duration</div>
+                                <div class="detail-value">{{ schedule.journey_duration|default:"Calculating..." }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Base Fare</div>
+                                <div class="detail-value">रू {{ schedule.base_fare }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Status</div>
+                                <div class="detail-value">
+                                    {% if schedule.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Inactive</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-bus"></i>
+                    </div>
+                    <h5>No Buses Assigned</h5>
+                    <p>No buses are currently assigned to this route. Use the form below to assign buses.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Assign New Bus -->
+        <div class="bus-assignment-card">
+            <h4 class="mb-3">
+                <i class="fas fa-plus me-2"></i>
+                Assign New Bus
+            </h4>
+            
+            {% if available_buses %}
+                <form method="post" class="assign-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="assign_bus">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bus_id" class="form-label">Select Bus</label>
+                            <select name="bus_id" id="bus_id" class="form-select" required>
+                                <option value="">Choose a bus...</option>
+                                {% for bus in available_buses %}
+                                    <option value="{{ bus.id }}">
+                                        {{ bus.bus_number }} - {{ bus.bus_type }} ({{ bus.total_seats }} seats)
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="departure_time" class="form-label">Departure Time</label>
+                            <input type="time" name="departure_time" id="departure_time" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="arrival_time" class="form-label">Arrival Time</label>
+                            <input type="time" name="arrival_time" id="arrival_time" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="base_fare" class="form-label">Base Fare (रू)</label>
+                            <input type="number" name="base_fare" id="base_fare" class="form-control" 
+                                   min="0" step="0.01" placeholder="0.00" required>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn-assign">
+                            <i class="fas fa-plus me-2"></i>Assign Bus to Route
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <h5>No Available Buses</h5>
+                    <p>All active buses are already assigned to this route, or there are no active buses in the system.</p>
+                    <a href="{% url 'dashboard:bus_management' %}" class="btn btn-primary">
+                        <i class="fas fa-bus me-2"></i>Manage Buses
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-dismiss alerts after 5 seconds
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+    
+    // Calculate journey duration when times are entered
+    document.getElementById('departure_time').addEventListener('change', calculateDuration);
+    document.getElementById('arrival_time').addEventListener('change', calculateDuration);
+    
+    function calculateDuration() {
+        const departureTime = document.getElementById('departure_time').value;
+        const arrivalTime = document.getElementById('arrival_time').value;
+        
+        if (departureTime && arrivalTime) {
+            const departure = new Date('2000-01-01 ' + departureTime);
+            let arrival = new Date('2000-01-01 ' + arrivalTime);
+            
+            // Handle overnight journeys
+            if (arrival < departure) {
+                arrival.setDate(arrival.getDate() + 1);
+            }
+            
+            const duration = arrival - departure;
+            const hours = Math.floor(duration / (1000 * 60 * 60));
+            const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
+            
+            // You could display this duration somewhere if needed
+            console.log(`Journey duration: ${hours}h ${minutes}m`);
+        }
+    }
+</script>
+{% endblock %}

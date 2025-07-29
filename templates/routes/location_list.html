@@ -1,0 +1,676 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}All Locations{% endblock %}
+
+{% block extra_css %}
+<style>
+    .locations-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .search-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .search-form {
+        display: flex;
+        gap: 1rem;
+        align-items: end;
+        flex-wrap: wrap;
+    }
+    
+    .form-group {
+        flex: 1;
+        min-width: 250px;
+    }
+    
+    .form-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control {
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .btn-search {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 0.5rem 1.5rem;
+        border-radius: 6px;
+        color: white;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex: 0 0 auto;
+    }
+    
+    .btn-search:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-clear {
+        background: transparent;
+        border: 1px solid #6c757d;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        color: #6c757d;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex: 0 0 auto;
+    }
+    
+    .btn-clear:hover {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .locations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .location-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        border: 1px solid #e9ecef;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .location-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    }
+    
+    .location-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .location-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .location-info {
+        flex: 1;
+    }
+    
+    .location-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .location-name i {
+        color: #667eea;
+        margin-right: 0.5rem;
+    }
+    
+    .location-region {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .location-country {
+        color: #6c757d;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .popular-badge {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        flex: 0 0 auto;
+    }
+    
+    .location-details {
+        margin-bottom: 1.5rem;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+    }
+    
+    .detail-label i {
+        color: #667eea;
+        margin-right: 0.5rem;
+        width: 16px;
+    }
+    
+    .detail-value {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .location-stats {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .stat-item {
+        text-align: center;
+        flex: 1;
+    }
+    
+    .stat-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .location-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        color: white;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        flex: 1;
+        justify-content: center;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #667eea;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        color: #667eea;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        flex: 1;
+        justify-content: center;
+    }
+    
+    .btn-outline:hover {
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn i {
+        margin-right: 0.5rem;
+    }
+    
+    .no-locations {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        grid-column: 1 / -1;
+    }
+    
+    .no-locations i {
+        font-size: 3rem;
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+    
+    .no-locations h3 {
+        color: #495057;
+        margin-bottom: 1rem;
+    }
+    
+    .no-locations p {
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+    
+    .pagination-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .pagination {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .page-link {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #dee2e6;
+        color: #667eea;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+    
+    .page-link:hover {
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .page-link.active {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+    
+    .page-link.disabled {
+        color: #6c757d;
+        pointer-events: none;
+        background: #f8f9fa;
+    }
+    
+    .summary-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .summary-item {
+        text-align: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .summary-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.25rem;
+    }
+    
+    .summary-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .summary-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    @media (max-width: 768px) {
+        .search-form {
+            flex-direction: column;
+        }
+        
+        .form-group {
+            min-width: auto;
+        }
+        
+        .locations-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .location-actions {
+            flex-direction: column;
+        }
+        
+        .summary-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="locations-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>All Locations</h1>
+                <p class="mb-0">Discover all destinations we serve across the country</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'routes:route_search' %}" class="btn btn-light me-2">
+                    <i class="fas fa-search me-2"></i>Search Routes
+                </a>
+                <a href="{% url 'routes:route_list' %}" class="btn btn-success">
+                    <i class="fas fa-route me-2"></i>All Routes
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Content -->
+<section class="py-4">
+    <div class="container">
+        <!-- Summary Section -->
+        <div class="summary-section">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="summary-value">{{ page_obj.paginator.count }}</div>
+                    <div class="summary-label">Total Locations</div>
+                </div>
+                
+                <div class="summary-item">
+                    <div class="summary-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="summary-value">{{ popular_count|default:"0" }}</div>
+                    <div class="summary-label">Popular Destinations</div>
+                </div>
+                
+                <div class="summary-item">
+                    <div class="summary-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <div class="summary-value">{{ states_count|default:"0" }}</div>
+                    <div class="summary-label">States Covered</div>
+                </div>
+                
+                <div class="summary-item">
+                    <div class="summary-icon">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <div class="summary-value">{{ routes_count|default:"0" }}</div>
+                    <div class="summary-label">Active Routes</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search and Filter -->
+        <div class="search-section">
+            <form method="GET" class="search-form">
+                <div class="form-group">
+                    <label class="form-label">Search Locations</label>
+                    <input type="text" name="search" class="form-control" placeholder="Search by city, state, or country..." value="{{ search_query }}">
+                </div>
+                
+                <div class="form-group" style="flex: 0 0 auto;">
+                    <button type="submit" class="btn-search">
+                        <i class="fas fa-search me-2"></i>Search
+                    </button>
+                </div>
+                
+                <div class="form-group" style="flex: 0 0 auto;">
+                    <a href="{% url 'routes:location_list' %}" class="btn-clear">
+                        <i class="fas fa-times me-2"></i>Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Locations Grid -->
+        {% if page_obj %}
+            <div class="locations-grid">
+                {% for location in page_obj %}
+                <div class="location-card">
+                    <div class="location-header">
+                        <div class="location-info">
+                            <div class="location-name">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ location.name }}
+                            </div>
+                            <div class="location-region">{{ location.state }}</div>
+                            <div class="location-country">{{ location.country }}</div>
+                        </div>
+                        {% if location.is_popular %}
+                        <div class="popular-badge">
+                            Popular
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="location-details">
+                        <div class="detail-row">
+                            <span class="detail-label">
+                                <i class="fas fa-clock"></i>
+                                Timezone
+                            </span>
+                            <span class="detail-value">{{ location.timezone|default:"UTC+5:30" }}</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">
+                                <i class="fas fa-map"></i>
+                                Coordinates
+                            </span>
+                            <span class="detail-value">
+                                {% if location.latitude and location.longitude %}
+                                    {{ location.latitude|floatformat:2 }}, {{ location.longitude|floatformat:2 }}
+                                {% else %}
+                                    Not available
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">
+                                <i class="fas fa-info-circle"></i>
+                                Status
+                            </span>
+                            <span class="detail-value">
+                                {% if location.is_active %}
+                                    <span style="color: #28a745;">Active</span>
+                                {% else %}
+                                    <span style="color: #dc3545;">Inactive</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="location-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">{{ location.source_routes_count|default:"0" }}</div>
+                            <div class="stat-label">From Here</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{ location.destination_routes_count|default:"0" }}</div>
+                            <div class="stat-label">To Here</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{ location.total_bookings|default:"0" }}</div>
+                            <div class="stat-label">Bookings</div>
+                        </div>
+                    </div>
+                    
+                    <div class="location-actions">
+                        <a href="{% url 'routes:route_search' %}?source={{ location.id }}" class="btn-primary">
+                            <i class="fas fa-plane-departure"></i>From Here
+                        </a>
+                        <a href="{% url 'routes:route_search' %}?destination={{ location.id }}" class="btn-outline">
+                            <i class="fas fa-plane-arrival"></i>To Here
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div class="pagination-wrapper">
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}page=1" class="page-link">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}page={{ page_obj.previous_page_number }}" class="page-link">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    {% else %}
+                        <span class="page-link disabled">
+                            <i class="fas fa-angle-double-left"></i>
+                        </span>
+                        <span class="page-link disabled">
+                            <i class="fas fa-angle-left"></i>
+                        </span>
+                    {% endif %}
+                    
+                    <span class="page-link active">
+                        {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}page={{ page_obj.next_page_number }}" class="page-link">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}page={{ page_obj.paginator.num_pages }}" class="page-link">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    {% else %}
+                        <span class="page-link disabled">
+                            <i class="fas fa-angle-right"></i>
+                        </span>
+                        <span class="page-link disabled">
+                            <i class="fas fa-angle-double-right"></i>
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="locations-grid">
+                <div class="no-locations">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>No Locations Found</h3>
+                    <p>{% if search_query %}No locations match your search criteria. Try adjusting your search terms.{% else %}No locations are currently available.{% endif %}</p>
+                    <a href="{% url 'routes:route_search' %}" class="btn-primary">
+                        <i class="fas fa-search me-2"></i>Search Routes
+                    </a>
+                    <a href="{% url 'home:home' %}" class="btn-outline">
+                        <i class="fas fa-home me-2"></i>Back to Home
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add any JavaScript functionality here if needed
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-submit search form on Enter key
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    this.form.submit();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

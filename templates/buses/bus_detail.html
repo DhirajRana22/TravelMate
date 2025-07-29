@@ -1,0 +1,480 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ bus.bus_number }} - Bus Details - TravelMate{% endblock %}
+
+{% block extra_css %}
+<style>
+    .bus-detail-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-top: -1.5rem;
+    }
+    .detail-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    .detail-card .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        border-radius: 15px 15px 0 0;
+        padding: 1.5rem;
+    }
+    .detail-card .card-body {
+        padding: 1.5rem;
+    }
+    .bus-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .info-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    .info-item:hover {
+        background: #e9ecef;
+        transform: translateY(-2px);
+    }
+    .info-item i {
+        width: 30px;
+        height: 30px;
+        background: #667eea;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 0.875rem;
+    }
+    .info-content .label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+    }
+    .info-content .value {
+        color: #6c757d;
+        font-size: 1rem;
+    }
+    .amenity-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    .amenity-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        background: #e3f2fd;
+        border-radius: 8px;
+        color: #1976d2;
+    }
+    .amenity-item i {
+        margin-right: 0.75rem;
+        font-size: 1.1rem;
+    }
+    .driver-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    .driver-avatar {
+        width: 80px;
+        height: 80px;
+        background: #667eea;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2rem;
+    }
+    .schedule-table {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .schedule-table th {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+    }
+    .schedule-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+    .schedule-table tr:last-child td {
+        border-bottom: none;
+    }
+    .route-badge {
+        background: #28a745;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    .fare-badge {
+        background: #ffc107;
+        color: #212529;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+    .btn-book-now {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        color: white;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    .btn-book-now:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+    .btn-back {
+        background: #6c757d;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        color: white;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    .btn-back:hover {
+        background: #5a6268;
+        color: white;
+        text-decoration: none;
+    }
+    .no-schedules {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+    .no-schedules i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    .bus-type-badge {
+        background: #667eea;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+    .status-inactive {
+        background: #f8d7da;
+        color: #721c24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Bus Detail Header -->
+<section class="bus-detail-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">{{ bus.bus_number }}</h1>
+                <p class="mb-3">{{ bus.bus_name|default:"Bus Details" }}</p>
+                <span class="bus-type-badge">{{ bus.bus_type.name }}</span>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'buses:bus_list' %}" class="btn btn-back me-2">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Buses
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bus Details -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Main Details -->
+            <div class="col-lg-8">
+                <!-- Basic Information -->
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-info-circle me-2"></i>Bus Information</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="bus-info-grid">
+                            <div class="info-item">
+                                <i class="fas fa-bus"></i>
+                                <div class="info-content">
+                                    <div class="label">Bus Number</div>
+                                    <div class="value">{{ bus.bus_number }}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-tag"></i>
+                                <div class="info-content">
+                                    <div class="label">Bus Type</div>
+                                    <div class="value">{{ bus.bus_type.name }}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-chair"></i>
+                                <div class="info-content">
+                                    <div class="label">Total Seats</div>
+                                    <div class="value">{{ bus.total_seats }}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-calendar-plus"></i>
+                                <div class="info-content">
+                                    <div class="label">Added On</div>
+                                    <div class="value">{{ bus.created_at|date:"M d, Y" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Amenities -->
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-star me-2"></i>Amenities</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if bus.amenities.all %}
+                            <div class="amenity-grid">
+                                {% for amenity in bus.amenities.all %}
+                                <div class="amenity-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>{{ amenity.name }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-3">
+                                <i class="fas fa-info-circle text-muted me-2"></i>
+                                <span class="text-muted">No amenities listed for this bus</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Available Schedules -->
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="fas fa-clock me-2"></i>Available Schedules</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if schedules %}
+                            <div class="table-responsive">
+                                <table class="table schedule-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Route</th>
+                                            <th>Departure</th>
+                                            <th>Arrival</th>
+                                            <th>Duration</th>
+                                            <th>Fare</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for schedule in schedules %}
+                                        <tr>
+                                            <td>
+                                                <div class="route-badge">
+                                                    {{ schedule.route.source }} → {{ schedule.route.destination }}
+                                                </div>
+                                                <small class="text-muted d-block mt-1">
+                                                    {{ schedule.route.distance }} km
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <strong>{{ schedule.departure_time|time:"g:i A" }}</strong>
+                                            </td>
+                                            <td>
+                                                <strong>{{ schedule.arrival_time|time:"g:i A" }}</strong>
+                                            </td>
+                                            <td>
+                                                <span class="text-muted">{{ schedule.journey_duration }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="fare-badge">रू {{ schedule.base_fare }}</span>
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'buses:route_detail' schedule.route.id %}" class="btn btn-book-now btn-sm">
+                                    <i class="fas fa-ticket-alt me-1"></i>Book
+                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="no-schedules">
+                                <i class="fas fa-calendar-times"></i>
+                                <h5>No schedules available</h5>
+                                <p>This bus doesn't have any scheduled routes at the moment.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Driver Information -->
+                {% if bus.driver %}
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-user-tie me-2"></i>Driver Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="driver-card">
+                            <div class="driver-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h5 class="mb-2">{{ bus.driver.name }}</h5>
+                            <div class="mb-2">
+                                <i class="fas fa-phone me-2 text-muted"></i>
+                                <span>{{ bus.driver.phone_number }}</span>
+                            </div>
+                            <div class="mb-2">
+                                <i class="fas fa-id-card me-2 text-muted"></i>
+                                <span>License: {{ bus.driver.license_number }}</span>
+                            </div>
+                            <div>
+                                <i class="fas fa-calendar me-2 text-muted"></i>
+                                <span>{{ bus.driver.experience_years }} years experience</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Quick Stats -->
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Quick Stats</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item mb-3">
+                            <i class="fas fa-route"></i>
+                            <div class="info-content">
+                                <div class="label">Available Routes</div>
+                                <div class="value">{{ schedules|length }}</div>
+                            </div>
+                        </div>
+                        <div class="info-item mb-3">
+                            <i class="fas fa-star"></i>
+                            <div class="info-content">
+                                <div class="label">Amenities</div>
+                                <div class="value">{{ bus.amenities.count }}</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <div class="info-content">
+                                <div class="label">Status</div>
+                                <div class="value">
+                                    {% if schedules %}
+                                        <span class="status-badge status-active">Active</span>
+                                    {% else %}
+                                        <span class="status-badge status-inactive">Inactive</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            {% if schedules %}
+                                <a href="{% url 'routes:route_search' %}?bus={{ bus.id }}" class="btn btn-book-now">
+                                    <i class="fas fa-ticket-alt me-2"></i>Book This Bus
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'buses:bus_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-list me-2"></i>View All Buses
+                            </a>
+                            <a href="{% url 'routes:route_search' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-search me-2"></i>Search Routes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Add hover effects to info items
+        $('.info-item').hover(
+            function() {
+                $(this).find('i').css('transform', 'scale(1.1)');
+            },
+            function() {
+                $(this).find('i').css('transform', 'scale(1)');
+            }
+        );
+        
+        // Add click effect to amenity items
+        $('.amenity-item').click(function() {
+            $(this).addClass('animate__animated animate__pulse');
+            setTimeout(() => {
+                $(this).removeClass('animate__animated animate__pulse');
+            }, 1000);
+        });
+        
+        // Smooth scroll to schedules when book button is clicked
+        $('a[href*="route_detail"]').click(function(e) {
+            // Add loading state
+            $(this).html('<i class="fas fa-spinner fa-spin me-1"></i>Loading...');
+        });
+    });
+</script>
+{% endblock %}

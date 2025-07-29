@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Privacy Policy - TravelMate{% endblock %}
+
+{% block extra_css %}
+<style>
+    .privacy-hero {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{% static "img/privacy-hero.jpg" %}') no-repeat center center;
+        background-size: cover;
+        color: white;
+        padding: 80px 0;
+        margin-top: -1.5rem;
+    }
+    .privacy-section {
+        margin-bottom: 2rem;
+    }
+    .privacy-section h3 {
+        color: #0d6efd;
+        margin-bottom: 1rem;
+    }
+    .privacy-nav {
+        position: sticky;
+        top: 100px;
+    }
+    .privacy-nav .nav-link {
+        color: #495057;
+        border-radius: 0;
+        padding: 0.5rem 1rem;
+    }
+    .privacy-nav .nav-link.active {
+        color: #0d6efd;
+        background-color: #e7f1ff;
+        border-left: 3px solid #0d6efd;
+    }
+    .privacy-content {
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+    .privacy-content ul, .privacy-content ol {
+        padding-left: 1.5rem;
+    }
+    .privacy-content li {
+        margin-bottom: 0.5rem;
+    }
+    .last-updated {
+        font-style: italic;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="privacy-hero">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-4">Privacy Policy</h1>
+        <p class="lead mb-0">How we collect, use, and protect your personal information</p>
+    </div>
+</section>
+
+<!-- Privacy Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar Navigation -->
+            <div class="col-lg-3 mb-4 mb-lg-0">
+                <div class="privacy-nav">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Table of Contents</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <nav class="nav flex-column">
+                                <a class="nav-link active" href="#introduction">Introduction</a>
+                                <a class="nav-link" href="#information">Information We Collect</a>
+                                <a class="nav-link" href="#use">How We Use Your Information</a>
+                                <a class="nav-link" href="#sharing">Information Sharing</a>
+                                <a class="nav-link" href="#cookies">Cookies and Tracking</a>
+                                <a class="nav-link" href="#security">Data Security</a>
+                                <a class="nav-link" href="#rights">Your Rights</a>
+                                <a class="nav-link" href="#children">Children's Privacy</a>
+                                <a class="nav-link" href="#international">International Data Transfers</a>
+                                <a class="nav-link" href="#changes">Changes to Privacy Policy</a>
+                                <a class="nav-link" href="#contact">Contact Us</a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Privacy Content -->
+            <div class="col-lg-9">
+                <div class="privacy-content">
+                    <p class="last-updated">Last Updated: May 15, 2024</p>
+                    
+                    <div id="introduction" class="privacy-section">
+                        <h3>1. Introduction</h3>
+                        <p>At TravelMate, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website, mobile applications, and services (collectively, the "Services").</p>
+                        <p>By accessing or using our Services, you consent to the collection, use, and disclosure of your information as described in this Privacy Policy. If you do not agree with our policies and practices, please do not use our Services.</p>
+                        <p>This Privacy Policy applies to all users of our Services, including bus operators, passengers, and visitors to our website or mobile applications.</p>
+                    </div>
+                    
+                    <div id="information" class="privacy-section">
+                        <h3>2. Information We Collect</h3>
+                        <p>We collect several types of information from and about users of our Services, including:</p>
+                        
+                        <h4>2.1 Personal Information</h4>
+                        <p>Personal information is information that identifies you as an individual. We collect the following types of personal information:</p>
+                        <ul>
+                            <li><strong>Contact Information:</strong> Name, email address, phone number, and mailing address</li>
+                            <li><strong>Account Information:</strong> Username, password, and profile information</li>
+                            <li><strong>Identity Information:</strong> Date of birth, gender, and government-issued ID details (when required for booking)</li>
+                            <li><strong>Payment Information:</strong> Credit card details, bank account information, and billing address</li>
+                            <li><strong>Travel Information:</strong> Booking history, travel preferences, and feedback</li>
+                        </ul>
+                        
+                        <h4>2.2 Non-Personal Information</h4>
+                        <p>Non-personal information is information that does not directly identify you. We collect the following types of non-personal information:</p>
+                        <ul>
+                            <li><strong>Device Information:</strong> IP address, device type, operating system, browser type, and mobile network information</li>
+                            <li><strong>Usage Information:</strong> Pages visited, time spent on pages, links clicked, and search queries</li>
+                            <li><strong>Location Information:</strong> General location based on IP address or more precise location if you grant permission</li>
+                            <li><strong>Log Data:</strong> Server logs, error reports, and performance data</li>
+                        </ul>
+                        
+                        <h4>2.3 Information Collection Methods</h4>
+                        <p>We collect information through various methods, including:</p>
+                        <ul>
+                            <li><strong>Direct Collection:</strong> Information you provide when creating an account, making a booking, contacting customer support, or participating in surveys</li>
+                            <li><strong>Automated Collection:</strong> Information collected automatically through cookies, web beacons, and similar technologies</li>
+                            <li><strong>Third-Party Sources:</strong> Information from business partners, social media platforms, and other third-party sources</li>
+                        </ul>
+                    </div>
+                    
+                    <div id="use" class="privacy-section">
+                        <h3>3. How We Use Your Information</h3>
+                        <p>We use the information we collect for various purposes, including:</p>
+                        
+                        <h4>3.1 Providing and Improving Our Services</h4>
+                        <ul>
+                            <li>Processing and confirming bookings</li>
+                            <li>Facilitating payments and refunds</li>
+                            <li>Providing customer support</li>
+                            <li>Personalizing your experience</li>
+                            <li>Improving our website, mobile applications, and services</li>
+                            <li>Developing new features and offerings</li>
+                        </ul>
+                        
+                        <h4>3.2 Communication</h4>
+                        <ul>
+                            <li>Sending booking confirmations and updates</li>
+                            <li>Providing important service announcements</li>
+                            <li>Responding to your inquiries and requests</li>
+                            <li>Sending promotional emails and newsletters (with your consent)</li>
+                            <li>Conducting surveys and collecting feedback</li>
+                        </ul>
+                        
+                        <h4>3.3 Security and Fraud Prevention</h4>
+                        <ul>
+                            <li>Verifying your identity</li>
+                            <li>Detecting and preventing fraudulent activities</li>
+                            <li>Protecting the security of our Services</li>
+                            <li>Enforcing our Terms and Conditions</li>
+                        </ul>
+                        
+                        <h4>3.4 Legal and Compliance</h4>
+                        <ul>
+                            <li>Complying with legal obligations</li>
+                            <li>Responding to legal requests and preventing harm</li>
+                            <li>Establishing, exercising, or defending legal claims</li>
+                        </ul>
+                        
+                        <h4>3.5 Analytics and Research</h4>
+                        <ul>
+                            <li>Analyzing usage patterns and trends</li>
+                            <li>Measuring the effectiveness of our marketing campaigns</li>
+                            <li>Conducting research to improve our Services</li>
+                        </ul>
+                    </div>
+                    
+                    <div id="sharing" class="privacy-section">
+                        <h3>4. Information Sharing</h3>
+                        <p>We may share your information with the following categories of recipients:</p>
+                        
+                        <h4>4.1 Bus Operators</h4>
+                        <p>We share necessary booking information with the bus operators to facilitate your travel. This includes passenger names, contact information, and booking details.</p>
+                        
+                        <h4>4.2 Service Providers</h4>
+                        <p>We engage various service providers to perform functions on our behalf, such as payment processing, customer support, data analysis, email delivery, and hosting services. These service providers have access to your information only to perform these tasks on our behalf and are obligated not to disclose or use it for any other purpose.</p>
+                        
+                        <h4>4.3 Business Partners</h4>
+                        <p>We may share your information with business partners who offer services that may be of interest to you. These partners include travel insurance providers, accommodation providers, and other travel-related service providers.</p>
+                        
+                        <h4>4.4 Legal and Regulatory Authorities</h4>
+                        <p>We may disclose your information to legal and regulatory authorities, or other third parties as required by law, to comply with a subpoena, court order, or other legal process, or to establish, protect, or exercise our legal rights or defend against legal claims.</p>
+                        
+                        <h4>4.5 Corporate Transactions</h4>
+                        <p>In the event of a merger, acquisition, reorganization, bankruptcy, or other similar event, your information may be transferred to a successor entity or to a third party in connection with such transaction.</p>
+                        
+                        <h4>4.6 With Your Consent</h4>
+                        <p>We may share your information with other third parties with your explicit consent.</p>
+                    </div>
+                    
+                    <div id="cookies" class="privacy-section">
+                        <h3>5. Cookies and Tracking</h3>
+                        <p>We use cookies, web beacons, and similar tracking technologies to collect information about your browsing activities on our website and mobile applications. These technologies help us analyze trends, administer the website, track users' movements around the website, and gather demographic information about our user base as a whole.</p>
+                        
+                        <h4>5.1 Types of Cookies We Use</h4>
+                        <ul>
+                            <li><strong>Essential Cookies:</strong> Necessary for the operation of our website and Services</li>
+                            <li><strong>Analytical/Performance Cookies:</strong> Allow us to recognize and count the number of visitors and see how visitors move around our website</li>
+                            <li><strong>Functionality Cookies:</strong> Enable us to personalize content and remember your preferences</li>
+                            <li><strong>Targeting Cookies:</strong> Record your visit to our website, the pages you have visited, and the links you have followed to deliver more relevant advertisements</li>
+                        </ul>
+                        
+                        <h4>5.2 Cookie Management</h4>
+                        <p>You can control and manage cookies in various ways. Most web browsers allow you to delete cookies, block all cookies, or block specific types of cookies. Please note that if you choose to block all cookies, you may not be able to access all or parts of our website, or some features may not function properly.</p>
+                        
+                        <h4>5.3 Do Not Track</h4>
+                        <p>Some web browsers have a "Do Not Track" feature that signals to websites that you visit that you do not want to have your online activity tracked. Our website does not currently respond to "Do Not Track" signals.</p>
+                    </div>
+                    
+                    <div id="security" class="privacy-section">
+                        <h3>6. Data Security</h3>
+                        <p>We implement appropriate technical and organizational measures to protect your personal information against unauthorized or unlawful processing, accidental loss, destruction, or damage. These measures include:</p>
+                        <ul>
+                            <li>Encryption of sensitive information</li>
+                            <li>Secure Socket Layer (SSL) technology for data transmission</li>
+                            <li>Access controls and authentication mechanisms</li>
+                            <li>Regular security assessments and audits</li>
+                            <li>Employee training on data protection and security</li>
+                        </ul>
+                        <p>While we strive to protect your personal information, no method of transmission over the Internet or method of electronic storage is 100% secure. Therefore, we cannot guarantee its absolute security.</p>
+                    </div>
+                    
+                    <div id="rights" class="privacy-section">
+                        <h3>7. Your Rights</h3>
+                        <p>Depending on your location, you may have certain rights regarding your personal information. These rights may include:</p>
+                        
+                        <h4>7.1 Access and Information</h4>
+                        <p>You have the right to request access to the personal information we hold about you and to receive information about how we process it.</p>
+                        
+                        <h4>7.2 Correction</h4>
+                        <p>You have the right to request that we correct any inaccurate or incomplete personal information we hold about you.</p>
+                        
+                        <h4>7.3 Deletion</h4>
+                        <p>You have the right to request that we delete your personal information in certain circumstances, such as when it is no longer necessary for the purposes for which it was collected.</p>
+                        
+                        <h4>7.4 Restriction of Processing</h4>
+                        <p>You have the right to request that we restrict the processing of your personal information in certain circumstances, such as when you contest the accuracy of the information.</p>
+                        
+                        <h4>7.5 Data Portability</h4>
+                        <p>You have the right to receive your personal information in a structured, commonly used, and machine-readable format, and to transmit that information to another controller.</p>
+                        
+                        <h4>7.6 Objection</h4>
+                        <p>You have the right to object to the processing of your personal information in certain circumstances, such as for direct marketing purposes.</p>
+                        
+                        <h4>7.7 Withdrawal of Consent</h4>
+                        <p>If we rely on your consent to process your personal information, you have the right to withdraw that consent at any time.</p>
+                        
+                        <h4>7.8 Exercising Your Rights</h4>
+                        <p>To exercise any of these rights, please contact us using the contact information provided at the end of this Privacy Policy. We may need to verify your identity before responding to your request.</p>
+                    </div>
+                    
+                    <div id="children" class="privacy-section">
+                        <h3>8. Children's Privacy</h3>
+                        <p>Our Services are not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us, and we will delete such information from our systems.</p>
+                    </div>
+                    
+                    <div id="international" class="privacy-section">
+                        <h3>9. International Data Transfers</h3>
+                        <p>We may transfer your personal information to countries other than the country in which you reside. These countries may have different data protection laws than your country of residence. When we transfer your personal information internationally, we take appropriate safeguards to ensure that your information receives an adequate level of protection.</p>
+                        <p>By using our Services, you consent to the transfer of your personal information to countries outside your country of residence, including the United States, which may have different data protection rules than those of your country.</p>
+                    </div>
+                    
+                    <div id="changes" class="privacy-section">
+                        <h3>10. Changes to Privacy Policy</h3>
+                        <p>We may update this Privacy Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. We will notify you of any material changes by posting the new Privacy Policy on this page and updating the "Last Updated" date at the top of this Privacy Policy.</p>
+                        <p>We encourage you to review this Privacy Policy periodically to stay informed about how we are protecting your information.</p>
+                    </div>
+                    
+                    <div id="contact" class="privacy-section">
+                        <h3>11. Contact Us</h3>
+                        <p>If you have any questions or concerns about this Privacy Policy or our privacy practices, please contact us at:</p>
+                        <address>
+                            TravelMate Inc.<br>
+                            123 Travel Street, Suite 456<br>
+                            New York, NY 10001<br>
+                            United States<br><br>
+                            Email: <a href="mailto:privacy@travelmate.com">privacy@travelmate.com</a><br>
+                            Phone: +1 (212) 345-6789
+                        </address>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Acceptance Banner -->
+<section class="py-4 bg-light">
+    <div class="container text-center">
+        <p class="mb-0">By using TravelMate services, you acknowledge that you have read and understood this Privacy Policy and agree to the collection, use, and disclosure of your information as described herein.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Smooth scroll for anchor links
+        $('a[href^="#"]').on('click', function(e) {
+            e.preventDefault();
+            var target = $(this.hash);
+            if (target.length) {
+                $('html, body').animate({
+                    scrollTop: target.offset().top - 100
+                }, 500);
+            }
+        });
+        
+        // Update active nav link on scroll
+        $(window).on('scroll', function() {
+            $('.privacy-section').each(function() {
+                if ($(window).scrollTop() >= $(this).offset().top - 150) {
+                    var id = $(this).attr('id');
+                    $('.privacy-nav .nav-link').removeClass('active');
+                    $('.privacy-nav .nav-link[href="#' + id + '"]').addClass('active');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

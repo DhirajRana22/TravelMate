@@ -1,0 +1,619 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search Results - TravelMate{% endblock %}
+
+{% block extra_css %}
+<style>
+    .results-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-top: -1.5rem;
+    }
+    .search-summary {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .modify-search {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+    .schedule-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    .schedule-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    .schedule-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    .schedule-body {
+        padding: 1.5rem;
+    }
+    .bus-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    .bus-number {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #495057;
+        margin-right: 1rem;
+    }
+    .bus-type {
+        background: #667eea;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+    }
+    .time-info {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    .time-block {
+        text-align: center;
+    }
+    .time-large {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #495057;
+    }
+    .time-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    .duration-block {
+        text-align: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    .duration-time {
+        font-weight: bold;
+        color: #667eea;
+    }
+    .duration-line {
+        height: 2px;
+        background: #667eea;
+        margin: 0.5rem 0;
+        position: relative;
+    }
+    .duration-line::before {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: -3px;
+        width: 0;
+        height: 0;
+        border-left: 8px solid #667eea;
+        border-top: 4px solid transparent;
+        border-bottom: 4px solid transparent;
+    }
+    .amenities-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .amenity-badge {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+    }
+    .amenity-badge i {
+        margin-right: 0.25rem;
+    }
+    .price-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid #dee2e6;
+    }
+    .price-info {
+        text-align: right;
+    }
+    .price-amount {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #28a745;
+    }
+    .price-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+    .btn-book {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 12px 25px;
+        color: white;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    .btn-book:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+    .btn-view-seats {
+        background: #667eea;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        color: white;
+        font-size: 0.875rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        margin-right: 0.5rem;
+    }
+    .btn-view-seats:hover {
+        background: #5a67d8;
+        color: white;
+        text-decoration: none;
+    }
+    .filter-sidebar {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        position: sticky;
+        top: 2rem;
+    }
+    .filter-section {
+        margin-bottom: 2rem;
+    }
+    .filter-title {
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: #495057;
+        display: flex;
+        align-items: center;
+    }
+    .filter-title i {
+        margin-right: 0.5rem;
+        color: #667eea;
+    }
+    .filter-option {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    .filter-option input {
+        margin-right: 0.5rem;
+    }
+    .no-results {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #6c757d;
+    }
+    .no-results i {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+    }
+    .sort-options {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+    .sort-btn {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+    }
+    .sort-btn:hover, .sort-btn.active {
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+    }
+    .results-count {
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+    .seats-available {
+        color: #28a745;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    .seats-limited {
+        color: #ffc107;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    .seats-full {
+        color: #dc3545;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Results Header -->
+<section class="results-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2"><i class="fas fa-search me-2"></i>Search Results</h1>
+                <p class="mb-0">{{ source }} → {{ destination }} on {{ travel_date|date:"F d, Y" }}</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'routes:route_search' %}" class="btn btn-light">
+                    <i class="fas fa-search me-2"></i>New Search
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search Results -->
+<section class="py-5">
+    <div class="container">
+        <!-- Search Summary -->
+        <div class="search-summary">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="mb-1">{{ source }} to {{ destination }}</h5>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-calendar me-1"></i>{{ travel_date|date:"l, F d, Y" }}
+                        <span class="ms-3"><i class="fas fa-bus me-1"></i>{{ schedules|length }} bus{{ schedules|length|pluralize:"es" }} found</span>
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button class="btn btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#modifySearch">
+                        <i class="fas fa-edit me-2"></i>Modify Search
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modify Search Form -->
+        <div class="collapse modify-search" id="modifySearch">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">From</label>
+                    <input type="text" name="source" class="form-control" value="{{ source }}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">To</label>
+                    <input type="text" name="destination" class="form-control" value="{{ destination }}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Travel Date</label>
+                    <input type="date" name="travel_date" class="form-control" value="{{ travel_date|date:'Y-m-d' }}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary d-block w-100">
+                        <i class="fas fa-search me-2"></i>Search
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="row">
+            <!-- Filters Sidebar -->
+            <div class="col-lg-3">
+                <div class="filter-sidebar">
+                    <h5 class="mb-3"><i class="fas fa-filter me-2"></i>Filters</h5>
+                    
+                    <!-- Bus Type Filter -->
+                    <div class="filter-section">
+                        <div class="filter-title">
+                            <i class="fas fa-bus"></i>Bus Type
+                        </div>
+                        {% for bus_type in bus_types %}
+                        <div class="filter-option">
+                            <input type="checkbox" id="type_{{ bus_type.id }}" class="filter-checkbox" data-filter="bus_type" value="{{ bus_type.id }}">
+                            <label for="type_{{ bus_type.id }}">{{ bus_type.name }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Price Range Filter -->
+                    <div class="filter-section">
+                        <div class="filter-title">
+                            <i class="fas fa-money-bill"></i>Price Range
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="price_low" class="filter-checkbox" data-filter="price" value="low">
+                            <label for="price_low">रू 0 - रू 500</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="price_mid" class="filter-checkbox" data-filter="price" value="mid">
+                            <label for="price_mid">रू 500 - रू 1000</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="price_high" class="filter-checkbox" data-filter="price" value="high">
+                            <label for="price_high">रू 1000+</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Departure Time Filter -->
+                    <div class="filter-section">
+                        <div class="filter-title">
+                            <i class="fas fa-clock"></i>Departure Time
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="time_morning" class="filter-checkbox" data-filter="time" value="morning">
+                            <label for="time_morning">Morning (6 AM - 12 PM)</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="time_afternoon" class="filter-checkbox" data-filter="time" value="afternoon">
+                            <label for="time_afternoon">Afternoon (12 PM - 6 PM)</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="time_evening" class="filter-checkbox" data-filter="time" value="evening">
+                            <label for="time_evening">Evening (6 PM - 12 AM)</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="time_night" class="filter-checkbox" data-filter="time" value="night">
+                            <label for="time_night">Night (12 AM - 6 AM)</label>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-outline-secondary w-100" id="clearFilters">
+                        <i class="fas fa-times me-2"></i>Clear Filters
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Results List -->
+            <div class="col-lg-9">
+                <!-- Sort Options -->
+                <div class="sort-options">
+                    <span class="fw-bold">Sort by:</span>
+                    <a href="?{{ request.GET.urlencode }}&sort=departure" class="sort-btn {% if request.GET.sort == 'departure' or not request.GET.sort %}active{% endif %}">
+                        <i class="fas fa-clock me-1"></i>Departure Time
+                    </a>
+                    <a href="?{{ request.GET.urlencode }}&sort=price" class="sort-btn {% if request.GET.sort == 'price' %}active{% endif %}">
+                        <i class="fas fa-money-bill me-1"></i>Price
+                    </a>
+                    <a href="?{{ request.GET.urlencode }}&sort=duration" class="sort-btn {% if request.GET.sort == 'duration' %}active{% endif %}">
+                        <i class="fas fa-hourglass me-1"></i>Duration
+                    </a>
+                </div>
+                
+                <!-- Results Count -->
+                <div class="results-count">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Showing {{ schedules|length }} result{{ schedules|length|pluralize }} for your search
+                </div>
+                
+                <!-- Schedule Cards -->
+                {% if schedules %}
+                    {% for schedule in schedules %}
+                    <div class="schedule-card" data-bus-type="{{ schedule.bus.bus_type.id }}" data-price="{{ schedule.base_fare }}" data-departure="{{ schedule.departure_time|time:'H' }}">
+                        <div class="schedule-header">
+                            <div class="bus-info">
+                                <span class="bus-number">{{ schedule.bus.bus_number }}</span>
+                                <span class="bus-type">{{ schedule.bus.bus_type.name }}</span>
+                            </div>
+                        </div>
+                        <div class="schedule-body">
+                            <!-- Time Information -->
+                            <div class="time-info">
+                                <div class="time-block">
+                                    <div class="time-large">{{ schedule.departure_time|time:"g:i A" }}</div>
+                                    <div class="time-label">{{ schedule.route.source }}</div>
+                                </div>
+                                <div class="duration-block">
+                                    <div class="duration-time">{{ schedule.journey_duration }}</div>
+                                    <div class="duration-line"></div>
+                                    <small class="text-muted">{{ schedule.route.distance }} km</small>
+                                </div>
+                                <div class="time-block">
+                                    <div class="time-large">{{ schedule.arrival_time|time:"g:i A" }}</div>
+                                    <div class="time-label">{{ schedule.route.destination }}</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Amenities -->
+                            {% if schedule.bus.amenities.all %}
+                            <div class="amenities-row">
+                                {% for amenity in schedule.bus.amenities.all %}
+                                <span class="amenity-badge">
+                                    <i class="fas fa-check"></i>
+                                    {{ amenity.name }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Seat Availability -->
+                            <div class="mb-2">
+                                {% with available_seats=schedule.available_seats %}
+                                    {% if available_seats > 10 %}
+                                        <span class="seats-available">
+                                            <i class="fas fa-check-circle me-1"></i>{{ available_seats }} seats available
+                                        </span>
+                                    {% elif available_seats > 0 %}
+                                        <span class="seats-limited">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>Only {{ available_seats }} seats left
+                                        </span>
+                                    {% else %}
+                                        <span class="seats-full">
+                                            <i class="fas fa-times-circle me-1"></i>Fully booked
+                                        </span>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                            
+                            <!-- Price and Booking -->
+                            <div class="price-section">
+                                <div>
+                                    <a href="{% url 'bookings:seat_selection' schedule.id %}?date={{ travel_date|date:'Y-m-d' }}" class="btn-view-seats">
+                                    <i class="fas fa-eye me-1"></i>View Seats
+                                </a>
+                                </div>
+                                <div class="price-info">
+                                    <div class="price-amount">रू {{ schedule.base_fare }}</div>
+                                    <div class="price-label">per person</div>
+                                </div>
+                                <div>
+                                    {% if schedule.available_seats > 0 %}
+                                        <a href="{% url 'bookings:quick_booking' schedule.id %}?date={{ travel_date|date:'Y-m-d' }}" class="btn-book">
+                                        <i class="fas fa-ticket-alt me-1"></i>Book Now
+                                    </a>
+                                    {% else %}
+                                        <button class="btn btn-secondary" disabled>
+                                            <i class="fas fa-times me-2"></i>Fully Booked
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h4>No buses found</h4>
+                        <p>Sorry, we couldn't find any buses for your selected route and date.</p>
+                        <div class="mt-3">
+                            <a href="{% url 'routes:route_search' %}" class="btn btn-primary me-2">
+                                <i class="fas fa-search me-2"></i>Try Different Search
+                            </a>
+                            <button class="btn btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#modifySearch">
+                                <i class="fas fa-edit me-2"></i>Modify Search
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Filter functionality
+        $('.filter-checkbox').change(function() {
+            applyFilters();
+        });
+        
+        function applyFilters() {
+            const busTypeFilters = $('.filter-checkbox[data-filter="bus_type"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+            
+            const priceFilters = $('.filter-checkbox[data-filter="price"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+            
+            const timeFilters = $('.filter-checkbox[data-filter="time"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+            
+            $('.schedule-card').each(function() {
+                let show = true;
+                const card = $(this);
+                const busType = card.data('bus-type').toString();
+                const price = parseFloat(card.data('price'));
+                const departure = parseInt(card.data('departure'));
+                
+                // Bus type filter
+                if (busTypeFilters.length > 0 && !busTypeFilters.includes(busType)) {
+                    show = false;
+                }
+                
+                // Price filter
+                if (priceFilters.length > 0) {
+                    let priceMatch = false;
+                    priceFilters.forEach(function(filter) {
+                        if (filter === 'low' && price <= 500) priceMatch = true;
+                        if (filter === 'mid' && price > 500 && price <= 1000) priceMatch = true;
+                        if (filter === 'high' && price > 1000) priceMatch = true;
+                    });
+                    if (!priceMatch) show = false;
+                }
+                
+                // Time filter
+                if (timeFilters.length > 0) {
+                    let timeMatch = false;
+                    timeFilters.forEach(function(filter) {
+                        if (filter === 'morning' && departure >= 6 && departure < 12) timeMatch = true;
+                        if (filter === 'afternoon' && departure >= 12 && departure < 18) timeMatch = true;
+                        if (filter === 'evening' && departure >= 18 && departure < 24) timeMatch = true;
+                        if (filter === 'night' && (departure >= 0 && departure < 6)) timeMatch = true;
+                    });
+                    if (!timeMatch) show = false;
+                }
+                
+                if (show) {
+                    card.show();
+                } else {
+                    card.hide();
+                }
+            });
+            
+            updateResultsCount();
+        }
+        
+        function updateResultsCount() {
+            const visibleCards = $('.schedule-card:visible').length;
+            $('.results-count').html(`<i class="fas fa-info-circle me-1"></i>Showing ${visibleCards} result${visibleCards !== 1 ? 's' : ''} for your search`);
+        }
+        
+        // Clear filters
+        $('#clearFilters').click(function() {
+            $('.filter-checkbox').prop('checked', false);
+            $('.schedule-card').show();
+            updateResultsCount();
+        });
+        
+        // Add loading state to book buttons
+        $('.btn-book, .btn-view-seats').click(function() {
+            const btn = $(this);
+            const originalText = btn.html();
+            btn.html('<i class="fas fa-spinner fa-spin me-2"></i>Loading...');
+            
+            // Restore original text after a delay (in case of navigation issues)
+            setTimeout(function() {
+                btn.html(originalText);
+            }, 3000);
+        });
+        
+        // Set minimum date for modify search
+        const today = new Date().toISOString().split('T')[0];
+        $('input[name="travel_date"]').attr('min', today);
+    });
+</script>
+{% endblock %}

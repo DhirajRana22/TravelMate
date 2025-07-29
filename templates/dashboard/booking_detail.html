@@ -1,0 +1,776 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin - Booking Details - {{ booking.booking_id }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .admin-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #e9ecef;
+    }
+    
+    .admin-card h5 {
+        color: #495057;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+        font-weight: 600;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .info-label {
+        font-weight: 500;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+    }
+    
+    .info-label i {
+        margin-right: 0.5rem;
+        width: 20px;
+        color: #667eea;
+    }
+    
+    .info-value {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-confirmed {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+    
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    
+    .payment-completed {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .payment-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .payment-failed {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .seat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .seat-item {
+        background: #28a745;
+        color: white;
+        padding: 0.5rem;
+        border-radius: 6px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .admin-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1.5rem;
+    }
+    
+    .btn-admin {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #5a6fd8;
+        color: white;
+    }
+    
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+    
+    .btn-success:hover {
+        background: #218838;
+        color: white;
+    }
+    
+    .btn-warning {
+        background: #ffc107;
+        color: #212529;
+    }
+    
+    .btn-warning:hover {
+        background: #e0a800;
+        color: #212529;
+    }
+    
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #c82333;
+        color: white;
+    }
+    
+    .btn-outline {
+        background: transparent;
+        color: #667eea;
+        border: 1px solid #667eea;
+    }
+    
+    .btn-outline:hover {
+        background: #667eea;
+        color: white;
+    }
+    
+    .route-display {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    
+    .route-cities {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.1rem;
+        font-weight: 600;
+        gap: 1rem;
+    }
+    
+    .payment-details {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .refund-details {
+        background: #fff3cd;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        border-left: 4px solid #ffc107;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0.5rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -1.75rem;
+        top: 0.25rem;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #667eea;
+    }
+    
+    .timeline-content {
+        background: white;
+        padding: 0.75rem;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
+        border-left: 3px solid #667eea;
+    }
+    
+    .timeline-time {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+    
+    .timeline-title {
+        font-weight: 600;
+        color: #495057;
+        margin: 0;
+    }
+    
+    @media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .admin-actions {
+            flex-direction: column;
+        }
+        
+        .route-cities {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Admin Header -->
+<section class="admin-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2"><i class="fas fa-ticket-alt me-2"></i>Booking Management</h1>
+                <p class="mb-0">Detailed view and management of booking {{ booking.booking_id }}</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'dashboard:booking_management' %}" class="btn btn-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Bookings
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Booking Details Content -->
+<section class="py-4">
+    <div class="container">
+        <div class="row">
+            <!-- Main Booking Information -->
+            <div class="col-lg-8">
+                <!-- Booking Overview -->
+                <div class="admin-card">
+                    <h5><i class="fas fa-info-circle me-2"></i>Booking Overview</h5>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="mb-1">Booking ID: <strong>{{ booking.booking_id }}</strong></h6>
+                            <small class="text-muted">Created on {{ booking.booking_date|date:"F d, Y g:i A" }}</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="status-badge status-{{ booking.booking_status }}">{{ booking.get_booking_status_display }}</div>
+                            <br>
+                            <small class="status-badge payment-{{ booking.payment_status|lower }}">{{ booking.get_payment_status_display }}</small>
+                        </div>
+                    </div>
+                    
+                    <div class="route-display">
+                        <div class="route-cities">
+                            <span>{{ booking.bus_schedule.route.source.name }}</span>
+                            <i class="fas fa-arrow-right"></i>
+                            <span>{{ booking.bus_schedule.route.destination.name }}</span>
+                        </div>
+                        <small>{{ booking.travel_date|date:"l, F d, Y" }}</small>
+                    </div>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-bus"></i>
+                                Bus Number
+                            </div>
+                            <div class="info-value">{{ booking.bus_schedule.bus.bus_number }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-clock"></i>
+                                Departure
+                            </div>
+                            <div class="info-value">{{ booking.bus_schedule.departure_time|time:"g:i A" }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-clock"></i>
+                                Arrival
+                            </div>
+                            <div class="info-value">{{ booking.bus_schedule.arrival_time|time:"g:i A" }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-chair"></i>
+                                Seats
+                            </div>
+                            <div class="info-value">{{ booking.seats.count }} seat{{ booking.seats.count|pluralize }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Passenger Information -->
+                <div class="admin-card">
+                    <h5><i class="fas fa-user me-2"></i>Passenger Information</h5>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-user"></i>
+                                Full Name
+                            </div>
+                            <div class="info-value">{{ booking.passenger_name }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-envelope"></i>
+                                Email
+                            </div>
+                            <div class="info-value">{{ booking.passenger_email }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-phone"></i>
+                                Phone
+                            </div>
+                            <div class="info-value">{{ booking.passenger_phone }}</div>
+                        </div>
+                        
+                        {% if booking.passenger_age %}
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-birthday-cake"></i>
+                                Age
+                            </div>
+                            <div class="info-value">{{ booking.passenger_age }} years</div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-user-circle"></i>
+                                User Account
+                            </div>
+                            <div class="info-value">
+                                <a href="{% url 'dashboard:user_detail' booking.user.id %}" class="text-decoration-none">
+                                    {{ booking.user.get_full_name|default:booking.user.username }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Seat Details -->
+                <div class="admin-card">
+                    <h5><i class="fas fa-chair me-2"></i>Seat Details</h5>
+                    
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-list"></i>
+                            Selected Seats
+                        </div>
+                        <div class="info-value">
+                            <div class="seat-grid">
+                                {% for seat in seats %}
+                                    <div class="seat-item">{{ seat.seat_number }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payment Information -->
+                {% if payment %}
+                <div class="admin-card">
+                    <h5><i class="fas fa-credit-card me-2"></i>Payment Information</h5>
+                    
+                    <div class="payment-details">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-hashtag"></i>
+                                    Transaction ID
+                                </div>
+                                <div class="info-value">{{ payment.transaction_id }}</div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-credit-card"></i>
+                                    Payment Method
+                                </div>
+                                <div class="info-value">{{ payment.get_payment_method_display }}</div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-money-bill"></i>
+                                    Amount
+                                </div>
+                                <div class="info-value">रू {{ payment.amount }}</div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-calendar"></i>
+                                    Payment Date
+                                </div>
+                                <div class="info-value">{{ payment.payment_date|date:"M d, Y g:i A" }}</div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-info-circle"></i>
+                                    Status
+                                </div>
+                                <div class="info-value">
+                                    <span class="status-badge payment-{{ payment.payment_status|lower }}">{{ payment.get_payment_status_display }}</span>
+                                </div>
+                            </div>
+                            
+                            {% if payment.gateway_response %}
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-server"></i>
+                                    Gateway Response
+                                </div>
+                                <div class="info-value">
+                                    <small class="text-muted">{{ payment.gateway_response|truncatechars:50 }}</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Refund Information -->
+                    {% if refund %}
+                    <div class="refund-details">
+                        <h6><i class="fas fa-undo me-2"></i>Refund Information</h6>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-money-bill"></i>
+                                    Refund Amount
+                                </div>
+                                <div class="info-value">रू {{ refund.refund_amount }}</div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-calendar"></i>
+                                    Refund Date
+                                </div>
+                                <div class="info-value">{{ refund.refund_date|date:"M d, Y g:i A" }}</div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-info-circle"></i>
+                                    Status
+                                </div>
+                                <div class="info-value">{{ refund.get_refund_status_display }}</div>
+                            </div>
+                            
+                            {% if refund.reason %}
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-comment"></i>
+                                    Reason
+                                </div>
+                                <div class="info-value">{{ refund.reason }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Quick Stats -->
+                <div class="admin-card">
+                    <h5><i class="fas fa-chart-bar me-2"></i>Quick Stats</h5>
+                    
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-money-bill"></i>
+                            Base Fare
+                        </div>
+                        <div class="info-value">रू {{ booking.base_fare }}</div>
+                    </div>
+                    
+                    {% if booking.service_fee %}
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-plus"></i>
+                            Service Fee
+                        </div>
+                        <div class="info-value">रू {{ booking.service_fee }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="info-item" style="border-left-color: #28a745; background: #d4edda;">
+                        <div class="info-label">
+                            <i class="fas fa-calculator"></i>
+                            <strong>Total Fare</strong>
+                        </div>
+                        <div class="info-value">
+                            <strong style="color: #28a745;">रू {{ booking.total_fare }}</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Booking Timeline -->
+                <div class="admin-card">
+                    <h5><i class="fas fa-history me-2"></i>Activity Timeline</h5>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-time">{{ booking.booking_date|date:"M d, Y g:i A" }}</div>
+                                <div class="timeline-title">Booking Created</div>
+                            </div>
+                        </div>
+                        
+                        {% if payment %}
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-time">{{ payment.payment_date|date:"M d, Y g:i A" }}</div>
+                                <div class="timeline-title">Payment {{ payment.get_payment_status_display }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if booking.booking_status == 'confirmed' %}
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-time">{{ booking.updated_at|date:"M d, Y g:i A" }}</div>
+                                <div class="timeline-title">Booking Confirmed</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if refund %}
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-time">{{ refund.refund_date|date:"M d, Y g:i A" }}</div>
+                                <div class="timeline-title">Refund {{ refund.get_refund_status_display }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Admin Actions -->
+                <div class="admin-card">
+                    <h5><i class="fas fa-tools me-2"></i>Admin Actions</h5>
+                    
+                    <div class="admin-actions">
+                        {% if booking.booking_status == 'pending' %}
+                            <button class="btn-admin btn-success" onclick="confirmBooking('{{ booking.booking_id }}')">
+                                <i class="fas fa-check me-2"></i>Confirm Booking
+                            </button>
+                        {% endif %}
+                        
+                        {% if booking.booking_status != 'cancelled' %}
+                            <button class="btn-admin btn-danger" onclick="cancelBooking('{{ booking.booking_id }}')">
+                                <i class="fas fa-times me-2"></i>Cancel Booking
+                            </button>
+                        {% endif %}
+                        
+                        {% if payment and payment.payment_status == 'completed' and not refund %}
+                            <button class="btn-admin btn-warning" onclick="initiateRefund('{{ booking.booking_id }}')">
+                                <i class="fas fa-undo me-2"></i>Initiate Refund
+                            </button>
+                        {% endif %}
+                        
+                        <a href="{% url 'dashboard:user_detail' booking.user.id %}" class="btn-admin btn-outline">
+                            <i class="fas fa-user me-2"></i>View User
+                        </a>
+                        
+                        <a href="{% url 'dashboard:bus_detail' booking.bus_schedule.bus.id %}" class="btn-admin btn-outline">
+                            <i class="fas fa-bus me-2"></i>View Bus
+                        </a>
+                        
+                        <button class="btn-admin btn-primary" onclick="window.print()">
+                            <i class="fas fa-print me-2"></i>Print Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function confirmBooking(bookingId) {
+        if (confirm('Are you sure you want to confirm this booking?')) {
+            // Add AJAX call to confirm booking
+            fetch(`/dashboard/bookings/${bookingId}/confirm/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error confirming booking: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while confirming the booking.');
+            });
+        }
+    }
+    
+    function cancelBooking(bookingId) {
+        const reason = prompt('Please enter the reason for cancellation:');
+        if (reason) {
+            fetch(`/dashboard/bookings/${bookingId}/cancel/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ reason: reason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error cancelling booking: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while cancelling the booking.');
+            });
+        }
+    }
+    
+    function initiateRefund(bookingId) {
+        const amount = prompt('Enter refund amount (रू):');
+        if (amount && !isNaN(amount)) {
+            const reason = prompt('Enter refund reason:');
+            if (reason) {
+                fetch(`/dashboard/bookings/${bookingId}/refund/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        amount: parseFloat(amount),
+                        reason: reason 
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error initiating refund: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while initiating the refund.');
+                });
+            }
+        }
+    }
+    
+    // Add CSRF token to all requests
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create hidden CSRF token input if it doesn't exist
+        if (!document.querySelector('[name=csrfmiddlewaretoken]')) {
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = 'csrfmiddlewaretoken';
+            csrfToken.value = '{{ csrf_token }}';
+            document.body.appendChild(csrfToken);
+        }
+    });
+</script>
+{% endblock %}
