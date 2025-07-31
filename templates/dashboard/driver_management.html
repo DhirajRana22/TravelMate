@@ -1,210 +1,199 @@
-{% extends 'dashboard/base.html' %} {% load static %} {% block title %}Driver
-Management - Dashboard{% endblock %} {% block extra_css %}
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Driver Management - Dashboard{% endblock %}
+
+{% block extra_css %}
 <style>
-  .stats-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  .stats-number {
-    font-size: 2rem;
-    font-weight: bold;
-  }
-  .driver-table {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
-  .btn-action {
-    margin: 2px;
-    padding: 5px 10px;
-    font-size: 0.8rem;
-  }
-  .status-badge {
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-  .status-assigned {
-    background-color: #d4edda;
-    color: #155724;
-  }
-  .status-unassigned {
-    background-color: #f8d7da;
-    color: #721c24;
-  }
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .stats-number {
+        font-size: 2rem;
+        font-weight: bold;
+    }
+    .driver-table {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .btn-action {
+        margin: 2px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    .status-assigned {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .status-unassigned {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
 </style>
-{% endblock %} {% block content %}
+{% endblock %}
+
+{% block content %}
 <div class="container-fluid">
-  <div class="row">
-    <div class="col-12">
-      <h2 class="mb-4">Driver Management</h2>
-
-      <!-- Statistics Cards -->
-      <div class="row mb-4">
-        <div class="col-md-3">
-          <div class="stats-card text-center">
-            <div class="stats-number">{{ total_drivers }}</div>
-            <div>Total Drivers</div>
-          </div>
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Driver Management</h2>
+            
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="stats-card text-center">
+                        <div class="stats-number">{{ total_drivers }}</div>
+                        <div>Total Drivers</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card text-center">
+                        <div class="stats-number">{{ assigned_drivers }}</div>
+                        <div>Assigned Drivers</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card text-center">
+                        <div class="stats-number">{{ unassigned_drivers }}</div>
+                        <div>Unassigned Drivers</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card text-center">
+                        <div class="stats-number">{{ drivers|length }}</div>
+                        <div>Showing Results</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Search and Add Section -->
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <form method="get" class="d-flex">
+                        <input type="text" name="search" class="form-control me-2" 
+                               placeholder="Search by name, license, or contact..." 
+                               value="{{ search_query }}">
+                        <button type="submit" class="btn btn-outline-primary">Search</button>
+                        {% if search_query %}
+                            <a href="{% url 'dashboard:driver_management' %}" class="btn btn-outline-secondary ms-2">Clear</a>
+                        {% endif %}
+                    </form>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{% url 'dashboard:driver_add' %}" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Add New Driver
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Drivers Table -->
+            <div class="driver-table">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>License Number</th>
+                                <th>Contact</th>
+                                <th>Experience</th>
+                                <th>Assigned Bus</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for driver in drivers %}
+                            <tr>
+                                <td>
+                                    <strong>{{ driver.name }}</strong>
+                                </td>
+                                <td>
+                                    <code>{{ driver.license_number }}</code>
+                                </td>
+                                <td>
+                                    {% if driver.contact_number %}
+                                        {{ driver.contact_number }}
+                                    {% else %}
+                                        <span class="text-muted">Not provided</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ driver.experience_years }} year{{ driver.experience_years|pluralize }}
+                                </td>
+                                <td>
+                                    {% if driver.bus %}
+                                        <strong>{{ driver.bus.bus_number }}</strong><br>
+                                        <small class="text-muted">{{ driver.bus.route.name }}</small>
+                                    {% else %}
+                                        <span class="text-muted">Not assigned</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if driver.bus %}
+                                        <span class="status-badge status-assigned">Assigned</span>
+                                    {% else %}
+                                        <span class="status-badge status-unassigned">Unassigned</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'dashboard:driver_edit' driver.id %}" 
+                                       class="btn btn-sm btn-outline-primary btn-action">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="{% url 'dashboard:driver_delete' driver.id %}" 
+                                       class="btn btn-sm btn-outline-danger btn-action">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    {% if search_query %}
+                                        <div class="text-muted">
+                                            <i class="fas fa-search fa-2x mb-2"></i><br>
+                                            No drivers found matching "{{ search_query }}"
+                                        </div>
+                                    {% else %}
+                                        <div class="text-muted">
+                                            <i class="fas fa-users fa-2x mb-2"></i><br>
+                                            No drivers found. <a href="{% url 'dashboard:driver_add' %}">Add the first driver</a>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div class="col-md-3">
-          <div class="stats-card text-center">
-            <div class="stats-number">{{ assigned_drivers }}</div>
-            <div>Assigned Drivers</div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stats-card text-center">
-            <div class="stats-number">{{ unassigned_drivers }}</div>
-            <div>Unassigned Drivers</div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stats-card text-center">
-            <div class="stats-number">{{ drivers|length }}</div>
-            <div>Showing Results</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Search and Add Section -->
-      <div class="row mb-4">
-        <div class="col-md-8">
-          <form method="get" class="d-flex">
-            <input
-              type="text"
-              name="search"
-              class="form-control me-2"
-              placeholder="Search by name, license, or contact..."
-              value="{{ search_query }}"
-            />
-            <button type="submit" class="btn btn-outline-primary">
-              Search
-            </button>
-            {% if search_query %}
-            <a
-              href="{% url 'dashboard:driver_management' %}"
-              class="btn btn-outline-secondary ms-2"
-              >Clear</a
-            >
-            {% endif %}
-          </form>
-        </div>
-        <div class="col-md-4 text-end">
-          <a href="{% url 'dashboard:driver_add' %}" class="btn btn-success">
-            <i class="fas fa-plus"></i> Add New Driver
-          </a>
-        </div>
-      </div>
-
-      <!-- Drivers Table -->
-      <div class="driver-table">
-        <div class="table-responsive">
-          <table class="table table-hover mb-0">
-            <thead class="table-dark">
-              <tr>
-                <th>Name</th>
-                <th>License Number</th>
-                <th>Contact</th>
-                <th>Experience</th>
-                <th>Assigned Bus</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for driver in drivers %}
-              <tr>
-                <td>
-                  <strong>{{ driver.name }}</strong>
-                </td>
-                <td>
-                  <code>{{ driver.license_number }}</code>
-                </td>
-                <td>
-                  {% if driver.contact_number %} {{ driver.contact_number }} {%
-                  else %}
-                  <span class="text-muted">Not provided</span>
-                  {% endif %}
-                </td>
-                <td>
-                  {{ driver.experience_years }} year{{
-                  driver.experience_years|pluralize }}
-                </td>
-                <td>
-                  {% if driver.bus %}
-                  <strong>{{ driver.bus.bus_number }}</strong><br />
-                  <small class="text-muted">{{ driver.bus.route.name }}</small>
-                  {% else %}
-                  <span class="text-muted">Not assigned</span>
-                  {% endif %}
-                </td>
-                <td>
-                  {% if driver.bus %}
-                  <span class="status-badge status-assigned">Assigned</span>
-                  {% else %}
-                  <span class="status-badge status-unassigned">Unassigned</span>
-                  {% endif %}
-                </td>
-                <td>
-                  <a
-                    href="{% url 'dashboard:driver_edit' driver.id %}"
-                    class="btn btn-sm btn-outline-primary btn-action"
-                  >
-                    <i class="fas fa-edit"></i> Edit
-                  </a>
-                  <a
-                    href="{% url 'dashboard:driver_delete' driver.id %}"
-                    class="btn btn-sm btn-outline-danger btn-action"
-                  >
-                    <i class="fas fa-trash"></i> Delete
-                  </a>
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="7" class="text-center py-4">
-                  {% if search_query %}
-                  <div class="text-muted">
-                    <i class="fas fa-search fa-2x mb-2"></i><br />
-                    No drivers found matching "{{ search_query }}"
-                  </div>
-                  {% else %}
-                  <div class="text-muted">
-                    <i class="fas fa-users fa-2x mb-2"></i><br />
-                    No drivers found.
-                    <a href="{% url 'dashboard:driver_add' %}"
-                      >Add the first driver</a
-                    >
-                  </div>
-                  {% endif %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
-  </div>
 </div>
-{% endblock %} {% block extra_js %}
+{% endblock %}
+
+{% block extra_js %}
 <script>
-  // Auto-submit search form on input (with debounce)
-  let searchTimeout;
-  document
-    .querySelector('input[name="search"]')
-    .addEventListener("input", function () {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
-        if (this.value.length >= 2 || this.value.length === 0) {
-          this.form.submit();
-        }
-      }, 500);
+    // Auto-submit search form on input (with debounce)
+    let searchTimeout;
+    document.querySelector('input[name="search"]').addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            if (this.value.length >= 2 || this.value.length === 0) {
+                this.form.submit();
+            }
+        }, 500);
     });
 </script>
 {% endblock %}
