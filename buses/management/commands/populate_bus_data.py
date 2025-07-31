@@ -53,14 +53,14 @@ class Command(BaseCommand):
         
         # Create Sample Bus Drivers
         drivers = [
-            {'name': 'Rajesh Kumar', 'license_number': 'DL001234567', 'contact_number': '+91-9876543210', 'experience_years': 8},
-            {'name': 'Suresh Sharma', 'license_number': 'DL001234568', 'contact_number': '+91-9876543211', 'experience_years': 12},
-            {'name': 'Mahesh Singh', 'license_number': 'DL001234569', 'contact_number': '+91-9876543212', 'experience_years': 5},
-            {'name': 'Ramesh Gupta', 'license_number': 'DL001234570', 'contact_number': '+91-9876543213', 'experience_years': 15},
-            {'name': 'Dinesh Yadav', 'license_number': 'DL001234571', 'contact_number': '+91-9876543214', 'experience_years': 7},
-            {'name': 'Vikash Jha', 'license_number': 'DL001234572', 'contact_number': '+91-9876543215', 'experience_years': 10},
-            {'name': 'Anil Verma', 'license_number': 'DL001234573', 'contact_number': '+91-9876543216', 'experience_years': 6},
-            {'name': 'Santosh Mishra', 'license_number': 'DL001234574', 'contact_number': '+91-9876543217', 'experience_years': 9},
+            {'name': 'Rajesh Kumar', 'license_number': 'NP001234567', 'contact_number': '+977-9876543210', 'experience_years': 8},
+        {'name': 'Suresh Sharma', 'license_number': 'NP001234568', 'contact_number': '+977-9876543211', 'experience_years': 12},
+        {'name': 'Mahesh Singh', 'license_number': 'NP001234569', 'contact_number': '+977-9876543212', 'experience_years': 5},
+        {'name': 'Ramesh Gupta', 'license_number': 'NP001234570', 'contact_number': '+977-9876543213', 'experience_years': 15},
+        {'name': 'Dinesh Yadav', 'license_number': 'NP001234571', 'contact_number': '+977-9876543214', 'experience_years': 7},
+        {'name': 'Vikash Jha', 'license_number': 'NP001234572', 'contact_number': '+977-9876543215', 'experience_years': 10},
+        {'name': 'Anil Verma', 'license_number': 'NP001234573', 'contact_number': '+977-9876543216', 'experience_years': 6},
+        {'name': 'Santosh Mishra', 'license_number': 'NP001234574', 'contact_number': '+977-9876543217', 'experience_years': 9},
         ]
         
         for driver_data in drivers:

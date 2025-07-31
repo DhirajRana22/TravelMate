@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% block dashboard_title %}Dashboard{% endblock %} - TravelMate Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+  .dashboard-sidebar {
+    background: #343a40;
+    min-height: calc(100vh - 76px);
+    padding: 20px 0;
+  }
+  .dashboard-sidebar .nav-link {
+    color: #adb5bd;
+    padding: 12px 20px;
+    border-radius: 0;
+    transition: all 0.3s ease;
+  }
+  .dashboard-sidebar .nav-link:hover,
+  .dashboard-sidebar .nav-link.active {
+    color: #fff;
+    background: #495057;
+  }
+  .dashboard-sidebar .nav-link i {
+    width: 20px;
+    margin-right: 10px;
+  }
+  .dashboard-content {
+    padding: 30px;
+    background: #f8f9fa;
+    min-height: calc(100vh - 76px);
+  }
+  .dashboard-header {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+  }
+  .stat-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #007bff;
+  }
+  .quick-action-btn {
+    padding: 15px;
+    text-align: center;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  .quick-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+</style>
+{% block dashboard_extra_css %}{% endblock %} {% endblock %} {% block content %}
+<div class="container-fluid p-0">
+  <div class="row g-0">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2">
+      <div class="dashboard-sidebar">
+        <nav class="nav flex-column">
+          <a
+            class="nav-link {% if request.resolver_match.url_name == 'dashboard_home' %}active{% endif %}"
+            href="{% url 'dashboard:dashboard_home' %}"
+          >
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+          </a>
+          <a
+            class="nav-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}"
+            href="{% url 'dashboard:user_management' %}"
+          >
+            <i class="fas fa-users"></i> Users
+          </a>
+          <a
+            class="nav-link {% if 'bus' in request.resolver_match.url_name and 'route' not in request.resolver_match.url_name and 'driver' not in request.resolver_match.url_name %}active{% endif %}"
+            href="{% url 'dashboard:bus_management' %}"
+          >
+            <i class="fas fa-bus"></i> Buses
+          </a>
+          <a
+            class="nav-link {% if 'driver' in request.resolver_match.url_name %}active{% endif %}"
+            href="{% url 'dashboard:driver_management' %}"
+          >
+            <i class="fas fa-id-card"></i> Drivers
+          </a>
+          <a
+            class="nav-link {% if 'route' in request.resolver_match.url_name %}active{% endif %}"
+            href="{% url 'dashboard:route_management' %}"
+          >
+            <i class="fas fa-route"></i> Routes
+          </a>
+          <a
+            class="nav-link {% if 'destination' in request.resolver_match.url_name %}active{% endif %}"
+            href="{% url 'dashboard:popular_destinations_management' %}"
+          >
+            <i class="fas fa-map-marked-alt"></i> Popular Destinations
+          </a>
+          <a
+            class="nav-link {% if 'testimonial' in request.resolver_match.url_name %}active{% endif %}"
+            href="{% url 'dashboard:testimonials_management' %}"
+          >
+            <i class="fas fa-comments"></i> Testimonials
+          </a>
+          <a
+            class="nav-link {% if 'booking' in request.resolver_match.url_name %}active{% endif %}"
+            href="{% url 'dashboard:booking_management' %}"
+          >
+            <i class="fas fa-ticket-alt"></i> Bookings
+          </a>
+          <a
+            class="nav-link {% if 'payment' in request.resolver_match.url_name %}active{% endif %}"
+            href="{% url 'dashboard:admin_payments' %}"
+          >
+            <i class="fas fa-credit-card"></i> Payments
+          </a>
+          <hr class="text-light" />
+          <a
+            class="nav-link {% if 'analytics' in request.resolver_match.url_name %}active{% endif %}"
+            href="{% url 'dashboard:analytics' %}"
+          >
+            <i class="fas fa-chart-line"></i> Analytics
+          </a>
+          <a
+            class="nav-link {% if 'reports' in request.resolver_match.url_name %}active{% endif %}"
+            href="{% url 'dashboard:admin_reports' %}"
+          >
+            <i class="fas fa-file-alt"></i> Reports
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9 col-lg-10">
+      <div class="dashboard-content">
+        {% block dashboard_content %}
+        <!-- Dashboard content goes here -->
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %} {% block dashboard_extra_js %}{% endblock %}
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Delete Testimonial{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .delete-icon {
+        font-size: 4rem;
+        color: #dc3545;
+        margin-bottom: 20px;
+    }
+    
+    .testimonial-preview {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        border-left: 4px solid #dc3545;
+    }
+    
+    .avatar-small {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #e9ecef;
+    }
+    
+    .btn {
+        border-radius: 8px;
+        padding: 12px 30px;
+        font-weight: 600;
+        margin: 0 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-danger {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        border: none;
+    }
+    
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        border: none;
+    }
+    
+    .btn-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+    }
+    
+    .rating-stars {
+        color: #ffc107;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{% url 'dashboard:testimonials_management' %}" class="btn btn-outline-secondary me-3">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <h2 class="mb-0">
+                    <i class="fas fa-trash me-2"></i>Delete Testimonial
+                </h2>
+            </div>
+            
+            <div class="delete-container">
+                <div class="delete-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                
+                <h3 class="text-danger mb-3">Are you sure?</h3>
+                <p class="text-muted mb-4">
+                    This action cannot be undone. The testimonial will be permanently deleted from your website.
+                </p>
+                
+                <div class="testimonial-preview">
+                    <div class="d-flex align-items-start mb-3">
+                        <img 
+                            src="{% if testimonial.avatar %}{{ testimonial.avatar.url %}{% else %}{% static 'img/avatar-placeholder.svg' %}{% endif %}"
+                            alt="{{ testimonial.name }}"
+                            class="avatar-small me-3"
+                        >
+                        <div class="text-start flex-grow-1">
+                            <h5 class="mb-1">{{ testimonial.name }}</h5>
+                            {% if testimonial.designation %}
+                                <p class="text-muted mb-1">{{ testimonial.designation }}</p>
+                            {% endif %}
+                            <div class="rating-stars mb-2">
+                                {% for star in testimonial.get_star_range %}
+                                    <i class="fas fa-star"></i>
+                                {% endfor %}
+                                {% for empty_star in testimonial.get_empty_star_range %}
+                                    <i class="far fa-star"></i>
+                                {% endfor %}
+                                <span class="ms-1 text-muted">({{ testimonial.rating }}/5)</span>
+                            </div>
+                        </div>
+                        <span class="badge {% if testimonial.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                            {% if testimonial.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </div>
+                    
+                    <p class="mb-0 text-start">"{{ testimonial.testimonial_text }}"</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-sort-numeric-up me-1"></i>Order: {{ testimonial.display_order }}
+                        </small>
+                        <small class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>{{ testimonial.created_at|date:"M d, Y" }}
+                        </small>
+                    </div>
+                </div>
+                
+                <form method="post" class="d-inline">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center mt-4">
+                        <a href="{% url 'dashboard:testimonials_management' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Yes, Delete Testimonial
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="mt-4">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        This will remove the testimonial from your website immediately.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

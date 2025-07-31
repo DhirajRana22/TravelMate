@@ -1,0 +1,150 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Testimonials Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    .testimonial-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+    
+    .testimonial-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .testimonial-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #f8f9fa;
+    }
+    
+    .rating-stars {
+        color: #ffc107;
+    }
+    
+    .status-badge {
+        font-size: 0.8em;
+    }
+    
+    .alert {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .btn-action {
+        margin: 2px;
+        border-radius: 6px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-comments me-2"></i>Testimonials Management</h2>
+                <a href="{% url 'dashboard:testimonial_add' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add New Testimonial
+                </a>
+            </div>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% if testimonials %}
+                <div class="row">
+                    {% for testimonial in testimonials %}
+                    <div class="col-lg-6 col-xl-4">
+                        <div class="testimonial-card">
+                            <div class="d-flex align-items-start mb-3">
+                                <img 
+                                    src="{% if testimonial.avatar %}{{ testimonial.avatar.url }}{% else %}{% static 'img/avatar-placeholder.svg' %}{% endif %}"
+                                    alt="{{ testimonial.name }}"
+                                    class="testimonial-avatar me-3"
+                                >
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">{{ testimonial.name }}</h5>
+                                    <p class="text-muted mb-1">{{ testimonial.designation }}</p>
+                                    <div class="rating-stars mb-2">
+                                        {% for star in testimonial.get_star_range %}
+                                            <i class="fas fa-star"></i>
+                                        {% endfor %}
+                                        {% for empty_star in testimonial.get_empty_star_range %}
+                                            <i class="far fa-star"></i>
+                                        {% endfor %}
+                                        <span class="ms-1 text-muted">({{ testimonial.rating }}/5)</span>
+                                    </div>
+                                    <span class="badge {% if testimonial.is_active %}bg-success{% else %}bg-secondary{% endif %} status-badge">
+                                        {% if testimonial.is_active %}Active{% else %}Inactive{% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <p class="mb-3">"{{ testimonial.testimonial_text|truncatechars:150 }}"</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-sort-numeric-up me-1"></i>Order: {{ testimonial.display_order }}
+                                    <br>
+                                    <i class="fas fa-calendar me-1"></i>{{ testimonial.created_at|date:"M d, Y" }}
+                                </small>
+                                <div>
+                                    <a href="{% url 'dashboard:testimonial_edit' testimonial.id %}" 
+                                       class="btn btn-sm btn-outline-primary btn-action" 
+                                       title="Edit Testimonial">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'dashboard:testimonial_delete' testimonial.id %}" 
+                                       class="btn btn-sm btn-outline-danger btn-action" 
+                                       title="Delete Testimonial">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No Testimonials Found</h4>
+                    <p class="text-muted">Start by adding your first customer testimonial.</p>
+                    <a href="{% url 'dashboard:testimonial_add' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add First Testimonial
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-dismiss alerts after 5 seconds
+setTimeout(function() {
+    var alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+        var bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+    });
+}, 5000);
+</script>
+{% endblock %}

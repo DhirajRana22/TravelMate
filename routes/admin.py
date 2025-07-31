@@ -15,19 +15,10 @@ class RouteAdmin(admin.ModelAdmin):
 
 @admin.register(BusSchedule)
 class BusScheduleAdmin(admin.ModelAdmin):
-    list_display = ('bus', 'route', 'departure_time', 'arrival_time', 'base_fare', 'effective_from', 'effective_until', 'is_active')
-    list_filter = ('is_active', 'bus__bus_type', 'route__source', 'route__destination', 'effective_from')
-    search_fields = ('bus__bus_name', 'bus__bus_number', 'route__source__name', 'route__destination__name')
-    date_hierarchy = 'effective_from'
-    
-    fieldsets = (
-        ('Basic Information', {
-            'fields': ('bus', 'route', 'departure_time', 'arrival_time', 'base_fare')
-        }),
-        ('Schedule Settings', {
-            'fields': ('effective_from', 'effective_until', 'days_of_week', 'is_active')
-        }),
-    )
+    list_display = ('bus', 'route', 'departure_time', 'arrival_time', 'base_fare', 'is_active')
+    list_filter = ('is_active', 'bus', 'route')
+    search_fields = ('bus__bus_name', 'route__source__name', 'route__destination__name')
+    ordering = ('departure_time',)
 
 @admin.register(DynamicBusAssignment)
 class DynamicBusAssignmentAdmin(admin.ModelAdmin):

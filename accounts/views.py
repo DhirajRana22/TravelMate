@@ -122,14 +122,15 @@ def edit_profile(request):
 
 @login_required
 def change_password(request):
+    # Django's built-in password change form
+    from django.contrib.auth.forms import PasswordChangeForm
+    from django.contrib.auth import update_session_auth_hash
+    
     if request.method == 'POST':
-        # Django's built-in password change form
-        from django.contrib.auth.forms import PasswordChangeForm
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
             # Update the session with the new password hash
-            from django.contrib.auth import update_session_auth_hash
             update_session_auth_hash(request, user)
             messages.success(request, 'Your password was successfully updated!')
             return redirect('accounts:profile')

@@ -169,10 +169,131 @@
         margin-bottom: 1rem;
     }
     
+    .revenue-summary {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .revenue-metrics {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .metric {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .metric-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+    
+    .metric-value {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .metric-value.growth {
+        color: #28a745;
+    }
+    
+    .metric-value.growth.negative {
+        color: #dc3545;
+    }
+    
+    .revenue-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        margin-right: 1rem;
+    }
+    
+    .total-revenue, .last-updated {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .btn-refresh {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.875rem;
+        margin-left: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-refresh:hover {
+        background: #218838;
+        transform: rotate(180deg);
+    }
+    
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+    }
+    
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 20px;
+    }
+    
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+        background-color: #667eea;
+    }
+    
+    input:checked + .slider:before {
+        transform: translateX(20px);
+    }
+    
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
     .chart-controls {
         display: flex;
         gap: 0.5rem;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
         flex-wrap: wrap;
     }
     
@@ -507,21 +628,48 @@
             <div class="card-header">
                 <h3 class="card-title">
                     <i class="fas fa-chart-line"></i>
-                    Revenue Trend
+                    Revenue Trend (Confirmed Bookings Only)
                 </h3>
                 <div class="card-actions">
+                    <div class="revenue-info">
+                        <span class="total-revenue">Total Revenue: <strong id="totalRevenueDisplay">रू {{ total_revenue|floatformat:0 }}</strong></span>
+                        <span class="last-updated">Last Updated: <span id="lastUpdated">{{ last_updated|date:"M d, Y H:i" }}</span></span>
+                    </div>
                     <div class="export-section">
                         <button class="btn-export" onclick="exportChart('revenue')">
                             <i class="fas fa-download"></i>Export
+                        </button>
+                        <button class="btn-refresh" onclick="refreshRevenueData()" title="Refresh Data">
+                            <i class="fas fa-sync-alt"></i>
                         </button>
                     </div>
                 </div>
             </div>
             
+            <div class="revenue-summary">
+                <div class="revenue-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Period Revenue:</span>
+                        <span class="metric-value" id="periodRevenue">रू {{ recent_revenue|floatformat:0 }}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Growth:</span>
+                        <span class="metric-value growth" id="growthPercentage">+0.0%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Auto-refresh:</span>
+                        <label class="switch">
+                            <input type="checkbox" id="autoRefresh" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
             <div class="chart-controls">
-                <button class="btn-chart active" onclick="setChartPeriod('daily')">Daily</button>
-                <button class="btn-chart" onclick="setChartPeriod('weekly')">Weekly</button>
-                <button class="btn-chart" onclick="setChartPeriod('monthly')">Monthly</button>
+                <button class="btn-chart active" onclick="setChartPeriod(30)">Last 30 Days</button>
+                <button class="btn-chart" onclick="setChartPeriod(90)">Last 3 Months</button>
+                <button class="btn-chart" onclick="setChartPeriod(365)">Last Year</button>
             </div>
             
             <div class="chart-container">
@@ -736,6 +884,12 @@
     document.addEventListener('DOMContentLoaded', function() {
         initializeCharts();
         setupEventListeners();
+        setupAutoRefresh();
+        
+        // Initial revenue data update
+        setTimeout(() => {
+            updateRevenueData();
+        }, 1000);
     });
     
     function setupEventListeners() {
@@ -895,8 +1049,11 @@
         });
     }
     
-    function setChartPeriod(period) {
-        currentChartPeriod = period;
+    let currentChartPeriod = 30;
+    let autoRefreshInterval;
+    
+    function setChartPeriod(days) {
+        currentChartPeriod = days;
         
         // Update button states
         document.querySelectorAll('.btn-chart').forEach(btn => {
@@ -905,13 +1062,73 @@
         event.target.classList.add('active');
         
         // Update chart data based on period
-        updateChartData(period);
+        updateRevenueData(days);
     }
     
-    function updateChartData(period) {
-        // This would typically fetch new data from the server
-        // For now, we'll just update the existing chart
-        console.log('Updating chart data for period:', period);
+    function updateRevenueData(days = currentChartPeriod) {
+        fetch(`{% url 'dashboard:get_real_time_revenue_data' %}?days=${days}`)
+            .then(response => response.json())
+            .then(data => {
+                // Update total revenue display
+                document.getElementById('totalRevenueDisplay').textContent = `रू ${data.total_revenue.toLocaleString()}`;
+                
+                // Update period revenue
+                document.getElementById('periodRevenue').textContent = `रू ${data.recent_revenue.toLocaleString()}`;
+                
+                // Update growth percentage
+                const growthElement = document.getElementById('growthPercentage');
+                const growthValue = data.growth_percentage;
+                growthElement.textContent = `${growthValue >= 0 ? '+' : ''}${growthValue}%`;
+                growthElement.className = `metric-value growth ${growthValue < 0 ? 'negative' : ''}`;
+                
+                // Update last updated time
+                const lastUpdated = new Date(data.last_updated);
+                document.getElementById('lastUpdated').textContent = lastUpdated.toLocaleString();
+                
+                // Update chart
+                if (revenueChart) {
+                    revenueChart.data.labels = data.chart_data.labels;
+                    revenueChart.data.datasets[0].data = data.chart_data.data;
+                    revenueChart.update('none');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching revenue data:', error);
+            });
+    }
+    
+    function refreshRevenueData() {
+        const refreshBtn = document.querySelector('.btn-refresh i');
+        refreshBtn.style.animation = 'spin 1s linear';
+        
+        updateRevenueData().finally(() => {
+            setTimeout(() => {
+                refreshBtn.style.animation = '';
+            }, 1000);
+        });
+    }
+    
+    function setupAutoRefresh() {
+        const autoRefreshCheckbox = document.getElementById('autoRefresh');
+        
+        function toggleAutoRefresh() {
+            if (autoRefreshCheckbox.checked) {
+                // Start auto-refresh every 30 seconds
+                autoRefreshInterval = setInterval(updateRevenueData, 30000);
+            } else {
+                // Stop auto-refresh
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                }
+            }
+        }
+        
+        autoRefreshCheckbox.addEventListener('change', toggleAutoRefresh);
+        
+        // Start auto-refresh if checkbox is checked
+        if (autoRefreshCheckbox.checked) {
+            toggleAutoRefresh();
+        }
     }
     
     function updateAnalytics() {

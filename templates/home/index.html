@@ -3,7 +3,8 @@
   .hero-section {
     /* Background image with overlay */
     background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-      url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+      url("https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80")
+        no-repeat center center;
     background-size: cover;
     background-attachment: fixed;
     color: white;
@@ -55,7 +56,7 @@
       background-attachment: scroll;
       min-height: 80vh;
     }
-    
+
     .hero-video {
       display: none; /* Hide video on mobile for performance */
     }
@@ -276,7 +277,7 @@
   </video>
   <div class="video-overlay"></div>
   -->
-  
+
   <div class="container">
     <div class="row align-items-center">
       <div class="col-lg-6">
@@ -418,17 +419,21 @@
       <div class="col-md-4 col-lg-4">
         <div class="card destination-card h-100">
           <img
-            src="{% static 'img/destination-placeholder.jpg' %}"
+            src="{{ destination.image.url }}"
             class="card-img-top destination-img"
-            alt="{{ destination.name }}"
+            alt="{{ destination.title }}"
           />
           <div class="card-body">
-            <h5 class="card-title">{{ destination.name }}</h5>
+            <h5 class="card-title">{{ destination.title }}</h5>
             <p class="card-text">
-              {{ destination.route_count }} routes available
+              {% if destination.description %}
+                {{ destination.description|truncatechars:100 }}
+              {% else %}
+                {{ destination.route_count }} routes available
+              {% endif %}
             </p>
             <a
-              href="{% url 'routes:route_search' %}?destination={{ destination.id }}"
+              href="{% url 'routes:route_search' %}?destination={{ destination.location.id }}"
               class="btn btn-outline-primary"
               >Explore Routes</a
             >
@@ -529,90 +534,39 @@
   <div class="container">
     <h2 class="text-center mb-5">What Our Customers Say</h2>
     <div class="row g-4">
+      {% for testimonial in testimonials %}
       <div class="col-md-4">
         <div class="testimonial-card h-100">
           <div class="d-flex align-items-center mb-3">
             <img
-              src="{% static 'img/avatar-placeholder.jpg' %}"
-              alt="Customer"
+              src="{% if testimonial.avatar %}{{ testimonial.avatar.url }}{% else %}{% static 'img/avatar-placeholder.svg' %}{% endif %}"
+              alt="{{ testimonial.name }}"
               class="rounded-circle me-3"
               width="60"
             />
             <div>
-              <h5 class="mb-0">Ram Bhujel</h5>
-              <small class="text-muted">Regular Traveler</small>
+              <h5 class="mb-0">{{ testimonial.name }}</h5>
+              <small class="text-muted">{{ testimonial.designation }}</small>
             </div>
           </div>
           <p class="mb-0">
-            "TravelMate has made my travel experience so much better. The
-            booking process is simple, and the buses are always clean and
-            comfortable."
+            "{{ testimonial.testimonial_text }}"
           </p>
           <div class="mt-3 text-warning">
+            {% for star in testimonial.get_star_range %}
             <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
+            {% endfor %}
+            {% for empty_star in testimonial.get_empty_star_range %}
+            <i class="far fa-star"></i>
+            {% endfor %}
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="testimonial-card h-100">
-          <div class="d-flex align-items-center mb-3">
-            <img
-              src="{% static 'img/avatar-placeholder.jpg' %}"
-              alt="Customer"
-              class="rounded-circle me-3"
-              width="60"
-            />
-            <div>
-              <h5 class="mb-0">Ravi Sharma</h5>
-              <small class="text-muted">Business Traveler</small>
-            </div>
-          </div>
-          <p class="mb-0">
-            "I travel frequently for business, and TravelMate has been my go-to
-            platform for booking bus tickets. The service is reliable, and the
-            customer support is excellent."
-          </p>
-          <div class="mt-3 text-warning">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star-half-alt"></i>
-          </div>
-        </div>
+      {% empty %}
+      <div class="col-12 text-center">
+        <p>No testimonials available at the moment.</p>
       </div>
-      <div class="col-md-4">
-        <div class="testimonial-card h-100">
-          <div class="d-flex align-items-center mb-3">
-            <img
-              src="{% static 'img/avatar-placeholder.jpg' %}"
-              alt="Customer"
-              class="rounded-circle me-3"
-              width="60"
-            />
-            <div>
-              <h5 class="mb-0">BIshal Shrestha</h5>
-              <small class="text-muted">Tourist</small>
-            </div>
-          </div>
-          <p class="mb-0">
-            "As a tourist, I was worried about navigating the local
-            transportation, but TravelMate made it so easy. The app is
-            user-friendly, and the buses are comfortable."
-          </p>
-          <div class="mt-3 text-warning">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-          </div>
-        </div>
-      </div>
+      {% endfor %}
     </div>
   </div>
 </section>
@@ -710,7 +664,7 @@
             >
               <div class="accordion-body">
                 <p>
-                  We accept all major credit/debit cards, net banking, UPI,
+                  We accept all major credit/debit cards, net banking, eSewa, Khalti,
                   digital wallets, and mobile banking. All transactions are
                   secured with 256-bit SSL encryption for your safety.
                 </p>
@@ -766,7 +720,7 @@
             >
               <div class="accordion-body">
                 <p>
-                  You can reach our 24/7 customer support via phone at +1 (123)
+                  You can reach our 24/7 customer support via phone at +977 9847435111
                   456-7890, email at info@travelmate.com, or through the live
                   chat feature on our website and mobile app.
                 </p>

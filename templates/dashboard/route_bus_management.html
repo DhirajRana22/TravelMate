@@ -143,6 +143,38 @@
         border-radius: 8px;
         margin-bottom: 1rem;
     }
+    
+    .update-schedule-form {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .update-schedule-form .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .update-schedule-form .form-control,
+    .update-schedule-form .form-select {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+    }
+    
+    .update-schedule-form .form-control:focus,
+    .update-schedule-form .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
 </style>
 {% endblock %}
 
@@ -239,15 +271,21 @@
                                     <p class="mb-0 text-muted">{{ schedule.bus.bus_type }} • {{ schedule.bus.total_seats }} seats</p>
                                 </div>
                             </div>
-                            <form method="post" style="display: inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="action" value="remove_bus">
-                                <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
-                                <button type="submit" class="btn-remove" 
-                                        onclick="return confirm('Are you sure you want to remove this bus from the route?')">
-                                    <i class="fas fa-times me-1"></i>Remove
+                            <div class="action-buttons">
+                                <button type="button" class="btn btn-sm btn-outline-primary me-2" 
+                                        onclick="toggleUpdateForm('{{ schedule.id }}')">
+                                    <i class="fas fa-edit me-1"></i>Update Schedule
                                 </button>
-                            </form>
+                                <form method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="remove_bus">
+                                    <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                            onclick="return confirm('Are you sure you want to remove this bus from the route?')">
+                                        <i class="fas fa-times me-1"></i>Remove
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                         
                         <div class="schedule-details">
@@ -276,6 +314,82 @@
                                         <span class="badge bg-warning">Inactive</span>
                                     {% endif %}
                                 </div>
+                            </div>
+                            
+                            <!-- Update Schedule Form (Hidden by default) -->
+                            <div id="update-form-{{ schedule.id }}" class="update-schedule-form" style="display: none;">
+                                <form method="post" class="mt-3">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="update_schedule">
+                                    <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Departure Time</label>
+                                            <input type="time" class="form-control" name="departure_time" value="{{ schedule.departure_time|time:'H:i' }}" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Arrival Time</label>
+                                            <input type="time" class="form-control" name="arrival_time" value="{{ schedule.arrival_time|time:'H:i' }}" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Base Fare (रू)</label>
+                                            <input type="number" class="form-control" name="base_fare" value="{{ schedule.base_fare }}" step="0.01" min="0" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Schedule Type</label>
+                                            <select class="form-select" name="schedule_type">
+                                                <option value="morning" {% if schedule.schedule_type == 'morning' %}selected{% endif %}>Morning</option>
+                                                <option value="afternoon" {% if schedule.schedule_type == 'afternoon' %}selected{% endif %}>Afternoon</option>
+                                                <option value="evening" {% if schedule.schedule_type == 'evening' %}selected{% endif %}>Evening</option>
+                                                <option value="night" {% if schedule.schedule_type == 'night' %}selected{% endif %}>Night</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Effective From</label>
+                                            <input type="date" class="form-control" name="effective_from" value="{{ schedule.effective_from|date:'Y-m-d' }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Effective Until</label>
+                                            <input type="date" class="form-control" name="effective_until" value="{{ schedule.effective_until|date:'Y-m-d' }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Days of Week</label>
+                                            <input type="text" class="form-control" name="days_of_week" value="{{ schedule.days_of_week }}" placeholder="1234567">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Buffer Hours</label>
+                                            <input type="number" class="form-control" name="buffer_hours" value="{{ schedule.buffer_hours }}" min="0" max="24">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="return_schedule_enabled" {% if schedule.return_schedule_enabled %}checked{% endif %}>
+                                                <label class="form-check-label">Enable Return Schedule</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="is_active" {% if schedule.is_active %}checked{% endif %}>
+                                                <label class="form-check-label">Active Schedule</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-secondary me-2" onclick="toggleUpdateForm('{{ schedule.id }}')">
+                                            Cancel
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-1"></i>Update Schedule
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -333,6 +447,51 @@
                         </div>
                     </div>
                     
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="effective_from" class="form-label">Effective From</label>
+                            <input type="date" name="effective_from" id="effective_from" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="effective_until" class="form-label">Effective Until (Optional)</label>
+                            <input type="date" name="effective_until" id="effective_until" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="schedule_type" class="form-label">Schedule Type</label>
+                            <select name="schedule_type" id="schedule_type" class="form-select">
+                                <option value="morning">Morning</option>
+                                <option value="afternoon">Afternoon</option>
+                                <option value="evening">Evening</option>
+                                <option value="night">Night</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="days_of_week" class="form-label">Days of Week</label>
+                            <input type="text" name="days_of_week" id="days_of_week" class="form-control" 
+                                   value="1234567" placeholder="1234567 (1=Mon, 7=Sun)">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="buffer_hours" class="form-label">Buffer Hours</label>
+                            <input type="number" name="buffer_hours" id="buffer_hours" class="form-control" 
+                                   value="2" min="0" max="24">
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" id="return_schedule_enabled" name="return_schedule_enabled">
+                                <label class="form-check-label" for="return_schedule_enabled">
+                                    Enable Return Schedule
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="text-center">
                         <button type="submit" class="btn-assign">
                             <i class="fas fa-plus me-2"></i>Assign Bus to Route
@@ -358,6 +517,28 @@
 
 {% block extra_js %}
 <script>
+    // Form is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Route bus management form loaded');
+            
+            // Set default effective_from to today
+            const today = new Date().toISOString().split('T')[0];
+            const effectiveFromInput = document.getElementById('effective_from');
+            if (effectiveFromInput) {
+                effectiveFromInput.value = today;
+            }
+        });
+        
+        // Function to toggle update form visibility
+        function toggleUpdateForm(scheduleId) {
+            const updateForm = document.getElementById('update-form-' + scheduleId);
+            if (updateForm.style.display === 'none' || updateForm.style.display === '') {
+                updateForm.style.display = 'block';
+            } else {
+                updateForm.style.display = 'none';
+            }
+        }
+    
     // Auto-dismiss alerts after 5 seconds
     setTimeout(function() {
         const alerts = document.querySelectorAll('.alert');
@@ -392,5 +573,25 @@
             console.log(`Journey duration: ${hours}h ${minutes}m`);
         }
     }
+    
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const busId = document.getElementById('bus_id').value;
+        const departureTime = document.getElementById('departure_time').value;
+        const arrivalTime = document.getElementById('arrival_time').value;
+        const baseFare = document.getElementById('base_fare').value;
+        
+        if (!busId || !departureTime || !arrivalTime || !baseFare) {
+            e.preventDefault();
+            alert('Please fill in all required fields.');
+            return false;
+        }
+        
+        if (parseFloat(baseFare) <= 0) {
+            e.preventDefault();
+            alert('Base fare must be greater than 0.');
+            return false;
+        }
+    });
 </script>
 {% endblock %}

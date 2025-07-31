@@ -642,12 +642,12 @@
                                 <div class="method-description">All major debit cards accepted</div>
                             </div>
                             
-                            <div class="method-card" data-method="upi">
+                            <div class="method-card" data-method="connectips">
                                 <div class="method-icon">
                                     <i class="fas fa-mobile-alt"></i>
                                 </div>
-                                <div class="method-name">UPI</div>
-                                <div class="method-description">PhonePe, Google Pay, Paytm</div>
+                                <div class="method-name">ConnectIPS</div>
+                                <div class="method-description">eSewa, Khalti, IME Pay</div>
                             </div>
                             
                             <div class="method-card" data-method="net_banking">
@@ -663,7 +663,7 @@
                                     <i class="fas fa-wallet"></i>
                                 </div>
                                 <div class="method-name">Digital Wallet</div>
-                                <div class="method-description">Paytm, PhonePe, Amazon Pay</div>
+                                <div class="method-description">eSewa, Khalti, IME Pay, FonePay</div>
                             </div>
                         </div>
                     </div>
@@ -703,15 +703,15 @@
                         </div>
                     </form>
                     
-                    <form class="payment-form" id="upi-form" method="POST">
+                    <form class="payment-form" id="connectips-form" method="POST">
                         {% csrf_token %}
-                        <input type="hidden" name="payment_method" value="upi">
+                        <input type="hidden" name="payment_method" value="connectips">
                         <input type="hidden" name="booking_id" value="{{ booking.booking_id }}">
                         
                         <div class="form-group">
-                            <label class="form-label">UPI ID</label>
-                            <input type="text" name="upi_id" class="form-control" 
-                                   placeholder="yourname@paytm" required>
+                            <label class="form-label">ConnectIPS ID</label>
+                            <input type="text" name="connectips_id" class="form-control" 
+                                   placeholder="yourname@esewa" required>
                         </div>
                     </form>
                     
@@ -724,12 +724,19 @@
                             <label class="form-label">Select Bank</label>
                             <select name="bank" class="form-control" required>
                                 <option value="">Choose your bank</option>
-                                <option value="sbi">State Bank of India</option>
-                                <option value="hdfc">HDFC Bank</option>
-                                <option value="icici">ICICI Bank</option>
-                                <option value="axis">Axis Bank</option>
-                                <option value="kotak">Kotak Mahindra Bank</option>
-                                <option value="pnb">Punjab National Bank</option>
+                                <option value="nabil">Nabil Bank</option>
+                                <option value="nic">NIC Asia Bank</option>
+                                <option value="scb">Standard Chartered Bank Nepal</option>
+                                <option value="himalayan">Himalayan Bank</option>
+                                <option value="ncc">NCC Bank</option>
+                                <option value="everest">Everest Bank</option>
+                                <option value="kumari">Kumari Bank</option>
+                                <option value="laxmi">Laxmi Sunrise Bank</option>
+                                <option value="mega">Mega Bank Nepal</option>
+                                <option value="global">Global IME Bank</option>
+                                <option value="rastriya">Rastriya Banijya Bank</option>
+                                <option value="nepal">Nepal Bank Limited</option>
+                                <option value="agriculture">Agriculture Development Bank</option>
                                 <option value="other">Other Banks</option>
                             </select>
                         </div>
@@ -744,11 +751,12 @@
                             <label class="form-label">Select Wallet</label>
                             <select name="wallet_provider" class="form-control" required>
                                 <option value="">Choose your wallet</option>
-                                <option value="paytm">Paytm</option>
-                                <option value="phonepe">PhonePe</option>
-                                <option value="amazonpay">Amazon Pay</option>
-                                <option value="googlepay">Google Pay</option>
-                                <option value="mobikwik">MobiKwik</option>
+                                <option value="esewa">eSewa</option>
+                                <option value="khalti">Khalti</option>
+                                <option value="ime_pay">IME Pay</option>
+                                <option value="fonepay">FonePay</option>
+                                <option value="connectips">ConnectIPS</option>
+                                <option value="nchl">NCHL ePay</option>
                             </select>
                         </div>
                     </form>
@@ -883,7 +891,7 @@
             const formMap = {
                 'credit_card': 'card-form',
                 'debit_card': 'card-form',
-                'upi': 'upi-form',
+                'connectips': 'connectips-form',
                 'net_banking': 'netbanking-form',
                 'wallet': 'wallet-form'
             };

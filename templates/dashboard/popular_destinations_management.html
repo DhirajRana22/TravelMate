@@ -1,0 +1,123 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .destination-card {
+        transition: transform 0.2s;
+        border: 1px solid #dee2e6;
+    }
+    .destination-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .destination-image {
+        height: 150px;
+        object-fit: cover;
+        width: 100%;
+    }
+    .status-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    .order-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-map-marked-alt me-2"></i>{{ title }}</h2>
+                <a href="{% url 'dashboard:popular_destination_add' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add New Destination
+                </a>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if destinations %}
+                <div class="row g-4">
+                    {% for destination in destinations %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card destination-card h-100">
+                                <div class="position-relative">
+                                    <img src="{{ destination.image.url }}" class="destination-image" alt="{{ destination.title }}">
+                                    <span class="order-badge">Order: {{ destination.display_order }}</span>
+                                    <span class="badge status-badge {% if destination.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                                        {% if destination.is_active %}Active{% else %}Inactive{% endif %}
+                                    </span>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ destination.title }}</h5>
+                                    <p class="card-text text-muted mb-2">
+                                        <i class="fas fa-map-marker-alt me-1"></i>{{ destination.location.name }}
+                                    </p>
+                                    {% if destination.description %}
+                                        <p class="card-text">{{ destination.description|truncatechars:100 }}</p>
+                                    {% endif %}
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            <i class="fas fa-route me-1"></i>{{ destination.route_count }} routes available
+                                        </small>
+                                    </p>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <div class="btn-group w-100" role="group">
+                                        <a href="{% url 'dashboard:popular_destination_edit' destination.id %}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-edit me-1"></i>Edit
+                                        </a>
+                                        <a href="{% url 'dashboard:popular_destination_delete' destination.id %}" 
+                                           class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash me-1"></i>Delete
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-map-marked-alt fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No Popular Destinations</h4>
+                    <p class="text-muted">Start by adding your first popular destination to showcase on the homepage.</p>
+                    <a href="{% url 'dashboard:popular_destination_add' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add First Destination
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-dismiss alerts after 5 seconds
+    setTimeout(function() {
+        $('.alert').alert('close');
+    }, 5000);
+</script>
+{% endblock %}

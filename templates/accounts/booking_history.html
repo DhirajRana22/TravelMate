@@ -674,7 +674,7 @@
                 <div class="stat-icon">
                     <i class="fas fa-rupee-sign"></i>
                 </div>
-                <div class="stat-value">₹{{ stats.total_spent|default:0|floatformat:0 }}</div>
+                <div class="stat-value">रू {{ stats.total_spent|default:0|floatformat:0 }}</div>
                 <div class="stat-label">Total Spent</div>
             </div>
         </div>
@@ -821,7 +821,7 @@
                         
                         <div class="booking-amount">
                             <div class="amount-label">Total Amount Paid</div>
-                            <div class="amount-value">₹{{ booking.total_fare|floatformat:2 }}</div>
+                            <div class="amount-value">रू {{ booking.total_fare|floatformat:2 }}</div>
                         </div>
                         
                         <div class="booking-actions">

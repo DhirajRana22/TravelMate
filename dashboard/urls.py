@@ -32,4 +32,25 @@ urlpatterns = [
     path('analytics/', views.analytics, name='analytics'),
     path('analytics/recommendations/', views.recommendation_analytics, name='recommendation_analytics'),
     path('analytics/recommendations/export/', views.export_recommendation_data, name='export_recommendation_data'),
+    # Removed weekly assignments, scheduler control, and schedule management features
+    # AJAX endpoints
+    path('api/schedules-for-route-bus/', views.get_schedules_for_route_bus, name='get_schedules_for_route_bus'),
+    path('api/real-time-revenue/', views.get_real_time_revenue_data, name='get_real_time_revenue_data'),
+    # Popular Destinations Management
+    path('destinations/', views.popular_destinations_management, name='popular_destinations_management'),
+    path('destinations/add/', views.popular_destination_add, name='popular_destination_add'),
+    path('destinations/<int:destination_id>/edit/', views.popular_destination_edit, name='popular_destination_edit'),
+    path('destinations/<int:destination_id>/delete/', views.popular_destination_delete, name='popular_destination_delete'),
+    
+    # Testimonials Management
+    path('testimonials/', views.testimonials_management, name='testimonials_management'),
+    path('testimonials/add/', views.testimonial_add, name='testimonial_add'),
+    path('testimonials/<int:testimonial_id>/edit/', views.testimonial_edit, name='testimonial_edit'),
+    path('testimonials/<int:testimonial_id>/delete/', views.testimonial_delete, name='testimonial_delete'),
+    
+    # Bus Driver Management
+    path('drivers/', views.driver_management, name='driver_management'),
+    path('drivers/add/', views.driver_add, name='driver_add'),
+    path('drivers/<int:driver_id>/edit/', views.driver_edit, name='driver_edit'),
+    path('drivers/<int:driver_id>/delete/', views.driver_delete, name='driver_delete'),
 ]

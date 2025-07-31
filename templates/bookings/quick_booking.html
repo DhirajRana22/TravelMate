@@ -255,7 +255,7 @@
                         <small>{{ schedule.arrival_time|time:"g:i A" }}</small>
                     </div>
                 </div>
-                <p class="mt-2 mb-0">{{ schedule.bus.bus_number }} • {{ travel_date|date:"M d, Y" }} • ₹{{ schedule.base_fare }}/seat</p>
+                <p class="mt-2 mb-0">{{ schedule.bus.bus_number }} • {{ travel_date|date:"M d, Y" }} • रू {{ schedule.base_fare }}/seat</p>
             </div>
             
             <!-- Main Content -->
@@ -344,15 +344,15 @@
                     <div class="price-summary" id="priceSummary" style="display: none;">
                         <div class="price-row">
                             <span>Seats (<span id="seatCount">0</span>):</span>
-                            <span>₹<span id="subtotal">0</span></span>
+                            <span>रू <span id="subtotal">0</span></span>
                         </div>
                         <div class="price-row">
                             <span>Service Fee (2%):</span>
-                            <span>₹<span id="serviceFee">0</span></span>
+                            <span>रू <span id="serviceFee">0</span></span>
                         </div>
                         <div class="price-row total-price">
                             <span>Total Amount:</span>
-                            <span>₹<span id="totalAmount">0</span></span>
+                            <span>रू <span id="totalAmount">0</span></span>
                         </div>
                     </div>
                     
@@ -440,7 +440,7 @@ function updateBookingDisplay() {
     const bookButton = document.getElementById('bookButton');
     if (seatCount > 0) {
         bookButton.disabled = false;
-        bookButton.innerHTML = `<i class="fas fa-credit-card me-2"></i>Book Now - ₹${total}`;
+        bookButton.innerHTML = `<i class="fas fa-credit-card me-2"></i>Book Now - रू ${total}`;
     } else {
         bookButton.disabled = true;
         bookButton.innerHTML = '<i class="fas fa-chair me-2"></i>Select Seats to Continue';

@@ -10,8 +10,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from bookings.models import Booking
 from buses.models import Bus, BusType, BusRecommendation
-from routes.models import Route, BusSchedule, Location
+from routes.models import Route, Location, DynamicBusAssignment, BusSchedule
 from payments.models import Payment, Refund
+from home.models import PopularDestination, Testimonial
 from .forms import (
     DateRangeForm, AdminUserSearchForm, AdminBusSearchForm,
     AdminRouteSearchForm, AdminBookingSearchForm, BusForm, RouteForm, UserForm
@@ -39,9 +40,15 @@ def dashboard_home(request):
     total_bookings = Booking.objects.count()
     recent_bookings = Booking.objects.filter(booking_date__range=[start_date, end_date]).count()
     
-    total_revenue = Payment.objects.filter(payment_status='COMPLETED').aggregate(Sum('amount'))['amount__sum'] or 0
+    # Revenue only from confirmed bookings with completed payments
+    total_revenue = Payment.objects.filter(
+        payment_status='completed',
+        booking__booking_status='confirmed'
+    ).aggregate(Sum('amount'))['amount__sum'] or 0
+    
     recent_revenue = Payment.objects.filter(
-        payment_status='COMPLETED',
+        payment_status='completed',
+        booking__booking_status='confirmed',
         payment_date__date__range=[start_date, end_date]
     ).aggregate(Sum('amount'))['amount__sum'] or 0
     
@@ -57,9 +64,10 @@ def dashboard_home(request):
         'data': [item['count'] for item in bookings_by_day],
     }
     
-    # Get revenue data for chart
+    # Get revenue data for chart - only confirmed bookings with completed payments
     revenue_by_day = Payment.objects.filter(
-        payment_status='COMPLETED',
+        payment_status='completed',
+        booking__booking_status='confirmed',
         payment_date__date__range=[start_date, end_date]
     ).annotate(
         day=TruncDay('payment_date')
@@ -83,6 +91,12 @@ def dashboard_home(request):
     # Recent bookings
     recent_booking_list = Booking.objects.order_by('-booking_date')[:10]
     
+    # Operational metrics
+    active_buses = Bus.objects.filter(is_active=True).count()
+    active_routes = Route.objects.filter(is_active=True).count()
+    confirmed_bookings = Booking.objects.filter(booking_status='confirmed').count()
+    pending_bookings = Booking.objects.filter(booking_status='pending').count()
+    
     context = {
         'form': form,
         'total_users': total_users,
@@ -96,6 +110,10 @@ def dashboard_home(request):
         'top_routes': top_routes,
         'top_buses': top_buses,
         'recent_booking_list': recent_booking_list,
+        'active_buses': active_buses,
+        'active_routes': active_routes,
+        'confirmed_bookings': confirmed_bookings,
+        'pending_bookings': pending_bookings,
         'start_date': start_date,
         'end_date': end_date,
     }
@@ -365,6 +383,12 @@ def route_bus_management(request, route_id):
             departure_time_str = request.POST.get('departure_time')
             arrival_time_str = request.POST.get('arrival_time')
             base_fare = request.POST.get('base_fare')
+            schedule_type = request.POST.get('schedule_type', 'morning')
+            buffer_hours = request.POST.get('buffer_hours', 2)
+            return_schedule_enabled = request.POST.get('return_schedule_enabled') == 'on'
+            effective_from = request.POST.get('effective_from')
+            effective_until = request.POST.get('effective_until')
+            days_of_week = request.POST.get('days_of_week', '1234567')
             
             if bus_id and departure_time_str and arrival_time_str and base_fare:
                 try:
@@ -375,21 +399,43 @@ def route_bus_management(request, route_id):
                     departure_time = datetime.strptime(departure_time_str, '%H:%M').time()
                     arrival_time = datetime.strptime(arrival_time_str, '%H:%M').time()
                     
-                    # Check if this bus is already assigned to this route
-                    if not BusSchedule.objects.filter(route=route, bus=bus).exists():
+                    # Parse dates
+                    effective_from_date = None
+                    effective_until_date = None
+                    
+                    if effective_from:
+                        effective_from_date = datetime.strptime(effective_from, '%Y-%m-%d').date()
+                    
+                    if effective_until:
+                        effective_until_date = datetime.strptime(effective_until, '%Y-%m-%d').date()
+                    
+                    # Check if this bus is already assigned to this route with same schedule
+                    existing_schedule = BusSchedule.objects.filter(
+                        route=route, 
+                        bus=bus, 
+                        departure_time=departure_time
+                    ).first()
+                    
+                    if not existing_schedule:
                         BusSchedule.objects.create(
                             bus=bus,
                             route=route,
                             departure_time=departure_time,
                             arrival_time=arrival_time,
                             base_fare=base_fare,
-                            is_active=True
+                            is_active=True,
+                            schedule_type=schedule_type,
+                            buffer_hours=int(buffer_hours),
+                            return_schedule_enabled=return_schedule_enabled,
+                            effective_from=effective_from_date,
+                            effective_until=effective_until_date,
+                            days_of_week=days_of_week
                         )
-                        messages.success(request, f'Bus {bus.bus_number} has been assigned to this route.')
+                        messages.success(request, f'Bus {bus.bus_number} has been assigned to this route with enhanced scheduling.')
                     else:
-                        messages.error(request, f'Bus {bus.bus_number} is already assigned to this route.')
-                except ValueError:
-                    messages.error(request, 'Invalid time format. Please use HH:MM format.')
+                        messages.error(request, f'Bus {bus.bus_number} is already assigned to this route at {departure_time}.')
+                except ValueError as e:
+                    messages.error(request, f'Invalid date/time format: {str(e)}')
                 except Exception as e:
                     messages.error(request, f'Error assigning bus: {str(e)}')
             else:
@@ -402,6 +448,54 @@ def route_bus_management(request, route_id):
                 bus_number = schedule.bus.bus_number
                 schedule.delete()
                 messages.success(request, f'Bus {bus_number} has been removed from this route.')
+        
+        elif action == 'update_schedule':
+            schedule_id = request.POST.get('schedule_id')
+            if schedule_id:
+                try:
+                    schedule = get_object_or_404(BusSchedule, id=schedule_id, route=route)
+                    
+                    # Get form data
+                    departure_time_str = request.POST.get('departure_time')
+                    arrival_time_str = request.POST.get('arrival_time')
+                    base_fare = request.POST.get('base_fare')
+                    schedule_type = request.POST.get('schedule_type', 'morning')
+                    buffer_hours = request.POST.get('buffer_hours', 2)
+                    return_schedule_enabled = request.POST.get('return_schedule_enabled') == 'on'
+                    effective_from = request.POST.get('effective_from')
+                    effective_until = request.POST.get('effective_until')
+                    days_of_week = request.POST.get('days_of_week', '1234567')
+                    is_active = request.POST.get('is_active') == 'on'
+                    
+                    # Parse times and dates
+                    departure_time = datetime.strptime(departure_time_str, '%H:%M').time()
+                    arrival_time = datetime.strptime(arrival_time_str, '%H:%M').time()
+                    
+                    effective_from_date = None
+                    effective_until_date = None
+                    
+                    if effective_from:
+                        effective_from_date = datetime.strptime(effective_from, '%Y-%m-%d').date()
+                    
+                    if effective_until:
+                        effective_until_date = datetime.strptime(effective_until, '%Y-%m-%d').date()
+                    
+                    # Update schedule
+                    schedule.departure_time = departure_time
+                    schedule.arrival_time = arrival_time
+                    schedule.base_fare = float(base_fare)
+                    schedule.schedule_type = schedule_type
+                    schedule.buffer_hours = int(buffer_hours)
+                    schedule.return_schedule_enabled = return_schedule_enabled
+                    schedule.effective_from = effective_from_date
+                    schedule.effective_until = effective_until_date
+                    schedule.days_of_week = days_of_week
+                    schedule.is_active = is_active
+                    schedule.save()
+                    
+                    messages.success(request, f'Schedule for bus {schedule.bus.bus_number} has been updated successfully!')
+                except Exception as e:
+                    messages.error(request, f'Error updating schedule: {str(e)}')
         
         return redirect('dashboard:route_bus_management', route_id=route_id)
     
@@ -477,9 +571,10 @@ def analytics(request):
         start_date = form.cleaned_data['start_date']
         end_date = form.cleaned_data['end_date']
     
-    # Monthly revenue
+    # Monthly revenue - only from confirmed bookings with completed payments
     revenue_by_month = Payment.objects.filter(
-        payment_status='COMPLETED',
+        payment_status='completed',
+        booking__booking_status='confirmed',
         payment_date__date__range=[start_date, end_date]
     ).annotate(
         month=TruncMonth('payment_date')
@@ -512,12 +607,13 @@ def analytics(request):
         'data': [item['count'] for item in booking_status_data],
     }
     
-    # Top routes by revenue
+    # Top routes by revenue - only from confirmed bookings with completed payments
     top_routes_revenue = Route.objects.filter(
-        busschedule__booking__payment__payment_status='COMPLETED',
-        busschedule__booking__payment__payment_date__date__range=[start_date, end_date]
+        busschedule__booking__payments__payment_status='completed',
+        busschedule__booking__booking_status='confirmed',
+        busschedule__booking__payments__payment_date__range=[start_date, end_date]
     ).annotate(
-        revenue=Sum('busschedule__booking__payment__amount')
+        revenue=Sum('busschedule__booking__payments__amount')
     ).order_by('-revenue')[:10]
     
     # Top bus types by bookings
@@ -532,6 +628,18 @@ def analytics(request):
         'data': [item.booking_count for item in top_bus_types],
     }
     
+    # Calculate total and recent revenue for display
+    total_revenue = Payment.objects.filter(
+        payment_status='completed',
+        booking__booking_status='confirmed'
+    ).aggregate(Sum('amount'))['amount__sum'] or 0
+    
+    recent_revenue = Payment.objects.filter(
+        payment_status='completed',
+        booking__booking_status='confirmed',
+        payment_date__date__range=[start_date, end_date]
+    ).aggregate(Sum('amount'))['amount__sum'] or 0
+    
     context = {
         'form': form,
         'revenue_chart_data': json.dumps(revenue_chart_data),
@@ -539,6 +647,9 @@ def analytics(request):
         'status_chart_data': json.dumps(status_chart_data),
         'bus_type_chart_data': json.dumps(bus_type_chart_data),
         'top_routes_revenue': top_routes_revenue,
+        'total_revenue': total_revenue,
+        'recent_revenue': recent_revenue,
+        'last_updated': timezone.now(),
         'start_date': start_date,
         'end_date': end_date,
     }
@@ -931,3 +1042,432 @@ def user_delete(request, user_id):
         'title': 'Delete User'
     }
     return render(request, 'dashboard/user_confirm_delete.html', context)
+
+# Removed weekly_bus_assignments and intelligent_scheduler_control views
+
+# Removed bus_assignment_analytics view as it's no longer needed
+
+# Removed schedule_management, assignment_management and related CRUD functions
+
+@staff_member_required
+def get_real_time_revenue_data(request):
+    """API endpoint for real-time revenue data updates"""
+    # Get date range from request parameters
+    days = int(request.GET.get('days', 30))
+    end_date = timezone.now().date()
+    start_date = end_date - timedelta(days=days)
+    
+    # Calculate total revenue from confirmed bookings with completed payments
+    total_revenue = Payment.objects.filter(
+        payment_status='completed',
+        booking__booking_status='confirmed'
+    ).aggregate(Sum('amount'))['amount__sum'] or 0
+    
+    # Calculate recent revenue for the specified period
+    recent_revenue = Payment.objects.filter(
+        payment_status='completed',
+        booking__booking_status='confirmed',
+        payment_date__date__range=[start_date, end_date]
+    ).aggregate(Sum('amount'))['amount__sum'] or 0
+    
+    # Get daily revenue data for chart
+    revenue_by_day = Payment.objects.filter(
+        payment_status='completed',
+        booking__booking_status='confirmed',
+        payment_date__date__range=[start_date, end_date]
+    ).annotate(
+        day=TruncDay('payment_date')
+    ).values('day').annotate(total=Sum('amount')).order_by('day')
+    
+    # Format chart data
+    chart_data = {
+        'labels': [item['day'].strftime('%Y-%m-%d') for item in revenue_by_day],
+        'data': [float(item['total']) for item in revenue_by_day],
+    }
+    
+    # Calculate growth percentage
+    previous_period_start = start_date - timedelta(days=days)
+    previous_revenue = Payment.objects.filter(
+        payment_status='completed',
+        booking__booking_status='confirmed',
+        payment_date__date__range=[previous_period_start, start_date]
+    ).aggregate(Sum('amount'))['amount__sum'] or 0
+    
+    growth_percentage = 0
+    if previous_revenue > 0:
+        growth_percentage = ((recent_revenue - previous_revenue) / previous_revenue) * 100
+    
+    return JsonResponse({
+        'total_revenue': float(total_revenue),
+        'recent_revenue': float(recent_revenue),
+        'chart_data': chart_data,
+        'growth_percentage': round(growth_percentage, 2),
+        'period_days': days,
+        'last_updated': timezone.now().isoformat()
+    })
+
+@staff_member_required
+def get_schedules_for_route_bus(request):
+    """AJAX endpoint to get schedules for a specific route and bus combination"""
+    route_id = request.GET.get('route_id')
+    bus_id = request.GET.get('bus_id')
+    
+    if route_id and bus_id:
+        schedules = BusSchedule.objects.filter(
+            route_id=route_id, bus_id=bus_id, is_active=True
+        ).values('id', 'departure_time', 'arrival_time', 'schedule_type')
+        
+        schedule_list = []
+        for schedule in schedules:
+            schedule_list.append({
+                'id': schedule['id'],
+                'text': f"{schedule['departure_time'].strftime('%H:%M')} - {schedule['arrival_time'].strftime('%H:%M')} ({schedule['schedule_type'].title()})",
+                'departure_time': schedule['departure_time'].strftime('%H:%M'),
+                'arrival_time': schedule['arrival_time'].strftime('%H:%M'),
+                'schedule_type': schedule['schedule_type']
+            })
+        
+        return JsonResponse({'schedules': schedule_list})
+    
+    return JsonResponse({'schedules': []})
+
+@staff_member_required
+def popular_destinations_management(request):
+    """Manage popular destinations"""
+    destinations = PopularDestination.objects.all().order_by('display_order')
+    
+    context = {
+        'destinations': destinations,
+        'title': 'Popular Destinations Management'
+    }
+    
+    return render(request, 'dashboard/popular_destinations_management.html', context)
+
+@staff_member_required
+def popular_destination_add(request):
+    """Add new popular destination"""
+    if request.method == 'POST':
+        location_id = request.POST.get('location')
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        display_order = request.POST.get('display_order', 0)
+        image = request.FILES.get('image')
+        is_active = request.POST.get('is_active') == 'on'
+        
+        try:
+            location = Location.objects.get(id=location_id)
+            destination = PopularDestination.objects.create(
+                location=location,
+                title=title,
+                description=description,
+                display_order=int(display_order),
+                image=image,
+                is_active=is_active
+            )
+            messages.success(request, f'Popular destination "{title}" added successfully!')
+            return redirect('dashboard:popular_destinations_management')
+        except Location.DoesNotExist:
+            messages.error(request, 'Selected location does not exist.')
+        except Exception as e:
+            messages.error(request, f'Error adding destination: {str(e)}')
+    
+    locations = Location.objects.all().order_by('name')
+    return render(request, 'dashboard/popular_destination_form.html', {
+        'locations': locations,
+        'title': 'Add Popular Destination'
+    })
+
+
+# Testimonials Management
+@staff_member_required
+def testimonials_management(request):
+    testimonials = Testimonial.objects.all().order_by('display_order', '-created_at')
+    return render(request, 'dashboard/testimonials_management.html', {
+        'testimonials': testimonials
+    })
+
+@staff_member_required
+def testimonial_add(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        designation = request.POST.get('designation')
+        testimonial_text = request.POST.get('testimonial_text')
+        rating = request.POST.get('rating')
+        display_order = request.POST.get('display_order', 0)
+        is_active = request.POST.get('is_active') == 'on'
+        avatar = request.FILES.get('avatar')
+        
+        testimonial = Testimonial.objects.create(
+            name=name,
+            designation=designation,
+            testimonial_text=testimonial_text,
+            rating=rating,
+            display_order=display_order,
+            is_active=is_active,
+            avatar=avatar
+        )
+        
+        messages.success(request, f'Testimonial from {testimonial.name} has been added successfully!')
+        return redirect('dashboard:testimonials_management')
+    
+    return render(request, 'dashboard/testimonial_form.html', {
+        'title': 'Add New Testimonial',
+        'action': 'Add'
+    })
+
+@staff_member_required
+def testimonial_edit(request, testimonial_id):
+    testimonial = get_object_or_404(Testimonial, id=testimonial_id)
+    
+    if request.method == 'POST':
+        testimonial.name = request.POST.get('name')
+        testimonial.designation = request.POST.get('designation')
+        testimonial.testimonial_text = request.POST.get('testimonial_text')
+        testimonial.rating = request.POST.get('rating')
+        testimonial.display_order = request.POST.get('display_order', 0)
+        testimonial.is_active = request.POST.get('is_active') == 'on'
+        
+        if request.FILES.get('avatar'):
+            testimonial.avatar = request.FILES.get('avatar')
+        
+        testimonial.save()
+        
+        messages.success(request, f'Testimonial from {testimonial.name} has been updated successfully!')
+        return redirect('dashboard:testimonials_management')
+    
+    return render(request, 'dashboard/testimonial_form.html', {
+        'testimonial': testimonial,
+        'title': 'Edit Testimonial',
+        'action': 'Update'
+    })
+
+@staff_member_required
+def testimonial_delete(request, testimonial_id):
+    testimonial = get_object_or_404(Testimonial, id=testimonial_id)
+    
+    if request.method == 'POST':
+        testimonial_name = testimonial.name
+        testimonial.delete()
+        messages.success(request, f'Testimonial from {testimonial_name} has been deleted successfully!')
+        return redirect('dashboard:testimonials_management')
+    
+    return render(request, 'dashboard/testimonial_delete.html', {
+        'testimonial': testimonial
+    })
+
+@staff_member_required
+def popular_destination_edit(request, destination_id):
+    """Edit popular destination"""
+    destination = get_object_or_404(PopularDestination, id=destination_id)
+    
+    if request.method == 'POST':
+        location_id = request.POST.get('location')
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        display_order = request.POST.get('display_order', 0)
+        image = request.FILES.get('image')
+        is_active = request.POST.get('is_active') == 'on'
+        
+        try:
+            location = Location.objects.get(id=location_id)
+            destination.location = location
+            destination.title = title
+            destination.description = description
+            destination.display_order = int(display_order)
+            if image:
+                destination.image = image
+            destination.is_active = is_active
+            destination.save()
+            
+            messages.success(request, f'Popular destination "{title}" updated successfully!')
+            return redirect('dashboard:popular_destinations_management')
+        except Exception as e:
+            messages.error(request, f'Error updating destination: {str(e)}')
+    
+    locations = Location.objects.all().order_by('name')
+    context = {
+        'destination': destination,
+        'locations': locations,
+        'title': 'Edit Popular Destination'
+    }
+    
+    return render(request, 'dashboard/popular_destination_form.html', context)
+
+@staff_member_required
+def popular_destination_delete(request, destination_id):
+    """Delete popular destination"""
+    destination = get_object_or_404(PopularDestination, id=destination_id)
+    
+    if request.method == 'POST':
+        title = destination.title
+        destination.delete()
+        messages.success(request, f'Popular destination "{title}" deleted successfully!')
+        return redirect('dashboard:popular_destinations_management')
+    
+    context = {
+        'destination': destination,
+        'title': 'Delete Popular Destination'
+    }
+    
+    return render(request, 'dashboard/popular_destination_confirm_delete.html', context)
+
+
+# Bus Driver Management Views
+@staff_member_required
+def driver_management(request):
+    """Manage bus drivers"""
+    from buses.models import BusDriver
+    
+    search_query = request.GET.get('search', '')
+    drivers = BusDriver.objects.all().select_related('bus').order_by('name')
+    
+    if search_query:
+        drivers = drivers.filter(
+            Q(name__icontains=search_query) |
+            Q(license_number__icontains=search_query) |
+            Q(contact_number__icontains=search_query)
+        )
+    
+    # Add statistics
+    total_drivers = BusDriver.objects.count()
+    assigned_drivers = BusDriver.objects.exclude(bus=None).count()
+    unassigned_drivers = BusDriver.objects.filter(bus=None).count()
+    
+    context = {
+        'drivers': drivers,
+        'search_query': search_query,
+        'total_drivers': total_drivers,
+        'assigned_drivers': assigned_drivers,
+        'unassigned_drivers': unassigned_drivers,
+    }
+    
+    return render(request, 'dashboard/driver_management.html', context)
+
+
+@staff_member_required
+def driver_add(request):
+    """Add a new bus driver"""
+    from buses.models import BusDriver, Bus
+    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        license_number = request.POST.get('license_number')
+        contact_number = request.POST.get('contact_number')
+        experience_years = request.POST.get('experience_years', 0)
+        bus_id = request.POST.get('bus')
+        
+        if name and license_number:
+            # Check if license number already exists
+            if BusDriver.objects.filter(license_number=license_number).exists():
+                messages.error(request, 'A driver with this license number already exists.')
+            else:
+                driver = BusDriver.objects.create(
+                    name=name,
+                    license_number=license_number,
+                    contact_number=contact_number or '',
+                    experience_years=int(experience_years) if experience_years else 0
+                )
+                
+                # Assign to bus if selected
+                if bus_id:
+                    try:
+                        bus = Bus.objects.get(id=bus_id)
+                        # Remove current driver from bus
+                        BusDriver.objects.filter(bus=bus).update(bus=None)
+                        # Assign new driver
+                        driver.bus = bus
+                        driver.save()
+                    except Bus.DoesNotExist:
+                        pass
+                
+                messages.success(request, f'Driver "{name}" added successfully!')
+                return redirect('dashboard:driver_management')
+        else:
+            messages.error(request, 'Name and license number are required.')
+    
+    # Get available buses (without assigned drivers)
+    available_buses = Bus.objects.filter(drivers__isnull=True, is_active=True)
+    
+    context = {
+        'available_buses': available_buses,
+    }
+    
+    return render(request, 'dashboard/driver_form.html', context)
+
+
+@staff_member_required
+def driver_edit(request, driver_id):
+    """Edit an existing bus driver"""
+    from buses.models import BusDriver, Bus
+    
+    driver = get_object_or_404(BusDriver, id=driver_id)
+    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        license_number = request.POST.get('license_number')
+        contact_number = request.POST.get('contact_number')
+        experience_years = request.POST.get('experience_years', 0)
+        bus_id = request.POST.get('bus')
+        
+        if name and license_number:
+            # Check if license number already exists (excluding current driver)
+            if BusDriver.objects.filter(license_number=license_number).exclude(id=driver_id).exists():
+                messages.error(request, 'A driver with this license number already exists.')
+            else:
+                driver.name = name
+                driver.license_number = license_number
+                driver.contact_number = contact_number or ''
+                driver.experience_years = int(experience_years) if experience_years else 0
+                
+                # Handle bus assignment
+                if bus_id:
+                    try:
+                        bus = Bus.objects.get(id=bus_id)
+                        # Remove current driver from the selected bus
+                        BusDriver.objects.filter(bus=bus).update(bus=None)
+                        # Assign this driver to the bus
+                        driver.bus = bus
+                    except Bus.DoesNotExist:
+                        driver.bus = None
+                else:
+                    driver.bus = None
+                
+                driver.save()
+                messages.success(request, f'Driver "{name}" updated successfully!')
+                return redirect('dashboard:driver_management')
+        else:
+            messages.error(request, 'Name and license number are required.')
+    
+    # Get available buses (without assigned drivers) plus current bus
+    available_buses = Bus.objects.filter(
+        Q(drivers__isnull=True) | Q(id=driver.bus.id if driver.bus else None),
+        is_active=True
+    ).distinct()
+    
+    context = {
+        'driver': driver,
+        'available_buses': available_buses,
+        'is_edit': True,
+    }
+    
+    return render(request, 'dashboard/driver_form.html', context)
+
+
+@staff_member_required
+def driver_delete(request, driver_id):
+    """Delete a bus driver"""
+    from buses.models import BusDriver
+    
+    driver = get_object_or_404(BusDriver, id=driver_id)
+    
+    if request.method == 'POST':
+        name = driver.name
+        driver.delete()
+        messages.success(request, f'Driver "{name}" deleted successfully!')
+        return redirect('dashboard:driver_management')
+    
+    context = {
+        'driver': driver,
+    }
+    
+    return render(request, 'dashboard/driver_confirm_delete.html', context)
