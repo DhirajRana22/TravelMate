@@ -260,6 +260,42 @@
         font-size: 0.875rem;
         font-weight: 600;
     }
+    .recommended-card {
+        border: 2px solid #ffd700;
+        position: relative;
+    }
+    .recommended-card::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+        border-radius: 17px;
+        z-index: -1;
+        animation: recommendedGlow 2s ease-in-out infinite alternate;
+    }
+    @keyframes recommendedGlow {
+        0% { opacity: 0.7; }
+        100% { opacity: 1; }
+    }
+    .recommendation-badge {
+        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        color: #333;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+    }
+    .recommendation-badge i {
+        font-size: 0.7rem;
+    }
 </style>
 {% endblock %}
 
@@ -418,11 +454,16 @@
                 <!-- Schedule Cards -->
                 {% if schedules %}
                     {% for schedule in schedules %}
-                    <div class="schedule-card" data-bus-type="{{ schedule.bus.bus_type.id }}" data-price="{{ schedule.base_fare }}" data-departure="{{ schedule.departure_time|time:'H' }}">
+                    <div class="schedule-card{% if schedule.is_recommended %} recommended-card{% endif %}" data-bus-type="{{ schedule.bus.bus_type.id }}" data-price="{{ schedule.base_fare }}" data-departure="{{ schedule.departure_time|time:'H' }}">
                         <div class="schedule-header">
                             <div class="bus-info">
                                 <span class="bus-number">{{ schedule.bus.bus_number }}</span>
                                 <span class="bus-type">{{ schedule.bus.bus_type.name }}</span>
+                                {% if schedule.is_recommended %}
+                                <span class="recommendation-badge">
+                                    <i class="fas fa-star"></i> Recommended for You
+                                </span>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="schedule-body">

@@ -83,16 +83,29 @@ def bus_preference(request):
             preference.user = request.user
             preference.save()
             form.save_m2m()  # Save many-to-many relationships
-            messages.success(request, 'Your bus preferences have been updated!')
+            messages.success(request, 'Your bus preferences have been updated successfully!')
             
             # Generate recommendations based on new preferences
             generate_bus_recommendations(request.user)
             
             return redirect('buses:bus_recommendations')
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = UserBusPreferenceForm(instance=preference)
     
-    return render(request, 'buses/bus_preference.html', {'form': form})
+    # Get all bus types and amenities for the template
+    bus_types = BusType.objects.all()
+    amenities = BusAmenity.objects.all()
+    
+    context = {
+        'form': form,
+        'bus_types': bus_types,
+        'amenities': amenities,
+        'preference': preference,
+    }
+    
+    return render(request, 'buses/bus_preference.html', context)
 
 @login_required
 def bus_recommendations(request):

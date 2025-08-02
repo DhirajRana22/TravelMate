@@ -44,6 +44,7 @@
             <li class="nav-item">
               <a class="nav-link" href="{% url 'buses:bus_list' %}">Find Bus</a>
             </li>
+
             <li class="nav-item">
               <a class="nav-link" href="{% url 'home:about' %}">About Us</a>
             </li>
@@ -62,6 +63,7 @@
                 <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="fas fa-user me-2"></i>My Profile</a></li>
                 <li><a class="dropdown-item" href="{% url 'accounts:booking_history' %}"><i class="fas fa-ticket-alt me-2"></i>My Bookings</a></li>
                 <li><a class="dropdown-item" href="{% url 'accounts:payment_history' %}"><i class="fas fa-credit-card me-2"></i>Payment History</a></li>
+                <li><a class="dropdown-item" href="{% url 'buses:bus_recommendations' %}"><i class="fas fa-magic me-2"></i>Bus Recommendations</a></li>
                 <li><a class="dropdown-item" href="{% url 'buses:bus_preference' %}"><i class="fas fa-cog me-2"></i>Bus Preferences</a></li>
                 <li><hr class="dropdown-divider"></li>
                 {% if user.is_staff %}

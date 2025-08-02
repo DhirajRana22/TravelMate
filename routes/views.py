@@ -3,10 +3,11 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
 from django.utils import timezone
-from datetime import date
+from datetime import date, time
 from .models import Location, Route, BusSchedule
 from .forms import RouteSearchForm, LocationForm, RouteForm, BusScheduleForm
 from bookings.models import Seat
+from buses.models import UserBusPreference
 
 def route_search(request):
     form = RouteSearchForm(request.GET or None)
@@ -192,6 +193,10 @@ def route_results(request):
                     )['total_booked'] or 0
                     
                     schedule.available_seats = schedule.bus.total_seats - booked_seats_count
+            
+            # Apply recommendation sorting if user is authenticated
+            if request.user.is_authenticated:
+                schedules = sort_schedules_by_preferences(request.user, schedules, travel_date)
                     
         except Location.DoesNotExist:
             messages.error(request, 'Please enter valid source and destination cities.')
@@ -291,3 +296,62 @@ def route_list(request):
     }
     
     return render(request, 'routes/route_list.html', context)
+
+
+def sort_schedules_by_preferences(user, schedules, travel_date):
+    """Sort schedules based on user preferences, putting recommended buses at the top"""
+    try:
+        preference = UserBusPreference.objects.get(user=user)
+    except UserBusPreference.DoesNotExist:
+        # If no preferences, return schedules sorted by departure time
+        return sorted(schedules, key=lambda x: x.departure_time)
+    
+    def calculate_recommendation_score(schedule):
+        score = 0
+        
+        # Bus type preference (40% weight)
+        if schedule.bus.bus_type in preference.preferred_bus_types.all():
+            score += 40
+        
+        # Price preference (30% weight)
+        if float(schedule.base_fare) <= preference.max_budget:
+            # Higher score for lower prices if user is price sensitive
+            price_score = (preference.max_budget - float(schedule.base_fare)) / preference.max_budget * 30
+            score += price_score * (preference.price_sensitivity / 10)
+        
+        # Time preference (20% weight)
+        departure_hour = schedule.departure_time.hour
+        preferred_times = preference.get_preferred_times_list()
+        
+        for time_pref in preferred_times:
+            if time_pref == 'morning' and 6 <= departure_hour < 12:
+                score += 20
+            elif time_pref == 'afternoon' and 12 <= departure_hour < 18:
+                score += 20
+            elif time_pref == 'evening' and 18 <= departure_hour < 22:
+                score += 20
+            elif time_pref == 'night' and (departure_hour >= 22 or departure_hour < 6):
+                score += 20
+        
+        # Amenities preference (10% weight)
+        preferred_amenities = set(preference.preferred_amenities.all())
+        bus_amenities = set(schedule.bus.amenities.all())
+        
+        if preferred_amenities:
+            amenities_match_ratio = len(preferred_amenities.intersection(bus_amenities)) / len(preferred_amenities)
+            score += amenities_match_ratio * 10
+        
+        return score
+    
+    # Calculate scores and sort
+    schedule_scores = [(schedule, calculate_recommendation_score(schedule)) for schedule in schedules]
+    schedule_scores.sort(key=lambda x: (-x[1], x[0].departure_time))  # Sort by score desc, then by time
+    
+    # Add recommendation score to schedule objects for template use
+    sorted_schedules = []
+    for schedule, score in schedule_scores:
+        schedule.recommendation_score = score
+        schedule.is_recommended = score > 30  # Mark as recommended if score > 30
+        sorted_schedules.append(schedule)
+    
+    return sorted_schedules

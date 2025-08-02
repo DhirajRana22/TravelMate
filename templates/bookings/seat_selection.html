@@ -19,50 +19,56 @@
         margin-bottom: 2rem;
     }
     .bus-layout {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        padding: 2rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        padding: 25px 20px;
         margin-bottom: 2rem;
-    }
-    .seat-map {
-        max-width: 400px;
-        margin: 0 auto;
-        background: #f8f9fa;
-        border-radius: 15px;
-        padding: 2rem 1rem;
+        border: 2px solid #dee2e6;
         position: relative;
+        overflow: hidden;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .seat-map {
+        max-width: 350px;
+        margin: 0 auto;
+        background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 2rem 1.2rem;
+        position: relative;
+        box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);
+        border: 2px solid #dee2e6;
     }
     .driver-section {
-        background: #667eea;
-        color: white;
-        padding: 1rem;
-        border-radius: 10px 10px 0 0;
+        background: #f8f9fa;
+        color: #495057;
+        padding: 0.75rem;
+        border-radius: 6px;
         text-align: center;
-        margin-bottom: 1rem;
-        position: relative;
-    }
-    .driver-section::after {
-        content: '';
-        position: absolute;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 15px solid transparent;
-        border-right: 15px solid transparent;
-        border-top: 10px solid #667eea;
+        margin-bottom: 0.75rem;
+        border: 1px solid #dee2e6;
     }
     .seat-row {
         display: flex;
-        justify-content: space-between;
-        margin-bottom: 1rem;
+        justify-content: center;
+        margin-bottom: 8px;
         align-items: center;
+        padding: 0 15px;
+        gap: 15px;
+    }
+    .seat-row.last-row {
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        margin-top: 8px;
+        padding: 0 15px;
     }
     .seat-group {
         display: flex;
-        gap: 0.5rem;
+        gap: 8px;
     }
     .seat {
         width: 40px;
@@ -74,66 +80,115 @@
         justify-content: center;
         cursor: pointer;
         transition: all 0.3s ease;
-        font-size: 0.75rem;
-        font-weight: bold;
+        font-size: 11px;
+        font-weight: 600;
         position: relative;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        transform: translateY(0);
+    }
+    .seat::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 26px;
+        height: 3px;
+        background: #dee2e6;
+        border-radius: 2px;
+        transition: all 0.3s ease;
     }
     .seat.available {
-        background: #e8f5e8;
-        border-color: #28a745;
-        color: #28a745;
-    }
+                background: linear-gradient(145deg, #4ade80,rgb(153, 217, 226));
+                border-color: #16a34a;
+                color: white;
+            }
+
     .seat.available:hover {
-        background: #28a745;
-        color: white;
-        transform: scale(1.1);
-    }
+                background: linear-gradient(145deg, #22c55e, #06b6d4);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+            }
+
     .seat.selected {
-        background: #667eea;
-        border-color: #667eea;
-        color: white;
-        transform: scale(1.1);
+                background: linear-gradient(145deg, #fbbf24, #f59e0b);
+                border-color: #d97706;
+                color: #92400e;
+                animation: pulse 2s infinite;
+            }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
     }
     .seat.booked {
-        background: #f8d7da;
-        border-color: #dc3545;
-        color: #dc3545;
-        cursor: not-allowed;
-    }
+                background: linear-gradient(145deg, #f87171, #ef4444);
+                border-color: #dc2626;
+                color: white;
+                cursor: not-allowed;
+                opacity: 0.8;
+            }
+
     .seat.reserved {
-        background: #fff3cd;
-        border-color: #ffc107;
-        color: #856404;
-        cursor: not-allowed;
-    }
+                background: linear-gradient(145deg, #fef3c7, #fde68a);
+                border-color: #f59e0b;
+                color: #92400e;
+                cursor: not-allowed;
+                opacity: 0.8;
+            }
     .aisle {
         width: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #6c757d;
-        font-size: 0.75rem;
+        color: #999;
+        font-size: 10px;
+        opacity: 0.6;
     }
+
+    
+
     .seat-legend {
         display: flex;
         justify-content: center;
-        gap: 2rem;
-        margin-top: 2rem;
+        gap: 1rem;
+        margin-top: 1.5rem;
         flex-wrap: wrap;
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
     }
     .legend-item {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        font-size: 0.875rem;
+        gap: 0.4rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #666;
     }
     .legend-seat {
-        width: 20px;
-        height: 20px;
-        border-radius: 4px;
-        border: 2px solid;
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        border: 1px solid;
+        position: relative;
     }
-    .booking-summary {
+    .legend-seat::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 12px;
+        height: 2px;
+        border-radius: 1px;
+     }
+
+     .booking-summary {
         background: white;
         border-radius: 15px;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -245,17 +300,21 @@
     }
     .seat-number {
         position: absolute;
-        top: -8px;
-        right: -8px;
+        top: -6px;
+        right: -6px;
         background: #495057;
         color: white;
         border-radius: 50%;
-        width: 16px;
-        height: 16px;
-        font-size: 0.6rem;
+        width: 14px;
+        height: 14px;
+        font-size: 0.55rem;
+        font-weight: 800;
         display: flex;
         align-items: center;
         justify-content: center;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        z-index: 2;
     }
 </style>
 {% endblock %}
@@ -341,63 +400,89 @@
                         <div class="seat-map">
                             <!-- Driver Section -->
                             <div class="driver-section">
-                                <i class="fas fa-user-tie me-2"></i>Driver
+                                <div style="font-size: 0.8rem; opacity: 0.9; margin-bottom: 0.3rem;">
+                                    <i class="fas fa-route me-1"></i>{{ schedule.route.origin.name }} → {{ schedule.route.destination.name }}
+                                </div>
+                                <div class="driver-content d-flex align-items-center justify-content-end">
+                    <strong class="driver-label me-2">Driver</strong>
+                    <i class="fas fa-steering-wheel driver-icon"></i>
+                </div>
                             </div>
                             
                             <!-- Seat Rows -->
                             {% for row in seat_layout %}
-                            <div class="seat-row">
-                                <div class="seat-group">
-                                    {% for seat in row.left_seats %}
-                                    <div class="seat {{ seat.status }}" 
-                                         data-seat-id="{{ seat.id }}" 
-                                         data-seat-number="{{ seat.seat_number }}"
-                                         {% if seat.status == 'available' %}onclick="toggleSeat(this)"{% endif %}>
-                                        {{ seat.seat_number }}
-                                        {% if seat.is_window %}
-                                            <div class="seat-number">W</div>
-                                        {% endif %}
+                                {% if row.last_row_seats %}
+                                    <!-- Last row with 5 seats -->
+                                    <div class="seat-row last-row">
+                                        {% for seat in row.last_row_seats %}
+                                        <div class="seat {{ seat.status }}" 
+                                             data-seat-id="{{ seat.id }}" 
+                                             data-seat-number="{{ seat.seat_number }}"
+                                             {% if seat.status == 'available' %}onclick="toggleSeat(this)"{% endif %}
+                                             title="{{ seat.seat_number }}">
+                                            <span class="seat-number">{{ seat.seat_number }}</span>
+                                        </div>
+                                        {% endfor %}
                                     </div>
-                                    {% endfor %}
-                                </div>
-                                
-                                <div class="aisle">
-                                    <i class="fas fa-arrows-alt-h"></i>
-                                </div>
-                                
-                                <div class="seat-group">
-                                    {% for seat in row.right_seats %}
-                                    <div class="seat {{ seat.status }}" 
-                                         data-seat-id="{{ seat.id }}" 
-                                         data-seat-number="{{ seat.seat_number }}"
-                                         {% if seat.status == 'available' %}onclick="toggleSeat(this)"{% endif %}>
-                                        {{ seat.seat_number }}
-                                        {% if seat.is_window %}
-                                            <div class="seat-number">W</div>
-                                        {% endif %}
+                                {% else %}
+                                    <!-- Regular 2x2 row -->
+                                    <div class="seat-row">
+                                        <div class="seat-group">
+                                            {% for seat in row.left_seats %}
+                                            <div class="seat {{ seat.status }}" 
+                                                 data-seat-id="{{ seat.id }}" 
+                                                 data-seat-number="{{ seat.seat_number }}"
+                                                 {% if seat.status == 'available' %}onclick="toggleSeat(this)"{% endif %}
+                                                 title="{{ seat.seat_number }}">
+                                                <span class="seat-number">{{ seat.seat_number }}</span>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        
+                                        <div class="aisle">
+                                            <i class="fas fa-arrows-alt-h"></i>
+                                        </div>
+                                        
+                                        <div class="seat-group">
+                                            {% for seat in row.right_seats %}
+                                            <div class="seat {{ seat.status }}" 
+                                                 data-seat-id="{{ seat.id }}" 
+                                                 data-seat-number="{{ seat.seat_number }}"
+                                                 {% if seat.status == 'available' %}onclick="toggleSeat(this)"{% endif %}
+                                                 title="{{ seat.seat_number }}">
+                                                <span class="seat-number">{{ seat.seat_number }}</span>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
                                     </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
+                                {% endif %}
                             {% endfor %}
                         </div>
                         
                         <!-- Seat Legend -->
                         <div class="seat-legend">
                             <div class="legend-item">
-                                <div class="legend-seat available" style="background: #e8f5e8; border-color: #28a745;"></div>
+                                <div class="legend-seat" style="background: linear-gradient(145deg, #d4edda 0%, #c3e6cb 100%); border-color: #28a745;">
+                                    <div style="position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 16px; height: 3px; background: #28a745; border-radius: 1px;"></div>
+                                </div>
                                 <span>Available</span>
                             </div>
                             <div class="legend-item">
-                                <div class="legend-seat selected" style="background: #667eea; border-color: #667eea;"></div>
+                                <div class="legend-seat" style="background: linear-gradient(145deg, #ffc107 0%, #e0a800 100%); border-color: #ffc107;">
+                                    <div style="position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 16px; height: 3px; background: #ffffff; border-radius: 1px; box-shadow: 0 0 6px rgba(255,255,255,0.8);"></div>
+                                </div>
                                 <span>Selected</span>
                             </div>
                             <div class="legend-item">
-                                <div class="legend-seat booked" style="background: #f8d7da; border-color: #dc3545;"></div>
+                                <div class="legend-seat" style="background: linear-gradient(145deg, #dc3545 0%, #c82333 100%); border-color: #dc3545;">
+                                    <div style="position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 16px; height: 3px; background: #c82333; border-radius: 1px;"></div>
+                                </div>
                                 <span>Booked</span>
                             </div>
                             <div class="legend-item">
-                                <div class="legend-seat reserved" style="background: #fff3cd; border-color: #ffc107;"></div>
+                                <div class="legend-seat" style="background: linear-gradient(145deg, #fff3cd 0%, #ffeaa7 100%); border-color: #ffc107; opacity: 0.8;">
+                                    <div style="position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 16px; height: 3px; background: #ffc107; border-radius: 1px;"></div>
+                                </div>
                                 <span>Reserved</span>
                             </div>
                         </div>

@@ -234,6 +234,21 @@
                     <div class="stats-label">Favorite Route</div>
                 </div>
                 
+                <!-- Recommended for You -->
+                <div class="profile-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-star me-2"></i>Recommended for You</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">Based on your preferences and travel history</p>
+                        <div class="d-grid">
+                            <a href="{% url 'buses:bus_recommendations' %}" class="btn btn-primary">
+                                <i class="fas fa-route me-2"></i>View Recommendations
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Quick Actions -->
                 <div class="profile-card">
                     <div class="card-header">

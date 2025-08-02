@@ -92,7 +92,7 @@ def seat_selection(request, schedule_id):
         else:
             seat.status = 'available'
     
-    # Create seat layout (2x2 configuration) with A/B sides
+    # Create dynamic seat layout based on actual seat count
     seat_layout = []
     
     # Sort seats by extracting number from seat_number (A1, A2, B1, B2, etc.)
@@ -102,20 +102,56 @@ def seat_selection(request, schedule_id):
         return (number, side)  # Sort by number first, then by side
     
     seats_list = sorted(seats, key=seat_sort_key)
+    total_seats = len(seats_list)
     
-    # Group seats into rows of 4 (A1, A2, B1, B2 per row)
-    for i in range(0, len(seats_list), 4):
-        row_seats = seats_list[i:i+4]
-        
-        # Separate A and B sides
-        a_seats = [seat for seat in row_seats if seat.seat_number.startswith('A')]
-        b_seats = [seat for seat in row_seats if seat.seat_number.startswith('B')]
-        
+    # Nepali bus layout: 2x2 rows with aisle + 5-seat last row (standard configuration)
+    if total_seats <= 4:
+        # Very small buses - single row layout
+        for i in range(0, len(seats_list), 4):
+            row_seats = seats_list[i:i+4]
+            a_seats = [seat for seat in row_seats if seat.seat_number.startswith('A')]
+            b_seats = [seat for seat in row_seats if seat.seat_number.startswith('B')]
+            
+            row = {
+                'left_seats': a_seats,
+                'right_seats': b_seats
+            }
+            seat_layout.append(row)
+    elif total_seats <= 5:
+        # Small buses with 5 seats - single last row
         row = {
-            'left_seats': a_seats,  # A side (left)
-            'right_seats': b_seats  # B side (right)
+            'left_seats': [],
+            'right_seats': [],
+            'last_row_seats': seats_list
         }
         seat_layout.append(row)
+    else:
+        # Standard Nepali bus layout: regular 2x2 rows + 5-seat last row
+        if total_seats >= 5:
+            # Reserve 5 seats for the last row (standard Nepali bus configuration)
+            regular_seats_count = total_seats - 5
+            
+            # Create regular 2x2 rows with aisle
+            for i in range(0, regular_seats_count, 4):
+                row_seats = seats_list[i:i+4]
+                a_seats = [seat for seat in row_seats if seat.seat_number.startswith('A')]
+                b_seats = [seat for seat in row_seats if seat.seat_number.startswith('B')]
+                
+                row = {
+                    'left_seats': a_seats,
+                    'right_seats': b_seats
+                }
+                seat_layout.append(row)
+            
+            # Create the standard 5-seat last row
+            last_row_seats = seats_list[regular_seats_count:]
+            if last_row_seats:
+                row = {
+                    'left_seats': [],
+                    'right_seats': [],
+                    'last_row_seats': last_row_seats
+                }
+                seat_layout.append(row)
     
     # Handle pre-selected seats from URL (for form validation errors)
     preselected_seat_ids = []

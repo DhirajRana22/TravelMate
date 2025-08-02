@@ -335,41 +335,24 @@
                             Bus Type Preferences
                         </div>
                         <div class="preference-grid">
-                            <div class="preference-item" data-value="AC">
-                                <input type="checkbox" name="preferred_bus_types" value="AC" 
-                                       {% if 'AC' in form.preferred_bus_types.value %}checked{% endif %}>
+                            {% for bus_type in bus_types %}
+                            <div class="preference-item" data-value="{{ bus_type.id }}">
+                                <input type="checkbox" name="preferred_bus_types" value="{{ bus_type.id }}" 
+                                       {% if preference and bus_type in preference.preferred_bus_types.all %}checked{% endif %}>
                                 <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon"><i class="fas fa-snowflake"></i></div>
-                                <div class="title">AC Buses</div>
-                                <div class="description">Air-conditioned buses for comfortable travel</div>
+                                <div class="icon">
+                                    {% if 'AC' in bus_type.name %}
+                                        <i class="fas fa-snowflake"></i>
+                                    {% elif 'Sleeper' in bus_type.name %}
+                                        <i class="fas fa-bed"></i>
+                                    {% else %}
+                                        <i class="fas fa-bus"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="title">{{ bus_type.name }}</div>
+                                <div class="description">{{ bus_type.description|default:"Comfortable travel option" }}</div>
                             </div>
-                            
-                            <div class="preference-item" data-value="NON_AC">
-                                <input type="checkbox" name="preferred_bus_types" value="NON_AC" 
-                                       {% if 'NON_AC' in form.preferred_bus_types.value %}checked{% endif %}>
-                                <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon"><i class="fas fa-wind"></i></div>
-                                <div class="title">Non-AC Buses</div>
-                                <div class="description">Budget-friendly option with natural ventilation</div>
-                            </div>
-                            
-                            <div class="preference-item" data-value="SLEEPER">
-                                <input type="checkbox" name="preferred_bus_types" value="SLEEPER" 
-                                       {% if 'SLEEPER' in form.preferred_bus_types.value %}checked{% endif %}>
-                                <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon"><i class="fas fa-bed"></i></div>
-                                <div class="title">Sleeper Buses</div>
-                                <div class="description">Comfortable berths for overnight journeys</div>
-                            </div>
-                            
-                            <div class="preference-item" data-value="SEMI_SLEEPER">
-                                <input type="checkbox" name="preferred_bus_types" value="SEMI_SLEEPER" 
-                                       {% if 'SEMI_SLEEPER' in form.preferred_bus_types.value %}checked{% endif %}>
-                                <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon"><i class="fas fa-chair"></i></div>
-                                <div class="title">Semi-Sleeper</div>
-                                <div class="description">Reclining seats for medium-distance travel</div>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                     
@@ -380,59 +363,22 @@
                             Preferred Amenities
                         </div>
                         <div class="preference-grid">
-                            <div class="preference-item" data-value="wifi">
-                                <input type="checkbox" name="preferred_amenities" value="wifi" 
-                                       {% if 'wifi' in form.preferred_amenities.value %}checked{% endif %}>
+                            {% for amenity in amenities %}
+                            <div class="preference-item" data-value="{{ amenity.id }}">
+                                <input type="checkbox" name="preferred_amenities" value="{{ amenity.id }}" 
+                                       {% if preference and amenity in preference.preferred_amenities.all %}checked{% endif %}>
                                 <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon"><i class="fas fa-wifi"></i></div>
-                                <div class="title">WiFi</div>
-                                <div class="description">Stay connected during your journey</div>
+                                <div class="icon">
+                                    {% if amenity.icon %}
+                                        <i class="{{ amenity.icon }}"></i>
+                                    {% else %}
+                                        <i class="fas fa-star"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="title">{{ amenity.name }}</div>
+                                <div class="description">{{ amenity.description|default:"Enhanced travel experience" }}</div>
                             </div>
-                            
-                            <div class="preference-item" data-value="charging">
-                                <input type="checkbox" name="preferred_amenities" value="charging" 
-                                       {% if 'charging' in form.preferred_amenities.value %}checked{% endif %}>
-                                <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon"><i class="fas fa-charging-station"></i></div>
-                                <div class="title">Charging Points</div>
-                                <div class="description">Keep your devices powered up</div>
-                            </div>
-                            
-                            <div class="preference-item" data-value="entertainment">
-                                <input type="checkbox" name="preferred_amenities" value="entertainment" 
-                                       {% if 'entertainment' in form.preferred_amenities.value %}checked{% endif %}>
-                                <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon"><i class="fas fa-tv"></i></div>
-                                <div class="title">Entertainment</div>
-                                <div class="description">Movies and music for entertainment</div>
-                            </div>
-                            
-                            <div class="preference-item" data-value="blanket">
-                                <input type="checkbox" name="preferred_amenities" value="blanket" 
-                                       {% if 'blanket' in form.preferred_amenities.value %}checked{% endif %}>
-                                <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon"><i class="fas fa-bed"></i></div>
-                                <div class="title">Blankets</div>
-                                <div class="description">Cozy blankets for comfortable sleep</div>
-                            </div>
-                            
-                            <div class="preference-item" data-value="water">
-                                <input type="checkbox" name="preferred_amenities" value="water" 
-                                       {% if 'water' in form.preferred_amenities.value %}checked{% endif %}>
-                                <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon"><i class="fas fa-tint"></i></div>
-                                <div class="title">Water Bottle</div>
-                                <div class="description">Complimentary water bottle</div>
-                            </div>
-                            
-                            <div class="preference-item" data-value="reading_light">
-                                <input type="checkbox" name="preferred_amenities" value="reading_light" 
-                                       {% if 'reading_light' in form.preferred_amenities.value %}checked{% endif %}>
-                                <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon"><i class="fas fa-lightbulb"></i></div>
-                                <div class="title">Reading Light</div>
-                                <div class="description">Individual reading lights</div>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                     
@@ -442,18 +388,53 @@
                             <i class="fas fa-rupee-sign"></i>
                             Price Range Preference
                         </div>
+                        
+                        <!-- Price Sensitivity -->
+                        <div class="form-group">
+                            <label class="form-label">Price Sensitivity (1-10)</label>
+                            <div class="range-container">
+                                <span class="range-value">1</span>
+                                <input type="range" class="range-input" name="price_sensitivity" 
+                                       min="1" max="10" step="1" 
+                                       value="{% if preference %}{{ preference.price_sensitivity }}{% else %}5{% endif %}" 
+                                       id="priceRange">
+                                <span class="range-value">10</span>
+                            </div>
+                            <div class="text-center mt-2">
+                                <span class="range-value" id="currentPrice">{% if preference %}{{ preference.price_sensitivity }}{% else %}5{% endif %}</span>
+                            </div>
+                            <small class="text-muted">1 = Not price sensitive, 10 = Very price sensitive</small>
+                        </div>
+                        
+                        <!-- Comfort Preference -->
+                        <div class="form-group">
+                            <label class="form-label">Comfort Preference (1-10)</label>
+                            <div class="range-container">
+                                <span class="range-value">1</span>
+                                <input type="range" class="range-input" name="comfort_preference" 
+                                       min="1" max="10" step="1" 
+                                       value="{% if preference %}{{ preference.comfort_preference }}{% else %}5{% endif %}" 
+                                       id="comfortRange">
+                                <span class="range-value">10</span>
+                            </div>
+                            <div class="text-center mt-2">
+                                <span class="range-value" id="currentComfort">{% if preference %}{{ preference.comfort_preference }}{% else %}5{% endif %}</span>
+                            </div>
+                            <small class="text-muted">1 = Basic comfort, 10 = Highest comfort</small>
+                        </div>
+                        
                         <div class="form-group">
                             <label class="form-label">Maximum Budget per Ticket</label>
                             <div class="range-container">
                                 <span class="range-value">रू500</span>
                                 <input type="range" class="range-input" name="max_budget" 
                                        min="500" max="5000" step="100" 
-                                       value="{{ form.max_budget.value|default:2000 }}" 
+                                       value="{% if preference %}{{ preference.max_budget }}{% else %}2000{% endif %}" 
                                        id="budgetRange">
                                 <span class="range-value">रू5000</span>
                             </div>
                             <div class="text-center mt-2">
-                                <span class="range-value" id="currentBudget">रू{{ form.max_budget.value|default:2000 }}</span>
+                                <span class="range-value" id="currentBudget">रू{% if preference %}{{ preference.max_budget }}{% else %}2000{% endif %}</span>
                             </div>
                         </div>
                     </div>
@@ -465,36 +446,36 @@
                             Travel Time Preferences
                         </div>
                         <div class="preference-grid">
-                            <div class="preference-item" data-value="morning">
+                            <div class="preference-item{% if preference and 'morning' in preference.get_preferred_times_list %} selected{% endif %}" data-value="morning">
                                 <input type="checkbox" name="preferred_times" value="morning" 
-                                       {% if 'morning' in form.preferred_times.value %}checked{% endif %}>
+                                       {% if preference and 'morning' in preference.get_preferred_times_list %}checked{% endif %}>
                                 <div class="checkmark"><i class="fas fa-check"></i></div>
                                 <div class="icon"><i class="fas fa-sun"></i></div>
                                 <div class="title">Morning (6 AM - 12 PM)</div>
                                 <div class="description">Early start for day travel</div>
                             </div>
                             
-                            <div class="preference-item" data-value="afternoon">
+                            <div class="preference-item{% if preference and 'afternoon' in preference.get_preferred_times_list %} selected{% endif %}" data-value="afternoon">
                                 <input type="checkbox" name="preferred_times" value="afternoon" 
-                                       {% if 'afternoon' in form.preferred_times.value %}checked{% endif %}>
+                                       {% if preference and 'afternoon' in preference.get_preferred_times_list %}checked{% endif %}>
                                 <div class="checkmark"><i class="fas fa-check"></i></div>
                                 <div class="icon"><i class="fas fa-sun"></i></div>
                                 <div class="title">Afternoon (12 PM - 6 PM)</div>
                                 <div class="description">Midday departure</div>
                             </div>
                             
-                            <div class="preference-item" data-value="evening">
+                            <div class="preference-item{% if preference and 'evening' in preference.get_preferred_times_list %} selected{% endif %}" data-value="evening">
                                 <input type="checkbox" name="preferred_times" value="evening" 
-                                       {% if 'evening' in form.preferred_times.value %}checked{% endif %}>
+                                       {% if preference and 'evening' in preference.get_preferred_times_list %}checked{% endif %}>
                                 <div class="checkmark"><i class="fas fa-check"></i></div>
                                 <div class="icon"><i class="fas fa-moon"></i></div>
                                 <div class="title">Evening (6 PM - 10 PM)</div>
                                 <div class="description">Evening departure</div>
                             </div>
                             
-                            <div class="preference-item" data-value="night">
+                            <div class="preference-item{% if preference and 'night' in preference.get_preferred_times_list %} selected{% endif %}" data-value="night">
                                 <input type="checkbox" name="preferred_times" value="night" 
-                                       {% if 'night' in form.preferred_times.value %}checked{% endif %}>
+                                       {% if preference and 'night' in preference.get_preferred_times_list %}checked{% endif %}>
                                 <div class="checkmark"><i class="fas fa-check"></i></div>
                                 <div class="icon"><i class="fas fa-moon"></i></div>
                                 <div class="title">Night (10 PM - 6 AM)</div>
@@ -513,10 +494,10 @@
                             <label class="form-label">Preferred Seat Position</label>
                             <select class="form-control" name="preferred_seat_position">
                                 <option value="">No Preference</option>
-                                <option value="window" {% if form.preferred_seat_position.value == 'window' %}selected{% endif %}>Window Seat</option>
-                                <option value="aisle" {% if form.preferred_seat_position.value == 'aisle' %}selected{% endif %}>Aisle Seat</option>
-                                <option value="front" {% if form.preferred_seat_position.value == 'front' %}selected{% endif %}>Front Seats</option>
-                                <option value="back" {% if form.preferred_seat_position.value == 'back' %}selected{% endif %}>Back Seats</option>
+                                <option value="window" {% if preference and preference.preferred_seat_position == 'window' %}selected{% endif %}>Window Seat</option>
+                                <option value="aisle" {% if preference and preference.preferred_seat_position == 'aisle' %}selected{% endif %}>Aisle Seat</option>
+                                <option value="front" {% if preference and preference.preferred_seat_position == 'front' %}selected{% endif %}>Front Seats</option>
+                                <option value="back" {% if preference and preference.preferred_seat_position == 'back' %}selected{% endif %}>Back Seats</option>
                             </select>
                         </div>
                     </div>
@@ -525,7 +506,7 @@
                         <span class="loading-spinner">
                             <i class="fas fa-spinner fa-spin"></i>
                         </span>
-                        <i class="fas fa-save mr-2"></i>Save Preferences
+                        <i class="fas fa-save mr-2"></i>Update Preferences
                     </button>
                 </form>
             </div>
@@ -559,6 +540,26 @@
         if (budgetRange && currentBudget) {
             budgetRange.addEventListener('input', function() {
                 currentBudget.textContent = 'रू' + this.value;
+            });
+        }
+        
+        // Handle price sensitivity range slider
+        const priceRange = document.getElementById('priceRange');
+        const currentPrice = document.getElementById('currentPrice');
+        
+        if (priceRange && currentPrice) {
+            priceRange.addEventListener('input', function() {
+                currentPrice.textContent = this.value;
+            });
+        }
+        
+        // Handle comfort preference range slider
+        const comfortRange = document.getElementById('comfortRange');
+        const currentComfort = document.getElementById('currentComfort');
+        
+        if (comfortRange && currentComfort) {
+            comfortRange.addEventListener('input', function() {
+                currentComfort.textContent = this.value;
             });
         }
         
