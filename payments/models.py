@@ -4,15 +4,9 @@ import uuid
 
 class Payment(models.Model):
     PAYMENT_METHOD_CHOICES = (
-        ('cash', 'Cash'),
-        ('credit_card', 'Credit Card'),
-        ('debit_card', 'Debit Card'),
         ('esewa', 'eSewa'),
         ('khalti', 'Khalti'),
-        ('ime_pay', 'IME Pay'),
-        ('fonepay', 'FonePay'),
-        ('net_banking', 'Net Banking'),
-        ('mobile_banking', 'Mobile Banking'),
+        ('bus_conductor', 'Pay to Bus Conductor'),
     )
     
     PAYMENT_STATUS_CHOICES = (

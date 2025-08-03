@@ -503,70 +503,13 @@
                                     </div>
                                 </div>
                                 
-                                <!-- IME Pay -->
-                                <div class="payment-method" data-method="ime_pay">
-                                    <div class="method-icon">
-                                        <i class="fas fa-university"></i>
-                                    </div>
-                                    <div class="method-name">IME Pay</div>
-                                    <div class="method-description">Pay through IME Pay digital wallet</div>
-                                    <div class="method-features">
-                                        <div class="feature-item">
-                                            <i class="fas fa-check feature-icon"></i>
-                                            <span>Bank integration</span>
-                                        </div>
-                                        <div class="feature-item">
-                                            <i class="fas fa-check feature-icon"></i>
-                                            <span>Secure transactions</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- FonePay -->
-                                <div class="payment-method" data-method="fonepay">
-                                    <div class="method-icon">
-                                        <i class="fas fa-phone"></i>
-                                    </div>
-                                    <div class="method-name">FonePay</div>
-                                    <div class="method-description">Pay using FonePay mobile payment</div>
-                                    <div class="method-features">
-                                        <div class="feature-item">
-                                            <i class="fas fa-check feature-icon"></i>
-                                            <span>Mobile-first</span>
-                                        </div>
-                                        <div class="feature-item">
-                                            <i class="fas fa-check feature-icon"></i>
-                                            <span>Easy to use</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Mobile Banking -->
-                                <div class="payment-method" data-method="mobile_banking">
-                                    <div class="method-icon">
-                                        <i class="fas fa-mobile-alt"></i>
-                                    </div>
-                                    <div class="method-name">Mobile Banking</div>
-                                    <div class="method-description">Pay through your bank's mobile app</div>
-                                    <div class="method-features">
-                                        <div class="feature-item">
-                                            <i class="fas fa-check feature-icon"></i>
-                                            <span>Direct bank transfer</span>
-                                        </div>
-                                        <div class="feature-item">
-                                            <i class="fas fa-check feature-icon"></i>
-                                            <span>Highly secure</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Cash -->
-                                <div class="payment-method" data-method="cash">
+                                <!-- Pay to Bus Conductor -->
+                                <div class="payment-method" data-method="bus_conductor">
                                     <div class="method-icon">
                                         <i class="fas fa-money-bill-wave"></i>
                                     </div>
-                                    <div class="method-name">Cash Payment</div>
-                                    <div class="method-description">Pay cash at the time of boarding</div>
+                                    <div class="method-name">Pay to Bus Conductor</div>
+                                    <div class="method-description">Pay cash directly to the bus conductor</div>
                                     <div class="method-features">
                                         <div class="feature-item">
                                             <i class="fas fa-check feature-icon"></i>
@@ -611,83 +554,25 @@
                                 </div>
                             </div>
                             
-                            <!-- IME Pay Form -->
-                            <div class="payment-form" id="ime_payForm">
-                                <h6 class="mb-3"><i class="fas fa-university me-2"></i>IME Pay Payment</h6>
+                            <!-- Pay to Bus Conductor Form -->
+                            <div class="payment-form" id="bus_conductorForm">
+                                <h6 class="mb-3"><i class="fas fa-money-bill-wave me-2"></i>Pay to Bus Conductor</h6>
                                 <div class="mobile-payment-info">
                                     <p><strong>Instructions:</strong></p>
                                     <ol>
-                                        <li>You will be redirected to IME Pay gateway</li>
-                                        <li>Login with your IME Pay credentials</li>
-                                        <li>Confirm payment of <strong>रू {{ booking.total_fare }}</strong></li>
-                                        <li>Authorize the transaction</li>
-                                    </ol>
-                                </div>
-                            </div>
-                            
-                            <!-- FonePay Form -->
-                            <div class="payment-form" id="fonepayForm">
-                                <h6 class="mb-3"><i class="fas fa-phone me-2"></i>FonePay Payment</h6>
-                                <div class="mobile-payment-info">
-                                    <p><strong>Instructions:</strong></p>
-                                    <ol>
-                                        <li>You will be redirected to FonePay gateway</li>
-                                        <li>Enter your mobile number and PIN</li>
-                                        <li>Verify payment amount: <strong>रू {{ booking.total_fare }}</strong></li>
-                                        <li>Complete the payment</li>
-                                    </ol>
-                                </div>
-                            </div>
-                            
-                            <!-- Mobile Banking Form -->
-                            <div class="payment-form" id="mobile_bankingForm">
-                                <h6 class="mb-3"><i class="fas fa-mobile-alt me-2"></i>Mobile Banking Payment</h6>
-                                <div class="form-group">
-                                    <label class="form-label">Select Your Bank</label>
-                                    <select class="form-control" name="bank_name">
-                                        <option value="">Choose your bank</option>
-                                        <option value="nabil">Nabil Bank</option>
-                                        <option value="nic">NIC Asia Bank</option>
-                                        <option value="scb">Standard Chartered Bank</option>
-                                        <option value="himalayan">Himalayan Bank</option>
-                                        <option value="ncc">NCC Bank</option>
-                                        <option value="everest">Everest Bank</option>
-                                        <option value="kumari">Kumari Bank</option>
-                                        <option value="laxmi">Laxmi Bank</option>
-                                        <option value="mega">Mega Bank</option>
-                                        <option value="global">Global IME Bank</option>
-                                    </select>
-                                </div>
-                                <div class="mobile-payment-info">
-                                    <p><strong>Instructions:</strong></p>
-                                    <ol>
-                                        <li>Open your bank's mobile banking app</li>
-                                        <li>Go to 'Fund Transfer' or 'Payment' section</li>
-                                        <li>Use the provided account details for transfer</li>
-                                        <li>Transfer amount: <strong>रू {{ booking.total_fare }}</strong></li>
-                                        <li>Note the transaction ID for verification</li>
-                                    </ol>
-                                </div>
-                            </div>
-                            
-                            <!-- Cash Form -->
-                            <div class="payment-form" id="cashForm">
-                                <h6 class="mb-3"><i class="fas fa-money-bill-wave me-2"></i>Cash Payment</h6>
-                                <div class="mobile-payment-info">
-                                    <div class="alert alert-warning">
-                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                        <strong>Important:</strong> Your booking will be confirmed, but payment must be made in cash to the bus conductor before boarding.
-                                    </div>
-                                    <p><strong>Instructions:</strong></p>
-                                    <ol>
-                                        <li>Your seats will be reserved for 2 hours</li>
-                                        <li>Arrive at the boarding point 15 minutes early</li>
+                                        <li>Your seat is reserved for this trip</li>
+                                        <li>Pay cash amount <strong>रू {{ booking.total_fare }}</strong> directly to the bus conductor</li>
                                         <li>Show your booking confirmation to the conductor</li>
-                                        <li>Pay the exact amount: <strong>रू {{ booking.total_fare }}</strong></li>
-                                        <li>Collect your physical ticket</li>
+                                        <li>Keep your ticket safe during the journey</li>
                                     </ol>
+                                    <div class="alert alert-info mt-3">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <strong>Note:</strong> Please arrive at the departure point 15 minutes early with exact change if possible.
+                                    </div>
                                 </div>
                             </div>
+                            
+
                             
                             <!-- Security Information -->
                             <div class="security-info">
@@ -777,10 +662,7 @@
         const buttonTexts = {
             'esewa': '<i class="fas fa-mobile-alt me-2"></i>Pay with eSewa',
             'khalti': '<i class="fas fa-wallet me-2"></i>Pay with Khalti',
-            'ime_pay': '<i class="fas fa-university me-2"></i>Pay with IME Pay',
-            'fonepay': '<i class="fas fa-phone me-2"></i>Pay with FonePay',
-            'mobile_banking': '<i class="fas fa-mobile-alt me-2"></i>Pay with Mobile Banking',
-            'cash': '<i class="fas fa-money-bill-wave me-2"></i>Confirm Cash Payment'
+            'bus_conductor': '<i class="fas fa-money-bill-wave me-2"></i>Pay to Bus Conductor'
         };
         
         payButton.innerHTML = buttonTexts[method] || '<i class="fas fa-credit-card me-2"></i>Proceed to Pay';

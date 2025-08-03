@@ -139,10 +139,7 @@
                         <option value="">All Methods</option>
                         <option value="esewa" {% if request.GET.payment_method == 'esewa' %}selected{% endif %}>eSewa</option>
                         <option value="khalti" {% if request.GET.payment_method == 'khalti' %}selected{% endif %}>Khalti</option>
-                        <option value="ime_pay" {% if request.GET.payment_method == 'ime_pay' %}selected{% endif %}>IME Pay</option>
-                        <option value="fone_pay" {% if request.GET.payment_method == 'fone_pay' %}selected{% endif %}>FonePay</option>
-                        <option value="mobile_banking" {% if request.GET.payment_method == 'mobile_banking' %}selected{% endif %}>Mobile Banking</option>
-                        <option value="cash" {% if request.GET.payment_method == 'cash' %}selected{% endif %}>Cash</option>
+                        <option value="bus_conductor" {% if request.GET.payment_method == 'bus_conductor' %}selected{% endif %}>Pay to Bus Conductor</option>
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">

@@ -36,11 +36,7 @@ class Booking(models.Model):
     PAYMENT_METHOD_CHOICES = (
         ('esewa', 'eSewa'),
         ('khalti', 'Khalti'),
-        ('ime_pay', 'IME Pay'),
-        ('fonepay', 'FonePay'),
-        ('connectips', 'ConnectIPS'),
-        ('bank_transfer', 'Bank Transfer'),
-        ('cash', 'Cash on Counter'),
+        ('bus_conductor', 'Pay to Bus Conductor'),
     )
     
     booking_id = models.CharField(max_length=20, unique=True, blank=True)
@@ -61,6 +57,37 @@ class Booking(models.Model):
     def __str__(self):
         return f"Booking {self.booking_id} - {self.user.username}"
     
+    def generate_qr_code(self):
+        """Generate QR code for the booking with complete information"""
+        if self.booking_status == 'confirmed':
+            # Get seat numbers
+            seat_numbers = ', '.join([str(seat.seat_number) for seat in self.seats.all()])
+            
+            # Create comprehensive QR code data
+            qr_data = f"""Booking ID: {self.booking_id}
+User: {self.user.username}
+Date: {self.booking_date}
+Bus: {self.bus_schedule.bus.bus_name}
+Route: {self.bus_schedule.route}
+Total Passengers: {self.seats.count()}
+Seat No.: {seat_numbers}
+Travel Date: {self.booking_date}"""
+            
+            qr = qrcode.QRCode(
+                version=2,  # Increased version to accommodate more data
+                error_correction=qrcode.constants.ERROR_CORRECT_M,  # Better error correction
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(qr_data)
+            qr.make(fit=True)
+            
+            img = qr.make_image(fill_color="black", back_color="white")
+            buffer = BytesIO()
+            img.save(buffer, format='PNG')
+            self.qr_code.save(f"{self.booking_id}.png", File(buffer), save=False)
+            self.save(update_fields=['qr_code'])
+
     def save(self, *args, **kwargs):
         # Generate unique booking_id if not set
         if not self.booking_id:
@@ -72,21 +99,3 @@ class Booking(models.Model):
                     break
         
         super().save(*args, **kwargs)
-        
-        # Generate QR code if booking is confirmed and QR code doesn't exist
-        if self.booking_status == 'confirmed' and not self.qr_code:
-            qr = qrcode.QRCode(
-                version=1,
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=10,
-                border=4,
-            )
-            qr.add_data(f"Booking ID: {self.booking_id}\nUser: {self.user.username}\nDate: {self.booking_date}\nBus: {self.bus_schedule.bus.bus_name}\nRoute: {self.bus_schedule.route}")
-            qr.make(fit=True)
-            
-            img = qr.make_image(fill_color="black", back_color="white")
-            buffer = BytesIO()
-            img.save(buffer, format='PNG')
-            self.qr_code.save(f"{self.booking_id}.png", File(buffer), save=False)
-            
-            super().save(*args, **kwargs)

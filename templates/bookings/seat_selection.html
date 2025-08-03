@@ -370,6 +370,10 @@
                     <div class="detail-value">{{ schedule.journey_duration }}</div>
                 </div>
                 <div class="detail-item">
+                    <div class="detail-label">Travel Date</div>
+                    <div class="detail-value">{{ travel_date|date:"l, M d, Y" }}</div>
+                </div>
+                <div class="detail-item">
                     <div class="detail-label">Fare per Seat</div>
                     <div class="detail-value">रू {{ schedule.base_fare }}</div>
                 </div>

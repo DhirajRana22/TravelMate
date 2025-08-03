@@ -626,138 +626,86 @@
                         </div>
                         
                         <div class="methods-grid">
-                            <div class="method-card" data-method="credit_card">
-                                <div class="method-icon">
-                                    <i class="fas fa-credit-card"></i>
-                                </div>
-                                <div class="method-name">Credit Card</div>
-                                <div class="method-description">Visa, MasterCard, American Express</div>
-                            </div>
-                            
-                            <div class="method-card" data-method="debit_card">
-                                <div class="method-icon">
-                                    <i class="fas fa-credit-card"></i>
-                                </div>
-                                <div class="method-name">Debit Card</div>
-                                <div class="method-description">All major debit cards accepted</div>
-                            </div>
-                            
-                            <div class="method-card" data-method="connectips">
+                            <div class="method-card" data-method="esewa">
                                 <div class="method-icon">
                                     <i class="fas fa-mobile-alt"></i>
                                 </div>
-                                <div class="method-name">ConnectIPS</div>
-                                <div class="method-description">eSewa, Khalti, IME Pay</div>
+                                <div class="method-name">eSewa</div>
+                                <div class="method-description">Digital wallet payment</div>
                             </div>
                             
-                            <div class="method-card" data-method="net_banking">
-                                <div class="method-icon">
-                                    <i class="fas fa-university"></i>
-                                </div>
-                                <div class="method-name">Net Banking</div>
-                                <div class="method-description">All major banks supported</div>
-                            </div>
-                            
-                            <div class="method-card" data-method="wallet">
+                            <div class="method-card" data-method="khalti">
                                 <div class="method-icon">
                                     <i class="fas fa-wallet"></i>
                                 </div>
-                                <div class="method-name">Digital Wallet</div>
-                                <div class="method-description">eSewa, Khalti, IME Pay, FonePay</div>
+                                <div class="method-name">Khalti</div>
+                                <div class="method-description">Mobile payment solution</div>
+                            </div>
+                            
+                            <div class="method-card" data-method="bus_conductor">
+                                <div class="method-icon">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <div class="method-name">Pay to Bus Conductor</div>
+                                <div class="method-description">Cash payment on boarding</div>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Payment Forms -->
-                    <form class="payment-form" id="card-form" method="POST">
+                    <form class="payment-form" id="esewa-form" method="POST">
                         {% csrf_token %}
-                        <input type="hidden" name="payment_method" value="credit_card">
+                        <input type="hidden" name="payment_method" value="esewa">
                         <input type="hidden" name="booking_id" value="{{ booking.booking_id }}">
                         
                         <div class="form-group">
-                            <label class="form-label">Card Number</label>
-                            <input type="text" name="card_number" class="form-control" 
-                                   placeholder="1234 5678 9012 3456" 
-                                   maxlength="19" required>
+                            <label class="form-label">eSewa ID</label>
+                            <input type="text" name="esewa_id" class="form-control" 
+                                   placeholder="Enter your eSewa ID" required>
                         </div>
                         
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Expiry Date</label>
-                                <input type="text" name="expiry_date" class="form-control" 
-                                       placeholder="MM/YY" 
-                                       maxlength="5" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">CVV</label>
-                                <input type="text" name="cvv" class="form-control" 
-                                       placeholder="123" 
-                                       maxlength="4" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Cardholder Name</label>
-                            <input type="text" name="cardholder_name" class="form-control" 
-                                   placeholder="Enter name as on card" required>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            You will be redirected to eSewa payment gateway to complete the transaction.
                         </div>
                     </form>
                     
-                    <form class="payment-form" id="connectips-form" method="POST">
+                    <form class="payment-form" id="khalti-form" method="POST">
                         {% csrf_token %}
-                        <input type="hidden" name="payment_method" value="connectips">
+                        <input type="hidden" name="payment_method" value="khalti">
                         <input type="hidden" name="booking_id" value="{{ booking.booking_id }}">
                         
                         <div class="form-group">
-                            <label class="form-label">ConnectIPS ID</label>
-                            <input type="text" name="connectips_id" class="form-control" 
-                                   placeholder="yourname@esewa" required>
+                            <label class="form-label">Mobile Number</label>
+                            <input type="tel" name="khalti_mobile" class="form-control" 
+                                   placeholder="98XXXXXXXX" maxlength="10" required>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            You will be redirected to Khalti payment gateway to complete the transaction.
                         </div>
                     </form>
                     
-                    <form class="payment-form" id="netbanking-form" method="POST">
+                    <form class="payment-form" id="bus_conductor-form" method="POST">
                         {% csrf_token %}
-                        <input type="hidden" name="payment_method" value="net_banking">
+                        <input type="hidden" name="payment_method" value="bus_conductor">
                         <input type="hidden" name="booking_id" value="{{ booking.booking_id }}">
                         
-                        <div class="form-group">
-                            <label class="form-label">Select Bank</label>
-                            <select name="bank" class="form-control" required>
-                                <option value="">Choose your bank</option>
-                                <option value="nabil">Nabil Bank</option>
-                                <option value="nic">NIC Asia Bank</option>
-                                <option value="scb">Standard Chartered Bank Nepal</option>
-                                <option value="himalayan">Himalayan Bank</option>
-                                <option value="ncc">NCC Bank</option>
-                                <option value="everest">Everest Bank</option>
-                                <option value="kumari">Kumari Bank</option>
-                                <option value="laxmi">Laxmi Sunrise Bank</option>
-                                <option value="mega">Mega Bank Nepal</option>
-                                <option value="global">Global IME Bank</option>
-                                <option value="rastriya">Rastriya Banijya Bank</option>
-                                <option value="nepal">Nepal Bank Limited</option>
-                                <option value="agriculture">Agriculture Development Bank</option>
-                                <option value="other">Other Banks</option>
-                            </select>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Important:</strong> Your booking will be confirmed, but payment must be made in cash to the bus conductor before boarding.
                         </div>
-                    </form>
-                    
-                    <form class="payment-form" id="wallet-form" method="POST">
-                        {% csrf_token %}
-                        <input type="hidden" name="payment_method" value="wallet">
-                        <input type="hidden" name="booking_id" value="{{ booking.booking_id }}">
                         
-                        <div class="form-group">
-                            <label class="form-label">Select Wallet</label>
-                            <select name="wallet_provider" class="form-control" required>
-                                <option value="">Choose your wallet</option>
-                                <option value="esewa">eSewa</option>
-                                <option value="khalti">Khalti</option>
-                                <option value="ime_pay">IME Pay</option>
-                                <option value="fonepay">FonePay</option>
-                                <option value="connectips">ConnectIPS</option>
-                                <option value="nchl">NCHL ePay</option>
-                            </select>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Instructions:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Arrive at the boarding point 15 minutes early</li>
+                                <li>Show your booking confirmation to the conductor</li>
+                                <li>Pay the exact amount: <strong>रू {{ booking.total_fare }}</strong></li>
+                                <li>Keep your ticket safe during the journey</li>
+                            </ul>
                         </div>
                     </form>
                     
@@ -857,45 +805,21 @@
             processPayment(activeForm);
         });
         
-        // Card number formatting
-        const cardNumberInput = document.querySelector('input[name="card_number"]');
-        if (cardNumberInput) {
-            cardNumberInput.addEventListener('input', function() {
-                let value = this.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
-                let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-                this.value = formattedValue;
-            });
-        }
-        
-        // Expiry date formatting
-        const expiryInput = document.querySelector('input[name="expiry_date"]');
-        if (expiryInput) {
-            expiryInput.addEventListener('input', function() {
-                let value = this.value.replace(/\D/g, '');
-                if (value.length >= 2) {
-                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
-                }
-                this.value = value;
-            });
-        }
-        
-        // CVV validation
-        const cvvInput = document.querySelector('input[name="cvv"]');
-        if (cvvInput) {
-            cvvInput.addEventListener('input', function() {
-                this.value = this.value.replace(/[^0-9]/g, '');
+        // Mobile number formatting for Khalti
+        const khaltiMobileInput = document.querySelector('input[name="khalti_mobile"]');
+        if (khaltiMobileInput) {
+            khaltiMobileInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);
             });
         }
         
         function getFormId(method) {
             const formMap = {
-                'credit_card': 'card-form',
-                'debit_card': 'card-form',
-                'connectips': 'connectips-form',
-                'net_banking': 'netbanking-form',
-                'wallet': 'wallet-form'
+                'esewa': 'esewa-form',
+                'khalti': 'khalti-form',
+                'bus_conductor': 'bus_conductor-form'
             };
-            return formMap[method] || 'card-form';
+            return formMap[method] || 'esewa-form';
         }
         
         function updatePayButton() {

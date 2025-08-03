@@ -1,0 +1,468 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Update Schedule - Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .admin-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        opacity: 0.1;
+    }
+    
+    .admin-header .container {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .bus-assignment-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        padding: 2.5rem;
+        margin-bottom: 2.5rem;
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .bus-assignment-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4, #10b981);
+    }
+    
+    .bus-assignment-card:hover {
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+        transform: translateY(-5px);
+    }
+    
+    .bus-assignment-card h4 {
+        color: #1f2937;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.75rem;
+        font-size: 1.5rem;
+    }
+    
+    .bus-assignment-card h4::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        border-radius: 2px;
+    }
+    
+    .assign-form {
+        background: linear-gradient(135deg, #f8fafc 0%, white 100%);
+        border-radius: 16px;
+        padding: 2.5rem;
+        margin-top: 1.5rem;
+        border: 2px solid #e2e8f0;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .assign-form::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    @media (max-width: 1200px) {
+        .form-row {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
+    @media (max-width: 900px) {
+        .form-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    .form-group {
+        position: relative;
+        margin-bottom: 1.75rem;
+    }
+    
+    .form-group:hover .form-control,
+    .form-group:hover .form-select {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    .form-group:focus-within .form-label {
+        color: #3b82f6;
+        transform: translateY(-2px);
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+        display: block;
+        position: relative;
+        padding-left: 1.5rem;
+    }
+    
+    .form-label::before {
+        content: '●';
+        position: absolute;
+        left: 0;
+        color: #3b82f6;
+        font-size: 0.8rem;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        font-size: 0.95rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        outline: none;
+        transform: translateY(-1px);
+    }
+    
+    .form-control::placeholder {
+        color: #9ca3af;
+        font-style: italic;
+    }
+    
+    .form-control:hover, .form-select:hover {
+        border-color: #d1d5db;
+    }
+    
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+    
+    .form-check:hover {
+        background: #f1f5f9;
+        border-color: #3b82f6;
+    }
+    
+    .form-check-input {
+        width: 1.25rem;
+        height: 1.25rem;
+        border: 2px solid #d1d5db;
+        border-radius: 6px;
+        background: white;
+        transition: all 0.3s ease;
+    }
+    
+    .form-check-input:checked {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-color: #3b82f6;
+    }
+    
+    .form-check-label {
+        font-weight: 500;
+        color: #374151;
+        cursor: pointer;
+    }
+    
+    .btn-assign {
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        color: white;
+        border: none;
+        padding: 1.25rem 3rem;
+        border-radius: 16px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        position: relative;
+        overflow: hidden;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .btn-assign::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .btn-assign:hover::before {
+        left: 100%;
+    }
+    
+    .btn-assign::after {
+        content: '→';
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .btn-assign:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+    }
+    
+    .btn-assign:hover::after {
+        transform: translateX(5px);
+    }
+    
+    .btn-assign:active {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-secondary {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(107, 114, 128, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .alert {
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        border: none;
+        font-weight: 500;
+    }
+    
+    .alert-success {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        color: #065f46;
+        border-left: 4px solid #10b981;
+    }
+    
+    .alert-danger {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        color: #991b1b;
+        border-left: 4px solid #ef4444;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">
+                    <i class="fas fa-edit me-3"></i>
+                    Update Schedule
+                </h1>
+                <p class="mb-0 opacity-75">
+                    Update schedule for bus {{ schedule.bus.bus_number }} on route {{ route.source }} → {{ route.destination }}
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'dashboard:route_bus_management' route.id %}" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Route Management
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <div class="bus-assignment-card">
+        <h4 class="mb-3">
+            <i class="fas fa-edit me-2"></i>
+            Update Schedule
+        </h4>
+        
+        <form method="post" class="assign-form">
+            {% csrf_token %}
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="departure_time" class="form-label">Departure Time</label>
+                    <input type="time" name="departure_time" id="departure_time" class="form-control" value="{{ schedule.departure_time|time:'H:i' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="arrival_time" class="form-label">Arrival Time</label>
+                    <input type="time" name="arrival_time" id="arrival_time" class="form-control" value="{{ schedule.arrival_time|time:'H:i' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="base_fare" class="form-label">Base Fare (रू)</label>
+                    <input type="number" name="base_fare" id="base_fare" class="form-control" 
+                           value="{{ schedule.base_fare }}" min="0" step="0.01" placeholder="0.00" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="schedule_type" class="form-label">Schedule Type</label>
+                    <select name="schedule_type" id="schedule_type" class="form-select">
+                        <option value="morning" {% if schedule.schedule_type == 'morning' %}selected{% endif %}>Morning</option>
+                        <option value="afternoon" {% if schedule.schedule_type == 'afternoon' %}selected{% endif %}>Afternoon</option>
+                        <option value="evening" {% if schedule.schedule_type == 'evening' %}selected{% endif %}>Evening</option>
+                        <option value="night" {% if schedule.schedule_type == 'night' %}selected{% endif %}>Night</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="effective_from" class="form-label">Effective From</label>
+                    <input type="date" name="effective_from" id="effective_from" class="form-control" value="{{ schedule.effective_from|date:'Y-m-d' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="effective_until" class="form-label">Effective Until (Optional)</label>
+                    <input type="date" name="effective_until" id="effective_until" class="form-control" value="{{ schedule.effective_until|date:'Y-m-d' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="days_of_week" class="form-label">Days of Week</label>
+                    <input type="text" name="days_of_week" id="days_of_week" class="form-control" 
+                           value="{{ schedule.days_of_week }}" placeholder="1234567 (1=Mon, 7=Sun)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="buffer_hours" class="form-label">Buffer Hours</label>
+                    <input type="number" name="buffer_hours" id="buffer_hours" class="form-control" 
+                           value="{{ schedule.buffer_hours }}" min="0" max="24">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <div class="form-check mt-4">
+                        <input class="form-check-input" type="checkbox" id="return_schedule_enabled" name="return_schedule_enabled" {% if schedule.return_schedule_enabled %}checked{% endif %}>
+                        <label class="form-check-label" for="return_schedule_enabled">
+                            Enable Return Schedule
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="form-check mt-4">
+                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {% if schedule.is_active %}checked{% endif %}>
+                        <label class="form-check-label" for="is_active">
+                            Active Schedule
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <a href="{% url 'dashboard:route_bus_management' route.id %}" class="btn-secondary me-3">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </a>
+                <button type="submit" class="btn-assign">
+                    <i class="fas fa-save me-2"></i>Update Schedule
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Update schedule page loaded');
+        
+        // Auto-dismiss alerts with fade effect
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.parentNode.removeChild(alert);
+                    }
+                }, 500);
+            });
+        }, 5000);
+    });
+</script>
+{% endblock %}

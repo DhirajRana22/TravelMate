@@ -371,8 +371,6 @@
   </div>
 </section>
 
-
-
 <!-- Features Section -->
 <section class="py-5 bg-light">
   <div class="container">
@@ -551,14 +549,11 @@
               <small class="text-muted">{{ testimonial.designation }}</small>
             </div>
           </div>
-          <p class="mb-0">
-            "{{ testimonial.testimonial_text }}"
-          </p>
+          <p class="mb-0">"{{ testimonial.testimonial_text }}"</p>
           <div class="mt-3 text-warning">
             {% for star in testimonial.get_star_range %}
             <i class="fas fa-star"></i>
-            {% endfor %}
-            {% for empty_star in testimonial.get_empty_star_range %}
+            {% endfor %} {% for empty_star in testimonial.get_empty_star_range %}
             <i class="far fa-star"></i>
             {% endfor %}
           </div>
@@ -611,7 +606,8 @@
                   Booking is simple: Enter your source, destination, and travel
                   date, browse available buses, select your seat, enter
                   passenger details, and complete payment. You'll receive your
-                  e-ticket via email and SMS.
+                  e-ticket after booking and you can download to show in Bus
+                  during travel.
                 </p>
               </div>
             </div>
@@ -666,9 +662,8 @@
             >
               <div class="accordion-body">
                 <p>
-                  We accept all major credit/debit cards, net banking, eSewa, Khalti,
-                  digital wallets, and mobile banking. All transactions are
-                  secured with 256-bit SSL encryption for your safety.
+                  We accept online payment through eSewa, Khalti and Offline
+                  through cash to conductor.
                 </p>
               </div>
             </div>
@@ -722,9 +717,8 @@
             >
               <div class="accordion-body">
                 <p>
-                  You can reach our 24/7 customer support via phone at +977 9847435111
-                  456-7890, email at info@travelmate.com, or through the live
-                  chat feature on our website and mobile app.
+                  You can reach our 24/7 customer support via phone at +977
+                  9847435111 ,email at info@travelmate.com.
                 </p>
               </div>
             </div>

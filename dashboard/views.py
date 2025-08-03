@@ -508,6 +508,65 @@ def route_bus_management(request, route_id):
     return render(request, 'dashboard/route_bus_management.html', context)
 
 @staff_member_required
+def update_schedule(request, schedule_id):
+    from routes.models import BusSchedule
+    from datetime import datetime
+    
+    schedule = get_object_or_404(BusSchedule, id=schedule_id)
+    route = schedule.route
+    
+    if request.method == 'POST':
+        departure_time_str = request.POST.get('departure_time')
+        arrival_time_str = request.POST.get('arrival_time')
+        base_fare = request.POST.get('base_fare')
+        schedule_type = request.POST.get('schedule_type', 'morning')
+        buffer_hours = request.POST.get('buffer_hours', 2)
+        return_schedule_enabled = request.POST.get('return_schedule_enabled') == 'on'
+        effective_from = request.POST.get('effective_from')
+        effective_until = request.POST.get('effective_until')
+        days_of_week = request.POST.get('days_of_week', '1234567')
+        is_active = request.POST.get('is_active') == 'on'
+        
+        if departure_time_str and arrival_time_str and base_fare:
+            try:
+                departure_time = datetime.strptime(departure_time_str, '%H:%M').time()
+                arrival_time = datetime.strptime(arrival_time_str, '%H:%M').time()
+                
+                effective_from_date = None
+                effective_until_date = None
+                
+                if effective_from:
+                    effective_from_date = datetime.strptime(effective_from, '%Y-%m-%d').date()
+                
+                if effective_until:
+                    effective_until_date = datetime.strptime(effective_until, '%Y-%m-%d').date()
+                
+                # Update schedule
+                schedule.departure_time = departure_time
+                schedule.arrival_time = arrival_time
+                schedule.base_fare = float(base_fare)
+                schedule.schedule_type = schedule_type
+                schedule.buffer_hours = int(buffer_hours)
+                schedule.return_schedule_enabled = return_schedule_enabled
+                schedule.effective_from = effective_from_date
+                schedule.effective_until = effective_until_date
+                schedule.days_of_week = days_of_week
+                schedule.is_active = is_active
+                schedule.save()
+                
+                messages.success(request, f'Schedule for bus {schedule.bus.bus_number} has been updated successfully!')
+                return redirect('dashboard:route_bus_management', route_id=route.id)
+            except Exception as e:
+                messages.error(request, f'Error updating schedule: {str(e)}')
+    
+    context = {
+        'schedule': schedule,
+        'route': route,
+    }
+    
+    return render(request, 'dashboard/update_schedule.html', context)
+
+@staff_member_required
 def booking_management(request):
     form = AdminBookingSearchForm(request.GET or None)
     bookings = Booking.objects.all().select_related('user', 'bus_schedule__bus', 'bus_schedule__route').order_by('-booking_date')

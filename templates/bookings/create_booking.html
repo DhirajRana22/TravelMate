@@ -716,11 +716,13 @@
                   <label class="form-label">Select Payment Method *</label>
                   <select name="payment_method" class="form-control" required>
                     <option value="">Choose Payment Method</option>
-                    <option value="esewa">eSewa</option>
-                    <option value="khalti">Khalti</option>
-                    <option value="ime_pay">IME Pay</option>
-                    <option value="fonepay">FonePay</option>
-                    <option value="cash">Cash on Departure</option>
+                    <optgroup label="Online Payment">
+                      <option value="esewa">eSewa</option>
+                      <option value="khalti">Khalti</option>
+                    </optgroup>
+                    <optgroup label="Offline Payment">
+                      <option value="bus_conductor">Pay to Bus Conductor</option>
+                    </optgroup>
                   </select>
                   <div class="error-message" id="error-payment-method"></div>
                 </div>

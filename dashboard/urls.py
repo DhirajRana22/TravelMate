@@ -24,6 +24,7 @@ urlpatterns = [
     path('routes/<int:route_id>/edit/', views.route_edit, name='route_edit'),
     path('routes/<int:route_id>/delete/', views.route_delete, name='route_delete'),
     path('routes/<int:route_id>/buses/', views.route_bus_management, name='route_bus_management'),
+    path('schedules/<int:schedule_id>/update/', views.update_schedule, name='update_schedule'),
     path('bookings/', views.booking_management, name='booking_management'),
     path('bookings/', views.booking_management, name='admin_bookings'),
     path('bookings/<str:booking_id>/', views.booking_detail, name='booking_detail'),

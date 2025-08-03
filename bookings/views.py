@@ -290,6 +290,9 @@ def quick_booking(request, schedule_id):
                     # Associate seats with booking
                     booking.seats.set(selected_seats)
                     
+                    # Generate QR code after seats are associated
+                    booking.generate_qr_code()
+                    
                     messages.success(request, f'Booking confirmed! Booking ID: {booking.booking_id}')
                     return redirect('bookings:booking_detail', booking_id=booking.booking_id)
                     
@@ -413,6 +416,10 @@ def create_booking(request, schedule_id):
                     # Add selected seats to booking
                     booking.seats.add(*selected_seats)
                     print(f"DEBUG: Added {len(selected_seats)} seats to booking")
+                    
+                    # Generate QR code after seats are associated
+                    booking.generate_qr_code()
+                    print("DEBUG: Generated QR code with seat information")
                     
                     # Mark seats as unavailable
                     for seat in selected_seats:
@@ -730,21 +737,7 @@ def download_ticket(request, booking_id):
     
     # Generate QR code if not already generated
     if not booking.qr_code:
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
-        qr.add_data(booking.booking_id)
-        qr.make(fit=True)
-        
-        img = qr.make_image(fill_color="black", back_color="white")
-        buffer = BytesIO()
-        img.save(buffer, format="PNG")
-        
-        # Save QR code to booking
-        booking.qr_code.save(f"{booking.booking_id}_qr.png", ContentFile(buffer.getvalue()), save=True)
+        booking.generate_qr_code()
     
     # Generate PDF ticket
     pdf_buffer = generate_ticket_pdf(booking)
@@ -772,22 +765,7 @@ def view_ticket(request, booking_id):
     
     # Generate QR code if not already generated
     if not booking.qr_code:
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
-        qr.add_data(f"Booking ID: {booking.booking_id}\nUser: {booking.user.username}\nDate: {booking.booking_date}\nBus: {booking.bus_schedule.bus.bus_name}\nRoute: {booking.bus_schedule.route}")
-        qr.make(fit=True)
-        
-        img = qr.make_image(fill_color="black", back_color="white")
-        buffer = BytesIO()
-        img.save(buffer, format="PNG")
-        
-        # Save QR code to booking
-        booking.qr_code.save(f"{booking.booking_id}_qr.png", ContentFile(buffer.getvalue()), save=True)
-        buffer.close()
+        booking.generate_qr_code()
     
     # Render ticket template
     context = {

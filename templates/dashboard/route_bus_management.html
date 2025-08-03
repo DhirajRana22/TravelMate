@@ -5,40 +5,139 @@
 
 {% block extra_css %}
 <style>
+    :root {
+        --primary-color: #4f46e5;
+        --primary-dark: #3730a3;
+        --success-color: #10b981;
+        --danger-color: #ef4444;
+        --warning-color: #f59e0b;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+
     .admin-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
         color: white;
-        padding: 2rem 0;
+        padding: 2.5rem 0;
         margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .admin-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
+        opacity: 0.1;
+    }
+    
+    .admin-header .container {
+        position: relative;
+        z-index: 1;
     }
     
     .bus-assignment-card {
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        padding: 1.5rem;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        padding: 2.5rem;
+        margin-bottom: 2.5rem;
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .bus-assignment-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4, #10b981);
+    }
+    
+    .bus-assignment-card:hover {
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+        transform: translateY(-5px);
+    }
+    
+    .bus-assignment-card h4 {
+        color: #1f2937;
+        font-weight: 700;
         margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.75rem;
+        font-size: 1.5rem;
+    }
+    
+    .bus-assignment-card h4::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        border-radius: 2px;
     }
     
     .route-info {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--gray-200);
+        box-shadow: var(--shadow-sm);
     }
     
     .bus-schedule-card {
         background: white;
-        border: 1px solid #e9ecef;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1rem;
+        border: 2px solid var(--gray-200);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
         transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .bus-schedule-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--primary-color);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
     }
     
     .bus-schedule-card:hover {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-4px);
+        border-color: var(--primary-color);
+    }
+    
+    .bus-schedule-card:hover::before {
+        transform: scaleY(1);
     }
     
     .bus-info {
@@ -48,132 +147,575 @@
     }
     
     .bus-icon {
-        width: 50px;
-        height: 50px;
-        background: #007bff;
-        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 1.2rem;
+        font-size: 1.5rem;
+        box-shadow: var(--shadow-md);
     }
     
     .schedule-details {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid #e9ecef;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 2px solid var(--gray-100);
     }
     
     .detail-item {
         text-align: center;
+        padding: 1rem;
+        background: var(--gray-50);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .detail-item:hover {
+        background: var(--gray-100);
+        transform: translateY(-2px);
     }
     
     .detail-label {
-        font-size: 0.8rem;
-        color: #6c757d;
-        margin-bottom: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
     }
     
     .detail-value {
-        font-weight: 600;
-        color: #495057;
+        font-weight: 700;
+        color: var(--gray-800);
+        font-size: 1.1rem;
     }
     
     .assign-form {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 1.5rem;
+        background: linear-gradient(135deg, #f8fafc 0%, white 100%);
+        border-radius: 16px;
+        padding: 2.5rem;
         margin-top: 1.5rem;
+        border: 2px solid #e2e8f0;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .assign-form::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
     }
     
     .form-row {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1rem;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    @media (max-width: 1200px) {
+        .form-row {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
+    @media (max-width: 900px) {
+        .form-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    .form-group {
+        position: relative;
+        margin-bottom: 1.75rem;
+    }
+    
+    .form-group:hover .form-control,
+    .form-group:hover .form-select {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    .form-group:focus-within .form-label {
+        color: #3b82f6;
+        transform: translateY(-2px);
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+        display: block;
+        position: relative;
+        padding-left: 1.5rem;
+    }
+    
+    .form-label::before {
+        content: '●';
+        position: absolute;
+        left: 0;
+        color: #3b82f6;
+        font-size: 0.8rem;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        font-size: 0.95rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        background: white;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        outline: none;
+        transform: translateY(-1px);
+    }
+    
+    .form-control::placeholder {
+        color: #9ca3af;
+        font-style: italic;
+    }
+    
+    .form-control:hover, .form-select:hover {
+        border-color: var(--gray-300);
     }
     
     .btn-remove {
-        background: #dc3545;
+        background: linear-gradient(135deg, var(--danger-color) 0%, #dc2626 100%);
         color: white;
         border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
         font-size: 0.9rem;
+        font-weight: 600;
         cursor: pointer;
-        transition: background 0.3s ease;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-sm);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
     }
     
     .btn-remove:hover {
-        background: #c82333;
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
     }
     
     .btn-assign {
-        background: #28a745;
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
         color: white;
         border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 6px;
-        font-weight: 600;
+        padding: 1.25rem 3rem;
+        border-radius: 16px;
+        font-weight: 700;
+        font-size: 1.1rem;
         cursor: pointer;
-        transition: background 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        overflow: hidden;
+        min-width: 200px;
+        justify-content: center;
+    }
+    
+    .btn-assign::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.6s ease;
+    }
+    
+    .btn-assign::after {
+        content: '→';
+        font-size: 1.2rem;
+        margin-left: 0.5rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .btn-assign:hover::before {
+        left: 100%;
     }
     
     .btn-assign:hover {
-        background: #218838;
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
+    }
+    
+    .btn-assign:hover::after {
+        transform: translateX(4px);
+    }
+    
+    .btn-assign:active {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, #312e81 100%);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .btn-secondary {
+        background: var(--gray-200);
+        color: var(--gray-700);
+        border: 2px solid var(--gray-300);
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+        background: var(--gray-300);
+        color: var(--gray-800);
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-primary {
+        background: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-outline-primary:hover {
+        background: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .btn-outline-danger {
+        background: transparent;
+        color: var(--danger-color);
+        border: 2px solid var(--danger-color);
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-outline-danger:hover {
+        background: var(--danger-color);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
     }
     
     .empty-state {
         text-align: center;
-        padding: 2rem;
-        color: #6c757d;
+        padding: 3rem 2rem;
+        color: var(--gray-500);
+        background: var(--gray-50);
+        border-radius: 12px;
+        border: 2px dashed var(--gray-300);
     }
     
     .empty-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.6;
+        color: var(--gray-400);
+    }
+    
+    .empty-state h5 {
+        color: var(--gray-700);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: var(--gray-500);
+        margin-bottom: 1.5rem;
     }
     
     .alert {
-        border-radius: 8px;
-        margin-bottom: 1rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        border: none;
+        box-shadow: var(--shadow-sm);
+        padding: 1rem 1.5rem;
+    }
+    
+    .alert-success {
+        background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+        color: #065f46;
+        border-left: 4px solid var(--success-color);
+    }
+    
+    .alert-danger {
+        background: linear-gradient(135deg, #fef2f2 0%, #fef7f7 100%);
+        color: #991b1b;
+        border-left: 4px solid var(--danger-color);
+    }
+    
+    .alert-warning {
+        background: linear-gradient(135deg, #fffbeb 0%, #fefce8 100%);
+        color: #92400e;
+        border-left: 4px solid var(--warning-color);
     }
     
     .update-schedule-form {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-top: 1rem;
+        background: linear-gradient(135deg, #fafafa 0%, white 100%);
+        border: 2px solid var(--gray-200);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-top: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        animation: slideDown 0.3s ease;
+    }
+    
+    .update-schedule-form .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .update-schedule-form .form-group {
+        position: relative;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
     .action-buttons {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.75rem;
         align-items: center;
+        flex-wrap: wrap;
     }
     
     .update-schedule-form .form-label {
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.5rem;
+        font-weight: 700;
+        color: var(--gray-700);
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
     .update-schedule-form .form-control,
     .update-schedule-form .form-select {
-        border-radius: 6px;
-        border: 1px solid #ced4da;
+        border: 2px solid var(--gray-200);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
     }
     
     .update-schedule-form .form-control:focus,
     .update-schedule-form .form-select:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        outline: none;
+    }
+    
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1.25rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 12px;
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .form-check::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .form-check:hover {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        border-color: #3b82f6;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+    
+    .form-check:hover::before {
+        opacity: 1;
+    }
+    
+    .form-check-input {
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 2px solid #d1d5db;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .form-check-input:checked {
+        background-color: #3b82f6;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        transform: scale(1.05);
+    }
+    
+    .form-check-label {
+        font-weight: 600;
+        color: #374151;
+        cursor: pointer;
+        user-select: none;
+        transition: color 0.3s ease;
+    }
+    
+    .form-check:hover .form-check-label {
+        color: #1f2937;
+    }
+    
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .bg-success {
+        background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%) !important;
+        color: white;
+    }
+    
+    .bg-warning {
+        background: linear-gradient(135deg, var(--warning-color) 0%, #d97706 100%) !important;
+        color: white;
+    }
+    
+    .bg-danger {
+        background: linear-gradient(135deg, var(--danger-color) 0%, #dc2626 100%) !important;
+        color: white;
+    }
+    
+    /* Loading states */
+    .loading {
+        position: relative;
+        pointer-events: none;
+        opacity: 0.7;
+    }
+    
+    .loading::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        margin: -10px 0 0 -10px;
+        border: 2px solid var(--gray-300);
+        border-top: 2px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+        .admin-header {
+            padding: 1.5rem 0;
+        }
+        
+        .bus-assignment-card {
+            padding: 1.5rem;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .schedule-details {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .schedule-details {
+            grid-template-columns: 1fr;
+        }
+        
+        .bus-info {
+            flex-direction: column;
+            text-align: center;
+        }
     }
 </style>
 {% endblock %}
@@ -272,10 +814,9 @@
                                 </div>
                             </div>
                             <div class="action-buttons">
-                                <button type="button" class="btn btn-sm btn-outline-primary me-2" 
-                                        onclick="toggleUpdateForm('{{ schedule.id }}')">
+                                <a href="{% url 'dashboard:update_schedule' schedule.id %}" class="btn btn-sm btn-outline-primary me-2">
                                     <i class="fas fa-edit me-1"></i>Update Schedule
-                                </button>
+                                </a>
                                 <form method="post" style="display: inline;">
                                     {% csrf_token %}
                                     <input type="hidden" name="action" value="remove_bus">
@@ -315,82 +856,7 @@
                                     {% endif %}
                                 </div>
                             </div>
-                            
-                            <!-- Update Schedule Form (Hidden by default) -->
-                            <div id="update-form-{{ schedule.id }}" class="update-schedule-form" style="display: none;">
-                                <form method="post" class="mt-3">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="action" value="update_schedule">
-                                    <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
-                                    
-                                    <div class="row mb-3">
-                                        <div class="col-md-3">
-                                            <label class="form-label">Departure Time</label>
-                                            <input type="time" class="form-control" name="departure_time" value="{{ schedule.departure_time|time:'H:i' }}" required>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Arrival Time</label>
-                                            <input type="time" class="form-control" name="arrival_time" value="{{ schedule.arrival_time|time:'H:i' }}" required>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Base Fare (रू)</label>
-                                            <input type="number" class="form-control" name="base_fare" value="{{ schedule.base_fare }}" step="0.01" min="0" required>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Schedule Type</label>
-                                            <select class="form-select" name="schedule_type">
-                                                <option value="morning" {% if schedule.schedule_type == 'morning' %}selected{% endif %}>Morning</option>
-                                                <option value="afternoon" {% if schedule.schedule_type == 'afternoon' %}selected{% endif %}>Afternoon</option>
-                                                <option value="evening" {% if schedule.schedule_type == 'evening' %}selected{% endif %}>Evening</option>
-                                                <option value="night" {% if schedule.schedule_type == 'night' %}selected{% endif %}>Night</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row mb-3">
-                                        <div class="col-md-3">
-                                            <label class="form-label">Effective From</label>
-                                            <input type="date" class="form-control" name="effective_from" value="{{ schedule.effective_from|date:'Y-m-d' }}">
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Effective Until</label>
-                                            <input type="date" class="form-control" name="effective_until" value="{{ schedule.effective_until|date:'Y-m-d' }}">
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Days of Week</label>
-                                            <input type="text" class="form-control" name="days_of_week" value="{{ schedule.days_of_week }}" placeholder="1234567">
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Buffer Hours</label>
-                                            <input type="number" class="form-control" name="buffer_hours" value="{{ schedule.buffer_hours }}" min="0" max="24">
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="return_schedule_enabled" {% if schedule.return_schedule_enabled %}checked{% endif %}>
-                                                <label class="form-check-label">Enable Return Schedule</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="is_active" {% if schedule.is_active %}checked{% endif %}>
-                                                <label class="form-check-label">Active Schedule</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="d-flex justify-content-end">
-                                        <button type="button" class="btn btn-secondary me-2" onclick="toggleUpdateForm('{{ schedule.id }}')">
-                                            Cancel
-                                        </button>
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-save me-1"></i>Update Schedule
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
+
                         </div>
                     </div>
                 {% endfor %}
@@ -517,51 +983,187 @@
 
 {% block extra_js %}
 <script>
-    // Form is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Route bus management form loaded');
-            
-            // Set default effective_from to today
-            const today = new Date().toISOString().split('T')[0];
-            const effectiveFromInput = document.getElementById('effective_from');
-            if (effectiveFromInput) {
-                effectiveFromInput.value = today;
+    // Enhanced form management with better UX
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Enhanced route bus management loaded');
+        
+        // Set default effective_from to today
+        const today = new Date().toISOString().split('T')[0];
+        const effectiveFromInputs = document.querySelectorAll('input[name="effective_from"]');
+        effectiveFromInputs.forEach(input => {
+            if (!input.value) {
+                input.value = today;
             }
         });
         
-        // Function to toggle update form visibility
-        function toggleUpdateForm(scheduleId) {
-            const updateForm = document.getElementById('update-form-' + scheduleId);
-            if (updateForm.style.display === 'none' || updateForm.style.display === '') {
-                updateForm.style.display = 'block';
-            } else {
-                updateForm.style.display = 'none';
+        // Initialize form enhancements
+        initializeFormValidation();
+        initializeDurationCalculator();
+        initializeLoadingStates();
+        initializeTooltips();
+        
+        // Auto-dismiss alerts with fade effect
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.parentNode.removeChild(alert);
+                    }
+                }, 500);
+            });
+        }, 5000);
+    });
+    
+
+    
+    // Enhanced form validation with real-time feedback
+    function initializeFormValidation() {
+        const forms = document.querySelectorAll('form');
+        
+        forms.forEach(form => {
+            const inputs = form.querySelectorAll('input[required], select[required]');
+            
+            inputs.forEach(input => {
+                input.addEventListener('blur', validateField);
+                input.addEventListener('input', clearFieldError);
+            });
+            
+            form.addEventListener('submit', function(e) {
+                if (!validateForm(form)) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Add loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.classList.add('loading');
+                    submitBtn.disabled = true;
+                }
+            });
+        });
+    }
+    
+    function validateField(e) {
+        const field = e.target;
+        const value = field.value.trim();
+        
+        // Remove existing error styling
+        field.classList.remove('is-invalid');
+        const existingError = field.parentNode.querySelector('.invalid-feedback');
+        if (existingError) {
+            existingError.remove();
+        }
+        
+        let isValid = true;
+        let errorMessage = '';
+        
+        // Required field validation
+        if (field.hasAttribute('required') && !value) {
+            isValid = false;
+            errorMessage = 'This field is required.';
+        }
+        
+        // Specific field validations
+        if (field.name === 'base_fare' && value && parseFloat(value) <= 0) {
+            isValid = false;
+            errorMessage = 'Base fare must be greater than 0.';
+        }
+        
+        if (field.name === 'departure_time' || field.name === 'arrival_time') {
+            validateTimeFields();
+        }
+        
+        if (field.name === 'days_of_week' && value && !/^[1-7]+$/.test(value)) {
+            isValid = false;
+            errorMessage = 'Days of week must contain only numbers 1-7.';
+        }
+        
+        if (!isValid) {
+            showFieldError(field, errorMessage);
+        }
+        
+        return isValid;
+    }
+    
+    function showFieldError(field, message) {
+        field.classList.add('is-invalid');
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'invalid-feedback';
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        errorDiv.style.color = 'var(--danger-color)';
+        errorDiv.style.fontSize = '0.875rem';
+        errorDiv.style.marginTop = '0.25rem';
+        field.parentNode.appendChild(errorDiv);
+    }
+    
+    function clearFieldError(e) {
+        const field = e.target;
+        field.classList.remove('is-invalid');
+        const existingError = field.parentNode.querySelector('.invalid-feedback');
+        if (existingError) {
+            existingError.remove();
+        }
+    }
+    
+    function validateForm(form) {
+        const inputs = form.querySelectorAll('input[required], select[required]');
+        let isValid = true;
+        
+        inputs.forEach(input => {
+            if (!validateField({ target: input })) {
+                isValid = false;
+            }
+        });
+        
+        if (!isValid) {
+            showNotification('Please fix the errors before submitting.', 'error');
+        }
+        
+        return isValid;
+    }
+    
+    function validateTimeFields() {
+        const departureInput = document.getElementById('departure_time');
+        const arrivalInput = document.getElementById('arrival_time');
+        
+        if (departureInput && arrivalInput && departureInput.value && arrivalInput.value) {
+            const departure = new Date('2000-01-01 ' + departureInput.value);
+            const arrival = new Date('2000-01-01 ' + arrivalInput.value);
+            
+            // For same-day journeys, arrival should be after departure
+            if (arrival <= departure) {
+                // This might be an overnight journey, which is valid
+                console.log('Overnight journey detected');
             }
         }
+    }
     
-    // Auto-dismiss alerts after 5 seconds
-    setTimeout(function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        });
-    }, 5000);
-    
-    // Calculate journey duration when times are entered
-    document.getElementById('departure_time').addEventListener('change', calculateDuration);
-    document.getElementById('arrival_time').addEventListener('change', calculateDuration);
-    
-    function calculateDuration() {
-        const departureTime = document.getElementById('departure_time').value;
-        const arrivalTime = document.getElementById('arrival_time').value;
+    // Enhanced duration calculator with display
+    function initializeDurationCalculator() {
+        const departureInputs = document.querySelectorAll('input[name="departure_time"]');
+        const arrivalInputs = document.querySelectorAll('input[name="arrival_time"]');
         
-        if (departureTime && arrivalTime) {
-            const departure = new Date('2000-01-01 ' + departureTime);
-            let arrival = new Date('2000-01-01 ' + arrivalTime);
+        [...departureInputs, ...arrivalInputs].forEach(input => {
+            input.addEventListener('change', calculateAndDisplayDuration);
+        });
+    }
+    
+    function calculateAndDisplayDuration(e) {
+        const form = e.target.closest('form');
+        const departureInput = form.querySelector('input[name="departure_time"]');
+        const arrivalInput = form.querySelector('input[name="arrival_time"]');
+        
+        if (departureInput && arrivalInput && departureInput.value && arrivalInput.value) {
+            const departure = new Date('2000-01-01 ' + departureInput.value);
+            let arrival = new Date('2000-01-01 ' + arrivalInput.value);
             
             // Handle overnight journeys
-            if (arrival < departure) {
+            if (arrival <= departure) {
                 arrival.setDate(arrival.getDate() + 1);
             }
             
@@ -569,29 +1171,119 @@
             const hours = Math.floor(duration / (1000 * 60 * 60));
             const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
             
-            // You could display this duration somewhere if needed
-            console.log(`Journey duration: ${hours}h ${minutes}m`);
+            // Display duration if there's a container for it
+            let durationDisplay = form.querySelector('.duration-display');
+            if (!durationDisplay) {
+                durationDisplay = document.createElement('div');
+                durationDisplay.className = 'duration-display';
+                durationDisplay.style.cssText = `
+                    margin-top: 0.5rem;
+                    padding: 0.5rem;
+                    background: var(--gray-100);
+                    border-radius: 6px;
+                    font-size: 0.875rem;
+                    color: var(--gray-700);
+                    font-weight: 600;
+                `;
+                arrivalInput.parentNode.appendChild(durationDisplay);
+            }
+            
+            durationDisplay.innerHTML = `<i class="fas fa-clock me-1"></i>Journey Duration: ${hours}h ${minutes}m`;
         }
     }
     
-    // Form validation
-    document.querySelector('form').addEventListener('submit', function(e) {
-        const busId = document.getElementById('bus_id').value;
-        const departureTime = document.getElementById('departure_time').value;
-        const arrivalTime = document.getElementById('arrival_time').value;
-        const baseFare = document.getElementById('base_fare').value;
+    // Loading states for better UX
+    function initializeLoadingStates() {
+        const removeButtons = document.querySelectorAll('button[type="submit"]');
         
-        if (!busId || !departureTime || !arrivalTime || !baseFare) {
-            e.preventDefault();
-            alert('Please fill in all required fields.');
-            return false;
+        removeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                if (this.closest('form')) {
+                    setTimeout(() => {
+                        this.classList.add('loading');
+                        this.disabled = true;
+                    }, 100);
+                }
+            });
+        });
+    }
+    
+    // Initialize tooltips for better guidance
+    function initializeTooltips() {
+        // Add helpful tooltips
+        const daysOfWeekInputs = document.querySelectorAll('input[name="days_of_week"]');
+        daysOfWeekInputs.forEach(input => {
+            input.title = 'Enter days as numbers: 1=Monday, 2=Tuesday, ..., 7=Sunday. Example: 1234567 for all days';
+        });
+        
+        const bufferHoursInputs = document.querySelectorAll('input[name="buffer_hours"]');
+        bufferHoursInputs.forEach(input => {
+            input.title = 'Buffer time in hours between consecutive trips for the same bus';
+        });
+    }
+    
+    // Notification system
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type} notification`;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            animation: slideInRight 0.3s ease;
+        `;
+        notification.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }
+        }, 5000);
+    }
+    
+    // Add CSS for notifications
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
         
-        if (parseFloat(baseFare) <= 0) {
-            e.preventDefault();
-            alert('Base fare must be greater than 0.');
-            return false;
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
         }
-    });
+        
+        .is-invalid {
+            border-color: var(--danger-color) !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+        }
+    `;
+    document.head.appendChild(style);
 </script>
 {% endblock %}

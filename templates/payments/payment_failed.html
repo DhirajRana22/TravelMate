@@ -151,34 +151,19 @@
             <div class="card-body">
                 <p class="mb-3">Choose a different payment method or try again with the same method:</p>
                 <div class="row">
-                    <div class="col-md-6 mb-2">
+                    <div class="col-md-4 mb-2">
                         <a href="{% url 'payment_form' booking.booking_id %}?method=esewa" class="btn btn-outline-primary w-100">
                             <i class="fas fa-wallet"></i> Try eSewa
                         </a>
                     </div>
-                    <div class="col-md-6 mb-2">
+                    <div class="col-md-4 mb-2">
                         <a href="{% url 'payment_form' booking.booking_id %}?method=khalti" class="btn btn-outline-success w-100">
                             <i class="fas fa-mobile-alt"></i> Try Khalti
                         </a>
                     </div>
-                    <div class="col-md-6 mb-2">
-                        <a href="{% url 'payment_form' booking.booking_id %}?method=ime_pay" class="btn btn-outline-info w-100">
-                            <i class="fas fa-credit-card"></i> Try IME Pay
-                        </a>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <a href="{% url 'payment_form' booking.booking_id %}?method=fone_pay" class="btn btn-outline-warning w-100">
-                            <i class="fas fa-phone"></i> Try FonePay
-                        </a>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <a href="{% url 'payment_form' booking.booking_id %}?method=mobile_banking" class="btn btn-outline-secondary w-100">
-                            <i class="fas fa-university"></i> Mobile Banking
-                        </a>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <a href="{% url 'payment_form' booking.booking_id %}?method=cash" class="btn btn-outline-dark w-100">
-                            <i class="fas fa-money-bill"></i> Pay at Counter
+                    <div class="col-md-4 mb-2">
+                        <a href="{% url 'payment_form' booking.booking_id %}?method=bus_conductor" class="btn btn-outline-dark w-100">
+                            <i class="fas fa-money-bill"></i> Pay to Bus Conductor
                         </a>
                     </div>
                 </div>

@@ -635,17 +635,17 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Generate QR Code
         {% if booking.booking_status == 'confirmed' %}
-        const qrData = {
-            bookingId: '{{ booking.booking_id }}',
-            passengerName: '{{ booking.passenger_name }}',
-            route: '{{ booking.bus_schedule.route.source.name }} to {{ booking.bus_schedule.route.destination.name }}',
-            travelDate: '{{ booking.booking_date|date:"Y-m-d" }}',
-            busNumber: '{{ booking.bus_schedule.bus.bus_number }}',
-            seats: [{% for seat in booking.seats.all %}'{{ seat.seat_number }}'{% if not forloop.last %},{% endif %}{% endfor %}],
-            departureTime: '{{ booking.bus_schedule.departure_time|time:"H:i" }}'
-        };
+        // Create comprehensive QR code data matching backend format
+        const qrDataText = `Booking ID: {{ booking.booking_id }}
+User: {{ booking.user.username }}
+Date: {{ booking.booking_date }}
+Bus: {{ booking.bus_schedule.bus.bus_name }}
+Route: {{ booking.bus_schedule.route }}
+Total Passengers: {{ booking.seats.count }}
+Seat No.: {% for seat in booking.seats.all %}{{ seat.seat_number }}{% if not forloop.last %}, {% endif %}{% endfor %}
+Travel Date: {{ booking.booking_date }}`;
         
-        QRCode.toCanvas(document.getElementById('qrcode'), JSON.stringify(qrData), {
+        QRCode.toCanvas(document.getElementById('qrcode'), qrDataText, {
             width: 200,
             height: 200,
             colorDark: '#000000',
