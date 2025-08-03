@@ -658,15 +658,15 @@
                         <input type="hidden" name="payment_method" value="esewa">
                         <input type="hidden" name="booking_id" value="{{ booking.booking_id }}">
                         
-                        <div class="form-group">
-                            <label class="form-label">eSewa ID</label>
-                            <input type="text" name="esewa_id" class="form-control" 
-                                   placeholder="Enter your eSewa ID" required>
-                        </div>
-                        
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle me-2"></i>
-                            You will be redirected to eSewa payment gateway to complete the transaction.
+                            <strong>eSewa Payment Instructions:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>You will be redirected to eSewa payment gateway</li>
+                                <li>Login with your eSewa credentials</li>
+                                <li>Complete the payment securely</li>
+                                <li>You will be redirected back after payment</li>
+                            </ul>
                         </div>
                     </form>
                     
@@ -839,6 +839,11 @@
         }
         
         function validateForm(form) {
+            // For eSewa form, no validation needed as it has no required fields
+            if (form.id === 'esewa-form') {
+                return true;
+            }
+            
             const requiredInputs = form.querySelectorAll('input[required], select[required]');
             for (let input of requiredInputs) {
                 if (!input.value.trim()) {
@@ -866,10 +871,16 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    if (data.redirect_url) {
-                        window.location.href = data.redirect_url;
+                    // Handle eSewa payment
+                    if (data.payment_method === 'esewa') {
+                        submitEsewaPayment(data.esewa_data, data.esewa_url);
                     } else {
-                        window.location.href = '{% url "bookings:booking_confirmation" booking.booking_id %}';
+                        // Handle other payment methods
+                        if (data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                        } else {
+                            window.location.href = '{% url "bookings:booking_confirmation" booking.booking_id %}';
+                        }
                     }
                 } else {
                     alert('Payment failed: ' + (data.error || 'Unknown error'));
@@ -885,6 +896,27 @@
                 payButton.disabled = false;
                 payButton.innerHTML = '<i class="fas fa-lock"></i> Pay रू {{ booking.total_fare|floatformat:2 }}';
             });
+        }
+        
+        function submitEsewaPayment(esewaData, esewaUrl) {
+            // Create a form dynamically for eSewa submission
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = esewaUrl;
+            form.style.display = 'none';
+            
+            // Add all eSewa parameters as hidden inputs
+            Object.keys(esewaData).forEach(key => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = esewaData[key];
+                form.appendChild(input);
+            });
+            
+            // Append form to body and submit
+            document.body.appendChild(form);
+            form.submit();
         }
         
         // Get CSRF token

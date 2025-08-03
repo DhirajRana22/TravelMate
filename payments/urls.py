@@ -11,6 +11,10 @@ urlpatterns = [
     path('refund/request/<uuid:payment_id>/', views.request_refund, name='request_refund'),
     path('verify/', views.verify_payment, name='verify_payment'),
     
+    # eSewa callback URLs
+    path('esewa/success/', views.esewa_success, name='esewa_success'),
+    path('esewa/failure/', views.esewa_failure, name='esewa_failure'),
+    
     # Admin URLs
     path('admin/refunds/', views.admin_refund_list, name='admin_refund_list'),
     path('admin/refunds/process/<int:refund_id>/', views.admin_process_refund, name='admin_process_refund'),

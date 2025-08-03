@@ -408,7 +408,7 @@ def create_booking(request, schedule_id):
                     booking.bus_schedule = schedule
                     booking.booking_date = travel_date
                     booking.total_fare = total_fare
-                    booking.booking_status = 'confirmed'
+                    booking.booking_status = 'pending'
                     booking.payment_status = 'pending'
                     booking.save()
                     print(f"DEBUG: Booking created successfully with ID: {booking.booking_id}")
@@ -421,11 +421,8 @@ def create_booking(request, schedule_id):
                     booking.generate_qr_code()
                     print("DEBUG: Generated QR code with seat information")
                     
-                    # Mark seats as unavailable
-                    for seat in selected_seats:
-                        seat.is_available = False
-                        seat.save()
-                    print("DEBUG: Marked seats as unavailable")
+                    # Note: Seats will be marked as unavailable only after payment confirmation
+                    print("DEBUG: Seats will be reserved after payment confirmation")
                     
                     # Create payment record
                     payment = Payment.objects.create(
