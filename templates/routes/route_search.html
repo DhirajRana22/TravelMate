@@ -3,407 +3,402 @@
 
 {% block title %}Search Routes - TravelMate{% endblock %}
 
-{% block extra_css %}
-<style>
-    .search-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 4rem 0;
-        margin-top: -1.5rem;
-    }
-    .search-form-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        padding: 2rem;
-        margin-top: -3rem;
-        position: relative;
-        z-index: 10;
-    }
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    .form-label {
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-    }
-    .form-label i {
-        margin-right: 0.5rem;
-        color: #667eea;
-    }
-    .form-control {
-        border: 2px solid #e9ecef;
-        border-radius: 10px;
-        padding: 0.75rem 1rem;
-        transition: all 0.3s ease;
-        font-size: 1rem;
-    }
-    .form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    .btn-search {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        border-radius: 10px;
-        padding: 0.75rem 2rem;
-        color: white;
-        font-weight: 600;
-        font-size: 1.1rem;
-        transition: all 0.3s ease;
-        width: 100%;
-    }
-    .btn-search:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        color: white;
-    }
-    .swap-btn {
-        background: #f8f9fa;
-        border: 2px solid #e9ecef;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #667eea;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        margin: 0 auto;
-    }
-    .swap-btn:hover {
-        background: #667eea;
-        color: white;
-        transform: rotate(180deg);
-    }
-    .popular-routes {
-        background: #f8f9fa;
-        border-radius: 15px;
-        padding: 2rem;
-        margin-top: 3rem;
-    }
-    .route-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    .route-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    }
-    .route-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .route-cities {
-        font-weight: 600;
-        color: #495057;
-        font-size: 1.1rem;
-    }
-    .route-arrow {
-        color: #667eea;
-        margin: 0 1rem;
-    }
-    .route-details {
-        color: #6c757d;
-        font-size: 0.9rem;
-        margin-top: 0.5rem;
-    }
-    .route-price {
-        background: #e3f2fd;
-        color: #1976d2;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: 600;
-    }
-    .features-section {
-        padding: 4rem 0;
-        background: white;
-    }
-    .feature-card {
-        text-align: center;
-        padding: 2rem;
-        border-radius: 15px;
-        background: #f8f9fa;
-        height: 100%;
-        transition: all 0.3s ease;
-    }
-    .feature-card:hover {
-        background: white;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        transform: translateY(-5px);
-    }
-    .feature-icon {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1.5rem;
-        font-size: 2rem;
-    }
-    .quick-search {
-        background: #e3f2fd;
-        border-radius: 10px;
-        padding: 1rem;
-        margin-top: 1rem;
-    }
-    .quick-search-btn {
-        background: white;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        padding: 0.5rem 1rem;
-        margin: 0.25rem;
-        color: #495057;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        display: inline-block;
-    }
-    .quick-search-btn:hover {
-        background: #667eea;
-        color: white;
-        text-decoration: none;
-    }
-    .location-suggestions {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: white;
-        border: 1px solid #dee2e6;
-        border-top: none;
-        border-radius: 0 0 8px 8px;
-        max-height: 200px;
-        overflow-y: auto;
-        z-index: 1000;
-        display: none;
-    }
-    .suggestion-item {
-        padding: 0.75rem 1rem;
-        cursor: pointer;
-        border-bottom: 1px solid #f8f9fa;
-        transition: background-color 0.2s ease;
-    }
-    .suggestion-item:hover {
-        background: #f8f9fa;
-    }
-    .suggestion-item:last-child {
-        border-bottom: none;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<!-- Search Header -->
-<section class="search-header">
-    <div class="container">
-        <div class="row">
-            <div class="col-12 text-center">
-                <h1 class="mb-3"><i class="fas fa-route me-2"></i>Find Your Perfect Journey</h1>
-                <p class="lead mb-0">Search and book bus tickets across Nepal with ease</p>
-            </div>
+<!-- Hero Section -->
+<section class="relative bg-gradient-to-br from-blue-600 via-purple-700 to-indigo-800 text-white py-20 overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-full h-full" style="background-image: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.1"><circle cx="30" cy="30" r="4"/></g></g></svg>');"></div>
+    </div>
+    
+    <!-- Animated Elements -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-white opacity-5 rounded-full animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-white opacity-5 rounded-full animate-pulse delay-1000"></div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-route text-3xl"></i>
         </div>
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+            Find Your Perfect <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">Route</span>
+        </h1>
+        <p class="text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
+            Search and compare bus routes across Nepal. Find the best schedules, prices, and operators for your journey.
+        </p>
     </div>
 </section>
 
 <!-- Search Form -->
-<section class="pb-5">
-    <div class="container">
-        <div class="search-form-card">
-            <form method="get" action="{% url 'routes:route_results' %}" id="searchForm">
-                <div class="row align-items-end">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="source" class="form-label">
-                                <i class="fas fa-map-marker-alt"></i>From
-                            </label>
-                            <div class="position-relative">
-                                <input type="text" name="source" id="source" class="form-control" 
-                                       placeholder="Enter departure city" value="{{ request.GET.source }}" required>
-                                <div class="location-suggestions" id="sourceSuggestions"></div>
+<section class="py-12 bg-gray-50 relative">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Search Card -->
+        <div class="bg-white rounded-3xl shadow-2xl p-8 -mt-16 relative z-10 border border-gray-100">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Search Bus Routes</h2>
+                <p class="text-gray-600">Enter your travel details to find available routes</p>
+            </div>
+            
+            <form id="searchForm" method="GET" action="{% url 'routes:route_results' %}" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Source Location -->
+                    <div class="relative">
+                        <label for="source" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>From (Source)
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="source" name="source" required
+                                   class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-lg"
+                                   placeholder="Enter departure city" autocomplete="off">
+                            <div id="sourceSuggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-20 hidden max-h-48 overflow-y-auto">
+                                <!-- Suggestions will be populated by JavaScript -->
                             </div>
                         </div>
                     </div>
                     
-                    <div class="col-md-1 text-center">
-                        <div class="swap-btn" id="swapBtn" title="Swap cities">
-                            <i class="fas fa-exchange-alt"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="destination" class="form-label">
-                                <i class="fas fa-flag-checkered"></i>To
-                            </label>
-                            <div class="position-relative">
-                                <input type="text" name="destination" id="destination" class="form-control" 
-                                       placeholder="Enter destination city" value="{{ request.GET.destination }}" required>
-                                <div class="location-suggestions" id="destinationSuggestions"></div>
+                    <!-- Destination Location -->
+                    <div class="relative">
+                        <label for="destination" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-map-marker-alt text-red-500 mr-2"></i>To (Destination)
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="destination" name="destination" required
+                                   class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-lg"
+                                   placeholder="Enter destination city" autocomplete="off">
+                            <div id="destinationSuggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-20 hidden max-h-48 overflow-y-auto">
+                                <!-- Suggestions will be populated by JavaScript -->
                             </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="travel_date" class="form-label">
-                                <i class="fas fa-calendar-alt"></i>Travel Date
-                            </label>
-                            <input type="date" name="travel_date" id="travel_date" class="form-control" 
-                                   value="{{ request.GET.travel_date|default:today }}" required>
                         </div>
                     </div>
                 </div>
                 
-                <div class="row mt-3">
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-search">
-                            <i class="fas fa-search me-2"></i>Search Buses
-                        </button>
+                <!-- Swap Button -->
+                <div class="flex justify-center -my-3">
+                    <button type="button" id="swapBtn" 
+                            class="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition-all duration-300 transform hover:scale-110 hover:rotate-180 shadow-lg">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+                
+                <!-- Travel Date -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="travel_date" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-calendar text-green-500 mr-2"></i>Travel Date
+                        </label>
+                        <input type="date" id="travel_date" name="travel_date" required
+                               class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-lg">
+                    </div>
+                    
+                    <div>
+                        <label for="passengers" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-users text-purple-500 mr-2"></i>Passengers
+                        </label>
+                        <select id="passengers" name="passengers"
+                                class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-lg">
+                            <option value="1">1 Passenger</option>
+                            <option value="2">2 Passengers</option>
+                            <option value="3">3 Passengers</option>
+                            <option value="4">4 Passengers</option>
+                            <option value="5">5+ Passengers</option>
+                        </select>
                     </div>
                 </div>
+                
+                <!-- Search Button -->
+                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-800 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-search mr-2"></i>Search Routes
+                </button>
             </form>
-            
-            <!-- Quick Search Options -->
-            <div class="quick-search">
-                <h6 class="mb-2"><i class="fas fa-bolt me-1"></i>Quick Search:</h6>
-                <a href="?source=Kathmandu&destination=Pokhara&travel_date={{ today }}" class="quick-search-btn">Kathmandu → Pokhara</a>
-                <a href="?source=Kathmandu&destination=Chitwan&travel_date={{ today }}" class="quick-search-btn">Kathmandu → Chitwan</a>
-                <a href="?source=Pokhara&destination=Kathmandu&travel_date={{ today }}" class="quick-search-btn">Pokhara → Kathmandu</a>
-                <a href="?source=Kathmandu&destination=Butwal&travel_date={{ today }}" class="quick-search-btn">Kathmandu → Butwal</a>
-                <a href="?source=Kathmandu&destination=Dharan&travel_date={{ today }}" class="quick-search-btn">Kathmandu → Dharan</a>
-            </div>
         </div>
     </div>
 </section>
 
 <!-- Popular Routes -->
-<section class="pb-5">
-    <div class="container">
-        <div class="popular-routes">
-            <h3 class="text-center mb-4"><i class="fas fa-star me-2"></i>Popular Routes</h3>
-            <div class="row">
-                {% for route in popular_routes %}
-                <div class="col-md-6 col-lg-4">
-                    <div class="route-card" onclick="selectRoute('{{ route.source }}', '{{ route.destination }}')">
-                        <div class="route-info">
-                            <div>
-                                <div class="route-cities">
-                                    {{ route.source }}
-                                    <span class="route-arrow"><i class="fas fa-arrow-right"></i></span>
-                                    {{ route.destination }}
-                                </div>
-                                <div class="route-details">
-                                    <i class="fas fa-road me-1"></i>{{ route.distance }} km
-                                    {% if route.busschedule_set.count %}
-                                        • {{ route.busschedule_set.count }} bus{{ route.busschedule_set.count|pluralize:"es" }}
-                                    {% endif %}
-                                </div>
-                            </div>
-                            {% if route.min_fare %}
-                            <div class="route-price">
-                                From रू {{ route.min_fare }}
-                            </div>
-                            {% endif %}
-                        </div>
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Popular Routes</h2>
+            <p class="text-xl text-gray-600">Most traveled routes across Nepal</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Route Card 1 -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group" 
+                 onclick="selectRoute('Kathmandu', 'Pokhara')">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                        <span class="font-semibold text-gray-800">Kathmandu</span>
+                    </div>
+                    <i class="fas fa-arrow-right text-gray-400 group-hover:text-blue-500 transition-colors"></i>
+                    <div class="flex items-center">
+                        <span class="font-semibold text-gray-800">Pokhara</span>
+                        <div class="w-3 h-3 bg-red-500 rounded-full ml-2"></div>
                     </div>
                 </div>
-                {% empty %}
-                <div class="col-12 text-center">
-                    <p class="text-muted">No popular routes available at the moment.</p>
+                <div class="grid grid-cols-3 gap-4 text-sm text-gray-600">
+                    <div class="text-center">
+                        <div class="font-semibold text-gray-800">6-7 hrs</div>
+                        <div>Duration</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-green-600">रू800-1200</div>
+                        <div>Price Range</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-blue-600">20+ buses</div>
+                        <div>Daily</div>
+                    </div>
                 </div>
-                {% endfor %}
+            </div>
+            
+            <!-- Route Card 2 -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group" 
+                 onclick="selectRoute('Kathmandu', 'Chitwan')">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                        <span class="font-semibold text-gray-800">Kathmandu</span>
+                    </div>
+                    <i class="fas fa-arrow-right text-gray-400 group-hover:text-blue-500 transition-colors"></i>
+                    <div class="flex items-center">
+                        <span class="font-semibold text-gray-800">Chitwan</span>
+                        <div class="w-3 h-3 bg-red-500 rounded-full ml-2"></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 text-sm text-gray-600">
+                    <div class="text-center">
+                        <div class="font-semibold text-gray-800">4-5 hrs</div>
+                        <div>Duration</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-green-600">रू500-800</div>
+                        <div>Price Range</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-blue-600">15+ buses</div>
+                        <div>Daily</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Route Card 3 -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group" 
+                 onclick="selectRoute('Kathmandu', 'Butwal')">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                        <span class="font-semibold text-gray-800">Kathmandu</span>
+                    </div>
+                    <i class="fas fa-arrow-right text-gray-400 group-hover:text-blue-500 transition-colors"></i>
+                    <div class="flex items-center">
+                        <span class="font-semibold text-gray-800">Butwal</span>
+                        <div class="w-3 h-3 bg-red-500 rounded-full ml-2"></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 text-sm text-gray-600">
+                    <div class="text-center">
+                        <div class="font-semibold text-gray-800">7-8 hrs</div>
+                        <div>Duration</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-green-600">रू900-1300</div>
+                        <div>Price Range</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-blue-600">12+ buses</div>
+                        <div>Daily</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Route Card 4 -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group" 
+                 onclick="selectRoute('Pokhara', 'Chitwan')">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                        <span class="font-semibold text-gray-800">Pokhara</span>
+                    </div>
+                    <i class="fas fa-arrow-right text-gray-400 group-hover:text-blue-500 transition-colors"></i>
+                    <div class="flex items-center">
+                        <span class="font-semibold text-gray-800">Chitwan</span>
+                        <div class="w-3 h-3 bg-red-500 rounded-full ml-2"></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 text-sm text-gray-600">
+                    <div class="text-center">
+                        <div class="font-semibold text-gray-800">3-4 hrs</div>
+                        <div>Duration</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-green-600">रू400-600</div>
+                        <div>Price Range</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-blue-600">10+ buses</div>
+                        <div>Daily</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Route Card 5 -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group" 
+                 onclick="selectRoute('Kathmandu', 'Dhangadhi')">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                        <span class="font-semibold text-gray-800">Kathmandu</span>
+                    </div>
+                    <i class="fas fa-arrow-right text-gray-400 group-hover:text-blue-500 transition-colors"></i>
+                    <div class="flex items-center">
+                        <span class="font-semibold text-gray-800">Dhangadhi</span>
+                        <div class="w-3 h-3 bg-red-500 rounded-full ml-2"></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 text-sm text-gray-600">
+                    <div class="text-center">
+                        <div class="font-semibold text-gray-800">12-14 hrs</div>
+                        <div>Duration</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-green-600">रू1500-2000</div>
+                        <div>Price Range</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-blue-600">8+ buses</div>
+                        <div>Daily</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Route Card 6 -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group" 
+                 onclick="selectRoute('Butwal', 'Nepalgunj')">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                        <span class="font-semibold text-gray-800">Butwal</span>
+                    </div>
+                    <i class="fas fa-arrow-right text-gray-400 group-hover:text-blue-500 transition-colors"></i>
+                    <div class="flex items-center">
+                        <span class="font-semibold text-gray-800">Nepalgunj</span>
+                        <div class="w-3 h-3 bg-red-500 rounded-full ml-2"></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 text-sm text-gray-600">
+                    <div class="text-center">
+                        <div class="font-semibold text-gray-800">5-6 hrs</div>
+                        <div>Duration</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-green-600">रू600-900</div>
+                        <div>Price Range</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="font-semibold text-blue-600">6+ buses</div>
+                        <div>Daily</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Features Section -->
-<section class="features-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-12 text-center mb-5">
-                <h2>Why Choose TravelMate?</h2>
-                <p class="text-muted">Experience the best bus booking service in Nepal</p>
+<section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Why Choose Our Route Search?</h2>
+            <p class="text-xl text-gray-600">Advanced features to help you find the perfect journey</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Feature 1 -->
+            <div class="text-center group">
+                <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
+                    <i class="fas fa-search text-2xl text-blue-600"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Smart Search</h3>
+                <p class="text-gray-600">Intelligent autocomplete and suggestions for faster route discovery.</p>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="text-center group">
+                <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-green-200 transition-colors">
+                    <i class="fas fa-clock text-2xl text-green-600"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Real-time Updates</h3>
+                <p class="text-gray-600">Live schedule updates and availability information for accurate planning.</p>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="text-center group">
+                <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-200 transition-colors">
+                    <i class="fas fa-filter text-2xl text-purple-600"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Advanced Filters</h3>
+                <p class="text-gray-600">Filter by price, duration, bus type, and amenities to find your ideal trip.</p>
+            </div>
+            
+            <!-- Feature 4 -->
+            <div class="text-center group">
+                <div class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-orange-200 transition-colors">
+                    <i class="fas fa-chart-line text-2xl text-orange-600"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Price Comparison</h3>
+                <p class="text-gray-600">Compare prices across different operators to get the best deals.</p>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <h5>Real-time Booking</h5>
-                    <p class="text-muted">Book your tickets instantly with real-time seat availability and instant confirmation.</p>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h5>Secure Payments</h5>
-                    <p class="text-muted">Multiple payment options including eSewa, Khalti, and other popular Nepali payment methods.</p>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-headset"></i>
-                    </div>
-                    <h5>24/7 Support</h5>
-                    <p class="text-muted">Round-the-clock customer support to help you with any queries or issues.</p>
-                </div>
-            </div>
-        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-16 bg-gradient-to-r from-blue-600 via-purple-700 to-blue-800 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Ready to Start Your Journey?</h2>
+        <p class="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+            Search from hundreds of routes and thousands of buses across Nepal. Find the perfect trip for your travel needs.
+        </p>
+        <a href="#searchForm" class="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-colors transform hover:scale-105 shadow-lg">
+            <i class="fas fa-search mr-2"></i>Search Routes Now
+        </a>
     </div>
 </section>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
         // Set minimum date to today
         const today = new Date().toISOString().split('T')[0];
-        $('#travel_date').attr('min', today);
+        document.getElementById('travel_date').setAttribute('min', today);
+        document.getElementById('travel_date').value = today;
         
-        // If no date is set, set it to today
-        if (!$('#travel_date').val()) {
-            $('#travel_date').val(today);
-        }
-        
-        // Swap cities functionality
-        $('#swapBtn').click(function() {
-            const source = $('#source').val();
-            const destination = $('#destination').val();
-            $('#source').val(destination);
-            $('#destination').val(source);
-        });
-        
-        // Location suggestions (mock data - replace with actual API)
+        // Nepali cities for autocomplete
         const nepaliCities = [
-            'Kathmandu', 'Pokhara', 'Chitwan', 'Butwal', 'Dharan', 'Biratnagar',
-            'Janakpur', 'Nepalgunj', 'Bhairahawa', 'Hetauda', 'Itahari', 'Birgunj',
-            'Dhangadhi', 'Tulsipur', 'Gorkha', 'Palpa', 'Syangja', 'Baglung',
-            'Mustang', 'Manang', 'Solukhumbu', 'Taplejung', 'Ilam', 'Jhapa'
+            'Kathmandu', 'Pokhara', 'Lalitpur', 'Bhaktapur', 'Biratnagar', 'Birgunj',
+            'Dharan', 'Bharatpur', 'Janakpur', 'Butwal', 'Dhangadhi', 'Mahendranagar',
+            'Hetauda', 'Itahari', 'Kalaiya', 'Gorkha', 'Baglung', 'Tansen',
+            'Dang', 'Nepalgunj', 'Surkhet', 'Tulsipur', 'Ghorahi', 'Chitwan',
+            'Lumbini', 'Kapilvastu', 'Nawalparasi', 'Rupandehi', 'Palpa', 'Syangja',
+            'Kaski', 'Lamjung', 'Tanahu', 'Gorkha', 'Manang', 'Mustang',
+            'Myagdi', 'Parbat', 'Baglung', 'Gulmi', 'Arghakhanchi', 'Pyuthan',
+            'Rolpa', 'Rukum', 'Salyan', 'Dolpa', 'Humla', 'Jumla', 'Kalikot',
+            'Mugu', 'Surkhet', 'Dailekh', 'Jajarkot', 'Dolakha', 'Ramechhap',
+            'Sindhuli', 'Kavrepalanchok', 'Sindhupalchok', 'Nuwakot', 'Rasuwa',
+            'Dhading', 'Makwanpur', 'Chitwan', 'Parsa', 'Bara', 'Rautahat',
+            'Sarlahi', 'Mahottari', 'Dhanusa', 'Siraha', 'Saptari', 'Sunsari',
+            'Morang', 'Jhapa', 'Ilam', 'Panchthar', 'Taplejung', 'Sankhuwasabha',
+            'Bhojpur', 'Solukhumbu', 'Okhaldhunga', 'Khotang', 'Udayapur'
         ];
         
         function showSuggestions(input, suggestionsDiv) {
-            const value = input.val().toLowerCase();
+            const value = input.value.toLowerCase();
             if (value.length < 2) {
-                suggestionsDiv.hide();
+                suggestionsDiv.classList.add('hidden');
                 return;
             }
             
@@ -413,43 +408,69 @@
             
             if (matches.length > 0) {
                 const html = matches.map(city => 
-                    `<div class="suggestion-item" data-city="${city}">${city}</div>`
+                    `<div class="suggestion-item px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0" data-city="${city}">${city}</div>`
                 ).join('');
-                suggestionsDiv.html(html).show();
+                suggestionsDiv.innerHTML = html;
+                suggestionsDiv.classList.remove('hidden');
             } else {
-                suggestionsDiv.hide();
+                suggestionsDiv.classList.add('hidden');
             }
         }
         
         // Source input suggestions
-        $('#source').on('input', function() {
-            showSuggestions($(this), $('#sourceSuggestions'));
+        const sourceInput = document.getElementById('source');
+        const sourceSuggestions = document.getElementById('sourceSuggestions');
+        
+        sourceInput.addEventListener('input', function() {
+            showSuggestions(this, sourceSuggestions);
         });
         
         // Destination input suggestions
-        $('#destination').on('input', function() {
-            showSuggestions($(this), $('#destinationSuggestions'));
+        const destinationInput = document.getElementById('destination');
+        const destinationSuggestions = document.getElementById('destinationSuggestions');
+        
+        destinationInput.addEventListener('input', function() {
+            showSuggestions(this, destinationSuggestions);
         });
         
         // Handle suggestion clicks
-        $(document).on('click', '.suggestion-item', function() {
-            const city = $(this).data('city');
-            const input = $(this).closest('.position-relative').find('input');
-            input.val(city);
-            $(this).parent().hide();
-        });
-        
-        // Hide suggestions when clicking outside
-        $(document).click(function(e) {
-            if (!$(e.target).closest('.position-relative').length) {
-                $('.location-suggestions').hide();
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('suggestion-item')) {
+                const city = e.target.getAttribute('data-city');
+                const input = e.target.closest('.relative').querySelector('input');
+                input.value = city;
+                e.target.parentElement.classList.add('hidden');
             }
         });
         
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.relative')) {
+                document.querySelectorAll('[id$="Suggestions"]').forEach(div => {
+                    div.classList.add('hidden');
+                });
+            }
+        });
+        
+        // Swap locations
+        document.getElementById('swapBtn').addEventListener('click', function() {
+            const source = sourceInput.value;
+            const destination = destinationInput.value;
+            
+            sourceInput.value = destination;
+            destinationInput.value = source;
+            
+            // Add rotation animation
+            this.style.transform = 'rotate(180deg)';
+            setTimeout(() => {
+                this.style.transform = 'rotate(0deg)';
+            }, 300);
+        });
+        
         // Form validation
-        $('#searchForm').submit(function(e) {
-            const source = $('#source').val().trim();
-            const destination = $('#destination').val().trim();
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            const source = sourceInput.value.trim();
+            const destination = destinationInput.value.trim();
             
             if (source === destination) {
                 e.preventDefault();
@@ -458,19 +479,38 @@
             }
             
             // Add loading state
-            $('.btn-search').html('<i class="fas fa-spinner fa-spin me-2"></i>Searching...');
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Searching Routes...';
+            submitBtn.disabled = true;
         });
         
         // Auto-focus on source input
-        $('#source').focus();
+        sourceInput.focus();
+        
+        // Smooth scroll for CTA button
+        document.querySelector('a[href="#searchForm"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('#searchForm').scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        });
     });
     
     // Function to select route from popular routes
     function selectRoute(source, destination) {
-        $('#source').val(source);
-        $('#destination').val(destination);
-        $('html, body').animate({
-            scrollTop: $('.search-form-card').offset().top - 100
+        document.getElementById('source').value = source;
+        document.getElementById('destination').value = destination;
+        
+        // Smooth scroll to search form
+        document.querySelector('#searchForm').scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+        
+        // Focus on travel date
+        setTimeout(() => {
+            document.getElementById('travel_date').focus();
         }, 500);
     }
 </script>

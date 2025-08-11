@@ -3,533 +3,312 @@
 
 {% block title %}Bus Preferences - TravelMate{% endblock %}
 
-{% block extra_css %}
-<style>
-    .preferences-container {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        min-height: 80vh;
-        padding: 2rem 0;
-    }
-    
-    .preferences-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        overflow: hidden;
-        max-width: 800px;
-        margin: 0 auto;
-    }
-    
-    .card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem;
-        text-align: center;
-    }
-    
-    .card-header h2 {
-        margin: 0;
-        font-weight: 700;
-        font-size: 2rem;
-    }
-    
-    .card-header p {
-        margin: 0.5rem 0 0;
-        opacity: 0.9;
-        font-size: 1.1rem;
-    }
-    
-    .card-body {
-        padding: 2.5rem;
-    }
-    
-    .preference-section {
-        margin-bottom: 2.5rem;
-        padding: 1.5rem;
-        background: #f8f9fa;
-        border-radius: 15px;
-        border-left: 4px solid #667eea;
-    }
-    
-    .preference-section:last-child {
-        margin-bottom: 0;
-    }
-    
-    .section-title {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-    }
-    
-    .section-title i {
-        margin-right: 0.75rem;
-        color: #667eea;
-        font-size: 1.4rem;
-    }
-    
-    .preference-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
-    }
-    
-    .preference-item {
-        background: white;
-        border: 2px solid #e9ecef;
-        border-radius: 12px;
-        padding: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        position: relative;
-    }
-    
-    .preference-item:hover {
-        border-color: #667eea;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
-    }
-    
-    .preference-item.selected {
-        border-color: #667eea;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-    }
-    
-    .preference-item .icon {
-        font-size: 2rem;
-        margin-bottom: 0.75rem;
-        color: #667eea;
-    }
-    
-    .preference-item.selected .icon {
-        color: white;
-    }
-    
-    .preference-item .title {
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        font-size: 1.1rem;
-    }
-    
-    .preference-item .description {
-        font-size: 0.9rem;
-        opacity: 0.8;
-        line-height: 1.4;
-    }
-    
-    .preference-item input[type="checkbox"] {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-    }
-    
-    .preference-item .checkmark {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        width: 24px;
-        height: 24px;
-        border: 2px solid #e9ecef;
-        border-radius: 50%;
-        background: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-    }
-    
-    .preference-item.selected .checkmark {
-        border-color: white;
-        background: white;
-        color: #667eea;
-    }
-    
-    .preference-item .checkmark i {
-        font-size: 0.8rem;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    .preference-item.selected .checkmark i {
-        opacity: 1;
-    }
-    
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    
-    .form-label {
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 0.75rem;
-        display: block;
-        font-size: 1.1rem;
-    }
-    
-    .form-control {
-        border: 2px solid #e9ecef;
-        border-radius: 10px;
-        padding: 0.75rem 1rem;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        background: white;
-    }
-    
-    .form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    
-    .range-container {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-top: 0.5rem;
-    }
-    
-    .range-input {
-        flex: 1;
-        -webkit-appearance: none;
-        appearance: none;
-        height: 6px;
-        background: #e9ecef;
-        border-radius: 3px;
-        outline: none;
-    }
-    
-    .range-input::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 20px;
-        height: 20px;
-        background: #667eea;
-        border-radius: 50%;
-        cursor: pointer;
-    }
-    
-    .range-input::-moz-range-thumb {
-        width: 20px;
-        height: 20px;
-        background: #667eea;
-        border-radius: 50%;
-        cursor: pointer;
-        border: none;
-    }
-    
-    .range-value {
-        font-weight: 600;
-        color: #667eea;
-        min-width: 80px;
-        text-align: center;
-        background: #f8f9fa;
-        padding: 0.5rem;
-        border-radius: 8px;
-    }
-    
-    .btn-save {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        border-radius: 12px;
-        padding: 1rem 3rem;
-        font-weight: 600;
-        font-size: 1.1rem;
-        color: white;
-        width: 100%;
-        transition: all 0.3s ease;
-        margin-top: 1rem;
-    }
-    
-    .btn-save:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        color: white;
-    }
-    
-    .btn-save:disabled {
-        opacity: 0.6;
-        transform: none;
-        box-shadow: none;
-    }
-    
-    .alert {
-        border-radius: 12px;
-        border: none;
-        padding: 1rem 1.25rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .alert-success {
-        background: #d4edda;
-        color: #155724;
-    }
-    
-    .alert-info {
-        background: #d1ecf1;
-        color: #0c5460;
-    }
-    
-    .loading-spinner {
-        display: none;
-        margin-right: 0.5rem;
-    }
-    
-    @media (max-width: 768px) {
-        .preferences-container {
-            padding: 1rem;
-        }
-        
-        .card-header {
-            padding: 1.5rem;
-        }
-        
-        .card-body {
-            padding: 1.5rem;
-        }
-        
-        .preference-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .range-container {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        
-        .range-value {
-            text-align: left;
-        }
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="preferences-container">
-    <div class="container">
-        <div class="preferences-card">
-            <div class="card-header">
-                <h2><i class="fas fa-cog mr-2"></i>Bus Preferences</h2>
-                <p>Customize your travel preferences for better recommendations</p>
+<!-- Header -->
+<section class="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-16 -mt-6">
+    <div class="container mx-auto px-4">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-sliders-h text-2xl"></i>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold mb-2">Bus Preferences</h1>
+            <p class="text-xl opacity-90">Customize your travel experience</p>
+        </div>
+    </div>
+</section>
+
+<!-- Preferences Form -->
+<section class="py-12 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                <!-- Form Header -->
+                <div class="bg-gradient-to-r from-blue-600 to-purple-700 text-white p-8 text-center">
+                    <h2 class="text-2xl font-bold mb-2">Set Your Travel Preferences</h2>
+                    <p class="opacity-90">Help us find the perfect bus for your journey</p>
+                </div>
+                
+                <!-- Form Content -->
+                <div class="p-8">
+                    <!-- Form Errors -->
+                    {% if form.errors %}
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+                            <h4 class="text-red-800 font-semibold">Please correct the following errors:</h4>
+                        </div>
+                        <ul class="list-disc list-inside text-red-700 space-y-1">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                <li>{{ field|title }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" id="preferencesForm" class="space-y-8">
+                        {% csrf_token %}
+                        
+                        <!-- Bus Type Preferences -->
+                        <div class="preference-section bg-gray-50 p-6 rounded-xl border-l-4 border-blue-500">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-bus mr-3 text-blue-500"></i>Bus Type Preferences
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {% for bus_type in bus_types %}
+                                <div class="preference-item bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:border-blue-500 hover:-translate-y-1 hover:shadow-lg" 
+                                     onclick="togglePreference(this)">
+                                    <input type="checkbox" name="preferred_bus_types" value="{{ bus_type.id }}" 
+                                           {% if preference and bus_type in preference.preferred_bus_types.all %}checked{% endif %} 
+                                           class="hidden">
+                                    <div class="text-center">
+                                        {% if 'AC' in bus_type.name or 'ac' in bus_type.name|lower %}
+                                            <i class="fas fa-snowflake text-3xl text-blue-500 mb-3"></i>
+                                        {% elif 'Sleeper' in bus_type.name or 'sleeper' in bus_type.name|lower %}
+                                            <i class="fas fa-bed text-3xl text-purple-500 mb-3"></i>
+                                        {% elif 'Semi' in bus_type.name or 'semi' in bus_type.name|lower %}
+                                            <i class="fas fa-chair text-3xl text-green-500 mb-3"></i>
+                                        {% else %}
+                                            <i class="fas fa-bus text-3xl text-gray-500 mb-3"></i>
+                                        {% endif %}
+                                        <h4 class="font-semibold text-gray-800">{{ bus_type.name }}</h4>
+                                        <p class="text-sm text-gray-600">{{ bus_type.description|default:"Comfortable travel" }}</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Amenity Preferences -->
+                        <div class="preference-section bg-gray-50 p-6 rounded-xl border-l-4 border-green-500">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-star mr-3 text-green-500"></i>Preferred Amenities
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {% for amenity in amenities %}
+                                <div class="preference-item bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:border-green-500 hover:-translate-y-1 hover:shadow-lg" 
+                                     onclick="togglePreference(this)">
+                                    <input type="checkbox" name="preferred_amenities" value="{{ amenity.id }}" 
+                                           {% if preference and amenity in preference.preferred_amenities.all %}checked{% endif %} 
+                                           class="hidden">
+                                    <div class="text-center">
+                                        {% if amenity.icon %}
+                                            <i class="fas fa-{{ amenity.icon }} text-2xl text-purple-500 mb-2"></i>
+                                        {% else %}
+                                            <i class="fas fa-check text-2xl text-green-500 mb-2"></i>
+                                        {% endif %}
+                                        <h4 class="font-semibold text-gray-800 text-sm">{{ amenity.name }}</h4>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Budget & Comfort Preferences -->
+                        <div class="preference-section bg-gray-50 p-6 rounded-xl border-l-4 border-purple-500">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                                <i class="fas fa-sliders-h mr-3 text-purple-500"></i>Budget & Comfort Settings
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <!-- Budget Range -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                                        Budget Range: <span id="currentBudget" class="font-semibold text-purple-600">रू{{ preference.max_budget|default:2000 }}</span>
+                                    </label>
+                                    <input type="range" id="budgetRange" name="max_budget" 
+                                           min="500" max="5000" step="100" 
+                                           value="{{ preference.max_budget|default:2000 }}"
+                                           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span>रू500</span>
+                                        <span>रू5000</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Price Sensitivity -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                                        Price Sensitivity: <span id="currentPrice" class="font-semibold text-purple-600">{{ preference.price_sensitivity|default:5 }}/10</span>
+                                    </label>
+                                    <input type="range" id="priceRange" name="price_sensitivity" 
+                                           min="1" max="10" step="1" 
+                                           value="{{ preference.price_sensitivity|default:5 }}"
+                                           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span>Low</span>
+                                        <span>High</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Comfort Level -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                                        Comfort Priority: <span id="currentComfort" class="font-semibold text-purple-600">{{ preference.comfort_preference|default:5 }}/10</span>
+                                    </label>
+                                    <input type="range" id="comfortRange" name="comfort_preference" 
+                                           min="1" max="10" step="1" 
+                                           value="{{ preference.comfort_preference|default:5 }}"
+                                           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span>Basic</span>
+                                        <span>Luxury</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Travel Preferences -->
+                        <div class="preference-section bg-gray-50 p-6 rounded-xl border-l-4 border-orange-500">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                                <i class="fas fa-route mr-3 text-orange-500"></i>Travel Preferences
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Preferred Times -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Preferred Travel Times
+                                    </label>
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="preferred_times" value="morning" 
+                                                   {% if preference and 'morning' in preference.get_preferred_times_list %}checked{% endif %}
+                                                   class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded">
+                                            <span class="ml-3 text-gray-700">Morning (6 AM - 12 PM)</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="preferred_times" value="afternoon" 
+                                                   {% if preference and 'afternoon' in preference.get_preferred_times_list %}checked{% endif %}
+                                                   class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded">
+                                            <span class="ml-3 text-gray-700">Afternoon (12 PM - 6 PM)</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="preferred_times" value="evening" 
+                                                   {% if preference and 'evening' in preference.get_preferred_times_list %}checked{% endif %}
+                                                   class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded">
+                                            <span class="ml-3 text-gray-700">Evening (6 PM - 10 PM)</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" name="preferred_times" value="night" 
+                                                   {% if preference and 'night' in preference.get_preferred_times_list %}checked{% endif %}
+                                                   class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded">
+                                            <span class="ml-3 text-gray-700">Night (10 PM - 6 AM)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Seat Position -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Preferred Seat Position
+                                    </label>
+                                    <select name="preferred_seat_position" 
+                                            class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                        <option value="">No Preference</option>
+                                        <option value="front" {% if preference and preference.preferred_seat_position == 'front' %}selected{% endif %}>Front Seats</option>
+
+                                        <option value="back" {% if preference and preference.preferred_seat_position == 'back' %}selected{% endif %}>Back Seats</option>
+                                        <option value="window" {% if preference and preference.preferred_seat_position == 'window' %}selected{% endif %}>Window Seats</option>
+                                        <option value="aisle" {% if preference and preference.preferred_seat_position == 'aisle' %}selected{% endif %}>Aisle Seats</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                        
+                        <!-- Save Button -->
+                        <div class="text-center pt-6">
+                            <button type="submit" id="saveBtn" 
+                                    class="bg-gradient-to-r from-blue-600 to-purple-700 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-purple-800 transition-all duration-200 transform hover:scale-105 font-semibold text-lg">
+                                <span class="loading-spinner hidden">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>
+                                </span>
+                                <i class="fas fa-save mr-2"></i>Update Preferences
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
             
-            <div class="card-body">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}" role="alert">
-                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}info-circle{% endif %} mr-2"></i>
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-                
-                <form method="post" id="preferencesForm">
-                    {% csrf_token %}
-                    
-                    <!-- Bus Type Preferences -->
-                    <div class="preference-section">
-                        <div class="section-title">
-                            <i class="fas fa-bus"></i>
-                            Bus Type Preferences
-                        </div>
-                        <div class="preference-grid">
-                            {% for bus_type in bus_types %}
-                            <div class="preference-item" data-value="{{ bus_type.id }}">
-                                <input type="checkbox" name="preferred_bus_types" value="{{ bus_type.id }}" 
-                                       {% if preference and bus_type in preference.preferred_bus_types.all %}checked{% endif %}>
-                                <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon">
-                                    {% if 'AC' in bus_type.name %}
-                                        <i class="fas fa-snowflake"></i>
-                                    {% elif 'Sleeper' in bus_type.name %}
-                                        <i class="fas fa-bed"></i>
-                                    {% else %}
-                                        <i class="fas fa-bus"></i>
-                                    {% endif %}
-                                </div>
-                                <div class="title">{{ bus_type.name }}</div>
-                                <div class="description">{{ bus_type.description|default:"Comfortable travel option" }}</div>
-                            </div>
-                            {% endfor %}
-                        </div>
+            <!-- Tips Section -->
+            <div class="bg-blue-50 rounded-xl p-6 mt-8 border border-blue-200">
+                <h4 class="text-lg font-semibold text-blue-800 mb-3">
+                    <i class="fas fa-lightbulb mr-2"></i>Preference Tips
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-700">
+                    <div>
+                        <h5 class="font-semibold mb-2">Bus Type Selection:</h5>
+                        <ul class="space-y-1">
+                            <li>• AC buses are ideal for hot weather</li>
+                            <li>• Sleeper buses are perfect for overnight journeys</li>
+                            <li>• Semi-sleeper offers good comfort for day travel</li>
+                        </ul>
                     </div>
-                    
-                    <!-- Amenity Preferences -->
-                    <div class="preference-section">
-                        <div class="section-title">
-                            <i class="fas fa-concierge-bell"></i>
-                            Preferred Amenities
-                        </div>
-                        <div class="preference-grid">
-                            {% for amenity in amenities %}
-                            <div class="preference-item" data-value="{{ amenity.id }}">
-                                <input type="checkbox" name="preferred_amenities" value="{{ amenity.id }}" 
-                                       {% if preference and amenity in preference.preferred_amenities.all %}checked{% endif %}>
-                                <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon">
-                                    {% if amenity.icon %}
-                                        <i class="{{ amenity.icon }}"></i>
-                                    {% else %}
-                                        <i class="fas fa-star"></i>
-                                    {% endif %}
-                                </div>
-                                <div class="title">{{ amenity.name }}</div>
-                                <div class="description">{{ amenity.description|default:"Enhanced travel experience" }}</div>
-                            </div>
-                            {% endfor %}
-                        </div>
+                    <div>
+                        <h5 class="font-semibold mb-2">Seat Position:</h5>
+                        <ul class="space-y-1">
+                            <li>• Front seats have less vibration</li>
+                            <li>• Window seats offer scenic views</li>
+                            <li>• Aisle seats provide easy access</li>
+                        </ul>
                     </div>
-                    
-                    <!-- Price Range -->
-                    <div class="preference-section">
-                        <div class="section-title">
-                            <i class="fas fa-rupee-sign"></i>
-                            Price Range Preference
-                        </div>
-                        
-                        <!-- Price Sensitivity -->
-                        <div class="form-group">
-                            <label class="form-label">Price Sensitivity (1-10)</label>
-                            <div class="range-container">
-                                <span class="range-value">1</span>
-                                <input type="range" class="range-input" name="price_sensitivity" 
-                                       min="1" max="10" step="1" 
-                                       value="{% if preference %}{{ preference.price_sensitivity }}{% else %}5{% endif %}" 
-                                       id="priceRange">
-                                <span class="range-value">10</span>
-                            </div>
-                            <div class="text-center mt-2">
-                                <span class="range-value" id="currentPrice">{% if preference %}{{ preference.price_sensitivity }}{% else %}5{% endif %}</span>
-                            </div>
-                            <small class="text-muted">1 = Not price sensitive, 10 = Very price sensitive</small>
-                        </div>
-                        
-                        <!-- Comfort Preference -->
-                        <div class="form-group">
-                            <label class="form-label">Comfort Preference (1-10)</label>
-                            <div class="range-container">
-                                <span class="range-value">1</span>
-                                <input type="range" class="range-input" name="comfort_preference" 
-                                       min="1" max="10" step="1" 
-                                       value="{% if preference %}{{ preference.comfort_preference }}{% else %}5{% endif %}" 
-                                       id="comfortRange">
-                                <span class="range-value">10</span>
-                            </div>
-                            <div class="text-center mt-2">
-                                <span class="range-value" id="currentComfort">{% if preference %}{{ preference.comfort_preference }}{% else %}5{% endif %}</span>
-                            </div>
-                            <small class="text-muted">1 = Basic comfort, 10 = Highest comfort</small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Maximum Budget per Ticket</label>
-                            <div class="range-container">
-                                <span class="range-value">रू500</span>
-                                <input type="range" class="range-input" name="max_budget" 
-                                       min="500" max="5000" step="100" 
-                                       value="{% if preference %}{{ preference.max_budget }}{% else %}2000{% endif %}" 
-                                       id="budgetRange">
-                                <span class="range-value">रू5000</span>
-                            </div>
-                            <div class="text-center mt-2">
-                                <span class="range-value" id="currentBudget">रू{% if preference %}{{ preference.max_budget }}{% else %}2000{% endif %}</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Travel Time Preferences -->
-                    <div class="preference-section">
-                        <div class="section-title">
-                            <i class="fas fa-clock"></i>
-                            Travel Time Preferences
-                        </div>
-                        <div class="preference-grid">
-                            <div class="preference-item{% if preference and 'morning' in preference.get_preferred_times_list %} selected{% endif %}" data-value="morning">
-                                <input type="checkbox" name="preferred_times" value="morning" 
-                                       {% if preference and 'morning' in preference.get_preferred_times_list %}checked{% endif %}>
-                                <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon"><i class="fas fa-sun"></i></div>
-                                <div class="title">Morning (6 AM - 12 PM)</div>
-                                <div class="description">Early start for day travel</div>
-                            </div>
-                            
-                            <div class="preference-item{% if preference and 'afternoon' in preference.get_preferred_times_list %} selected{% endif %}" data-value="afternoon">
-                                <input type="checkbox" name="preferred_times" value="afternoon" 
-                                       {% if preference and 'afternoon' in preference.get_preferred_times_list %}checked{% endif %}>
-                                <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon"><i class="fas fa-sun"></i></div>
-                                <div class="title">Afternoon (12 PM - 6 PM)</div>
-                                <div class="description">Midday departure</div>
-                            </div>
-                            
-                            <div class="preference-item{% if preference and 'evening' in preference.get_preferred_times_list %} selected{% endif %}" data-value="evening">
-                                <input type="checkbox" name="preferred_times" value="evening" 
-                                       {% if preference and 'evening' in preference.get_preferred_times_list %}checked{% endif %}>
-                                <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon"><i class="fas fa-moon"></i></div>
-                                <div class="title">Evening (6 PM - 10 PM)</div>
-                                <div class="description">Evening departure</div>
-                            </div>
-                            
-                            <div class="preference-item{% if preference and 'night' in preference.get_preferred_times_list %} selected{% endif %}" data-value="night">
-                                <input type="checkbox" name="preferred_times" value="night" 
-                                       {% if preference and 'night' in preference.get_preferred_times_list %}checked{% endif %}>
-                                <div class="checkmark"><i class="fas fa-check"></i></div>
-                                <div class="icon"><i class="fas fa-moon"></i></div>
-                                <div class="title">Night (10 PM - 6 AM)</div>
-                                <div class="description">Overnight travel</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Seat Preferences -->
-                    <div class="preference-section">
-                        <div class="section-title">
-                            <i class="fas fa-chair"></i>
-                            Seat Preferences
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Preferred Seat Position</label>
-                            <select class="form-control" name="preferred_seat_position">
-                                <option value="">No Preference</option>
-                                <option value="window" {% if preference and preference.preferred_seat_position == 'window' %}selected{% endif %}>Window Seat</option>
-                                <option value="aisle" {% if preference and preference.preferred_seat_position == 'aisle' %}selected{% endif %}>Aisle Seat</option>
-                                <option value="front" {% if preference and preference.preferred_seat_position == 'front' %}selected{% endif %}>Front Seats</option>
-                                <option value="back" {% if preference and preference.preferred_seat_position == 'back' %}selected{% endif %}>Back Seats</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-save" id="saveBtn">
-                        <span class="loading-spinner">
-                            <i class="fas fa-spinner fa-spin"></i>
-                        </span>
-                        <i class="fas fa-save mr-2"></i>Update Preferences
-                    </button>
-                </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<style>
+.slider::-webkit-slider-thumb {
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #667eea;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.slider::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #667eea;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Handle preference item clicks
-        document.querySelectorAll('.preference-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const checkbox = this.querySelector('input[type="checkbox"]');
-                checkbox.checked = !checkbox.checked;
-                this.classList.toggle('selected', checkbox.checked);
-            });
+        window.togglePreference = function(element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
             
-            // Set initial state
+            if (checkbox.checked) {
+                element.classList.add('border-blue-500', 'bg-blue-50');
+                element.classList.remove('border-gray-200');
+            } else {
+                element.classList.remove('border-blue-500', 'bg-blue-50');
+                element.classList.add('border-gray-200');
+            }
+        };
+        
+        // Set initial state for preference items
+        document.querySelectorAll('.preference-item').forEach(item => {
             const checkbox = item.querySelector('input[type="checkbox"]');
             if (checkbox && checkbox.checked) {
-                item.classList.add('selected');
+                item.classList.add('border-blue-500', 'bg-blue-50');
+                item.classList.remove('border-gray-200');
             }
         });
         
@@ -543,23 +322,13 @@
             });
         }
         
-        // Handle price sensitivity range slider
-        const priceRange = document.getElementById('priceRange');
-        const currentPrice = document.getElementById('currentPrice');
-        
-        if (priceRange && currentPrice) {
-            priceRange.addEventListener('input', function() {
-                currentPrice.textContent = this.value;
-            });
-        }
-        
         // Handle comfort preference range slider
         const comfortRange = document.getElementById('comfortRange');
         const currentComfort = document.getElementById('currentComfort');
         
         if (comfortRange && currentComfort) {
             comfortRange.addEventListener('input', function() {
-                currentComfort.textContent = this.value;
+                currentComfort.textContent = this.value + '/10';
             });
         }
         
@@ -569,7 +338,7 @@
             const saveBtn = document.getElementById('saveBtn');
             const buttonIcon = saveBtn.querySelector('i:not(.fa-spinner)');
             
-            loadingSpinner.style.display = 'inline-block';
+            loadingSpinner.classList.remove('hidden');
             buttonIcon.style.display = 'none';
             saveBtn.disabled = true;
         });

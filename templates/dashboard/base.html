@@ -5,149 +5,93 @@
 
 {% block extra_css %}
 <style>
-  .dashboard-sidebar {
-    background: #343a40;
-    min-height: calc(100vh - 76px);
-    padding: 20px 0;
+  /* Custom scrollbar for webkit browsers */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
   }
-  .dashboard-sidebar .nav-link {
-    color: #adb5bd;
-    padding: 12px 20px;
-    border-radius: 0;
-    transition: all 0.3s ease;
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9;
   }
-  .dashboard-sidebar .nav-link:hover,
-  .dashboard-sidebar .nav-link.active {
-    color: #fff;
-    background: #495057;
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 10px;
   }
-  .dashboard-sidebar .nav-link i {
-    width: 20px;
-    margin-right: 10px;
-  }
-  .dashboard-content {
-    padding: 30px;
-    background: #f8f9fa;
-    min-height: calc(100vh - 76px);
-  }
-  .dashboard-header {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 30px;
-  }
-  .stat-card {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  .stat-number {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #007bff;
-  }
-  .quick-action-btn {
-    padding: 15px;
-    text-align: center;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-  }
-  .quick-action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
   }
 </style>
-{% block dashboard_extra_css %}{% endblock %} {% endblock %} {% block content %}
-<div class="container-fluid p-0">
-  <div class="row g-0">
-    <!-- Sidebar -->
-    <div class="col-md-3 col-lg-2">
-      <div class="dashboard-sidebar">
-        <nav class="nav flex-column">
-          <a
-            class="nav-link {% if request.resolver_match.url_name == 'dashboard_home' %}active{% endif %}"
-            href="{% url 'dashboard:dashboard_home' %}"
-          >
-            <i class="fas fa-tachometer-alt"></i> Dashboard
-          </a>
-          <a
-            class="nav-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}"
-            href="{% url 'dashboard:user_management' %}"
-          >
-            <i class="fas fa-users"></i> Users
-          </a>
-          <a
-            class="nav-link {% if 'bus' in request.resolver_match.url_name and 'route' not in request.resolver_match.url_name and 'driver' not in request.resolver_match.url_name %}active{% endif %}"
-            href="{% url 'dashboard:bus_management' %}"
-          >
-            <i class="fas fa-bus"></i> Buses
-          </a>
-          <a
-            class="nav-link {% if 'driver' in request.resolver_match.url_name %}active{% endif %}"
-            href="{% url 'dashboard:driver_management' %}"
-          >
-            <i class="fas fa-id-card"></i> Drivers
-          </a>
-          <a
-            class="nav-link {% if 'route' in request.resolver_match.url_name %}active{% endif %}"
-            href="{% url 'dashboard:route_management' %}"
-          >
-            <i class="fas fa-route"></i> Routes
-          </a>
-          <a
-            class="nav-link {% if 'destination' in request.resolver_match.url_name %}active{% endif %}"
-            href="{% url 'dashboard:popular_destinations_management' %}"
-          >
-            <i class="fas fa-map-marked-alt"></i> Popular Destinations
-          </a>
-          <a
-            class="nav-link {% if 'testimonial' in request.resolver_match.url_name %}active{% endif %}"
-            href="{% url 'dashboard:testimonials_management' %}"
-          >
-            <i class="fas fa-comments"></i> Testimonials
-          </a>
-          <a
-            class="nav-link {% if 'booking' in request.resolver_match.url_name %}active{% endif %}"
-            href="{% url 'dashboard:booking_management' %}"
-          >
-            <i class="fas fa-ticket-alt"></i> Bookings
-          </a>
-          <a
-            class="nav-link {% if 'payment' in request.resolver_match.url_name %}active{% endif %}"
-            href="{% url 'dashboard:admin_payments' %}"
-          >
-            <i class="fas fa-credit-card"></i> Payments
-          </a>
-          <hr class="text-light" />
-          <a
-            class="nav-link {% if 'analytics' in request.resolver_match.url_name %}active{% endif %}"
-            href="{% url 'dashboard:analytics' %}"
-          >
-            <i class="fas fa-chart-line"></i> Analytics
-          </a>
-          <a
-            class="nav-link {% if 'reports' in request.resolver_match.url_name %}active{% endif %}"
-            href="{% url 'dashboard:admin_reports' %}"
-          >
-            <i class="fas fa-file-alt"></i> Reports
-          </a>
-        </nav>
-      </div>
-    </div>
+{% block dashboard_extra_css %}{% endblock %}
+{% endblock %}
 
-    <!-- Main Content -->
-    <div class="col-md-9 col-lg-10">
-      <div class="dashboard-content">
-        {% block dashboard_content %}
-        <!-- Dashboard content goes here -->
-        {% endblock %}
-      </div>
+{% block content %}
+<div class="flex h-screen bg-gray-100">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-gray-800 text-white flex-shrink-0 custom-scrollbar overflow-y-auto">
+    <div class="p-4 border-b border-gray-700">
+      <h2 class="text-xl font-semibold">Admin Menu</h2>
     </div>
-  </div>
+    <nav class="py-4">
+      <a class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white {% if request.resolver_match.url_name == 'dashboard_home' %}bg-gray-700 text-white{% endif %}" href="{% url 'dashboard:dashboard_home' %}">
+        <i class="fas fa-tachometer-alt w-6"></i>
+        <span class="ml-3">Dashboard</span>
+      </a>
+      <a class="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white {% if 'user' in request.resolver_match.url_name %}bg-gray-700 text-white{% endif %}" href="{% url 'dashboard:user_management' %}">
+        <i class="fas fa-users w-6"></i>
+        <span class="ml-3">Users</span>
+      </a>
+      <a class="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white {% if 'bus' in request.resolver_match.url_name and 'route' not in request.resolver_match.url_name and 'driver' not in request.resolver_match.url_name %}bg-gray-700 text-white{% endif %}" href="{% url 'dashboard:bus_management' %}">
+        <i class="fas fa-bus w-6"></i>
+        <span class="ml-3">Buses</span>
+      </a>
+      <a class="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white {% if 'driver' in request.resolver_match.url_name %}bg-gray-700 text-white{% endif %}" href="{% url 'dashboard:driver_management' %}">
+        <i class="fas fa-id-card w-6"></i>
+        <span class="ml-3">Drivers</span>
+      </a>
+      <a class="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white {% if 'route' in request.resolver_match.url_name %}bg-gray-700 text-white{% endif %}" href="{% url 'dashboard:route_management' %}">
+        <i class="fas fa-route w-6"></i>
+        <span class="ml-3">Routes</span>
+      </a>
+      <a class="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white {% if 'destination' in request.resolver_match.url_name %}bg-gray-700 text-white{% endif %}" href="{% url 'dashboard:popular_destinations_management' %}">
+        <i class="fas fa-map-marked-alt w-6"></i>
+        <span class="ml-3">Destinations</span>
+      </a>
+      <a class="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white {% if 'testimonial' in request.resolver_match.url_name %}bg-gray-700 text-white{% endif %}" href="{% url 'dashboard:testimonials_management' %}">
+        <i class="fas fa-comments w-6"></i>
+        <span class="ml-3">Testimonials</span>
+      </a>
+      <a class="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white {% if 'booking' in request.resolver_match.url_name %}bg-gray-700 text-white{% endif %}" href="{% url 'dashboard:booking_management' %}">
+        <i class="fas fa-ticket-alt w-6"></i>
+        <span class="ml-3">Bookings</span>
+      </a>
+      <a class="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white {% if 'payment' in request.resolver_match.url_name %}bg-gray-700 text-white{% endif %}" href="{% url 'dashboard:admin_payments' %}">
+        <i class="fas fa-credit-card w-6"></i>
+        <span class="ml-3">Payments</span>
+      </a>
+      <div class="px-4 my-4">
+        <div class="border-t border-gray-700"></div>
+      </div>
+      <a class="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white {% if 'analytics' in request.resolver_match.url_name %}bg-gray-700 text-white{% endif %}" href="{% url 'dashboard:analytics' %}">
+        <i class="fas fa-chart-line w-6"></i>
+        <span class="ml-3">Analytics</span>
+      </a>
+      <a class="flex items-center px-4 py-2 mt-2 text-gray-300 hover:bg-gray-700 hover:text-white {% if 'reports' in request.resolver_match.url_name %}bg-gray-700 text-white{% endif %}" href="{% url 'dashboard:admin_reports' %}">
+        <i class="fas fa-file-alt w-6"></i>
+        <span class="ml-3">Reports</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col custom-scrollbar overflow-y-auto">
+    <div class="p-6">
+      {% block dashboard_content %}
+      <!-- Dashboard content goes here -->
+      {% endblock %}
+    </div>
+  </main>
 </div>
-{% endblock %} {% block extra_js %} {% block dashboard_extra_js %}{% endblock %}
+{% endblock %}
+
+{% block extra_js %}
+{% block dashboard_extra_js %}{% endblock %}
 {% endblock %}

@@ -1,376 +1,505 @@
-{% extends 'dashboard/base.html' %}
-{% load static %}
-
-{% block title %}{% if testimonial %}Edit Testimonial{% else %}Add New Testimonial{% endif %}{% endblock %}
-
-{% block extra_css %}
-<style>
-    .form-container {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        padding: 30px;
-        margin-bottom: 30px;
-    }
-    
-    .form-group {
-        margin-bottom: 20px;
-    }
-    
-    .form-label {
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 8px;
-    }
-    
-    .form-control, .form-select {
-        border-radius: 8px;
-        border: 2px solid #e9ecef;
-        padding: 12px 15px;
-        transition: all 0.3s ease;
-    }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    }
-    
-    .btn {
-        border-radius: 8px;
-        padding: 12px 30px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #007bff, #0056b3);
-        border: none;
-    }
-    
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
-    }
-    
-    .btn-secondary {
-        background: #6c757d;
-        border: none;
-    }
-    
-    .btn-secondary:hover {
-        background: #5a6268;
-        transform: translateY(-2px);
-    }
-    
-    .avatar-preview {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid #e9ecef;
-        margin-bottom: 15px;
-    }
-    
-    .rating-input {
-        display: flex;
-        gap: 5px;
-        margin-bottom: 10px;
-    }
-    
-    .rating-star {
-        font-size: 24px;
-        color: #ddd;
-        cursor: pointer;
-        transition: color 0.2s;
-    }
-    
-    .rating-star.active {
-        color: #ffc107;
-    }
-    
-    .rating-star:hover {
-        color: #ffc107;
-    }
-    
-    .alert {
-        border-radius: 10px;
-        border: none;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .required {
-        color: #dc3545;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="d-flex align-items-center mb-4">
-                <a href="{% url 'dashboard:testimonials_management' %}" class="btn btn-outline-secondary me-3">
-                    <i class="fas fa-arrow-left"></i>
-                </a>
-                <h2 class="mb-0">
-                    <i class="fas fa-{% if testimonial %}edit{% else %}plus{% endif %} me-2"></i>
-                    {% if testimonial %}Edit Testimonial{% else %}Add New Testimonial{% endif %}
-                </h2>
-            </div>
-            
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-            
-            <div class="form-container">
-                <form method="post" enctype="multipart/form-data" id="testimonialForm">
-                    {% csrf_token %}
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="id_name" class="form-label">
-                                    Customer Name <span class="required">*</span>
-                                </label>
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="id_name" 
-                                       name="name" 
-                                       value="{{ form.name.value|default:'' }}"
-                                       required>
-                                {% if form.name.errors %}
-                                    <div class="text-danger mt-1">
-                                        {% for error in form.name.errors %}
-                                            <small>{{ error }}</small>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="id_designation" class="form-label">
-                                    Designation/Title
-                                </label>
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="id_designation" 
-                                       name="designation" 
-                                       value="{{ form.designation.value|default:'' }}"
-                                       placeholder="e.g., Travel Enthusiast, Business Traveler">
-                                {% if form.designation.errors %}
-                                    <div class="text-danger mt-1">
-                                        {% for error in form.designation.errors %}
-                                            <small>{{ error }}</small>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">
-                                    Rating <span class="required">*</span>
-                                </label>
-                                <div class="rating-input" id="ratingInput">
-                                    {% for i in "12345" %}
-                                        <i class="fas fa-star rating-star" data-rating="{{ forloop.counter }}"></i>
-                                    {% endfor %}
-                                </div>
-                                <input type="hidden" 
-                                       id="id_rating" 
-                                       name="rating" 
-                                       value="{{ form.rating.value|default:'5' }}">
-                                <small class="text-muted">Click stars to set rating</small>
-                                {% if form.rating.errors %}
-                                    <div class="text-danger mt-1">
-                                        {% for error in form.rating.errors %}
-                                            <small>{{ error }}</small>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="id_display_order" class="form-label">
-                                    Display Order
-                                </label>
-                                <input type="number" 
-                                       class="form-control" 
-                                       id="id_display_order" 
-                                       name="display_order" 
-                                       value="{{ form.display_order.value|default:'1' }}"
-                                       min="1">
-                                <small class="text-muted">Lower numbers appear first</small>
-                                {% if form.display_order.errors %}
-                                    <div class="text-danger mt-1">
-                                        {% for error in form.display_order.errors %}
-                                            <small>{{ error }}</small>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="id_testimonial_text" class="form-label">
-                            Testimonial Text <span class="required">*</span>
-                        </label>
-                        <textarea class="form-control" 
-                                  id="id_testimonial_text" 
-                                  name="testimonial_text" 
-                                  rows="4" 
-                                  placeholder="Enter the customer's testimonial here..."
-                                  required>{{ form.testimonial_text.value|default:'' }}</textarea>
-                        {% if form.testimonial_text.errors %}
-                            <div class="text-danger mt-1">
-                                {% for error in form.testimonial_text.errors %}
-                                    <small>{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="id_avatar" class="form-label">
-                                    Customer Avatar
-                                </label>
-                                {% if testimonial and testimonial.avatar %}
-                                    <div class="mb-3">
-                                        <img src="{{ testimonial.avatar.url }}" 
-                                             alt="Current avatar" 
-                                             class="avatar-preview">
-                                        <br>
-                                        <small class="text-muted">Current avatar</small>
-                                    </div>
-                                {% endif %}
-                                <input type="file" 
-                                       class="form-control" 
-                                       id="id_avatar" 
-                                       name="avatar" 
-                                       accept="image/*">
-                                <small class="text-muted">Upload a profile picture (optional)</small>
-                                {% if form.avatar.errors %}
-                                    <div class="text-danger mt-1">
-                                        {% for error in form.avatar.errors %}
-                                            <small>{{ error }}</small>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label">Status</label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" 
-                                           type="checkbox" 
-                                           id="id_is_active" 
-                                           name="is_active"
-                                           {% if form.is_active.value %}checked{% endif %}>
-                                    <label class="form-check-label" for="id_is_active">
-                                        Active (visible on website)
-                                    </label>
-                                </div>
-                                {% if form.is_active.errors %}
-                                    <div class="text-danger mt-1">
-                                        {% for error in form.is_active.errors %}
-                                            <small>{{ error }}</small>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between mt-4">
-                        <a href="{% url 'dashboard:testimonials_management' %}" class="btn btn-secondary">
-                            <i class="fas fa-times me-2"></i>Cancel
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>
-                            {% if testimonial %}Update Testimonial{% else %}Add Testimonial{% endif %}
-                        </button>
-                    </div>
-                </form>
-            </div>
+{% extends "dashboard/base.html" %} {% load static %} {% block title %}{% if
+testimonial %}Edit Testimonial{% else %}Add New Testimonial{% endif %} -
+Dashboard{% endblock %} {% block dashboard_content %}
+<div class="container mx-auto px-4 sm:px-8">
+  <div class="py-8">
+    <div class="max-w-4xl mx-auto">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-2xl font-semibold leading-tight text-gray-800">
+            <i
+              class="fas fa-{% if testimonial %}edit{% else %}plus{% endif %} mr-2"
+            ></i>
+            {% if testimonial %}Edit Testimonial{% else %}Add New Testimonial{%
+            endif %}
+          </h2>
+          <p class="text-gray-600">
+            {% if testimonial %}Update customer testimonial{% else %}Create a
+            new customer testimonial{% endif %}
+          </p>
         </div>
-    </div>
-</div>
+        <a
+          href="{% url 'dashboard:testimonials_management' %}"
+          class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+        >
+          <i class="fas fa-arrow-left mr-2"></i>Back to Testimonials
+        </a>
+      </div>
 
+      <!-- Messages -->
+      {% if messages %} {% for message in messages %}
+      <div
+        class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-100 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800 border border-yellow-200{% else %}bg-blue-100 text-blue-800 border border-blue-200{% endif %}"
+      >
+        <div class="flex justify-between items-center">
+          <span>{{ message }}</span>
+          <button
+            onclick="this.parentElement.parentElement.remove()"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      {% endfor %} {% endif %}
+
+      <form
+        method="post"
+        enctype="multipart/form-data"
+        id="testimonialForm"
+        class="space-y-6"
+      >
+        {% csrf_token %}
+
+        <!-- Customer Information Section -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-user mr-2 text-blue-500"></i>Customer Information
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label
+                for="id_name"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Customer Name <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="id_name"
+                name="name"
+                value="{{ form.name.value|default:'' }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter customer name"
+                required
+              />
+              {% if form.name.errors %}
+              <div class="text-red-500 text-sm mt-1">
+                {% for error in form.name.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <div>
+              <label
+                for="id_designation"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Designation/Title
+              </label>
+              <input
+                type="text"
+                id="id_designation"
+                name="designation"
+                value="{{ form.designation.value|default:'' }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                placeholder="e.g., Travel Enthusiast, Business Traveler"
+              />
+              {% if form.designation.errors %}
+              <div class="text-red-500 text-sm mt-1">
+                {% for error in form.designation.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Rating and Display Section -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-star mr-2 text-yellow-500"></i>Rating & Display
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Rating <span class="text-red-500">*</span>
+              </label>
+              <div class="flex space-x-1 mb-2" id="ratingInput">
+                {% for i in "12345" %}
+                <i
+                  class="fas fa-star text-2xl cursor-pointer text-gray-300 hover:text-yellow-400 transition-colors rating-star"
+                  data-rating="{{ forloop.counter }}"
+                ></i>
+                {% endfor %}
+              </div>
+              <input
+                type="hidden"
+                id="id_rating"
+                name="rating"
+                value="{{ form.rating.value|default:'5' }}"
+              />
+              <p class="text-sm text-gray-500">Click stars to set rating</p>
+              {% if form.rating.errors %}
+              <div class="text-red-500 text-sm mt-1">
+                {% for error in form.rating.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <div>
+              <label
+                for="id_display_order"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Display Order
+              </label>
+              <input
+                type="number"
+                id="id_display_order"
+                name="display_order"
+                value="{{ form.display_order.value|default:'1' }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                min="1"
+                placeholder="1"
+              />
+              <p class="text-sm text-gray-500 mt-1">
+                Lower numbers appear first
+              </p>
+              {% if form.display_order.errors %}
+              <div class="text-red-500 text-sm mt-1">
+                {% for error in form.display_order.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonial Content Section -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-quote-left mr-2 text-green-500"></i>Testimonial
+            Content
+          </h3>
+
+          <div>
+            <label
+              for="id_testimonial_text"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Testimonial Text <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              id="id_testimonial_text"
+              name="testimonial_text"
+              rows="4"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter the customer's testimonial here..."
+              required
+            >
+{{ form.testimonial_text.value|default:'' }}</textarea
+            >
+            {% if form.testimonial_text.errors %}
+            <div class="text-red-500 text-sm mt-1">
+              {% for error in form.testimonial_text.errors %}
+              <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Avatar and Status Section -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-image mr-2 text-purple-500"></i>Avatar & Status
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label
+                for="id_avatar"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Customer Avatar
+              </label>
+
+              {% if testimonial and testimonial.avatar %}
+              <div class="mb-4">
+                <img
+                  src="{{ testimonial.avatar.url }}"
+                  alt="Current avatar"
+                  class="w-24 h-24 rounded-full object-cover border-4 border-gray-200 avatar-preview"
+                />
+                <p class="text-sm text-gray-500 mt-2">Current avatar</p>
+              </div>
+              {% endif %}
+
+              <input
+                type="file"
+                id="id_avatar"
+                name="avatar"
+                accept="image/*"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              />
+              <p class="text-sm text-gray-500 mt-1">
+                Upload a profile picture (optional)
+              </p>
+              {% if form.avatar.errors %}
+              <div class="text-red-500 text-sm mt-1">
+                {% for error in form.avatar.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Status</label
+              >
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="id_is_active"
+                  name="is_active"
+                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  {%
+                  if
+                  form.is_active.value
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <label
+                  for="id_is_active"
+                  class="ml-2 block text-sm text-gray-700"
+                >
+                  <span class="font-medium">Active</span>
+                  <p class="text-gray-500 text-xs">Visible on website</p>
+                </label>
+              </div>
+              {% if form.is_active.errors %}
+              <div class="text-red-500 text-sm mt-1">
+                {% for error in form.is_active.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-eye mr-2 text-indigo-500"></i>Preview
+          </h3>
+
+          <div
+            class="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300"
+          >
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0">
+                <div
+                  class="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center preview-avatar"
+                >
+                  <i class="fas fa-user text-gray-500 text-xl"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center mb-2">
+                  <div class="flex space-x-1 preview-rating">
+                    {% for i in "12345" %}
+                    <i class="fas fa-star text-yellow-400"></i>
+                    {% endfor %}
+                  </div>
+                </div>
+                <blockquote class="text-gray-700 italic preview-text">
+                  "Enter testimonial text to see preview..."
+                </blockquote>
+                <div class="mt-3">
+                  <p class="font-semibold text-gray-800 preview-name">
+                    Customer Name
+                  </p>
+                  <p class="text-sm text-gray-600 preview-designation">
+                    Designation
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row justify-between gap-4">
+          <a
+            href="{% url 'dashboard:testimonials_management' %}"
+            class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors text-center"
+          >
+            <i class="fas fa-times mr-2"></i>Cancel
+          </a>
+
+          <button
+            type="submit"
+            class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            <i class="fas fa-save mr-2"></i>
+            {% if testimonial %}Update Testimonial{% else %}Add Testimonial{%
+            endif %}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block dashboard_extra_js %}
 <script>
-// Rating functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const stars = document.querySelectorAll('.rating-star');
-    const ratingInput = document.getElementById('id_rating');
-    
+  document.addEventListener("DOMContentLoaded", function () {
+    const stars = document.querySelectorAll(".rating-star");
+    const ratingInput = document.getElementById("id_rating");
+    const nameInput = document.getElementById("id_name");
+    const designationInput = document.getElementById("id_designation");
+    const textInput = document.getElementById("id_testimonial_text");
+    const avatarInput = document.getElementById("id_avatar");
+
+    // Preview elements
+    const previewName = document.querySelector(".preview-name");
+    const previewDesignation = document.querySelector(".preview-designation");
+    const previewText = document.querySelector(".preview-text");
+    const previewRating = document.querySelector(".preview-rating");
+    const previewAvatar = document.querySelector(".preview-avatar");
+
     // Set initial rating display
     const currentRating = parseInt(ratingInput.value) || 5;
     updateStarDisplay(currentRating);
-    
-    stars.forEach(star => {
-        star.addEventListener('click', function() {
-            const rating = parseInt(this.dataset.rating);
-            ratingInput.value = rating;
-            updateStarDisplay(rating);
-        });
-        
-        star.addEventListener('mouseover', function() {
-            const rating = parseInt(this.dataset.rating);
-            updateStarDisplay(rating);
-        });
+    updatePreviewRating(currentRating);
+
+    // Rating functionality
+    stars.forEach((star) => {
+      star.addEventListener("click", function () {
+        const rating = parseInt(this.dataset.rating);
+        ratingInput.value = rating;
+        updateStarDisplay(rating);
+        updatePreviewRating(rating);
+      });
+
+      star.addEventListener("mouseover", function () {
+        const rating = parseInt(this.dataset.rating);
+        updateStarDisplay(rating);
+      });
     });
-    
-    document.getElementById('ratingInput').addEventListener('mouseleave', function() {
+
+    document
+      .getElementById("ratingInput")
+      .addEventListener("mouseleave", function () {
         const currentRating = parseInt(ratingInput.value) || 5;
         updateStarDisplay(currentRating);
-    });
-    
+      });
+
     function updateStarDisplay(rating) {
-        stars.forEach((star, index) => {
-            if (index < rating) {
-                star.classList.add('active');
-            } else {
-                star.classList.remove('active');
-            }
-        });
+      stars.forEach((star, index) => {
+        if (index < rating) {
+          star.classList.remove("text-gray-300");
+          star.classList.add("text-yellow-400");
+        } else {
+          star.classList.remove("text-yellow-400");
+          star.classList.add("text-gray-300");
+        }
+      });
     }
-    
+
+    function updatePreviewRating(rating) {
+      const previewStars = previewRating.querySelectorAll("i");
+      previewStars.forEach((star, index) => {
+        if (index < rating) {
+          star.classList.remove("text-gray-300");
+          star.classList.add("text-yellow-400");
+        } else {
+          star.classList.remove("text-yellow-400");
+          star.classList.add("text-gray-300");
+        }
+      });
+    }
+
     // Avatar preview
-    const avatarInput = document.getElementById('id_avatar');
-    if (avatarInput) {
-        avatarInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    let preview = document.querySelector('.avatar-preview');
-                    if (!preview) {
-                        preview = document.createElement('img');
-                        preview.className = 'avatar-preview';
-                        avatarInput.parentNode.insertBefore(preview, avatarInput);
-                    }
-                    preview.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-});
+    avatarInput.addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          previewAvatar.innerHTML = `<img src="${e.target.result}" class="w-16 h-16 rounded-full object-cover">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Live preview updates
+    nameInput.addEventListener("input", function () {
+      previewName.textContent = this.value || "Customer Name";
+    });
+
+    designationInput.addEventListener("input", function () {
+      previewDesignation.textContent = this.value || "Designation";
+    });
+
+    textInput.addEventListener("input", function () {
+      previewText.textContent = `"${
+        this.value || "Enter testimonial text to see preview..."
+      }"`;
+    });
+
+    // Initialize preview with current values
+    if (nameInput.value) previewName.textContent = nameInput.value;
+    if (designationInput.value)
+      previewDesignation.textContent = designationInput.value;
+    if (textInput.value) previewText.textContent = `"${textInput.value}"`;
+
+    // Form validation
+    document
+      .getElementById("testimonialForm")
+      .addEventListener("submit", function (e) {
+        const name = nameInput.value.trim();
+        const text = textInput.value.trim();
+
+        if (!name || !text) {
+          e.preventDefault();
+          alert("Name and Testimonial Text are required fields.");
+          return false;
+        }
+
+        if (text.length < 10) {
+          e.preventDefault();
+          alert("Testimonial text should be at least 10 characters long.");
+          return false;
+        }
+      });
+
+    // Auto-dismiss messages after 5 seconds
+    setTimeout(function () {
+      const messages = document.querySelectorAll(
+        '[class*="bg-green-100"], [class*="bg-red-100"], [class*="bg-yellow-100"], [class*="bg-blue-100"]'
+      );
+      messages.forEach((message) => {
+        if (message.querySelector("button")) {
+          setTimeout(() => {
+            message.style.opacity = "0";
+            message.style.transition = "opacity 0.5s";
+            setTimeout(() => message.remove(), 500);
+          }, 5000);
+        }
+      });
+    }, 100);
+  });
 </script>
 {% endblock %}

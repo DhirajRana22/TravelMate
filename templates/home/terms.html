@@ -3,242 +3,362 @@
 
 {% block title %}Terms and Conditions - TravelMate{% endblock %}
 
-{% block extra_css %}
-<style>
-    .terms-hero {
-        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{% static "img/terms-hero.jpg" %}') no-repeat center center;
-        background-size: cover;
-        color: white;
-        padding: 80px 0;
-        margin-top: -1.5rem;
-    }
-    .terms-section {
-        margin-bottom: 2rem;
-    }
-    .terms-section h3 {
-        color: #0d6efd;
-        margin-bottom: 1rem;
-    }
-    .terms-nav {
-        position: sticky;
-        top: 100px;
-    }
-    .terms-nav .nav-link {
-        color: #495057;
-        border-radius: 0;
-        padding: 0.5rem 1rem;
-    }
-    .terms-nav .nav-link.active {
-        color: #0d6efd;
-        background-color: #e7f1ff;
-        border-left: 3px solid #0d6efd;
-    }
-    .terms-content {
-        font-size: 1rem;
-        line-height: 1.6;
-    }
-    .terms-content ul, .terms-content ol {
-        padding-left: 1.5rem;
-    }
-    .terms-content li {
-        margin-bottom: 0.5rem;
-    }
-    .last-updated {
-        font-style: italic;
-        color: #6c757d;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
 <!-- Hero Section -->
-<section class="terms-hero">
-    <div class="container text-center">
-        <h1 class="display-4 fw-bold mb-4">Terms and Conditions</h1>
-        <p class="lead mb-0">Please read these terms carefully before using our services</p>
+<section class="relative bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white py-24 overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-full h-full" style="background-image: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.1"><circle cx="30" cy="30" r="4"/></g></g></svg>');"></div>
+    </div>
+    
+    <!-- Animated Elements -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-white opacity-5 rounded-full animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-white opacity-5 rounded-full animate-pulse delay-1000"></div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-file-contract text-3xl"></i>
+        </div>
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            Terms & <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">Conditions</span>
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
+            Please read these terms carefully before using our services
+        </p>
+        <p class="text-sm text-blue-200 mt-4">Last Updated: May 15, 2024</p>
     </div>
 </section>
 
 <!-- Terms Content -->
-<section class="py-5">
-    <div class="container">
-        <div class="row">
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-12">
             <!-- Sidebar Navigation -->
-            <div class="col-lg-3 mb-4 mb-lg-0">
-                <div class="terms-nav">
-                    <div class="card">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Table of Contents</h5>
-                        </div>
-                        <div class="card-body p-0">
-                            <nav class="nav flex-column">
-                                <a class="nav-link active" href="#introduction">Introduction</a>
-                                <a class="nav-link" href="#definitions">Definitions</a>
-                                <a class="nav-link" href="#account">User Account</a>
-                                <a class="nav-link" href="#booking">Booking & Tickets</a>
-                                <a class="nav-link" href="#payment">Payment & Refunds</a>
-                                <a class="nav-link" href="#cancellation">Cancellation Policy</a>
-                                <a class="nav-link" href="#liability">Limitation of Liability</a>
-                                <a class="nav-link" href="#privacy">Privacy Policy</a>
-                                <a class="nav-link" href="#intellectual">Intellectual Property</a>
-                                <a class="nav-link" href="#termination">Termination</a>
-                                <a class="nav-link" href="#governing">Governing Law</a>
-                                <a class="nav-link" href="#changes">Changes to Terms</a>
-                                <a class="nav-link" href="#contact">Contact Us</a>
-                            </nav>
-                        </div>
-                    </div>
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6 border-b border-gray-200 pb-3">
+                        <i class="fas fa-list mr-2 text-blue-500"></i>Table of Contents
+                    </h3>
+                    <nav class="space-y-2">
+                        <a href="#introduction" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link active">
+                            1. Introduction
+                        </a>
+                        <a href="#definitions" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            2. Definitions
+                        </a>
+                        <a href="#account" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            3. User Account
+                        </a>
+                        <a href="#booking" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            4. Booking & Tickets
+                        </a>
+                        <a href="#payment" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            5. Payment & Refunds
+                        </a>
+                        <a href="#cancellation" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            6. Cancellation Policy
+                        </a>
+                        <a href="#liability" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            7. Limitation of Liability
+                        </a>
+                        <a href="#privacy" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            8. Privacy Policy
+                        </a>
+                        <a href="#intellectual" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            9. Intellectual Property
+                        </a>
+                        <a href="#termination" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            10. Termination
+                        </a>
+                        <a href="#governing" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            11. Governing Law
+                        </a>
+                        <a href="#changes" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            12. Changes to Terms
+                        </a>
+                        <a href="#contact" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            13. Contact Us
+                        </a>
+                    </nav>
                 </div>
             </div>
             
             <!-- Terms Content -->
-            <div class="col-lg-9">
-                <div class="terms-content">
-                    <p class="last-updated">Last Updated: May 15, 2024</p>
-                    
-                    <div id="introduction" class="terms-section">
-                        <h3>1. Introduction</h3>
-                        <p>Welcome to TravelMate. These Terms and Conditions govern your use of the TravelMate website, mobile applications, and services (collectively, the "Services"). By accessing or using our Services, you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, you may not use our Services.</p>
-                        <p>TravelMate is an online platform that allows users to search, compare, and book bus tickets from various bus operators. We act as an intermediary between users and bus operators, facilitating the booking process and providing customer support.</p>
+            <div class="lg:col-span-3">
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+                    <!-- Introduction -->
+                    <div id="introduction" class="terms-section mb-12">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-info-circle text-blue-500 mr-3"></i>1. Introduction
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <p class="mb-4">
+                                Welcome to TravelMate! These Terms and Conditions ("Terms") govern your use of our website, mobile applications, 
+                                and services (collectively, the "Services") operated by TravelMate Inc. ("we," "us," or "our").
+                            </p>
+                            <p class="mb-4">
+                                By accessing or using our Services, you agree to be bound by these Terms. If you disagree with any part of these 
+                                terms, then you may not access the Services.
+                            </p>
+                            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg">
+                                <p class="text-yellow-800 font-medium">
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                                    Please read these terms carefully as they contain important information about your legal rights.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div id="definitions" class="terms-section">
-                        <h3>2. Definitions</h3>
-                        <p>In these Terms and Conditions, the following terms shall have the meanings assigned to them below:</p>
-                        <ul>
-                            <li><strong>"TravelMate,"</strong> "we," "us," or "our" refers to TravelMate Inc., the company that operates the TravelMate platform.</li>
-                            <li><strong>"User,"</strong> "you," or "your" refers to any person who accesses or uses the TravelMate Services.</li>
-                            <li><strong>"Bus Operator"</strong> refers to the company or individual that owns and operates the buses for which tickets are available on the TravelMate platform.</li>
-                            <li><strong>"Booking"</strong> refers to the reservation of a seat or seats on a bus through the TravelMate platform.</li>
-                            <li><strong>"Ticket"</strong> refers to the electronic or physical document that confirms a Booking.</li>
-                            <li><strong>"Services"</strong> refers to all services provided by TravelMate, including but not limited to the website, mobile applications, customer support, and payment processing.</li>
-                        </ul>
+                    <!-- Definitions -->
+                    <div id="definitions" class="terms-section mb-12">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-book text-green-500 mr-3"></i>2. Definitions
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <p class="mb-6">For the purposes of these Terms:</p>
+                            
+                            <div class="space-y-4">
+                                <div class="border-l-4 border-blue-500 pl-4">
+                                    <h4 class="font-semibold text-gray-800">"Service"</h4>
+                                    <p class="text-sm">Refers to the TravelMate website, mobile application, and all related services.</p>
+                                </div>
+                                
+                                <div class="border-l-4 border-green-500 pl-4">
+                                    <h4 class="font-semibold text-gray-800">"User" or "You"</h4>
+                                    <p class="text-sm">Refers to any individual who accesses or uses our Service.</p>
+                                </div>
+                                
+                                <div class="border-l-4 border-purple-500 pl-4">
+                                    <h4 class="font-semibold text-gray-800">"Booking"</h4>
+                                    <p class="text-sm">Refers to a reservation made through our platform for bus travel services.</p>
+                                </div>
+                                
+                                <div class="border-l-4 border-orange-500 pl-4">
+                                    <h4 class="font-semibold text-gray-800">"Operator"</h4>
+                                    <p class="text-sm">Refers to the bus companies and transportation providers partnered with TravelMate.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div id="account" class="terms-section">
-                        <h3>3. User Account</h3>
-                        <p>To use certain features of our Services, you may need to create a user account. When creating an account, you agree to provide accurate, current, and complete information. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</p>
-                        <p>You agree to:</p>
-                        <ul>
-                            <li>Create only one account per person</li>
-                            <li>Not share your account credentials with any third party</li>
-                            <li>Notify us immediately of any unauthorized use of your account</li>
-                            <li>Ensure that you log out of your account at the end of each session</li>
-                            <li>Update your account information promptly if there are any changes</li>
-                        </ul>
-                        <p>We reserve the right to suspend or terminate your account if we suspect any unauthorized or fraudulent activity.</p>
+                    <!-- User Account -->
+                    <div id="account" class="terms-section mb-12">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-user-circle text-purple-500 mr-3"></i>3. User Account
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <h4 class="text-xl font-semibold text-gray-800 mb-4">Account Creation</h4>
+                            <ul class="list-disc list-inside space-y-2 mb-6">
+                                <li>You must provide accurate and complete information when creating an account</li>
+                                <li>You are responsible for maintaining the confidentiality of your account credentials</li>
+                                <li>You must be at least 18 years old to create an account</li>
+                                <li>One person may not maintain more than one account</li>
+                            </ul>
+                            
+                            <h4 class="text-xl font-semibold text-gray-800 mb-4">Account Responsibilities</h4>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>You are responsible for all activities that occur under your account</li>
+                                <li>You must notify us immediately of any unauthorized use of your account</li>
+                                <li>You agree to provide accurate and up-to-date information</li>
+                                <li>You may not transfer your account to another person</li>
+                            </ul>
+                        </div>
                     </div>
                     
-                    <div id="booking" class="terms-section">
-                        <h3>4. Booking & Tickets</h3>
-                        <p>When you make a booking through TravelMate, you are entering into a contract with the Bus Operator, not with TravelMate. We act as an intermediary, facilitating the booking process and providing customer support.</p>
-                        <p>By making a booking, you agree to:</p>
-                        <ul>
-                            <li>Provide accurate passenger information</li>
-                            <li>Pay the full fare and applicable fees</li>
-                            <li>Comply with the Bus Operator's terms and conditions</li>
-                            <li>Present a valid ID that matches the passenger information at the time of boarding</li>
-                            <li>Arrive at the boarding point at least 15 minutes before the scheduled departure time</li>
-                        </ul>
-                        <p>E-tickets issued by TravelMate are valid only when presented with a valid ID that matches the passenger information provided during booking. The Bus Operator reserves the right to deny boarding if the passenger fails to present a valid ID or if the ID does not match the passenger information.</p>
-                        <p>TravelMate is not responsible for any changes to the bus schedule, route, or amenities made by the Bus Operator. In case of any such changes, we will make reasonable efforts to notify you and assist you in making alternative arrangements.</p>
+                    <!-- Booking & Tickets -->
+                    <div id="booking" class="terms-section mb-12">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-ticket-alt text-indigo-500 mr-3"></i>4. Booking & Tickets
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="bg-blue-50 p-6 rounded-lg">
+                                    <h4 class="text-lg font-semibold text-gray-800 mb-3">
+                                        <i class="fas fa-calendar-check text-blue-500 mr-2"></i>Booking Process
+                                    </h4>
+                                    <ul class="list-disc list-inside space-y-1 text-sm">
+                                        <li>All bookings are subject to availability</li>
+                                        <li>Prices may change without notice</li>
+                                        <li>Booking confirmation is required</li>
+                                        <li>Valid ID required for travel</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-green-50 p-6 rounded-lg">
+                                    <h4 class="text-lg font-semibold text-gray-800 mb-3">
+                                        <i class="fas fa-mobile-alt text-green-500 mr-2"></i>E-Tickets
+                                    </h4>
+                                    <ul class="list-disc list-inside space-y-1 text-sm">
+                                        <li>Digital tickets sent via email/SMS</li>
+                                        <li>Must present ticket for boarding</li>
+                                        <li>Tickets are non-transferable</li>
+                                        <li>Lost tickets can be reprinted</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <p class="text-yellow-800 text-sm">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    <strong>Important:</strong> Please arrive at the departure point at least 15 minutes before scheduled departure time.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div id="payment" class="terms-section">
-                        <h3>5. Payment & Refunds</h3>
-                        <p>All payments made through TravelMate are processed securely. We accept various payment methods, including credit cards, debit cards, net banking, eSewa, Khalti, IME Pay, FonePay, and mobile banking.</p>
-                        <p>By making a payment, you represent and warrant that:</p>
-                        <ul>
-                            <li>You are authorized to use the payment method</li>
-                            <li>The payment information you provide is accurate and complete</li>
-                            <li>You will pay the full amount charged to your payment method</li>
-                        </ul>
-                        <p>The total fare displayed during the booking process includes the bus fare, taxes, and TravelMate's service fee. The service fee is non-refundable in most cases.</p>
-                        <p>Refunds for cancelled bookings are processed according to the cancellation policy (see Section 6). Refunds are generally processed to the original payment method, and the time it takes for the refund to reflect in your account depends on your payment provider.</p>
+                    <!-- Payment & Refunds -->
+                    <div id="payment" class="terms-section mb-12">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-credit-card text-emerald-500 mr-3"></i>5. Payment & Refunds
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <h4 class="text-xl font-semibold text-gray-800 mb-4">Payment Terms</h4>
+                            <ul class="list-disc list-inside space-y-2 mb-6">
+                                <li>Payment must be made in full at the time of booking</li>
+                                <li>We accept major credit cards, debit cards, and digital wallets</li>
+                                <li>All prices are in Nepali Rupees (NPR) unless otherwise stated</li>
+                                <li>Additional fees may apply for certain payment methods</li>
+                            </ul>
+                            
+                            <h4 class="text-xl font-semibold text-gray-800 mb-4">Refund Policy</h4>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <h5 class="font-semibold text-gray-800 mb-2">Cancellation Timeframe</h5>
+                                        <ul class="text-sm space-y-1">
+                                            <li>24+ hours: 90% refund</li>
+                                            <li>12-24 hours: 75% refund</li>
+                                            <li>6-12 hours: 50% refund</li>
+                                            <li>&lt;6 hours: No refund</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-semibold text-gray-800 mb-2">Processing Time</h5>
+                                        <ul class="text-sm space-y-1">
+                                            <li>Digital wallets: 1-2 days</li>
+                                            <li>Credit cards: 3-7 days</li>
+                                            <li>Bank transfers: 2-5 days</li>
+                                            <li>Cash refunds: Same day</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div id="cancellation" class="terms-section">
-                        <h3>6. Cancellation Policy</h3>
-                        <p>You can cancel your booking through your TravelMate account or by contacting our customer support. The refund amount for cancelled bookings depends on how close to the departure time you are cancelling and the Bus Operator's cancellation policy.</p>
-                        <p>General cancellation policy:</p>
-                        <ul>
-                            <li>Cancellations made more than 48 hours before departure: 90% refund</li>
-                            <li>Cancellations made 24-48 hours before departure: 75% refund</li>
-                            <li>Cancellations made 12-24 hours before departure: 50% refund</li>
-                            <li>Cancellations made less than 12 hours before departure: 25% refund or no refund (depending on the Bus Operator)</li>
-                        </ul>
-                        <p>Please note that the TravelMate service fee is non-refundable in most cases. The exact refund amount will be displayed at the time of cancellation.</p>
-                        <p>In case of cancellations by the Bus Operator, we will assist you in getting a full refund or making alternative arrangements.</p>
+                    <!-- Limitation of Liability -->
+                    <div id="liability" class="terms-section mb-12">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-exclamation-triangle text-red-500 mr-3"></i>7. Limitation of Liability
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <div class="bg-red-50 border border-red-200 p-6 rounded-lg">
+                                <p class="text-red-800 mb-4">
+                                    <strong>IMPORTANT DISCLAIMER:</strong> Please read this section carefully as it limits our liability.
+                                </p>
+                                
+                                <ul class="list-disc list-inside space-y-2 text-red-700 text-sm">
+                                    <li>TravelMate acts as an intermediary between users and bus operators</li>
+                                    <li>We are not liable for delays, cancellations, or service issues by operators</li>
+                                    <li>Our liability is limited to the amount paid for the booking</li>
+                                    <li>We are not responsible for personal injury or property damage during travel</li>
+                                    <li>Force majeure events are beyond our control and responsibility</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div id="liability" class="terms-section">
-                        <h3>7. Limitation of Liability</h3>
-                        <p>TravelMate acts as an intermediary between users and Bus Operators. We are not responsible for the actions, omissions, or services of the Bus Operators. Our responsibility is limited to facilitating the booking process and providing customer support.</p>
-                        <p>To the maximum extent permitted by law, TravelMate shall not be liable for:</p>
-                        <ul>
-                            <li>Any direct, indirect, incidental, special, consequential, or punitive damages arising out of or in connection with your use of our Services</li>
-                            <li>Any loss or damage arising from your interactions with Bus Operators</li>
-                            <li>Any changes to bus schedules, routes, or amenities made by the Bus Operator</li>
-                            <li>Any loss or damage due to delays, cancellations, or other issues with the bus service</li>
-                            <li>Any personal injury, death, or property damage resulting from the use of the bus service</li>
-                            <li>Any unauthorized access to or use of our servers and/or any personal information stored therein</li>
-                        </ul>
-                        <p>Our total liability to you for any claim arising out of or relating to these Terms and Conditions or our Services shall not exceed the amount paid by you to TravelMate for the booking in question.</p>
+                    <!-- Intellectual Property -->
+                    <div id="intellectual" class="terms-section mb-12">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-copyright text-teal-500 mr-3"></i>9. Intellectual Property
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <p class="mb-6">All content, features, and functionality of our Service are protected by intellectual property laws:</p>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <i class="fas fa-trademark text-blue-500 mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Trademarks</h4>
+                                        <p class="text-sm">TravelMate name, logo, and related marks are our trademarks.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <i class="fas fa-code text-green-500 mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Software</h4>
+                                        <p class="text-sm">Our platform software and technology are proprietary and protected.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <i class="fas fa-file-alt text-purple-500 mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Content</h4>
+                                        <p class="text-sm">All text, images, and multimedia content are owned by us or our licensors.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div id="privacy" class="terms-section">
-                        <h3>8. Privacy Policy</h3>
-                        <p>We respect your privacy and are committed to protecting your personal information. Our Privacy Policy, which is incorporated into these Terms and Conditions by reference, explains how we collect, use, and disclose information about you. By using our Services, you consent to our collection, use, and disclosure of information as described in our Privacy Policy.</p>
-                        <p>You can view our Privacy Policy <a href="{% url 'home:privacy' %}">here</a>.</p>
+                    <!-- Governing Law -->
+                    <div id="governing" class="terms-section mb-12">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-gavel text-amber-500 mr-3"></i>11. Governing Law
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <div class="bg-amber-50 border border-amber-200 p-6 rounded-lg">
+                                <p class="text-amber-800 mb-4">
+                                    These Terms are governed by and construed in accordance with the laws of Nepal.
+                                </p>
+                                
+                                <ul class="list-disc list-inside space-y-2 text-amber-700 text-sm">
+                                    <li>Any disputes will be resolved in the courts of Kathmandu, Nepal</li>
+                                    <li>You consent to the jurisdiction of these courts</li>
+                                    <li>If any provision is invalid, the remainder remains in effect</li>
+                                    <li>These Terms constitute the entire agreement between us</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div id="intellectual" class="terms-section">
-                        <h3>9. Intellectual Property</h3>
-                        <p>All content on the TravelMate platform, including but not limited to text, graphics, logos, icons, images, audio clips, digital downloads, and software, is the property of TravelMate or its content suppliers and is protected by international copyright, trademark, and other intellectual property laws.</p>
-                        <p>You may not:</p>
-                        <ul>
-                            <li>Modify, copy, distribute, transmit, display, perform, reproduce, publish, license, create derivative works from, transfer, or sell any information, software, products, or services obtained from the TravelMate platform</li>
-                            <li>Use any content for commercial purposes without our express written consent</li>
-                            <li>Remove any copyright, trademark, or other proprietary notices from any content</li>
-                            <li>Frame or mirror any part of the TravelMate platform without our express written consent</li>
-                        </ul>
-                        <p>TravelMate grants you a limited, non-exclusive, non-transferable license to access and use the TravelMate platform for personal, non-commercial purposes.</p>
-                    </div>
-                    
-                    <div id="termination" class="terms-section">
-                        <h3>10. Termination</h3>
-                        <p>We reserve the right to terminate or suspend your account and access to our Services at our sole discretion, without notice, for any reason, including but not limited to a breach of these Terms and Conditions.</p>
-                        <p>Upon termination:</p>
-                        <ul>
-                            <li>Your right to use our Services will immediately cease</li>
-                            <li>We may delete or deactivate your account and all related information and files</li>
-                            <li>We may prohibit your access to any part of our Services</li>
-                        </ul>
-                        <p>All provisions of these Terms and Conditions that by their nature should survive termination shall survive termination, including, without limitation, ownership provisions, warranty disclaimers, indemnity, and limitations of liability.</p>
-                    </div>
-                    
-                    <div id="governing" class="terms-section">
-                        <h3>11. Governing Law</h3>
-                        <p>These Terms and Conditions shall be governed by and construed in accordance with the laws of the United States, without regard to its conflict of law principles. Any dispute arising out of or relating to these Terms and Conditions or our Services shall be subject to the exclusive jurisdiction of the courts located in New York, New York.</p>
-                    </div>
-                    
-                    <div id="changes" class="terms-section">
-                        <h3>12. Changes to Terms</h3>
-                        <p>We reserve the right to modify these Terms and Conditions at any time. Any changes will be effective immediately upon posting on the TravelMate platform. Your continued use of our Services after any such changes constitutes your acceptance of the new Terms and Conditions.</p>
-                        <p>We will make reasonable efforts to notify you of any significant changes to these Terms and Conditions, but it is your responsibility to review these Terms and Conditions periodically to stay informed of any updates.</p>
-                    </div>
-                    
+                    <!-- Contact Us -->
                     <div id="contact" class="terms-section">
-                        <h3>13. Contact Us</h3>
-                        <p>If you have any questions or concerns about these Terms and Conditions, please contact us at:</p>
-                        <address>
-                            TravelMate Inc.<br>
-                            123 Travel Street, Suite 456<br>
-                            New York, NY 10001<br>
-                            United States<br><br>
-                            Email: <a href="mailto:legal@travelmate.com">legal@travelmate.com</a><br>
-                            Phone: +977 9847435111
-                        </address>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-envelope text-pink-500 mr-3"></i>13. Contact Us
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <p class="mb-6">If you have any questions about these Terms and Conditions, please contact us:</p>
+                            
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800 mb-3">Legal Department</h4>
+                                        <div class="space-y-2 text-sm">
+                                            <p><i class="fas fa-building mr-2 text-blue-500"></i>TravelMate Inc.</p>
+                                            <p><i class="fas fa-map-marker-alt mr-2 text-red-500"></i>Patan, Lalitpur, Nepal</p>
+                                            <p><i class="fas fa-envelope mr-2 text-green-500"></i>legal@travelmate.com</p>
+                                            <p><i class="fas fa-phone mr-2 text-purple-500"></i>+977 9847435111</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800 mb-3">Customer Support</h4>
+                                        <div class="space-y-2 text-sm">
+                                            <p><i class="fas fa-headset mr-2 text-indigo-500"></i>24/7 Support Available</p>
+                                            <p><i class="fas fa-envelope mr-2 text-green-500"></i>support@travelmate.com</p>
+                                            <p><i class="fas fa-comments mr-2 text-blue-500"></i>Live Chat on Website</p>
+                                            <p><i class="fas fa-clock mr-2 text-orange-500"></i>Response within 2 hours</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -247,37 +367,101 @@
 </section>
 
 <!-- Acceptance Banner -->
-<section class="py-4 bg-light">
-    <div class="container text-center">
-        <p class="mb-0">By using TravelMate services, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions.</p>
+<section class="py-12 bg-gradient-to-r from-blue-600 via-purple-700 to-blue-800 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="max-w-4xl mx-auto">
+            <h3 class="text-2xl font-bold mb-4">Agreement to Terms</h3>
+            <p class="text-blue-100 leading-relaxed">
+                By using TravelMate services, you acknowledge that you have read, understood, and agree to be bound by these 
+                Terms and Conditions. These terms are legally binding and govern your relationship with TravelMate. 
+                If you do not agree to these terms, please discontinue use of our services.
+            </p>
+        </div>
     </div>
 </section>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
         // Smooth scroll for anchor links
-        $('a[href^="#"]').on('click', function(e) {
-            e.preventDefault();
-            var target = $(this.hash);
-            if (target.length) {
-                $('html, body').animate({
-                    scrollTop: target.offset().top - 100
-                }, 500);
-            }
-        });
-        
-        // Update active nav link on scroll
-        $(window).on('scroll', function() {
-            $('.terms-section').each(function() {
-                if ($(window).scrollTop() >= $(this).offset().top - 150) {
-                    var id = $(this).attr('id');
-                    $('.terms-nav .nav-link').removeClass('active');
-                    $('.terms-nav .nav-link[href="#' + id + '"]').addClass('active');
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 }
             });
         });
+        
+        // Update active nav link on scroll
+        const sections = document.querySelectorAll('.terms-section');
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        function updateActiveLink() {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active', 'text-blue-600', 'bg-blue-50');
+                link.classList.add('text-gray-600');
+                
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active', 'text-blue-600', 'bg-blue-50');
+                    link.classList.remove('text-gray-600');
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', updateActiveLink);
+        updateActiveLink(); // Initial call
+        
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in-up');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe elements for animation
+        document.querySelectorAll('.terms-section').forEach(el => {
+            observer.observe(el);
+        });
     });
 </script>
+
+<style>
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+}
+</style>
 {% endblock %}

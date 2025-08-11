@@ -1,923 +1,292 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Booking History{% endblock %}
-
-{% block extra_css %}
-<style>
-    .history-header {
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-        color: white;
-        padding: 2rem 0;
-        margin-bottom: 2rem;
-    }
-    
-    .stats-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .stat-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        border: 1px solid #e9ecef;
-        position: relative;
-        overflow: hidden;
-        transition: transform 0.3s ease;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-2px);
-    }
-    
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-    }
-    
-    .stat-card.total::before {
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    }
-    
-    .stat-card.confirmed::before {
-        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-    }
-    
-    .stat-card.cancelled::before {
-        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    }
-    
-    .stat-card.spent::before {
-        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
-    }
-    
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .stat-card.total .stat-icon {
-        background: rgba(0, 123, 255, 0.1);
-        color: #007bff;
-    }
-    
-    .stat-card.confirmed .stat-icon {
-        background: rgba(40, 167, 69, 0.1);
-        color: #28a745;
-    }
-    
-    .stat-card.cancelled .stat-icon {
-        background: rgba(220, 53, 69, 0.1);
-        color: #dc3545;
-    }
-    
-    .stat-card.spent .stat-icon {
-        background: rgba(111, 66, 193, 0.1);
-        color: #6f42c1;
-    }
-    
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #495057;
-        margin-bottom: 0.5rem;
-    }
-    
-    .stat-label {
-        font-size: 0.875rem;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .filters-section {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        border: 1px solid #e9ecef;
-    }
-    
-    .filters-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #e9ecef;
-    }
-    
-    .filters-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #495057;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .filters-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        align-items: end;
-    }
-    
-    .filter-group {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .filter-label {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.5rem;
-    }
-    
-    .filter-control {
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        font-size: 0.875rem;
-        transition: all 0.3s ease;
-        background: #f8f9fa;
-    }
-    
-    .filter-control:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        background: white;
-        outline: none;
-    }
-    
-    .filter-actions {
-        display: flex;
-        gap: 0.5rem;
-    }
-    
-    .btn-filter {
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        color: white;
-        font-size: 0.875rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .btn-filter:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
-    }
-    
-    .btn-clear {
-        background: transparent;
-        border: 1px solid #6c757d;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        color: #6c757d;
-        font-size: 0.875rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        text-decoration: none;
-    }
-    
-    .btn-clear:hover {
-        background: #6c757d;
-        color: white;
-        text-decoration: none;
-    }
-    
-    .bookings-section {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        border: 1px solid #e9ecef;
-    }
-    
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #e9ecef;
-    }
-    
-    .section-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #495057;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .results-count {
-        font-size: 0.875rem;
-        color: #6c757d;
-        background: #f8f9fa;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-    }
-    
-    .booking-card {
-        border: 1px solid #e9ecef;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .booking-card:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        transform: translateY(-1px);
-    }
-    
-    .booking-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        width: 4px;
-    }
-    
-    .booking-card.confirmed::before {
-        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-    }
-    
-    .booking-card.pending::before {
-        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
-    }
-    
-    .booking-card.cancelled::before {
-        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    }
-    
-    .booking-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1rem;
-    }
-    
-    .booking-id {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: #495057;
-        margin-bottom: 0.25rem;
-    }
-    
-    .booking-date {
-        font-size: 0.875rem;
-        color: #6c757d;
-    }
-    
-    .booking-status {
-        padding: 0.25rem 0.75rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .status-confirmed {
-        background: rgba(40, 167, 69, 0.1);
-        color: #155724;
-        border: 1px solid rgba(40, 167, 69, 0.3);
-    }
-    
-    .status-pending {
-        background: rgba(255, 193, 7, 0.1);
-        color: #856404;
-        border: 1px solid rgba(255, 193, 7, 0.3);
-    }
-    
-    .status-cancelled {
-        background: rgba(220, 53, 69, 0.1);
-        color: #721c24;
-        border: 1px solid rgba(220, 53, 69, 0.3);
-    }
-    
-    .booking-route {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 1rem;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-    }
-    
-    .route-location {
-        text-align: center;
-        flex: 1;
-    }
-    
-    .location-name {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.25rem;
-    }
-    
-    .location-time {
-        font-size: 0.875rem;
-        color: #6c757d;
-    }
-    
-    .route-arrow {
-        color: #007bff;
-        font-size: 1.25rem;
-    }
-    
-    .route-duration {
-        text-align: center;
-        padding: 0.5rem;
-        background: white;
-        border-radius: 6px;
-        border: 1px solid #e9ecef;
-    }
-    
-    .duration-value {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #495057;
-    }
-    
-    .duration-label {
-        font-size: 0.75rem;
-        color: #6c757d;
-    }
-    
-    .booking-details {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-    
-    .detail-item {
-        text-align: center;
-        padding: 0.75rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-    }
-    
-    .detail-label {
-        font-size: 0.75rem;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.25rem;
-    }
-    
-    .detail-value {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #495057;
-    }
-    
-    .booking-amount {
-        text-align: center;
-        padding: 1rem;
-        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-        color: white;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-    }
-    
-    .amount-label {
-        font-size: 0.75rem;
-        opacity: 0.9;
-        margin-bottom: 0.25rem;
-    }
-    
-    .amount-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-    
-    .booking-actions {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    .btn-action {
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-        text-decoration: none;
-    }
-    
-    .btn-primary {
-        background: #007bff;
-        color: white;
-    }
-    
-    .btn-primary:hover {
-        background: #0056b3;
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn-success {
-        background: #28a745;
-        color: white;
-    }
-    
-    .btn-success:hover {
-        background: #1e7e34;
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn-danger {
-        background: #dc3545;
-        color: white;
-    }
-    
-    .btn-danger:hover {
-        background: #c82333;
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn-secondary {
-        background: #6c757d;
-        color: white;
-    }
-    
-    .btn-secondary:hover {
-        background: #545b62;
-        color: white;
-        text-decoration: none;
-    }
-    
-    .pagination-container {
-        display: flex;
-        justify-content: center;
-        margin-top: 2rem;
-    }
-    
-    .pagination {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-    }
-    
-    .page-link {
-        padding: 0.5rem 1rem;
-        border: 1px solid #e9ecef;
-        border-radius: 6px;
-        color: #6c757d;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-    
-    .page-link:hover {
-        background: #f8f9fa;
-        color: #495057;
-        text-decoration: none;
-    }
-    
-    .page-link.active {
-        background: #007bff;
-        border-color: #007bff;
-        color: white;
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-        color: #6c757d;
-    }
-    
-    .empty-icon {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-    
-    .empty-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-    
-    .empty-text {
-        font-size: 0.875rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .btn-book-now {
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-        border: none;
-        padding: 0.75rem 2rem;
-        border-radius: 8px;
-        color: white;
-        font-size: 0.875rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        text-decoration: none;
-    }
-    
-    .btn-book-now:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-    
-    @media (max-width: 768px) {
-        .stats-container {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        
-        .filters-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .booking-header {
-            flex-direction: column;
-            gap: 1rem;
-            text-align: center;
-        }
-        
-        .booking-route {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .route-arrow {
-            transform: rotate(90deg);
-        }
-        
-        .booking-details {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        
-        .booking-actions {
-            justify-content: center;
-        }
-        
-        .section-header {
-            flex-direction: column;
-            gap: 1rem;
-            text-align: center;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .stats-container {
-            grid-template-columns: 1fr;
-        }
-        
-        .booking-details {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-{% endblock %}
+{% block title %}Booking History - TravelMate{% endblock %}
 
 {% block content %}
 <!-- Header -->
-<section class="history-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="mb-2"><i class="fas fa-history me-2"></i>Booking History</h1>
-                <p class="mb-0">View and manage all your bus bookings</p>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <a href="{% url 'accounts:profile' %}" class="btn btn-light">
-                    <i class="fas fa-user me-2"></i>Back to Profile
-                </a>
-            </div>
+<section class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16 -mt-6">
+    <div class="container mx-auto px-4">
+        <div class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-2">Booking History</h1>
+            <p class="text-xl opacity-90">Track all your travel bookings and manage your trips</p>
         </div>
     </div>
 </section>
 
-<!-- Content -->
-<section class="py-4">
-    <div class="container">
-        <!-- Statistics -->
-        <div class="stats-container">
-            <div class="stat-card total">
-                <div class="stat-icon">
-                    <i class="fas fa-ticket-alt"></i>
+<!-- Statistics Cards -->
+<section class="py-8 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-blue-500 hover:shadow-xl transition-shadow">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-ticket-alt text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-gray-800">{{ total_bookings|default:0 }}</div>
+                        <div class="text-sm text-gray-600">Total Bookings</div>
+                    </div>
                 </div>
-                <div class="stat-value">{{ stats.total_bookings|default:0 }}</div>
-                <div class="stat-label">Total Bookings</div>
             </div>
             
-            <div class="stat-card confirmed">
-                <div class="stat-icon">
-                    <i class="fas fa-check-circle"></i>
+            <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-green-500 hover:shadow-xl transition-shadow">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-gray-800">{{ confirmed_bookings|default:0 }}</div>
+                        <div class="text-sm text-gray-600">Confirmed</div>
+                    </div>
                 </div>
-                <div class="stat-value">{{ stats.confirmed_bookings|default:0 }}</div>
-                <div class="stat-label">Confirmed</div>
             </div>
             
-            <div class="stat-card cancelled">
-                <div class="stat-icon">
-                    <i class="fas fa-times-circle"></i>
+            <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-red-500 hover:shadow-xl transition-shadow">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-times-circle text-red-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-gray-800">{{ cancelled_bookings|default:0 }}</div>
+                        <div class="text-sm text-gray-600">Cancelled</div>
+                    </div>
                 </div>
-                <div class="stat-value">{{ stats.cancelled_bookings|default:0 }}</div>
-                <div class="stat-label">Cancelled</div>
             </div>
             
-            <div class="stat-card spent">
-                <div class="stat-icon">
-                    <i class="fas fa-rupee-sign"></i>
+            <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-purple-500 hover:shadow-xl transition-shadow">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-money-bill-wave text-purple-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-gray-800">रू{{ total_spent|floatformat:0|default:0 }}</div>
+                        <div class="text-sm text-gray-600">Total Spent</div>
+                    </div>
                 </div>
-                <div class="stat-value">रू {{ stats.total_spent|default:0|floatformat:0 }}</div>
-                <div class="stat-label">Total Spent</div>
             </div>
         </div>
         
         <!-- Filters -->
-        <div class="filters-section">
-            <div class="filters-header">
-                <div class="filters-title">
-                    <i class="fas fa-filter"></i>
-                    Filter Bookings
-                </div>
-            </div>
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                <i class="fas fa-filter mr-2 text-blue-500"></i>Filter Bookings
+            </h3>
             
-            <form method="GET" id="filterForm">
-                <div class="filters-grid">
-                    <div class="filter-group">
-                        <label class="filter-label">Search</label>
-                        <input type="text" name="search" class="filter-control" 
-                               placeholder="Booking ID, Route, Bus..." 
-                               value="{{ request.GET.search }}">
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Status</label>
-                        <select name="status" class="filter-control">
-                            <option value="">All Statuses</option>
-                            <option value="confirmed" {% if request.GET.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
-                            <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
-                            <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Date From</label>
-                        <input type="date" name="date_from" class="filter-control" 
-                               value="{{ request.GET.date_from }}">
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">Date To</label>
-                        <input type="date" name="date_to" class="filter-control" 
-                               value="{{ request.GET.date_to }}">
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label class="filter-label">&nbsp;</label>
-                        <div class="filter-actions">
-                            <button type="submit" class="btn-filter">
-                                <i class="fas fa-search"></i>
-                                Filter
-                            </button>
-                            <a href="{% url 'accounts:booking_history' %}" class="btn-clear">
-                                <i class="fas fa-times"></i>
-                                Clear
-                            </a>
-                        </div>
-                    </div>
+            <form method="GET" id="filterForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                    <input type="text" name="search" value="{{ request.GET.search }}" 
+                           placeholder="Booking ID, route, destination..." 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">All Status</option>
+                        <option value="confirmed" {% if request.GET.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                        <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+                    <input type="date" name="date_from" value="{{ request.GET.date_from }}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+                    <input type="date" name="date_to" value="{{ request.GET.date_to }}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 </div>
             </form>
+            
+            <div class="flex justify-between items-center mt-4">
+                <button type="submit" form="filterForm" 
+                        class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                    <i class="fas fa-search mr-2"></i>Apply Filters
+                </button>
+                
+                {% if request.GET.search or request.GET.status or request.GET.date_from or request.GET.date_to %}
+                    <a href="{% url 'accounts:booking_history' %}" 
+                       class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                        <i class="fas fa-times mr-2"></i>Clear Filters
+                    </a>
+                {% endif %}
+            </div>
         </div>
         
         <!-- Bookings List -->
-        <div class="bookings-section">
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fas fa-list"></i>
-                    Your Bookings
-                </div>
-                <div class="results-count">
-                    {{ bookings|length }} of {{ total_count|default:0 }} bookings
-                </div>
-            </div>
-            
-            {% if bookings %}
+        {% if bookings %}
+            <div class="space-y-6">
                 {% for booking in bookings %}
-                    <div class="booking-card {{ booking.booking_status|lower }}">
-                        <div class="booking-header">
-                            <div>
-                                <div class="booking-id">
-                                    <i class="fas fa-hashtag me-1"></i>
-                                    {{ booking.booking_id }}
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                    <div class="p-6">
+                        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4">
+                            <div class="flex items-center space-x-4 mb-4 lg:mb-0">
+                                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white text-xl font-bold">
+                                    <i class="fas fa-bus"></i>
                                 </div>
-                                <div class="booking-date">
-                                    <i class="fas fa-calendar-alt me-1"></i>
-                                    Booked on {{ booking.created_at|date:"M d, Y" }}
-                                </div>
-                            </div>
-                            <div class="booking-status status-{{ booking.booking_status|lower }}">
-                                {{ booking.get_booking_status_display }}
-                            </div>
-                        </div>
-                        
-                        <div class="booking-route">
-                            <div class="route-location">
-                                <div class="location-name">{{ booking.bus_schedule.route.source.name }}</div>
-                                <div class="location-time">{{ booking.bus_schedule.departure_time|time:"H:i" }}</div>
-                            </div>
-                            <div class="route-arrow">
-                                <i class="fas fa-arrow-right"></i>
-                            </div>
-                            <div class="route-duration">
-                                <div class="duration-value">{{ booking.bus_schedule.route.duration|default:"N/A" }}</div>
-                                <div class="duration-label">Duration</div>
-                            </div>
-                            <div class="route-arrow">
-                                <i class="fas fa-arrow-right"></i>
-                            </div>
-                            <div class="route-location">
-                                <div class="location-name">{{ booking.bus_schedule.route.destination.name }}</div>
-                                <div class="location-time">{{ booking.bus_schedule.arrival_time|time:"H:i" }}</div>
-                            </div>
-                        </div>
-                        
-                        <div class="booking-details">
-                            <div class="detail-item">
-                                <div class="detail-label">Travel Date</div>
-                                <div class="detail-value">{{ booking.booking_date|date:"M d, Y" }}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Bus Number</div>
-                                <div class="detail-value">{{ booking.bus_schedule.bus.bus_number }}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Bus Type</div>
-                                <div class="detail-value">{{ booking.bus_schedule.bus.bus_type.name }}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Seats</div>
-                                <div class="detail-value">
-                                    {% for seat in booking.seats.all %}
-                                        {{ seat.seat_number }}{% if not forloop.last %}, {% endif %}
-                                    {% endfor %}
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-800">{{ booking.route.source }} → {{ booking.route.destination }}</h3>
+                                    <p class="text-gray-600">Booking ID: <span class="font-mono font-semibold">{{ booking.booking_id }}</span></p>
+                                    <p class="text-sm text-gray-500">{{ booking.bus.bus_number }} • {{ booking.bus.bus_type }}</p>
                                 </div>
                             </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Passengers</div>
-                                <div class="detail-value">{{ booking.seats.count }}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Contact</div>
-                                <div class="detail-value">{{ booking.contact_phone|default:"N/A" }}</div>
-                            </div>
-                        </div>
-                        
-                        <div class="booking-amount">
-                            <div class="amount-label">Total Amount Paid</div>
-                            <div class="amount-value">रू {{ booking.total_fare|floatformat:2 }}</div>
-                        </div>
-                        
-                        <div class="booking-actions">
-                            <a href="{% url 'bookings:booking_detail' booking.booking_id %}" class="btn-action btn-primary">
-                                <i class="fas fa-eye"></i>
-                                View Details
-                            </a>
                             
-                            {% if booking.booking_status == 'confirmed' %}
-                                <a href="{% url 'bookings:view_ticket' booking.booking_id %}" class="btn-action btn-primary">
-                            <i class="fas fa-eye me-1"></i>
-                            View Ticket
-                        </a>
-                        <a href="{% url 'bookings:download_ticket' booking.booking_id %}" class="btn-action btn-success">
-                            <i class="fas fa-download me-1"></i>
-                            Download PDF
-                        </a>
+                            <div class="flex items-center space-x-3">
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold 
+                                    {% if booking.status == 'confirmed' %}bg-green-100 text-green-800
+                                    {% elif booking.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                    {% elif booking.status == 'cancelled' %}bg-red-100 text-red-800
+                                    {% elif booking.status == 'completed' %}bg-blue-100 text-blue-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ booking.get_status_display }}
+                                </span>
+                                <span class="text-2xl font-bold text-gray-800">रू{{ booking.total_fare }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                            <div class="flex items-center text-gray-600">
+                                <i class="fas fa-calendar mr-2 text-blue-500"></i>
+                                <div>
+                                    <p class="text-xs text-gray-500">Travel Date</p>
+                                    <p class="font-semibold">{{ booking.travel_date|date:"M d, Y" }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center text-gray-600">
+                                <i class="fas fa-clock mr-2 text-green-500"></i>
+                                <div>
+                                    <p class="text-xs text-gray-500">Departure</p>
+                                    <p class="font-semibold">{{ booking.departure_time|time:"g:i A" }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center text-gray-600">
+                                <i class="fas fa-chair mr-2 text-purple-500"></i>
+                                <div>
+                                    <p class="text-xs text-gray-500">Seats</p>
+                                    <p class="font-semibold">{{ booking.seat_numbers }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center text-gray-600">
+                                <i class="fas fa-users mr-2 text-orange-500"></i>
+                                <div>
+                                    <p class="text-xs text-gray-500">Passengers</p>
+                                    <p class="font-semibold">{{ booking.passenger_count }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-4 border-t border-gray-200">
+                            <div class="text-sm text-gray-500 mb-3 sm:mb-0">
+                                <p>Booked on {{ booking.created_at|date:"M d, Y g:i A" }}</p>
+                                {% if booking.payment_status %}
+                                    <p>Payment: <span class="font-semibold text-green-600">{{ booking.payment_status }}</span></p>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <a href="{% url 'bookings:booking_detail' booking.booking_id %}" 
+                                   class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm">
+                                    <i class="fas fa-eye mr-1"></i>View Details
+                                </a>
                                 
-                                {% if booking.can_cancel %}
-                                    <button class="btn-action btn-danger" onclick="cancelBooking('{{ booking.booking_id }}')">
-                                        <i class="fas fa-times"></i>
-                                        Cancel
+                                {% if booking.status == 'confirmed' and booking.can_cancel %}
+                                    <button onclick="cancelBooking('{{ booking.booking_id }}')" 
+                                            class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors text-sm">
+                                        <i class="fas fa-times mr-1"></i>Cancel
                                     </button>
                                 {% endif %}
-                            {% endif %}
-                            
-                            {% if booking.payment_set.exists %}
-                                <a href="{% url 'payments:payment_detail' booking.payment_set.first.payment_id %}" class="btn-action btn-secondary">
-                                    <i class="fas fa-credit-card"></i>
-                                    Payment Details
-                                </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                {% endfor %}
-                
-                <!-- Pagination -->
-                {% if is_paginated %}
-                    <div class="pagination-container">
-                        <div class="pagination">
-                            {% if page_obj.has_previous %}
-                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1" class="page-link">
-                                    <i class="fas fa-angle-double-left"></i>
-                                </a>
-                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" class="page-link">
-                                    <i class="fas fa-angle-left"></i>
-                                </a>
-                            {% endif %}
-                            
-                            {% for num in page_obj.paginator.page_range %}
-                                {% if page_obj.number == num %}
-                                    <span class="page-link active">{{ num }}</span>
-                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                    <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}" class="page-link">{{ num }}</a>
+                                
+                                {% if booking.status == 'confirmed' %}
+                                    <a href="{% url 'bookings:download_ticket' booking.booking_id %}" 
+                                       class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm">
+                                        <i class="fas fa-download mr-1"></i>Ticket
+                                    </a>
                                 {% endif %}
-                            {% endfor %}
-                            
-                            {% if page_obj.has_next %}
-                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" class="page-link">
-                                    <i class="fas fa-angle-right"></i>
-                                </a>
-                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}" class="page-link">
-                                    <i class="fas fa-angle-double-right"></i>
-                                </a>
-                            {% endif %}
+                            </div>
                         </div>
                     </div>
-                {% endif %}
-            {% else %}
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="fas fa-ticket-alt"></i>
-                    </div>
-                    <div class="empty-title">No Bookings Found</div>
-                    <div class="empty-text">
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+                <div class="flex justify-center mt-8">
+                    <nav class="flex space-x-2">
+                        {% if page_obj.has_previous %}
+                            <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}" 
+                               class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}" 
+                               class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        {% endif %}
+                        
+                        <span class="bg-blue-500 text-white px-3 py-2 rounded">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </span>
+                        
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}" 
+                               class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}" 
+                               class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            {% endif %}
+        {% else %}
+            <!-- Empty State -->
+            <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                <div class="max-w-md mx-auto">
+                    <i class="fas fa-ticket-alt text-6xl text-gray-300 mb-6"></i>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">No Bookings Found</h3>
+                    <p class="text-gray-600 mb-6">
                         {% if request.GET.search or request.GET.status or request.GET.date_from or request.GET.date_to %}
                             No bookings match your current filters. Try adjusting your search criteria.
                         {% else %}
                             You haven't made any bookings yet. Start planning your next journey!
                         {% endif %}
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                        <a href="{% url 'routes:route_search' %}" 
+                           class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                            <i class="fas fa-search mr-2"></i>Search Routes
+                        </a>
+                        {% if request.GET.search or request.GET.status or request.GET.date_from or request.GET.date_to %}
+                            <a href="{% url 'accounts:booking_history' %}" 
+                               class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
+                                <i class="fas fa-times mr-2"></i>Clear Filters
+                            </a>
+                        {% endif %}
                     </div>
-                    <a href="{% url 'routes:route_search' %}" class="btn-book-now">
-                        <i class="fas fa-search"></i>
-                        Search Routes
-                    </a>
                 </div>
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
     </div>
 </section>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Auto-submit form on filter change
     document.addEventListener('DOMContentLoaded', function() {
+        // Auto-submit form on filter change
         const filterForm = document.getElementById('filterForm');
         const filterInputs = filterForm.querySelectorAll('select, input[type="date"]');
         
@@ -926,13 +295,32 @@
                 filterForm.submit();
             });
         });
+        
+        // Search input with debounce
+        const searchInput = filterForm.querySelector('input[name="search"]');
+        let searchTimeout;
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    filterForm.submit();
+                }, 1000); // 1 second delay
+            });
+        }
     });
     
     // Cancel booking function
     function cancelBooking(bookingId) {
-        if (!confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
+        if (!confirm('Are you sure you want to cancel this booking? This action cannot be undone and may incur cancellation charges.')) {
             return;
         }
+        
+        // Show loading state
+        const cancelBtn = event.target;
+        const originalText = cancelBtn.innerHTML;
+        cancelBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Cancelling...';
+        cancelBtn.disabled = true;
         
         fetch(`/bookings/${bookingId}/cancel/`, {
             method: 'POST',
@@ -948,11 +336,15 @@
                 location.reload();
             } else {
                 alert('Error cancelling booking: ' + (data.error || 'Unknown error'));
+                cancelBtn.innerHTML = originalText;
+                cancelBtn.disabled = false;
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Error cancelling booking. Please try again.');
+            cancelBtn.innerHTML = originalText;
+            cancelBtn.disabled = false;
         });
     }
     
@@ -971,5 +363,18 @@
         }
         return cookieValue;
     }
+    
+    // Add smooth animations to booking cards
+    const bookingCards = document.querySelectorAll('.bg-white.rounded-xl.shadow-lg');
+    bookingCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
 </script>
 {% endblock %}

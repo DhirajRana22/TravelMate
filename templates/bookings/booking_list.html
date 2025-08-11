@@ -3,595 +3,314 @@
 
 {% block title %}My Bookings - TravelMate{% endblock %}
 
-{% block extra_css %}
-<style>
-    .bookings-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem 0;
-        margin-top: -1.5rem;
-    }
-    .booking-filters {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    .booking-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        margin-bottom: 1.5rem;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        border-left: 5px solid #667eea;
-    }
-    .booking-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    }
-    .booking-card.cancelled {
-        border-left-color: #dc3545;
-        opacity: 0.8;
-    }
-    .booking-card.completed {
-        border-left-color: #28a745;
-    }
-    .booking-header {
-        background: #f8f9fa;
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid #e9ecef;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-    .booking-id {
-        font-weight: bold;
-        color: #495057;
-        font-size: 1.1rem;
-    }
-    .booking-status {
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.875rem;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-    .status-confirmed {
-        background: #d4edda;
-        color: #155724;
-    }
-    .status-cancelled {
-        background: #f8d7da;
-        color: #721c24;
-    }
-    .status-completed {
-        background: #d1ecf1;
-        color: #0c5460;
-    }
-    .status-pending {
-        background: #fff3cd;
-        color: #856404;
-    }
-    .booking-content {
-        padding: 1.5rem;
-    }
-    .journey-info {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-    .route-display {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-    .route-city {
-        font-size: 1.25rem;
-        font-weight: bold;
-        color: #495057;
-    }
-    .route-arrow {
-        color: #667eea;
-        font-size: 1.5rem;
-    }
-    .journey-date {
-        background: #e3f2fd;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        color: #1976d2;
-        font-weight: 600;
-    }
-    .booking-details {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-    .detail-item {
-        background: #f8f9fa;
-        padding: 1rem;
-        border-radius: 8px;
-        text-align: center;
-    }
-    .detail-label {
-        color: #6c757d;
-        font-size: 0.875rem;
-        margin-bottom: 0.25rem;
-    }
-    .detail-value {
-        font-weight: bold;
-        color: #495057;
-    }
-    .seat-info {
-        background: #f3e5f5;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-    .seat-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-top: 0.5rem;
-    }
-    .seat-tag {
-        background: #667eea;
-        color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 12px;
-        font-size: 0.875rem;
-        font-weight: 600;
-    }
-    .booking-actions {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        padding-top: 1rem;
-        border-top: 1px solid #f8f9fa;
-    }
-    .btn-action {
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 0.875rem;
-    }
-    .btn-view {
-        background: #667eea;
-        color: white;
-    }
-    .btn-view:hover {
-        background: #5a6fd8;
-        color: white;
-    }
-    .btn-cancel {
-        background: #dc3545;
-        color: white;
-    }
-    .btn-cancel:hover {
-        background: #c82333;
-        color: white;
-    }
-    .btn-download {
-        background: #28a745;
-        color: white;
-    }
-    .btn-download:hover {
-        background: #218838;
-        color: white;
-    }
-    .btn-rebook {
-        background: #ffc107;
-        color: #212529;
-    }
-    .btn-rebook:hover {
-        background: #e0a800;
-        color: #212529;
-    }
-    .empty-state {
-        text-align: center;
-        padding: 4rem 2rem;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-    .empty-icon {
-        font-size: 4rem;
-        color: #6c757d;
-        margin-bottom: 1rem;
-    }
-    .pagination-wrapper {
-        display: flex;
-        justify-content: center;
-        margin-top: 2rem;
-    }
-    .filter-form {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        align-items: end;
-    }
-    .form-group {
-        margin-bottom: 0;
-    }
-    .form-label {
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.5rem;
-    }
-    .form-control, .form-select {
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
-        padding: 0.75rem;
-    }
-    .form-control:focus, .form-select:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    .btn-filter {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-    }
-    .btn-filter:hover {
-        background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-        color: white;
-    }
-    .btn-clear {
-        background: #6c757d;
-        border: none;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-    }
-    .btn-clear:hover {
-        background: #5a6268;
-        color: white;
-    }
-    .booking-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }
-    .stat-card {
-        background: white;
-        border-radius: 10px;
-        padding: 1.5rem;
-        text-align: center;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    }
-    .stat-number {
-        font-size: 2rem;
-        font-weight: bold;
-        color: #667eea;
-        margin-bottom: 0.5rem;
-    }
-    .stat-label {
-        color: #6c757d;
-        font-size: 0.875rem;
-        text-transform: uppercase;
-        font-weight: 600;
-    }
-    .quick-actions {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    .quick-action-btn {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        color: white;
-        padding: 1rem 2rem;
-        border-radius: 10px;
-        text-decoration: none;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: all 0.3s ease;
-    }
-    .quick-action-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
-        color: white;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<!-- Bookings Header -->
-<section class="bookings-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="mb-2"><i class="fas fa-list me-2"></i>My Bookings</h1>
-                <p class="mb-0">Manage and track all your bus bookings</p>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <a href="{% url 'routes:route_search' %}" class="btn btn-light">
-                    <i class="fas fa-plus me-2"></i>New Booking
-                </a>
-            </div>
+<!-- Header -->
+<section class="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-16 -mt-6">
+    <div class="container mx-auto px-4">
+        <div class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-2">My Bookings</h1>
+            <p class="text-xl opacity-90">Manage and track all your bus reservations</p>
         </div>
     </div>
 </section>
 
-<!-- Bookings Content -->
-<section class="py-5">
-    <div class="container">
-        <!-- Booking Statistics -->
-        <div class="booking-stats">
-            <div class="stat-card">
-                <div class="stat-number">{{ total_bookings }}</div>
-                <div class="stat-label">Total Bookings</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">{{ confirmed_bookings }}</div>
-                <div class="stat-label">Confirmed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">{{ completed_bookings }}</div>
-                <div class="stat-label">Completed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">{{ cancelled_bookings }}</div>
-                <div class="stat-label">Cancelled</div>
-            </div>
-        </div>
-        
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <h5 class="mb-3"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
-            <div class="d-flex gap-2 flex-wrap">
-                <a href="{% url 'routes:route_search' %}" class="quick-action-btn">
-                    <i class="fas fa-search"></i>Book New Ticket
-                </a>
-                <a href="#" onclick="window.print()" class="quick-action-btn" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
-                    <i class="fas fa-print"></i>Print All Tickets
-                </a>
-            </div>
-        </div>
-        
-        <!-- Booking Filters -->
-        <div class="booking-filters">
-            <h5 class="mb-3"><i class="fas fa-filter me-2"></i>Filter Bookings</h5>
-            <form method="get" class="filter-form">
-                <div class="form-group">
-                    <label class="form-label">Booking Status</label>
-                    <select name="status" class="form-select">
-                        <option value="">All Status</option>
-                        <option value="confirmed" {% if request.GET.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
-                        <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
-                        <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">From Date</label>
-                    <input type="date" name="from_date" class="form-control" value="{{ request.GET.from_date }}">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">To Date</label>
-                    <input type="date" name="to_date" class="form-control" value="{{ request.GET.to_date }}">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Search</label>
-                    <input type="text" name="search" class="form-control" placeholder="Booking ID, Route..." value="{{ request.GET.search }}">
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn-filter">
-                        <i class="fas fa-search me-2"></i>Filter
+<!-- Bookings Management -->
+<section class="py-12 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- Filters and Search -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                    <i class="fas fa-filter mr-2 text-blue-500"></i>Filter & Search Bookings
+                </h3>
+                
+                <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                        <input type="text" name="search" value="{{ request.GET.search }}" 
+                               placeholder="Booking ID, route, destination..." 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                        <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">All Status</option>
+                            <option value="confirmed" {% if request.GET.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                            <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                            <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+                        <input type="date" name="date_from" value="{{ request.GET.date_from }}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+                        <input type="date" name="date_to" value="{{ request.GET.date_to }}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </form>
+                
+                <div class="flex justify-between items-center mt-4">
+                    <button type="submit" form="filterForm" 
+                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-search mr-2"></i>Apply Filters
                     </button>
+                    
+                    {% if request.GET.search or request.GET.status or request.GET.date_from or request.GET.date_to %}
+                        <a href="{% url 'bookings:booking_list' %}" 
+                           class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                            <i class="fas fa-times mr-2"></i>Clear Filters
+                        </a>
+                    {% endif %}
                 </div>
-                <div class="form-group">
-                    <a href="{% url 'accounts:booking_history' %}" class="btn-clear">
-                        <i class="fas fa-times me-2"></i>Clear
-                    </a>
-                </div>
-            </form>
-        </div>
-        
-        <!-- Booking List -->
-        {% if bookings %}
-            {% for booking in bookings %}
-            <div class="booking-card {% if booking.booking_status == 'cancelled' %}cancelled{% elif booking.booking_status == 'completed' %}completed{% endif %}">
-                <!-- Booking Header -->
-                <div class="booking-header">
-                    <div class="booking-id">
-                        <i class="fas fa-ticket-alt me-2"></i>{{ booking.booking_id }}
+            </div>
+            
+            <!-- Bookings List -->
+            {% if bookings %}
+                <div class="space-y-6">
+                    {% for booking in bookings %}
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow border-l-4 
+                        {% if booking.status == 'confirmed' %}border-green-500
+                        {% elif booking.status == 'pending' %}border-yellow-500
+                        {% elif booking.status == 'cancelled' %}border-red-500 opacity-75
+                        {% elif booking.status == 'completed' %}border-blue-500
+                        {% else %}border-gray-500{% endif %}">
+                        
+                        <!-- Booking Header -->
+                        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800 booking-id cursor-pointer hover:text-blue-600" 
+                                        title="Click to copy booking ID">
+                                        <i class="fas fa-ticket-alt mr-2"></i>{{ booking.booking_id }}
+                                    </h3>
+                                    <p class="text-sm text-gray-600">Booked on {{ booking.created_at|date:"M d, Y g:i A" }}</p>
+                                </div>
+                                
+                                <div class="flex items-center space-x-3">
+                                    <span class="px-3 py-1 rounded-full text-sm font-semibold 
+                                        {% if booking.status == 'confirmed' %}bg-green-100 text-green-800
+                                        {% elif booking.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                        {% elif booking.status == 'cancelled' %}bg-red-100 text-red-800
+                                        {% elif booking.status == 'completed' %}bg-blue-100 text-blue-800
+                                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                        {{ booking.get_status_display }}
+                                    </span>
+                                    <span class="text-xl font-bold text-green-600">रू{{ booking.total_fare }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Booking Content -->
+                        <div class="p-6">
+                            <!-- Journey Information -->
+                            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6">
+                                <div class="flex items-center space-x-4 mb-4 lg:mb-0">
+                                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white text-xl font-bold">
+                                        <i class="fas fa-bus"></i>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center space-x-2 mb-1">
+                                            <span class="text-xl font-semibold text-gray-800">{{ booking.route.source }}</span>
+                                            <i class="fas fa-arrow-right text-blue-500"></i>
+                                            <span class="text-xl font-semibold text-gray-800">{{ booking.route.destination }}</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600">{{ booking.bus.bus_number }} • {{ booking.bus.bus_type }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Booking Details Grid -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                                <div class="flex items-center text-gray-600">
+                                    <i class="fas fa-calendar mr-2 text-blue-500"></i>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Travel Date</p>
+                                        <p class="font-semibold">{{ booking.travel_date|date:"M d, Y" }}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center text-gray-600">
+                                    <i class="fas fa-clock mr-2 text-green-500"></i>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Departure</p>
+                                        <p class="font-semibold">{{ booking.departure_time|time:"g:i A" }}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center text-gray-600">
+                                    <i class="fas fa-chair mr-2 text-purple-500"></i>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Seats</p>
+                                        <p class="font-semibold">{{ booking.seat_numbers }}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center text-gray-600">
+                                    <i class="fas fa-users mr-2 text-orange-500"></i>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Passengers</p>
+                                        <p class="font-semibold">{{ booking.passenger_count }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-4 border-t border-gray-200">
+                                <div class="text-sm text-gray-500 mb-3 sm:mb-0">
+                                    {% if booking.payment_status %}
+                                        <p>Payment: <span class="font-semibold text-green-600">{{ booking.payment_status }}</span></p>
+                                    {% endif %}
+                                    {% if booking.can_cancel %}
+                                        <p class="text-blue-600">Cancellable until {{ booking.cancellation_deadline|date:"M d, Y g:i A" }}</p>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="flex flex-wrap gap-2">
+                                    <a href="{% url 'bookings:booking_detail' booking.booking_id %}" 
+                                       class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm btn-action">
+                                        <i class="fas fa-eye mr-1"></i>View Details
+                                    </a>
+                                    
+                                    {% if booking.status == 'confirmed' %}
+                                        <button onclick="printTicket('{{ booking.booking_id }}')" 
+                                                class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm btn-action">
+                                            <i class="fas fa-print mr-1"></i>Print
+                                        </button>
+                                        
+                                        {% if booking.can_cancel %}
+                                            <button onclick="cancelBooking('{{ booking.booking_id }}')" 
+                                                    class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors text-sm btn-action">
+                                                <i class="fas fa-times mr-1"></i>Cancel
+                                            </button>
+                                        {% endif %}
+                                    {% endif %}
+                                    
+                                    {% if booking.status == 'cancelled' and booking.refund_eligible %}
+                                        <a href="{% url 'payments:request_refund' booking.payment.id %}" 
+                                           class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors text-sm btn-action">
+                                            <i class="fas fa-undo mr-1"></i>Request Refund
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="booking-status status-{{ booking.booking_status }}">
-                        {{ booking.get_booking_status_display }}
-                    </div>
+                    {% endfor %}
                 </div>
                 
-                <!-- Booking Content -->
-                <div class="booking-content">
-                    <!-- Journey Info -->
-                    <div class="journey-info">
-                        <div class="route-display">
-                            <span class="route-city">{{ booking.bus_schedule.route.source }}</span>
-                            <i class="fas fa-arrow-right route-arrow"></i>
-                            <span class="route-city">{{ booking.bus_schedule.route.destination }}</span>
-                        </div>
-                        <div class="journey-date">
-                            <i class="fas fa-calendar me-1"></i>{{ booking.booking_date|date:"M d, Y" }}
-                        </div>
-                    </div>
-                    
-                    <!-- Booking Details -->
-                    <div class="booking-details">
-                        <div class="detail-item">
-                            <div class="detail-label">Bus Number</div>
-                            <div class="detail-value">{{ booking.bus_schedule.bus.bus_number }}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Departure</div>
-                            <div class="detail-value">{{ booking.bus_schedule.departure_time|time:"g:i A" }}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Arrival</div>
-                            <div class="detail-value">{{ booking.bus_schedule.arrival_time|time:"g:i A" }}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Total Fare</div>
-                            <div class="detail-value">रू {{ booking.total_fare }}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Booking Date</div>
-                            <div class="detail-value">{{ booking.created_at|date:"M d, Y" }}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Payment Status</div>
-                            <div class="detail-value">{{ booking.get_payment_status_display }}</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Seat Information -->
-                    <div class="seat-info">
-                        <strong><i class="fas fa-chair me-1"></i>Seats ({{ booking.selected_seats.count }}):</strong>
-                        <div class="seat-tags">
-                            {% for seat in booking.selected_seats.all %}
-                            <span class="seat-tag">{{ seat.seat_number }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    
-                    <!-- Booking Actions -->
-                    <div class="booking-actions">
-                        <a href="{% url 'accounts:booking_detail' booking.booking_id %}" class="btn-action btn-view">
-                            <i class="fas fa-eye me-1"></i>View Details
-                        </a>
-                        
-                        {% if booking.booking_status == 'confirmed' %}
-                            <a href="{% url 'accounts:booking_confirmation' booking.booking_id %}" class="btn-action btn-download">
-                                <i class="fas fa-download me-1"></i>Download Ticket
-                            </a>
-                            
-                            {% if booking.can_cancel %}
-                            <button onclick="cancelBooking('{{ booking.booking_id }}')" class="btn-action btn-cancel">
-                                <i class="fas fa-times me-1"></i>Cancel
-                            </button>
+                <!-- Pagination -->
+                {% if is_paginated %}
+                    <div class="flex justify-center mt-8">
+                        <nav class="flex space-x-2">
+                            {% if page_obj.has_previous %}
+                                <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}" 
+                                   class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}" 
+                                   class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
                             {% endif %}
-                        {% endif %}
-                        
-                        {% if booking.booking_status == 'cancelled' or booking.booking_status == 'completed' %}
-                            <a href="{% url 'routes:route_search' %}?source={{ booking.bus_schedule.route.source }}&destination={{ booking.bus_schedule.route.destination }}" class="btn-action btn-rebook">
-                                <i class="fas fa-redo me-1"></i>Book Again
+                            
+                            <span class="bg-blue-500 text-white px-3 py-2 rounded">
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                            </span>
+                            
+                            {% if page_obj.has_next %}
+                                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}" 
+                                   class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}" 
+                                   class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                {% endif %}
+            {% else %}
+                <!-- Empty State -->
+                <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                    <div class="max-w-md mx-auto">
+                        <i class="fas fa-ticket-alt text-6xl text-gray-300 mb-6"></i>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">No Bookings Found</h3>
+                        <p class="text-gray-600 mb-6">
+                            {% if request.GET.search or request.GET.status or request.GET.date_from or request.GET.date_to %}
+                                No bookings match your current filters. Try adjusting your search criteria.
+                            {% else %}
+                                You haven't made any bookings yet. Start planning your next journey!
+                            {% endif %}
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                            <a href="{% url 'routes:route_search' %}" 
+                               class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                                <i class="fas fa-search mr-2"></i>Search Routes
                             </a>
-                        {% endif %}
+                            {% if request.GET.search or request.GET.status or request.GET.date_from or request.GET.date_to %}
+                                <a href="{% url 'bookings:booking_list' %}" 
+                                   class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
+                                    <i class="fas fa-times mr-2"></i>Clear Filters
+                                </a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-            </div>
-            {% endfor %}
-            
-            <!-- Pagination -->
-            {% if is_paginated %}
-            <div class="pagination-wrapper">
-                <nav aria-label="Bookings pagination">
-                    <ul class="pagination">
-                        {% if page_obj.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page=1{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.from_date %}&from_date={{ request.GET.from_date }}{% endif %}{% if request.GET.to_date %}&to_date={{ request.GET.to_date }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">&laquo; First</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.from_date %}&from_date={{ request.GET.from_date }}{% endif %}{% if request.GET.to_date %}&to_date={{ request.GET.to_date }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Previous</a>
-                            </li>
-                        {% endif %}
-                        
-                        <li class="page-item active">
-                            <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-                        </li>
-                        
-                        {% if page_obj.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.from_date %}&from_date={{ request.GET.from_date }}{% endif %}{% if request.GET.to_date %}&to_date={{ request.GET.to_date }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Next</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.from_date %}&from_date={{ request.GET.from_date }}{% endif %}{% if request.GET.to_date %}&to_date={{ request.GET.to_date }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Last &raquo;</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-            </div>
             {% endif %}
-        {% else %}
-            <!-- Empty State -->
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <i class="fas fa-ticket-alt"></i>
-                </div>
-                <h3 class="mb-3">No Bookings Found</h3>
-                <p class="text-muted mb-4">
-                    {% if request.GET.status or request.GET.from_date or request.GET.to_date or request.GET.search %}
-                        No bookings match your current filters. Try adjusting your search criteria.
-                    {% else %}
-                        You haven't made any bookings yet. Start your journey by booking your first bus ticket!
-                    {% endif %}
-                </p>
-                <div class="d-flex gap-2 justify-content-center flex-wrap">
-                    <a href="{% url 'routes:route_search' %}" class="btn btn-primary btn-lg">
-                        <i class="fas fa-search me-2"></i>Book Your First Ticket
-                    </a>
-                    {% if request.GET.status or request.GET.from_date or request.GET.to_date or request.GET.search %}
-                    <a href="{% url 'accounts:booking_history' %}" class="btn btn-outline-secondary btn-lg">
-                        <i class="fas fa-times me-2"></i>Clear Filters
-                    </a>
-                    {% endif %}
-                </div>
+            
+            <!-- Quick Actions -->
+            <div class="mt-8 text-center">
+                <a href="{% url 'routes:route_search' %}" 
+                   class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors font-medium">
+                    <i class="fas fa-plus mr-2"></i>Book New Trip
+                </a>
             </div>
-        {% endif %}
+        </div>
     </div>
 </section>
 
 <!-- Cancel Booking Modal -->
-<div class="modal fade" id="cancelBookingModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Cancel Booking</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to cancel this booking?</p>
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>Cancellation Policy:</strong>
-                    <ul class="mb-0 mt-2">
-                        <li>Cancellation is allowed up to 2 hours before departure</li>
-                        <li>Refund will be processed within 5-7 business days</li>
-                        <li>Cancellation charges may apply</li>
-                    </ul>
-                </div>
+<div id="cancelBookingModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-exclamation-triangle mr-2 text-red-500"></i>Cancel Booking
+                </h3>
+                <p class="text-gray-600 mb-6">Are you sure you want to cancel this booking? This action cannot be undone and cancellation charges may apply.</p>
+                
                 <form id="cancelBookingForm" method="post">
                     {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="cancellationReason" class="form-label">Reason for Cancellation (Optional)</label>
-                        <textarea class="form-control" id="cancellationReason" name="reason" rows="3" placeholder="Please provide a reason for cancellation..."></textarea>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Reason for Cancellation</label>
+                        <select name="cancellation_reason" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" required>
+                            <option value="">Select a reason</option>
+                            <option value="change_of_plans">Change of Plans</option>
+                            <option value="emergency">Emergency</option>
+                            <option value="schedule_conflict">Schedule Conflict</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeCancelModal()" 
+                                class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                            <i class="fas fa-times mr-2"></i>Confirm Cancellation
+                        </button>
                     </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Booking</button>
-                <button type="submit" form="cancelBookingForm" class="btn btn-danger">
-                    <i class="fas fa-times me-2"></i>Cancel Booking
-                </button>
             </div>
         </div>
     </div>
@@ -606,8 +325,15 @@
         form.action = `/bookings/${bookingId}/cancel/`;
         
         // Show the modal
-        const modal = new bootstrap.Modal(document.getElementById('cancelBookingModal'));
-        modal.show();
+        document.getElementById('cancelBookingModal').classList.remove('hidden');
+    }
+    
+    function closeCancelModal() {
+        document.getElementById('cancelBookingModal').classList.add('hidden');
+    }
+    
+    function printTicket(bookingId) {
+        window.open(`/bookings/${bookingId}/ticket/`, '_blank');
     }
     
     // Auto-submit filter form on select change
@@ -629,7 +355,7 @@
                 button.addEventListener('click', function() {
                     const icon = this.querySelector('i');
                     if (icon && !icon.classList.contains('fa-spin')) {
-                        icon.className = 'fas fa-spinner fa-spin me-1';
+                        icon.className = 'fas fa-spinner fa-spin mr-1';
                     }
                 });
             }
@@ -638,19 +364,55 @@
         // Add copy booking ID functionality
         const bookingIds = document.querySelectorAll('.booking-id');
         bookingIds.forEach(element => {
-            element.style.cursor = 'pointer';
-            element.title = 'Click to copy booking ID';
             element.addEventListener('click', function() {
                 const id = this.textContent.trim();
                 navigator.clipboard.writeText(id).then(() => {
                     // Show temporary success message
                     const originalText = this.innerHTML;
-                    this.innerHTML = '<i class="fas fa-check me-2"></i>Copied!';
+                    this.innerHTML = '<i class="fas fa-check mr-2"></i>Copied!';
+                    this.classList.add('text-green-600');
                     setTimeout(() => {
                         this.innerHTML = originalText;
+                        this.classList.remove('text-green-600');
+                    }, 2000);
+                }).catch(() => {
+                    // Fallback for browsers that don't support clipboard API
+                    const textArea = document.createElement('textarea');
+                    textArea.value = id;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check mr-2"></i>Copied!';
+                    this.classList.add('text-green-600');
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.classList.remove('text-green-600');
                     }, 2000);
                 });
             });
+        });
+        
+        // Add smooth animations to booking cards
+        const bookingCards = document.querySelectorAll('.bg-white.rounded-xl.shadow-lg');
+        bookingCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('cancelBookingModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCancelModal();
+            }
         });
     });
     
@@ -668,20 +430,11 @@
                     break;
             }
         }
-    });
-    
-    // Add smooth scrolling for better UX
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
+        
+        // Close modal with Escape key
+        if (e.key === 'Escape') {
+            closeCancelModal();
+        }
     });
 </script>
 {% endblock %}

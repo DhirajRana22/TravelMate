@@ -1,687 +1,560 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}{{ schedule.route.source }} to {{ schedule.route.destination }} Schedule - TravelMate{% endblock %}
-
-{% block extra_css %}
-<style>
-    .schedule-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem 0;
-        margin-bottom: 2rem;
-    }
-    
-    .route-info {
-        background: white;
-        border-radius: 15px;
-        padding: 2rem;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        margin-bottom: 2rem;
-    }
-    
-    .route-path {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 1.5rem 0;
-    }
-    
-    .route-point {
-        text-align: center;
-        flex: 1;
-    }
-    
-    .route-point h4 {
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 0.5rem;
-    }
-    
-    .route-point .time {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #667eea;
-    }
-    
-    .route-point .date {
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
-    
-    .route-arrow {
-        flex: 0 0 auto;
-        margin: 0 2rem;
-        position: relative;
-    }
-    
-    .route-arrow::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: -1rem;
-        right: -1rem;
-        height: 2px;
-        background: #667eea;
-        transform: translateY(-50%);
-    }
-    
-    .route-arrow i {
-        background: white;
-        color: #667eea;
-        font-size: 1.5rem;
-        padding: 0.5rem;
-        border-radius: 50%;
-        border: 2px solid #667eea;
-        position: relative;
-        z-index: 1;
-    }
-    
-    .duration-info {
-        text-align: center;
-        margin-top: 1rem;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 10px;
-    }
-    
-    .duration-info .duration {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #333;
-    }
-    
-    .duration-info .distance {
-        color: #6c757d;
-        margin-top: 0.25rem;
-    }
-    
-    .bus-details {
-        background: white;
-        border-radius: 15px;
-        padding: 2rem;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        margin-bottom: 2rem;
-    }
-    
-    .bus-info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-top: 1.5rem;
-    }
-    
-    .bus-info-item {
-        display: flex;
-        align-items: center;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 10px;
-    }
-    
-    .bus-info-item .icon {
-        width: 50px;
-        height: 50px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        margin-right: 1rem;
-        font-size: 1.2rem;
-    }
-    
-    .bus-info-item .content h6 {
-        margin: 0;
-        font-weight: 600;
-        color: #333;
-    }
-    
-    .bus-info-item .content p {
-        margin: 0;
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
-    
-    .amenities-section {
-        background: white;
-        border-radius: 15px;
-        padding: 2rem;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        margin-bottom: 2rem;
-    }
-    
-    .amenities-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-top: 1.5rem;
-    }
-    
-    .amenity-item {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-    }
-    
-    .amenity-item i {
-        color: #28a745;
-        margin-right: 0.75rem;
-        font-size: 1.1rem;
-    }
-    
-    .amenity-item span {
-        color: #333;
-        font-weight: 500;
-    }
-    
-    .stops-section {
-        background: white;
-        border-radius: 15px;
-        padding: 2rem;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        margin-bottom: 2rem;
-    }
-    
-    .stops-timeline {
-        position: relative;
-        padding: 1rem 0;
-    }
-    
-    .stops-timeline::before {
-        content: '';
-        position: absolute;
-        left: 20px;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background: #e9ecef;
-    }
-    
-    .stop-item {
-        position: relative;
-        padding: 1rem 0 1rem 60px;
-        margin-bottom: 1rem;
-    }
-    
-    .stop-item:last-child {
-        margin-bottom: 0;
-    }
-    
-    .stop-dot {
-        position: absolute;
-        left: 12px;
-        top: 1.5rem;
-        width: 16px;
-        height: 16px;
-        background: #667eea;
-        border-radius: 50%;
-        border: 3px solid white;
-        box-shadow: 0 0 0 2px #667eea;
-    }
-    
-    .stop-item.source .stop-dot,
-    .stop-item.destination .stop-dot {
-        background: #28a745;
-        box-shadow: 0 0 0 2px #28a745;
-    }
-    
-    .stop-content {
-        background: #f8f9fa;
-        padding: 1rem;
-        border-radius: 10px;
-    }
-    
-    .stop-name {
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 0.25rem;
-    }
-    
-    .stop-time {
-        color: #667eea;
-        font-weight: 600;
-        font-size: 1.1rem;
-    }
-    
-    .stop-duration {
-        color: #6c757d;
-        font-size: 0.9rem;
-        margin-top: 0.25rem;
-    }
-    
-    .pricing-section {
-        background: white;
-        border-radius: 15px;
-        padding: 2rem;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        margin-bottom: 2rem;
-    }
-    
-    .pricing-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-top: 1.5rem;
-    }
-    
-    .price-card {
-        text-align: center;
-        padding: 1.5rem;
-        border: 2px solid #e9ecef;
-        border-radius: 15px;
-        transition: all 0.3s ease;
-    }
-    
-    .price-card:hover {
-        border-color: #667eea;
-        transform: translateY(-5px);
-    }
-    
-    .price-card.popular {
-        border-color: #667eea;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-    }
-    
-    .price-card .seat-type {
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-    
-    .price-card .price {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-    
-    .price-card .available {
-        font-size: 0.9rem;
-        opacity: 0.8;
-    }
-    
-    .action-buttons {
-        text-align: center;
-        margin-top: 2rem;
-    }
-    
-    .btn-book {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        border-radius: 10px;
-        padding: 1rem 3rem;
-        font-weight: 600;
-        font-size: 1.1rem;
-        color: white;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s ease;
-        margin: 0 0.5rem;
-    }
-    
-    .btn-book:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn-back {
-        background: #6c757d;
-        border: none;
-        border-radius: 10px;
-        padding: 1rem 2rem;
-        font-weight: 600;
-        color: white;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s ease;
-        margin: 0 0.5rem;
-    }
-    
-    .btn-back:hover {
-        background: #5a6268;
-        color: white;
-        text-decoration: none;
-    }
-    
-    @media (max-width: 768px) {
-        .route-path {
-            flex-direction: column;
-        }
-        
-        .route-arrow {
-            margin: 1rem 0;
-            transform: rotate(90deg);
-        }
-        
-        .bus-info-grid,
-        .amenities-grid,
-        .pricing-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .action-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        
-        .btn-book,
-        .btn-back {
-            margin: 0;
-            width: 100%;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block title %}{{
+schedule.route.source }} to {{ schedule.route.destination }} Schedule -
+TravelMate{% endblock %} {% block content %}
 <!-- Header -->
-<div class="schedule-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="mb-2">
-                    <i class="fas fa-route mr-2"></i>
-                    {{ schedule.route.source }} to {{ schedule.route.destination }}
-                </h1>
-                <p class="mb-0 opacity-75">
-                    <i class="fas fa-calendar mr-1"></i>
-                    {{ schedule.departure_time|date:"l, F d, Y" }}
-                </p>
-            </div>
-            <div class="col-md-4 text-md-right">
-                <div class="badge badge-light badge-pill px-3 py-2">
-                    <i class="fas fa-bus mr-1"></i>
-                    {{ schedule.bus.bus_number }}
-                </div>
-            </div>
-        </div>
+<section
+  class="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-12 -mt-6"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center">
+      <h1 class="text-3xl md:text-4xl font-bold mb-2">
+        {{ schedule.route.source }} → {{ schedule.route.destination }}
+      </h1>
+      <p class="text-xl opacity-90">
+        Schedule Details • {{ schedule.departure_time|date:"M d, Y" }}
+      </p>
     </div>
-</div>
+  </div>
+</section>
 
-<div class="container">
+<!-- Schedule Details -->
+<section class="py-12 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Route Information -->
-    <div class="route-info">
-        <div class="route-path">
-            <div class="route-point">
-                <h4>{{ schedule.route.source }}</h4>
-                <div class="time">{{ schedule.departure_time|time:"H:i" }}</div>
-                <div class="date">{{ schedule.departure_time|date:"M d, Y" }}</div>
-            </div>
-            
-            <div class="route-arrow">
-                <i class="fas fa-arrow-right"></i>
-            </div>
-            
-            <div class="route-point">
-                <h4>{{ schedule.route.destination }}</h4>
-                <div class="time">{{ schedule.arrival_time|time:"H:i" }}</div>
-                <div class="date">{{ schedule.arrival_time|date:"M d, Y" }}</div>
-            </div>
+    <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">
+        <i class="fas fa-route mr-2 text-blue-500"></i>Journey Overview
+      </h2>
+
+      <!-- Route Path -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center mb-8">
+        <!-- Departure -->
+        <div class="text-center">
+          <div
+            class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <i class="fas fa-play text-white text-xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">
+            {{ schedule.route.source }}
+          </h3>
+          <div class="text-3xl font-bold text-blue-600 mb-1">
+            {{ schedule.departure_time|time:"g:i A" }}
+          </div>
+          <div class="text-gray-600">
+            {{ schedule.departure_time|date:"M d, Y" }}
+          </div>
+          <div class="text-sm text-gray-500 mt-1">Departure</div>
         </div>
-        
-        <div class="duration-info">
-            <div class="duration">
-                <i class="fas fa-clock mr-2"></i>
-                {{ schedule.duration }} hours
+
+        <!-- Journey Info -->
+        <div class="text-center">
+          <div class="bg-gray-50 rounded-xl p-6">
+            <div class="flex items-center justify-center mb-4">
+              <div class="h-1 bg-blue-500 flex-1 rounded-full"></div>
+              <div class="w-4 h-4 bg-blue-500 rounded-full mx-2"></div>
+              <div class="h-1 bg-blue-500 flex-1 rounded-full"></div>
             </div>
-            <div class="distance">
-                <i class="fas fa-road mr-1"></i>
-                {{ schedule.route.distance }} km
+            <div class="text-lg font-semibold text-gray-800 mb-1">
+              {{ schedule.duration|default:"6h 30m" }}
             </div>
+            <div class="text-sm text-gray-600">
+              {{ schedule.distance|default:"200" }}km • Direct
+            </div>
+          </div>
         </div>
+
+        <!-- Arrival -->
+        <div class="text-center">
+          <div
+            class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <i class="fas fa-flag-checkered text-white text-xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">
+            {{ schedule.route.destination }}
+          </h3>
+          <div class="text-3xl font-bold text-green-600 mb-1">
+            {{ schedule.arrival_time|time:"g:i A" }}
+          </div>
+          <div class="text-gray-600">
+            {{ schedule.arrival_time|date:"M d, Y" }}
+          </div>
+          <div class="text-sm text-gray-500 mt-1">Arrival</div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="text-center p-4 bg-blue-50 rounded-lg">
+          <i class="fas fa-users text-blue-500 text-2xl mb-2"></i>
+          <div class="text-lg font-semibold text-gray-800">
+            {{ schedule.bus.total_seats }}
+          </div>
+          <div class="text-sm text-gray-600">Total Seats</div>
+        </div>
+
+        <div class="text-center p-4 bg-green-50 rounded-lg">
+          <i class="fas fa-chair text-green-500 text-2xl mb-2"></i>
+          <div class="text-lg font-semibold text-green-600">
+            {{ schedule.available_seats }}
+          </div>
+          <div class="text-sm text-gray-600">Available</div>
+        </div>
+
+        <div class="text-center p-4 bg-purple-50 rounded-lg">
+          <i class="fas fa-star text-purple-500 text-2xl mb-2"></i>
+          <div class="text-lg font-semibold text-gray-800">
+            {{ schedule.bus.rating|default:"4.2" }}
+          </div>
+          <div class="text-sm text-gray-600">Rating</div>
+        </div>
+
+        <div class="text-center p-4 bg-orange-50 rounded-lg">
+          <i class="fas fa-money-bill text-orange-500 text-2xl mb-2"></i>
+          <div class="text-lg font-semibold text-orange-600">
+            रू{{ schedule.base_fare }}
+          </div>
+          <div class="text-sm text-gray-600">Starting From</div>
+        </div>
+      </div>
     </div>
-    
-    <!-- Bus Details -->
-    <div class="bus-details">
-        <h3 class="mb-0">
-            <i class="fas fa-bus mr-2"></i>
-            Bus Information
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Bus Details -->
+      <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">
+          <i class="fas fa-bus mr-2 text-blue-500"></i>Bus Information
         </h3>
-        
-        <div class="bus-info-grid">
-            <div class="bus-info-item">
-                <div class="icon">
-                    <i class="fas fa-id-card"></i>
-                </div>
-                <div class="content">
-                    <h6>Bus Number</h6>
-                    <p>{{ schedule.bus.bus_number }}</p>
-                </div>
+
+        <div class="space-y-6">
+          <!-- Bus Basic Info -->
+          <div class="border-b border-gray-200 pb-6">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h4 class="text-lg font-semibold text-gray-800">
+                  {{ schedule.bus.bus_number }}
+                </h4>
+                <p class="text-gray-600">
+                  {{ schedule.bus.operator|default:"TravelMate" }}
+                </p>
+              </div>
+              <span
+                class="px-3 py-1 bg-blue-500 text-white rounded-full text-sm font-medium"
+              >
+                {{ schedule.bus.bus_type|title }}
+              </span>
             </div>
-            
-            <div class="bus-info-item">
-                <div class="icon">
-                    <i class="fas fa-tag"></i>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <div class="text-sm text-gray-500">Registration</div>
+                <div class="font-semibold text-gray-800">
+                  {{ schedule.bus.registration_number|default:"BA-1-PA-1234" }}
                 </div>
-                <div class="content">
-                    <h6>Bus Type</h6>
-                    <p>{{ schedule.bus.bus_type.name }}</p>
+              </div>
+              <div>
+                <div class="text-sm text-gray-500">Model Year</div>
+                <div class="font-semibold text-gray-800">
+                  {{ schedule.bus.model_year|default:"2022" }}
                 </div>
+              </div>
             </div>
-            
-            <div class="bus-info-item">
-                <div class="icon">
-                    <i class="fas fa-users"></i>
+          </div>
+
+          <!-- Driver Information -->
+          {% if schedule.driver %}
+          <div class="border-b border-gray-200 pb-6">
+            <h5 class="font-semibold text-gray-800 mb-3">Driver Information</h5>
+            <div class="flex items-center">
+              <div
+                class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mr-4"
+              >
+                <i class="fas fa-user text-gray-500"></i>
+              </div>
+              <div>
+                <div class="font-semibold text-gray-800">
+                  {{ schedule.driver.name }}
                 </div>
-                <div class="content">
-                    <h6>Total Seats</h6>
-                    <p>{{ schedule.bus.total_seats }} seats</p>
+                <div class="text-sm text-gray-600">
+                  {{ schedule.driver.experience|default:"5" }} years experience
                 </div>
+                <div class="text-sm text-yellow-600">
+                  <i class="fas fa-star"></i> {{
+                  schedule.driver.rating|default:"4.5" }}/5
+                </div>
+              </div>
             </div>
-            
-            <div class="bus-info-item">
-                <div class="icon">
-                    <i class="fas fa-chair"></i>
-                </div>
-                <div class="content">
-                    <h6>Available Seats</h6>
-                    <p>{{ schedule.available_seats }} seats</p>
-                </div>
+          </div>
+          {% endif %}
+
+          <!-- Safety Features -->
+          <div>
+            <h5 class="font-semibold text-gray-800 mb-3">Safety Features</h5>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-shield-alt text-green-500 mr-2"></i>
+                GPS Tracking
+              </div>
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-first-aid text-red-500 mr-2"></i>
+                First Aid Kit
+              </div>
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-fire-extinguisher text-orange-500 mr-2"></i>
+                Fire Extinguisher
+              </div>
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-phone text-blue-500 mr-2"></i>
+                Emergency Contact
+              </div>
             </div>
-            
-            <div class="bus-info-item">
-                <div class="icon">
-                    <i class="fas fa-building"></i>
-                </div>
-                <div class="content">
-                    <h6>Operator</h6>
-                    <p>{{ schedule.bus.operator.name }}</p>
-                </div>
-            </div>
-            
-            <div class="bus-info-item">
-                <div class="icon">
-                    <i class="fas fa-star"></i>
-                </div>
-                <div class="content">
-                    <h6>Rating</h6>
-                    <p>{{ schedule.bus.operator.rating|floatformat:1 }}/5.0</p>
-                </div>
-            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Amenities & Features -->
+      <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">
+          <i class="fas fa-star mr-2 text-purple-500"></i>Amenities & Features
+        </h3>
+
+        <div class="space-y-6">
+          <!-- Basic Amenities -->
+          <div>
+            <h5 class="font-semibold text-gray-800 mb-3">Comfort Features</h5>
+            <div class="grid grid-cols-2 gap-3">
+              {% if schedule.bus.is_ac %}
+              <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                <i class="fas fa-snowflake text-blue-500 mr-3"></i>
+                <span class="text-sm font-medium text-gray-800"
+                  >Air Conditioning</span
+                >
+              </div>
+              {% endif %} {% if schedule.bus.has_wifi %}
+              <div class="flex items-center p-3 bg-purple-50 rounded-lg">
+                <i class="fas fa-wifi text-purple-500 mr-3"></i>
+                <span class="text-sm font-medium text-gray-800">Free WiFi</span>
+              </div>
+              {% endif %} {% if schedule.bus.has_charging %}
+              <div class="flex items-center p-3 bg-yellow-50 rounded-lg">
+                <i class="fas fa-charging-station text-yellow-500 mr-3"></i>
+                <span class="text-sm font-medium text-gray-800"
+                  >Charging Points</span
+                >
+              </div>
+              {% endif %} {% if schedule.bus.has_entertainment %}
+              <div class="flex items-center p-3 bg-red-50 rounded-lg">
+                <i class="fas fa-tv text-red-500 mr-3"></i>
+                <span class="text-sm font-medium text-gray-800"
+                  >Entertainment</span
+                >
+              </div>
+              {% endif %}
+
+              <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                <i class="fas fa-toilet text-green-500 mr-3"></i>
+                <span class="text-sm font-medium text-gray-800">Restroom</span>
+              </div>
+
+              <div class="flex items-center p-3 bg-indigo-50 rounded-lg">
+                <i class="fas fa-volume-down text-indigo-500 mr-3"></i>
+                <span class="text-sm font-medium text-gray-800"
+                  >Reading Lights</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Services -->
+          <div>
+            <h5 class="font-semibold text-gray-800 mb-3">
+              Additional Services
+            </h5>
+            <div class="space-y-2">
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-coffee text-brown-500 mr-3 w-4"></i>
+                Complimentary refreshments
+              </div>
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-newspaper text-gray-500 mr-3 w-4"></i>
+                Newspapers and magazines
+              </div>
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-blanket text-blue-500 mr-3 w-4"></i>
+                Blankets (on request)
+              </div>
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-luggage-cart text-purple-500 mr-3 w-4"></i>
+                Luggage assistance
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    
-    <!-- Amenities -->
-    <div class="amenities-section">
-        <h3 class="mb-0">
-            <i class="fas fa-concierge-bell mr-2"></i>
-            Amenities
-        </h3>
-        
-        <div class="amenities-grid">
-            {% if schedule.bus.has_ac %}
-            <div class="amenity-item">
-                <i class="fas fa-snowflake"></i>
-                <span>Air Conditioning</span>
+
+    <!-- Route Stops -->
+    {% if schedule.route.stops.all %}
+    <div class="bg-white rounded-2xl shadow-lg p-8 mt-8 border border-gray-100">
+      <h3 class="text-xl font-bold text-gray-900 mb-6">
+        <i class="fas fa-map-marker-alt mr-2 text-red-500"></i>Route Stops
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for stop in schedule.route.stops.all %}
+        <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+          <div
+            class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center mr-3 text-sm font-semibold"
+          >
+            {{ forloop.counter }}
+          </div>
+          <div>
+            <div class="font-semibold text-gray-800">{{ stop.name }}</div>
+            <div class="text-sm text-gray-600">
+              {{ stop.arrival_time|default:"--:--" }}
             </div>
-            {% endif %}
-            
-            {% if schedule.bus.has_wifi %}
-            <div class="amenity-item">
-                <i class="fas fa-wifi"></i>
-                <span>Free WiFi</span>
-            </div>
-            {% endif %}
-            
-            {% if schedule.bus.has_charging %}
-            <div class="amenity-item">
-                <i class="fas fa-charging-station"></i>
-                <span>Charging Points</span>
-            </div>
-            {% endif %}
-            
-            {% if schedule.bus.has_entertainment %}
-            <div class="amenity-item">
-                <i class="fas fa-tv"></i>
-                <span>Entertainment</span>
-            </div>
-            {% endif %}
-            
-            {% if schedule.bus.has_blanket %}
-            <div class="amenity-item">
-                <i class="fas fa-bed"></i>
-                <span>Blankets</span>
-            </div>
-            {% endif %}
-            
-            {% if schedule.bus.has_water %}
-            <div class="amenity-item">
-                <i class="fas fa-tint"></i>
-                <span>Water Bottle</span>
-            </div>
-            {% endif %}
-            
-            <div class="amenity-item">
-                <i class="fas fa-shield-alt"></i>
-                <span>GPS Tracking</span>
-            </div>
-            
-            <div class="amenity-item">
-                <i class="fas fa-first-aid"></i>
-                <span>First Aid Kit</span>
-            </div>
+          </div>
         </div>
-    </div>
-    
-    <!-- Stops -->
-    {% if schedule.stops.exists %}
-    <div class="stops-section">
-        <h3 class="mb-0">
-            <i class="fas fa-map-marker-alt mr-2"></i>
-            Route Stops
-        </h3>
-        
-        <div class="stops-timeline">
-            {% for stop in schedule.stops.all %}
-            <div class="stop-item {% if forloop.first %}source{% elif forloop.last %}destination{% endif %}">
-                <div class="stop-dot"></div>
-                <div class="stop-content">
-                    <div class="stop-name">{{ stop.location }}</div>
-                    <div class="stop-time">{{ stop.arrival_time|time:"H:i" }}</div>
-                    {% if not forloop.last %}
-                    <div class="stop-duration">{{ stop.duration_to_next }} min stop</div>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+        {% endfor %}
+      </div>
     </div>
     {% endif %}
-    
-    <!-- Pricing -->
-    <div class="pricing-section">
-        <h3 class="mb-0">
-            <i class="fas fa-rupee-sign mr-2"></i>
-            Seat Pricing
-        </h3>
-        
-        <div class="pricing-grid">
-            <div class="price-card">
-                <div class="seat-type">Economy</div>
-                <div class="price">रू {{ schedule.base_fare }}</div>
-                <div class="available">{{ schedule.available_seats }} seats available</div>
-            </div>
-            
-            {% if schedule.premium_fare %}
-            <div class="price-card popular">
-                <div class="seat-type">Premium</div>
-                <div class="price">रू {{ schedule.premium_fare }}</div>
-                <div class="available">{{ schedule.premium_available }} seats available</div>
-            </div>
-            {% endif %}
-            
-            {% if schedule.sleeper_fare %}
-            <div class="price-card">
-                <div class="seat-type">Sleeper</div>
-                <div class="price">रू {{ schedule.sleeper_fare }}</div>
-                <div class="available">{{ schedule.sleeper_available }} seats available</div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-        {% if schedule.available_seats > 0 %}
-            <a href="{% url 'buses:bus_detail' schedule.bus.id %}?schedule={{ schedule.id }}" class="btn-book">
-                <i class="fas fa-ticket-alt mr-2"></i>
-                Book Now
-            </a>
-        {% else %}
-            <button class="btn-book" disabled>
-                <i class="fas fa-times mr-2"></i>
-                Sold Out
-            </button>
-        {% endif %}
-        
-        <a href="{% url 'routes:route_search' %}" class="btn-back">
-            <i class="fas fa-arrow-left mr-2"></i>
-            Back to Search
-        </a>
-    </div>
-</div>
-{% endblock %}
 
-{% block extra_js %}
+    <!-- Pricing Section -->
+    <div class="bg-white rounded-2xl shadow-lg p-8 mt-8 border border-gray-100">
+      <h3 class="text-xl font-bold text-gray-900 mb-6">
+        <i class="fas fa-rupee-sign mr-2 text-green-500"></i>Seat Pricing
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Economy Pricing -->
+        <div
+          class="border border-gray-200 rounded-xl p-6 hover:border-blue-500 transition-colors"
+        >
+          <div class="text-center">
+            <h4 class="text-lg font-semibold text-gray-800 mb-2">Economy</h4>
+            <div class="text-3xl font-bold text-blue-600 mb-2">
+              रू{{ schedule.base_fare }}
+            </div>
+            <div class="text-sm text-gray-600 mb-4">
+              {{ schedule.available_seats }} seats available
+            </div>
+
+            <div class="space-y-2 text-sm text-gray-600">
+              <div class="flex items-center justify-center">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Standard seating
+              </div>
+              <div class="flex items-center justify-center">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Basic amenities
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Premium Pricing -->
+        {% if schedule.premium_fare %}
+        <div class="border-2 border-purple-500 rounded-xl p-6 relative">
+          <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+            <span
+              class="bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-semibold"
+              >POPULAR</span
+            >
+          </div>
+          <div class="text-center">
+            <h4 class="text-lg font-semibold text-gray-800 mb-2">Premium</h4>
+            <div class="text-3xl font-bold text-purple-600 mb-2">
+              रू{{ schedule.premium_fare }}
+            </div>
+            <div class="text-sm text-gray-600 mb-4">
+              {{ schedule.premium_available|default:"8" }} seats available
+            </div>
+
+            <div class="space-y-2 text-sm text-gray-600">
+              <div class="flex items-center justify-center">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Extra legroom
+              </div>
+              <div class="flex items-center justify-center">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Premium amenities
+              </div>
+              <div class="flex items-center justify-center">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Priority boarding
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Sleeper Pricing -->
+        {% if schedule.sleeper_fare %}
+        <div
+          class="border border-gray-200 rounded-xl p-6 hover:border-blue-500 transition-colors"
+        >
+          <div class="text-center">
+            <h4 class="text-lg font-semibold text-gray-800 mb-2">Sleeper</h4>
+            <div class="text-3xl font-bold text-green-600 mb-2">
+              रू{{ schedule.sleeper_fare }}
+            </div>
+            <div class="text-sm text-gray-600 mb-4">
+              {{ schedule.sleeper_available|default:"6" }} seats available
+            </div>
+
+            <div class="space-y-2 text-sm text-gray-600">
+              <div class="flex items-center justify-center">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Flat bed seating
+              </div>
+              <div class="flex items-center justify-center">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Privacy curtains
+              </div>
+              <div class="flex items-center justify-center">
+                <i class="fas fa-check text-green-500 mr-2"></i>
+                Pillow & blanket
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4 mt-8 justify-center">
+      {% if schedule.available_seats > 0 %}
+      <a
+        href="{% url 'bookings:seat_selection' schedule.id %}"
+        class="bg-green-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105 shadow-lg text-center"
+      >
+        <i class="fas fa-ticket-alt mr-2"></i>Book Now
+      </a>
+      {% else %}
+      <button
+        disabled
+        class="bg-gray-400 text-white px-8 py-4 rounded-xl font-semibold text-lg cursor-not-allowed text-center"
+      >
+        <i class="fas fa-times mr-2"></i>Sold Out
+      </button>
+      {% endif %}
+
+      <a
+        href="{% url 'routes:route_search' %}"
+        class="bg-blue-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-600 transition-colors text-center"
+      >
+        <i class="fas fa-search mr-2"></i>Search Other Routes
+      </a>
+
+      <button
+        onclick="shareSchedule()"
+        class="bg-purple-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-purple-600 transition-colors"
+      >
+        <i class="fas fa-share mr-2"></i>Share
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Support -->
+<section class="py-12 bg-blue-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <h3 class="text-2xl font-bold text-gray-900 mb-4">Need Help?</h3>
+    <p class="text-gray-600 mb-6">
+      Our customer support team is available 24/7 to assist you with any
+      questions about this schedule.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a
+        href="tel:+9779847435111"
+        class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors"
+      >
+        <i class="fas fa-phone mr-2"></i>Call Support
+      </a>
+      <a
+        href="{% url 'home:contact' %}"
+        class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
+      >
+        <i class="fas fa-envelope mr-2"></i>Contact Us
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Animate elements on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-        
-        // Observe all sections
-        document.querySelectorAll('.route-info, .bus-details, .amenities-section, .stops-section, .pricing-section').forEach(section => {
-            section.style.opacity = '0';
-            section.style.transform = 'translateY(20px)';
-            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(section);
-        });
-        
-        // Add click tracking for booking button
-        const bookButton = document.querySelector('.btn-book:not([disabled])');
-        if (bookButton) {
-            bookButton.addEventListener('click', function() {
-                // Track booking attempt
-                console.log('Booking attempt for schedule:', '{{ schedule.id }}');
-            });
+  document.addEventListener("DOMContentLoaded", function () {
+    // Animate elements on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: "0px 0px -50px 0px",
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("animate-fade-in-up");
         }
+      });
+    }, observerOptions);
+
+    // Observe all sections
+    document.querySelectorAll(".bg-white").forEach((section) => {
+      observer.observe(section);
     });
+
+    // Add click tracking for booking button
+    const bookButton = document.querySelector('a[href*="seat_selection"]');
+    if (bookButton) {
+      bookButton.addEventListener("click", function () {
+        console.log("Booking attempt for schedule:", "{{ schedule.id }}");
+      });
+    }
+  });
+
+  // Share schedule function
+  function shareSchedule() {
+    const url = window.location.href;
+    const title =
+      "{{ schedule.route.source }} to {{ schedule.route.destination }} - TravelMate";
+    const text = "Check out this bus schedule on TravelMate";
+
+    if (navigator.share) {
+      navigator.share({
+        title: title,
+        text: text,
+        url: url,
+      });
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard
+        .writeText(url)
+        .then(() => {
+          alert("Schedule link copied to clipboard!");
+        })
+        .catch(() => {
+          prompt("Copy this link:", url);
+        });
+    }
+  }
 </script>
+
+<style>
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+</style>
 {% endblock %}

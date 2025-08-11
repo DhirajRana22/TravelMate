@@ -1,104 +1,272 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Payment Failed{% endblock %}
-
-{% block extra_css %}
-<style>
-    .failure-container {
-        max-width: 600px;
-        margin: 2rem auto;
-        text-align: center;
-    }
-    
-    .failure-icon {
-        width: 80px;
-        height: 80px;
-        background: #dc3545;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1.5rem;
-        color: white;
-        font-size: 2rem;
-    }
-    
-    .failure-title {
-        color: #dc3545;
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-    }
-    
-    .failure-message {
-        color: #6c757d;
-        margin-bottom: 2rem;
-    }
-    
-    .btn-primary {
-        background: #007bff;
-        border: none;
-        padding: 0.75rem 2rem;
-        border-radius: 8px;
-        color: white;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        margin: 0 0.5rem;
-    }
-    
-    .btn-primary:hover {
-        background: #0056b3;
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn-secondary {
-        background: #6c757d;
-        border: none;
-        padding: 0.75rem 2rem;
-        border-radius: 8px;
-        color: white;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        margin: 0 0.5rem;
-    }
-    
-    .btn-secondary:hover {
-        background: #545b62;
-        color: white;
-        text-decoration: none;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="container">
-    <div class="failure-container">
-        <div class="failure-icon">
-            <i class="fas fa-times"></i>
-        </div>
-        
-        <h1 class="failure-title">Payment Failed</h1>
-        
-        <p class="failure-message">
-            Your payment could not be processed. This might be due to insufficient balance, 
-            network issues, or the payment was cancelled. Please try again.
-        </p>
-        
-        <div class="mt-3">
-            <a href="javascript:history.back()" class="btn btn-primary">
-                <i class="fas fa-arrow-left me-2"></i>
-                Try Again
-            </a>
-            
-            <a href="{% url 'accounts:booking_history' %}" class="btn btn-secondary">
-                <i class="fas fa-list me-2"></i>
-                My Bookings
-            </a>
-        </div>
+{% extends 'base.html' %} {% load static %} {% block title %}eSewa Payment
+Failed - TravelMate{% endblock %} {% block content %}
+<!-- Failure Header -->
+<section
+  class="bg-gradient-to-r from-red-600 to-pink-700 text-white py-16 -mt-6"
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div
+      class="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse"
+    >
+      <i class="fas fa-times-circle text-4xl text-white"></i>
     </div>
-</div>
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">Payment Failed</h1>
+    <p class="text-xl opacity-90 max-w-2xl mx-auto">
+      Your eSewa payment could not be processed. Don't worry, we can help you
+      complete your booking.
+    </p>
+  </div>
+</section>
+
+<!-- Failure Details -->
+<section class="py-12 bg-gray-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+      <!-- eSewa Logo/Icon -->
+      <div
+        class="w-20 h-20 bg-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6"
+      >
+        <i class="fas fa-mobile-alt text-white text-3xl"></i>
+      </div>
+
+      <h2 class="text-2xl font-bold text-gray-900 mb-4">
+        <span class="text-red-600">eSewa</span> Payment Failed
+      </h2>
+
+      <p class="text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+        Your payment could not be processed through eSewa. This might be due to
+        insufficient balance, network issues, or the payment was cancelled.
+        Please try again or use a different payment method.
+      </p>
+
+      <!-- Common Reasons -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="text-center">
+          <div
+            class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-3"
+          >
+            <i class="fas fa-wallet text-red-600 text-xl"></i>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Insufficient Balance</h3>
+          <p class="text-sm text-gray-600">
+            Check your eSewa balance and add funds if needed
+          </p>
+        </div>
+
+        <div class="text-center">
+          <div
+            class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-3"
+          >
+            <i class="fas fa-wifi text-orange-600 text-xl"></i>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Network Issues</h3>
+          <p class="text-sm text-gray-600">
+            Poor internet connection may have interrupted the payment
+          </p>
+        </div>
+
+        <div class="text-center">
+          <div
+            class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-3"
+          >
+            <i class="fas fa-user-times text-yellow-600 text-xl"></i>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">Payment Cancelled</h3>
+          <p class="text-sm text-gray-600">
+            The payment process was cancelled or timed out
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <button
+          onclick="history.back()"
+          class="bg-red-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-red-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
+        >
+          <i class="fas fa-redo mr-2"></i>Try eSewa Again
+        </button>
+
+        <a
+          href="{% url 'payments:payment_form' booking.id %}"
+          class="bg-blue-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-600 transition-colors"
+        >
+          <i class="fas fa-credit-card mr-2"></i>Different Method
+        </a>
+
+        <a
+          href="{% url 'accounts:booking_history' %}"
+          class="bg-gray-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-600 transition-colors"
+        >
+          <i class="fas fa-list mr-2"></i>My Bookings
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Troubleshooting -->
+<section class="py-12 bg-red-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-2xl shadow-lg p-8">
+      <div class="text-center mb-8">
+        <h3 class="text-2xl font-bold text-gray-900 mb-4">
+          <i class="fas fa-tools text-red-500 mr-2"></i>Troubleshooting eSewa
+          Payment
+        </h3>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          Follow these steps to resolve common eSewa payment issues and complete
+          your booking successfully.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <h4 class="font-semibold text-gray-800 mb-4">Quick Solutions</h4>
+          <ul class="space-y-3 text-sm text-gray-600">
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+              <span>Check your eSewa balance and add funds if needed</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+              <span>Ensure you have a stable internet connection</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+              <span>Verify your eSewa PIN and credentials</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+              <span>Try using a different browser or device</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+              <span>Clear browser cache and cookies</span>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold text-gray-800 mb-4">Alternative Options</h4>
+          <div class="space-y-3">
+            <div class="p-3 bg-gray-50 rounded-lg">
+              <div class="font-medium text-gray-900 mb-1">Try Khalti</div>
+              <div class="text-sm text-gray-600">
+                Another popular digital wallet option
+              </div>
+            </div>
+
+            <div class="p-3 bg-gray-50 rounded-lg">
+              <div class="font-medium text-gray-900 mb-1">Use IME Pay</div>
+              <div class="text-sm text-gray-600">
+                Bank-backed digital payment solution
+              </div>
+            </div>
+
+            <div class="p-3 bg-gray-50 rounded-lg">
+              <div class="font-medium text-gray-900 mb-1">Pay to Conductor</div>
+              <div class="text-sm text-gray-600">
+                Reserve seats and pay cash on the bus
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- eSewa Support -->
+<section class="py-12 bg-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-green-50 rounded-2xl p-8">
+      <div class="text-center mb-8">
+        <h3 class="text-2xl font-bold text-gray-900 mb-4">
+          <i class="fas fa-headset text-green-500 mr-2"></i>Need More Help?
+        </h3>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          If you're still having trouble with eSewa payments, contact support
+          for assistance.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="text-center">
+          <h4 class="font-semibold text-gray-800 mb-4">eSewa Support</h4>
+          <div class="space-y-3">
+            <a
+              href="tel:9801234567"
+              class="flex items-center justify-center p-3 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <i class="fas fa-phone text-green-500 mr-3"></i>
+              <div>
+                <div class="font-medium text-gray-900">eSewa Helpline</div>
+                <div class="text-sm text-gray-600">9801234567</div>
+              </div>
+            </a>
+
+            <a
+              href="mailto:support@esewa.com.np"
+              class="flex items-center justify-center p-3 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <i class="fas fa-envelope text-green-500 mr-3"></i>
+              <div>
+                <div class="font-medium text-gray-900">eSewa Email</div>
+                <div class="text-sm text-gray-600">support@esewa.com.np</div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <h4 class="font-semibold text-gray-800 mb-4">TravelMate Support</h4>
+          <div class="space-y-3">
+            <a
+              href="tel:+9779847435111"
+              class="flex items-center justify-center p-3 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <i class="fas fa-phone text-blue-500 mr-3"></i>
+              <div>
+                <div class="font-medium text-gray-900">Call Support</div>
+                <div class="text-sm text-gray-600">+977 9847435111</div>
+              </div>
+            </a>
+
+            <a
+              href="{% url 'home:contact' %}"
+              class="flex items-center justify-center p-3 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <i class="fas fa-comments text-blue-500 mr-3"></i>
+              <div>
+                <div class="font-medium text-gray-900">Live Chat</div>
+                <div class="text-sm text-gray-600">Available 24/7</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Show failure animation
+    setTimeout(() => {
+      const failureIcon = document.querySelector(".animate-pulse");
+      if (failureIcon) {
+        failureIcon.classList.remove("animate-pulse");
+        failureIcon.classList.add("animate-bounce");
+      }
+    }, 1000);
+
+    // Auto-redirect after 60 seconds (optional)
+    setTimeout(function () {
+      if (confirm("Would you like to try a different payment method?")) {
+        window.location.href = '{% url "payments:payment_form" booking.id %}';
+      }
+    }, 60000);
+  });
+</script>
 {% endblock %}

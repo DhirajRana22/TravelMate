@@ -1,751 +1,597 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Payment - TravelMate{% endblock %}
-
-{% block extra_css %}
-<style>
-    .payment-header {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        color: white;
-        padding: 2rem 0;
-        margin-top: -1.5rem;
-    }
-    .payment-container {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    .payment-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        margin-bottom: 2rem;
-    }
-    .booking-summary {
-        background: #f8f9fa;
-        padding: 2rem;
-        border-bottom: 1px solid #e9ecef;
-    }
-    .route-display {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1.5rem;
-    }
-    .route-city {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #495057;
-    }
-    .route-arrow {
-        margin: 0 1.5rem;
-        color: #28a745;
-        font-size: 2rem;
-    }
-    .summary-details {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-    .summary-item {
-        text-align: center;
-        padding: 1rem;
-        background: white;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
-    }
-    .summary-label {
-        color: #6c757d;
-        font-size: 0.875rem;
-        margin-bottom: 0.25rem;
-    }
-    .summary-value {
-        font-weight: bold;
-        color: #495057;
-        font-size: 1.1rem;
-    }
-    .seat-info {
-        background: #e3f2fd;
-        border-radius: 8px;
-        padding: 1rem;
-        text-align: center;
-    }
-    .seat-tags {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-top: 0.5rem;
-    }
-    .seat-tag {
-        background: #667eea;
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: bold;
-        font-size: 0.875rem;
-    }
-    .payment-methods {
-        padding: 2rem;
-    }
-    .method-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }
-    .payment-method {
-        border: 2px solid #e9ecef;
-        border-radius: 12px;
-        padding: 1.5rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        position: relative;
-        background: white;
-    }
-    .payment-method:hover {
-        border-color: #28a745;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.15);
-    }
-    .payment-method.selected {
-        border-color: #28a745;
-        background: #f8fff9;
-        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.2);
-    }
-    .payment-method.selected::after {
-        content: '✓';
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        background: #28a745;
-        color: white;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.875rem;
-        font-weight: bold;
-    }
-    .method-icon {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-        color: #28a745;
-    }
-    .method-name {
-        font-size: 1.1rem;
-        font-weight: bold;
-        color: #495057;
-        margin-bottom: 0.5rem;
-    }
-    .method-description {
-        color: #6c757d;
-        font-size: 0.875rem;
-        line-height: 1.4;
-    }
-    .method-features {
-        margin-top: 1rem;
-    }
-    .feature-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 0.25rem;
-        font-size: 0.875rem;
-        color: #495057;
-    }
-    .feature-icon {
-        color: #28a745;
-        font-size: 0.75rem;
-    }
-    .payment-form {
-        background: #f8f9fa;
-        border-radius: 12px;
-        padding: 2rem;
-        margin-top: 2rem;
-        display: none;
-    }
-    .payment-form.active {
-        display: block;
-        animation: fadeIn 0.3s ease;
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    .form-label {
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.5rem;
-    }
-    .form-control {
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
-        padding: 0.75rem 1rem;
-        font-size: 1rem;
-    }
-    .form-control:focus {
-        border-color: #28a745;
-        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-    }
-    .input-group {
-        position: relative;
-    }
-    .input-group-text {
-        background: #e9ecef;
-        border: 1px solid #e9ecef;
-        border-radius: 8px 0 0 8px;
-        color: #495057;
-        font-weight: 600;
-    }
-    .fare-breakdown {
-        background: white;
-        border: 1px solid #e9ecef;
-        border-radius: 12px;
-        overflow: hidden;
-        margin-bottom: 2rem;
-    }
-    .fare-header {
-        background: #28a745;
-        color: white;
-        padding: 1rem 1.5rem;
-        font-weight: bold;
-    }
-    .fare-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid #f8f9fa;
-    }
-    .fare-item:last-child {
-        border-bottom: none;
-        background: #f8f9fa;
-        font-weight: bold;
-        font-size: 1.1rem;
-    }
-    .security-info {
-        background: #e3f2fd;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 2rem;
-    }
-    .security-title {
-        color: #1976d2;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-    }
-    .security-features {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 0.5rem;
-    }
-    .security-feature {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: #1976d2;
-        font-size: 0.875rem;
-    }
-    .btn-pay {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        border: none;
-        color: white;
-        padding: 1rem 2rem;
-        border-radius: 10px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        width: 100%;
-        transition: all 0.3s ease;
-        margin-top: 1rem;
-    }
-    .btn-pay:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
-        color: white;
-    }
-    .btn-pay:disabled {
-        background: #6c757d;
-        cursor: not-allowed;
-    }
-    .timer-display {
-        background: #fff3cd;
-        border: 1px solid #ffeaa7;
-        border-radius: 8px;
-        padding: 1rem;
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-    .timer-text {
-        color: #856404;
-        font-weight: bold;
-        font-size: 1.1rem;
-    }
-    .timer-countdown {
-        color: #dc3545;
-        font-size: 1.5rem;
-        font-weight: bold;
-        margin-top: 0.5rem;
-    }
-    .payment-steps {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 2rem;
-    }
-    .step {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        background: #f8f9fa;
-        border-radius: 20px;
-        margin: 0 0.5rem;
-        font-size: 0.875rem;
-        color: #6c757d;
-    }
-    .step.active {
-        background: #28a745;
-        color: white;
-    }
-    .step.completed {
-        background: #20c997;
-        color: white;
-    }
-    .mobile-payment-info {
-        background: #f3e5f5;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-top: 1rem;
-    }
-    .qr-code-section {
-        text-align: center;
-        padding: 2rem;
-        background: white;
-        border-radius: 8px;
-        margin-top: 1rem;
-    }
-    .qr-placeholder {
-        width: 200px;
-        height: 200px;
-        background: #f8f9fa;
-        border: 2px dashed #dee2e6;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 1rem auto;
-        color: #6c757d;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<!-- Payment Header -->
-<section class="payment-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="mb-2"><i class="fas fa-credit-card me-2"></i>Complete Payment</h1>
-                <p class="mb-0">Secure payment for your bus booking</p>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <a href="{% url 'bookings:create_booking' booking.bus_schedule.id %}" class="btn btn-light">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Seats
-                </a>
-            </div>
-        </div>
+{% extends 'base.html' %} {% load static %} {% block title %}Payment -
+TravelMate{% endblock %} {% block content %}
+<!-- Header -->
+<section
+  class="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-12 -mt-6"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center">
+      <div
+        class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4"
+      >
+        <i class="fas fa-credit-card text-2xl"></i>
+      </div>
+      <h1 class="text-3xl md:text-4xl font-bold mb-2">Secure Payment</h1>
+      <p class="text-xl opacity-90">
+        Complete your booking with our secure payment gateway
+      </p>
     </div>
+  </div>
 </section>
 
-<!-- Payment Content -->
-<section class="py-5">
-    <div class="container payment-container">
-        <!-- Payment Steps -->
-        <div class="payment-steps">
-            <div class="step completed">
-                <i class="fas fa-check"></i>
-                <span>Select Seats</span>
-            </div>
-            <div class="step active">
-                <i class="fas fa-credit-card"></i>
-                <span>Payment</span>
-            </div>
-            <div class="step">
-                <i class="fas fa-ticket-alt"></i>
-                <span>Confirmation</span>
-            </div>
-        </div>
-        
-        <!-- Session Timer -->
-        <div class="timer-display">
-            <div class="timer-text">
-                <i class="fas fa-clock me-2"></i>Complete payment within:
-            </div>
-            <div class="timer-countdown" id="countdown">10:00</div>
-            <small class="text-muted">Your seats will be released after this time</small>
-        </div>
-        
-        <div class="row">
-            <!-- Booking Summary -->
-            <div class="col-lg-4 order-lg-2">
-                <div class="payment-card">
-                    <div class="booking-summary">
-                        <h5 class="mb-3"><i class="fas fa-receipt me-2"></i>Booking Summary</h5>
-                        
-                        <!-- Route Display -->
-                        <div class="route-display">
-                            <span class="route-city">{{ booking.bus_schedule.route.source }}</span>
-                            <i class="fas fa-arrow-right route-arrow"></i>
-                            <span class="route-city">{{ booking.bus_schedule.route.destination }}</span>
-                        </div>
-                        
-                        <!-- Summary Details -->
-                        <div class="summary-details">
-                            <div class="summary-item">
-                                <div class="summary-label">Travel Date</div>
-                                <div class="summary-value">{{ booking.travel_date|date:"M d, Y" }}</div>
-                            </div>
-                            <div class="summary-item">
-                                <div class="summary-label">Departure</div>
-                                <div class="summary-value">{{ booking.bus_schedule.departure_time|time:"g:i A" }}</div>
-                            </div>
-                            <div class="summary-item">
-                                <div class="summary-label">Bus Number</div>
-                                <div class="summary-value">{{ booking.bus_schedule.bus.bus_number }}</div>
-                            </div>
-                            <div class="summary-item">
-                                <div class="summary-label">Duration</div>
-                                <div class="summary-value">{{ booking.bus_schedule.journey_duration }}</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Seat Information -->
-                        <div class="seat-info">
-                            <strong>Selected Seats ({{ booking.selected_seats.count }}):</strong>
-                            <div class="seat-tags">
-                                {% for seat in booking.selected_seats.all %}
-                                <span class="seat-tag">{{ seat.seat_number }}</span>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Fare Breakdown -->
-                    <div class="fare-breakdown">
-                        <div class="fare-header">
-                            <i class="fas fa-calculator me-2"></i>Fare Breakdown
-                        </div>
-                        <div class="fare-item">
-                            <span>Base Fare ({{ booking.selected_seats.count }} × रू {{ booking.bus_schedule.base_fare }}):</span>
-                            <span>रू {% widthratio booking.bus_schedule.base_fare 1 booking.selected_seats.count %}</span>
-                        </div>
-                        <div class="fare-item">
-                            <span>Total Amount:</span>
-                            <span>रू {{ booking.total_fare }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Payment Methods -->
-            <div class="col-lg-8 order-lg-1">
-                <div class="payment-card">
-                    <div class="payment-methods">
-                        <h5 class="mb-4"><i class="fas fa-wallet me-2"></i>Choose Payment Method</h5>
-                        
-                        <form method="post" id="paymentForm">
-                            {% csrf_token %}
-                            
-                            <!-- Payment Method Selection -->
-                            <div class="method-grid">
-                                <!-- eSewa -->
-                                <div class="payment-method" data-method="esewa">
-                                    <div class="method-icon">
-                                        <i class="fas fa-mobile-alt"></i>
-                                    </div>
-                                    <div class="method-name">eSewa</div>
-                                    <div class="method-description">Pay securely using your eSewa digital wallet</div>
-                                    <div class="method-features">
-                                        <div class="feature-item">
-                                            <i class="fas fa-check feature-icon"></i>
-                                            <span>Instant payment</span>
-                                        </div>
-                                        <div class="feature-item">
-                                            <i class="fas fa-check feature-icon"></i>
-                                            <span>No additional charges</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Khalti -->
-                                <div class="payment-method" data-method="khalti">
-                                    <div class="method-icon">
-                                        <i class="fas fa-wallet"></i>
-                                    </div>
-                                    <div class="method-name">Khalti</div>
-                                    <div class="method-description">Pay using Khalti digital wallet</div>
-                                    <div class="method-features">
-                                        <div class="feature-item">
-                                            <i class="fas fa-check feature-icon"></i>
-                                            <span>Quick & secure</span>
-                                        </div>
-                                        <div class="feature-item">
-                                            <i class="fas fa-check feature-icon"></i>
-                                            <span>Cashback offers</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Pay to Bus Conductor -->
-                                <div class="payment-method" data-method="bus_conductor">
-                                    <div class="method-icon">
-                                        <i class="fas fa-money-bill-wave"></i>
-                                    </div>
-                                    <div class="method-name">Pay to Bus Conductor</div>
-                                    <div class="method-description">Pay cash directly to the bus conductor</div>
-                                    <div class="method-features">
-                                        <div class="feature-item">
-                                            <i class="fas fa-check feature-icon"></i>
-                                            <span>No online payment needed</span>
-                                        </div>
-                                        <div class="feature-item">
-                                            <i class="fas fa-info feature-icon"></i>
-                                            <span>Subject to seat availability</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <input type="hidden" name="payment_method" id="selectedPaymentMethod">
-                            
-                            <!-- Payment Forms -->
-                            <!-- eSewa Form -->
-                            <div class="payment-form" id="esewaForm">
-                                <h6 class="mb-3"><i class="fas fa-mobile-alt me-2"></i>eSewa Payment</h6>
-                                <div class="mobile-payment-info">
-                                    <p><strong>Instructions:</strong></p>
-                                    <ol>
-                                        <li>You will be redirected to eSewa payment gateway</li>
-                                        <li>Login with your eSewa credentials</li>
-                                        <li>Confirm the payment amount: <strong>रू {{ booking.total_fare }}</strong></li>
-                                        <li>Complete the payment</li>
-                                    </ol>
-                                </div>
-                            </div>
-                            
-                            <!-- Khalti Form -->
-                            <div class="payment-form" id="khaltiForm">
-                                <h6 class="mb-3"><i class="fas fa-wallet me-2"></i>Khalti Payment</h6>
-                                <div class="mobile-payment-info">
-                                    <p><strong>Instructions:</strong></p>
-                                    <ol>
-                                        <li>You will be redirected to Khalti payment gateway</li>
-                                        <li>Enter your Khalti PIN or login credentials</li>
-                                        <li>Verify the payment amount: <strong>रू {{ booking.total_fare }}</strong></li>
-                                        <li>Complete the transaction</li>
-                                    </ol>
-                                </div>
-                            </div>
-                            
-                            <!-- Pay to Bus Conductor Form -->
-                            <div class="payment-form" id="bus_conductorForm">
-                                <h6 class="mb-3"><i class="fas fa-money-bill-wave me-2"></i>Pay to Bus Conductor</h6>
-                                <div class="mobile-payment-info">
-                                    <p><strong>Instructions:</strong></p>
-                                    <ol>
-                                        <li>Your seat is reserved for this trip</li>
-                                        <li>Pay cash amount <strong>रू {{ booking.total_fare }}</strong> directly to the bus conductor</li>
-                                        <li>Show your booking confirmation to the conductor</li>
-                                        <li>Keep your ticket safe during the journey</li>
-                                    </ol>
-                                    <div class="alert alert-info mt-3">
-                                        <i class="fas fa-info-circle me-2"></i>
-                                        <strong>Note:</strong> Please arrive at the departure point 15 minutes early with exact change if possible.
-                                    </div>
-                                </div>
-                            </div>
-                            
+<!-- Payment Container -->
+<section class="py-12 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Booking Summary -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
+          <h2 class="text-xl font-bold text-gray-900 mb-6">
+            <i class="fas fa-receipt mr-2 text-green-500"></i>Booking Summary
+          </h2>
 
-                            
-                            <!-- Security Information -->
-                            <div class="security-info">
-                                <div class="security-title"><i class="fas fa-shield-alt me-2"></i>Your Payment is Secure</div>
-                                <div class="security-features">
-                                    <div class="security-feature">
-                                        <i class="fas fa-lock"></i>
-                                        <span>256-bit SSL encryption</span>
-                                    </div>
-                                    <div class="security-feature">
-                                        <i class="fas fa-shield-alt"></i>
-                                        <span>PCI DSS compliant</span>
-                                    </div>
-                                    <div class="security-feature">
-                                        <i class="fas fa-user-shield"></i>
-                                        <span>Data protection</span>
-                                    </div>
-                                    <div class="security-feature">
-                                        <i class="fas fa-undo"></i>
-                                        <span>Refund guarantee</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Payment Button -->
-                            <button type="submit" class="btn-pay" id="payButton" disabled>
-                                <i class="fas fa-lock me-2"></i>Select Payment Method
-                            </button>
-                        </form>
-                    </div>
+          <!-- Route Display -->
+          <div class="text-center mb-6">
+            <div class="flex items-center justify-center">
+              <div class="text-center">
+                <div class="text-lg font-bold text-gray-800">
+                  {{ booking.bus_schedule.route.source }}
                 </div>
+                <div class="text-sm text-gray-600">
+                  {{ booking.departure_time|time:"g:i A" }}
+                </div>
+              </div>
+              <div class="mx-4">
+                <i class="fas fa-arrow-right text-green-500 text-2xl"></i>
+              </div>
+              <div class="text-center">
+                <div class="text-lg font-bold text-gray-800">
+                  {{ booking.bus_schedule.route.destination }}
+                </div>
+                <div class="text-sm text-gray-600">
+                  {{ booking.arrival_time|time:"g:i A" }}
+                </div>
+              </div>
             </div>
+          </div>
+
+          <!-- Booking Details -->
+          <div class="space-y-4 mb-6">
+            <div
+              class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+            >
+              <span class="text-gray-600">Bus Number</span>
+              <span class="font-semibold text-gray-800"
+                >{{ booking.bus_schedule.bus.bus_number }}</span
+              >
+            </div>
+
+            <div
+              class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+            >
+              <span class="text-gray-600">Travel Date</span>
+              <span class="font-semibold text-gray-800"
+                >{{ booking.travel_date|date:"M d, Y" }}</span
+              >
+            </div>
+
+            <div
+              class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+            >
+              <span class="text-gray-600">Passenger</span>
+              <span class="font-semibold text-gray-800"
+                >{{ booking.passenger_name }}</span
+              >
+            </div>
+
+            <div
+              class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+            >
+              <span class="text-gray-600">Contact</span>
+              <span class="font-semibold text-gray-800"
+                >{{ booking.passenger_phone }}</span
+              >
+            </div>
+          </div>
+
+          <!-- Seat Information -->
+          <div class="bg-blue-50 rounded-lg p-4 mb-6">
+            <h3 class="font-semibold text-gray-800 mb-3">
+              <i class="fas fa-chair mr-2 text-blue-500"></i>Selected Seats
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              {% for seat in booking.seats.all %}
+              <span
+                class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
+              >
+                {{ seat.seat_number }}
+              </span>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Price Breakdown -->
+          <div class="border-t border-gray-200 pt-4">
+            <h3 class="font-semibold text-gray-800 mb-4">Price Breakdown</h3>
+
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="text-gray-600"
+                  >Ticket Price ({{ booking.seats.count }} seat{{
+                  booking.seats.count|pluralize }})</span
+                >
+                <span class="text-gray-800">रू{{ booking.subtotal }}</span>
+              </div>
+
+              {% if booking.service_fee %}
+              <div class="flex justify-between">
+                <span class="text-gray-600">Service Fee</span>
+                <span class="text-gray-800">रू{{ booking.service_fee }}</span>
+              </div>
+              {% endif %} {% if booking.discount %}
+              <div class="flex justify-between text-green-600">
+                <span>Discount</span>
+                <span>-रू{{ booking.discount }}</span>
+              </div>
+              {% endif %}
+
+              <div class="border-t border-gray-200 pt-2 mt-2">
+                <div class="flex justify-between text-lg font-bold">
+                  <span class="text-gray-800">Total Amount</span>
+                  <span class="text-green-600"
+                    >रू{{ booking.total_amount }}</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Session Timer -->
+          <div
+            class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
+          >
+            <div class="text-center">
+              <div class="text-sm text-yellow-800 mb-1">Session expires in</div>
+              <div id="countdown" class="text-2xl font-bold text-yellow-600">
+                15:00
+              </div>
+              <div class="text-xs text-yellow-700 mt-1">
+                Complete payment before time runs out
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Payment Methods -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">
+            <i class="fas fa-wallet mr-2 text-green-500"></i>Choose Payment
+            Method
+          </h2>
+
+          <form
+            id="paymentForm"
+            method="POST"
+            action="{% url 'payments:process_payment' booking.id %}"
+          >
+            {% csrf_token %}
+
+            <!-- Payment Methods Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <!-- eSewa -->
+              <div
+                class="payment-method border-2 border-gray-200 rounded-xl p-6 cursor-pointer hover:border-green-500 transition-all duration-300"
+                data-method="esewa"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center">
+                    <div
+                      class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4"
+                    >
+                      <i class="fas fa-mobile-alt text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                      <h3 class="font-semibold text-gray-800">eSewa</h3>
+                      <p class="text-sm text-gray-600">
+                        Digital wallet payment
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    class="method-radio w-5 h-5 border-2 border-gray-300 rounded-full"
+                  ></div>
+                </div>
+
+                <div class="text-sm text-gray-600">
+                  <div class="flex items-center mb-2">
+                    <i class="fas fa-check text-green-500 mr-2"></i>
+                    Instant payment confirmation
+                  </div>
+                  <div class="flex items-center">
+                    <i class="fas fa-shield-alt text-green-500 mr-2"></i>
+                    Secure and encrypted
+                  </div>
+                </div>
+              </div>
+
+              <!-- Khalti -->
+              <div
+                class="payment-method border-2 border-gray-200 rounded-xl p-6 cursor-pointer hover:border-purple-500 transition-all duration-300"
+                data-method="khalti"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center">
+                    <div
+                      class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4"
+                    >
+                      <i class="fas fa-wallet text-purple-600 text-xl"></i>
+                    </div>
+                    <div>
+                      <h3 class="font-semibold text-gray-800">Khalti</h3>
+                      <p class="text-sm text-gray-600">
+                        Digital wallet payment
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    class="method-radio w-5 h-5 border-2 border-gray-300 rounded-full"
+                  ></div>
+                </div>
+
+                <div class="text-sm text-gray-600">
+                  <div class="flex items-center mb-2">
+                    <i class="fas fa-check text-green-500 mr-2"></i>
+                    Quick and easy payment
+                  </div>
+                  <div class="flex items-center">
+                    <i class="fas fa-mobile-alt text-green-500 mr-2"></i>
+                    Mobile-first experience
+                  </div>
+                </div>
+              </div>
+
+              <!-- IME Pay -->
+              <div
+                class="payment-method border-2 border-gray-200 rounded-xl p-6 cursor-pointer hover:border-blue-500 transition-all duration-300"
+                data-method="ime_pay"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center">
+                    <div
+                      class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4"
+                    >
+                      <i class="fas fa-university text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                      <h3 class="font-semibold text-gray-800">IME Pay</h3>
+                      <p class="text-sm text-gray-600">Bank-backed payment</p>
+                    </div>
+                  </div>
+                  <div
+                    class="method-radio w-5 h-5 border-2 border-gray-300 rounded-full"
+                  ></div>
+                </div>
+
+                <div class="text-sm text-gray-600">
+                  <div class="flex items-center mb-2">
+                    <i class="fas fa-check text-green-500 mr-2"></i>
+                    Bank-grade security
+                  </div>
+                  <div class="flex items-center">
+                    <i class="fas fa-clock text-green-500 mr-2"></i>
+                    Real-time processing
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pay to Conductor -->
+              <div
+                class="payment-method border-2 border-gray-200 rounded-xl p-6 cursor-pointer hover:border-yellow-500 transition-all duration-300"
+                data-method="bus_conductor"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center">
+                    <div
+                      class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4"
+                    >
+                      <i
+                        class="fas fa-money-bill-wave text-yellow-600 text-xl"
+                      ></i>
+                    </div>
+                    <div>
+                      <h3 class="font-semibold text-gray-800">
+                        Pay to Conductor
+                      </h3>
+                      <p class="text-sm text-gray-600">Cash payment on bus</p>
+                    </div>
+                  </div>
+                  <div
+                    class="method-radio w-5 h-5 border-2 border-gray-300 rounded-full"
+                  ></div>
+                </div>
+
+                <div class="text-sm text-gray-600">
+                  <div class="flex items-center mb-2">
+                    <i class="fas fa-check text-green-500 mr-2"></i>
+                    Pay directly to conductor
+                  </div>
+                  <div class="flex items-center">
+                    <i class="fas fa-ticket-alt text-green-500 mr-2"></i>
+                    Seat reserved for 2 hours
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional Payment Options -->
+            <div id="additionalOptions" class="hidden mb-8">
+              <!-- Bank Selection for Mobile Banking -->
+              <div id="bankSelection" class="hidden">
+                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                  >Select Your Bank</label
+                >
+                <select
+                  name="bank_name"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                >
+                  <option value="">Choose your bank</option>
+                  <option value="nabil">Nabil Bank</option>
+                  <option value="nic">NIC Asia Bank</option>
+                  <option value="scb">Standard Chartered Bank</option>
+                  <option value="hbl">Himalayan Bank</option>
+                  <option value="nbl">Nepal Bank Limited</option>
+                  <option value="rbbl">Rastriya Banijya Bank</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Security Notice -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+              <div class="flex items-start">
+                <i class="fas fa-shield-alt text-blue-500 mt-1 mr-3"></i>
+                <div>
+                  <h4 class="font-semibold text-blue-800 mb-2">
+                    Secure Payment Guarantee
+                  </h4>
+                  <ul class="text-sm text-blue-700 space-y-1">
+                    <li>
+                      • All payments are processed through secure, encrypted
+                      channels
+                    </li>
+                    <li>
+                      • Your financial information is never stored on our
+                      servers
+                    </li>
+                    <li>• 100% refund guarantee for failed transactions</li>
+                    <li>• 24/7 customer support for payment issues</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Terms and Conditions -->
+            <div class="mb-6">
+              <label class="flex items-start">
+                <input
+                  type="checkbox"
+                  name="terms_accepted"
+                  required
+                  class="h-5 w-5 text-green-600 focus:ring-green-500 border-gray-300 rounded mt-1 mr-3"
+                />
+                <span class="text-sm text-gray-600 leading-relaxed">
+                  I agree to the
+                  <a
+                    href="{% url 'home:terms' %}"
+                    class="text-green-600 hover:text-green-700 font-medium"
+                    target="_blank"
+                    >Terms and Conditions</a
+                  >
+                  and
+                  <a
+                    href="{% url 'home:privacy' %}"
+                    class="text-green-600 hover:text-green-700 font-medium"
+                    target="_blank"
+                    >Privacy Policy</a
+                  >. I understand that this booking is subject to the bus
+                  operator's terms and cancellation policy.
+                </span>
+              </label>
+            </div>
+
+            <!-- Payment Button -->
+            <button
+              type="submit"
+              id="payButton"
+              disabled
+              class="w-full bg-green-500 text-white py-4 rounded-xl font-semibold text-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              <i class="fas fa-credit-card mr-2"></i>Select Payment Method
+            </button>
+
+            <input
+              type="hidden"
+              name="payment_method"
+              id="paymentMethodInput"
+            />
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
 </section>
-{% endblock %}
 
-{% block extra_js %}
+<!-- Help Section -->
+<section class="py-12 bg-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <h3 class="text-2xl font-bold text-gray-900 mb-4">
+      Need Help with Payment?
+    </h3>
+    <p class="text-gray-600 mb-6">
+      Our customer support team is available 24/7 to assist you with any
+      payment-related questions.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a
+        href="tel:+9779847435111"
+        class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors"
+      >
+        <i class="fas fa-phone mr-2"></i>Call Support
+      </a>
+      <a
+        href="{% url 'home:contact' %}"
+        class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
+      >
+        <i class="fas fa-envelope mr-2"></i>Contact Us
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_js %}
 <script>
-    let selectedMethod = null;
-    let countdownTimer = null;
-    let timeLeft = 600; // 10 minutes in seconds
-    
+  let selectedMethod = null;
+  let countdownTimer = null;
+  let timeLeft = 15 * 60; // 15 minutes in seconds
+
+  document.addEventListener("DOMContentLoaded", function () {
     // Payment method selection
-    document.addEventListener('DOMContentLoaded', function() {
-        const paymentMethods = document.querySelectorAll('.payment-method');
-        const paymentForms = document.querySelectorAll('.payment-form');
-        const payButton = document.getElementById('payButton');
-        const selectedMethodInput = document.getElementById('selectedPaymentMethod');
-        
-        paymentMethods.forEach(method => {
-            method.addEventListener('click', function() {
-                const methodType = this.getAttribute('data-method');
-                
-                // Remove selected class from all methods
-                paymentMethods.forEach(m => m.classList.remove('selected'));
-                
-                // Add selected class to clicked method
-                this.classList.add('selected');
-                
-                // Hide all forms
-                paymentForms.forEach(form => form.classList.remove('active'));
-                
-                // Show selected form
-                const selectedForm = document.getElementById(methodType + 'Form');
-                if (selectedForm) {
-                    selectedForm.classList.add('active');
-                }
-                
-                // Update selected method
-                selectedMethod = methodType;
-                selectedMethodInput.value = methodType;
-                
-                // Update pay button
-                updatePayButton(methodType);
-            });
+    document.querySelectorAll(".payment-method").forEach((method) => {
+      method.addEventListener("click", function () {
+        // Remove previous selection
+        document.querySelectorAll(".payment-method").forEach((m) => {
+          m.classList.remove("border-green-500", "bg-green-50");
+          m.querySelector(".method-radio").classList.remove(
+            "bg-green-500",
+            "border-green-500"
+          );
+          m.querySelector(".method-radio").classList.add("border-gray-300");
         });
-        
-        // Start countdown timer
-        startCountdown();
+
+        // Add selection to clicked method
+        this.classList.add("border-green-500", "bg-green-50");
+        const radio = this.querySelector(".method-radio");
+        radio.classList.remove("border-gray-300");
+        radio.classList.add("bg-green-500", "border-green-500");
+
+        // Update selected method
+        selectedMethod = this.dataset.method;
+        document.getElementById("paymentMethodInput").value = selectedMethod;
+
+        // Update pay button
+        updatePayButton(selectedMethod);
+
+        // Show additional options if needed
+        const additionalOptions = document.getElementById("additionalOptions");
+        const bankSelection = document.getElementById("bankSelection");
+
+        if (selectedMethod === "mobile_banking") {
+          additionalOptions.classList.remove("hidden");
+          bankSelection.classList.remove("hidden");
+        } else {
+          additionalOptions.classList.add("hidden");
+          bankSelection.classList.add("hidden");
+        }
+      });
     });
-    
-    function updatePayButton(method) {
-        const payButton = document.getElementById('payButton');
-        payButton.disabled = false;
-        
-        const buttonTexts = {
-            'esewa': '<i class="fas fa-mobile-alt me-2"></i>Pay with eSewa',
-            'khalti': '<i class="fas fa-wallet me-2"></i>Pay with Khalti',
-            'bus_conductor': '<i class="fas fa-money-bill-wave me-2"></i>Pay to Bus Conductor'
-        };
-        
-        payButton.innerHTML = buttonTexts[method] || '<i class="fas fa-credit-card me-2"></i>Proceed to Pay';
+
+    // Start countdown timer
+    startCountdown();
+  });
+
+  function updatePayButton(method) {
+    const payButton = document.getElementById("payButton");
+    payButton.disabled = false;
+    payButton.classList.remove("disabled:bg-gray-400");
+
+    const buttonTexts = {
+      esewa: '<i class="fas fa-mobile-alt mr-2"></i>Pay with eSewa',
+      khalti: '<i class="fas fa-wallet mr-2"></i>Pay with Khalti',
+      ime_pay: '<i class="fas fa-university mr-2"></i>Pay with IME Pay',
+      bus_conductor:
+        '<i class="fas fa-money-bill-wave mr-2"></i>Reserve & Pay to Conductor',
+    };
+
+    payButton.innerHTML =
+      buttonTexts[method] ||
+      '<i class="fas fa-credit-card mr-2"></i>Proceed to Pay';
+  }
+
+  function startCountdown() {
+    const countdownElement = document.getElementById("countdown");
+
+    countdownTimer = setInterval(function () {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+
+      countdownElement.textContent = `${minutes
+        .toString()
+        .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
+      if (timeLeft <= 0) {
+        clearInterval(countdownTimer);
+        alert("Session expired! Please select your seats again.");
+        window.location.href =
+          '{% url "bookings:seat_selection" booking.bus_schedule.id %}';
+      }
+
+      // Change color when time is running out
+      if (timeLeft <= 120) {
+        // Last 2 minutes
+        countdownElement.classList.add("text-red-600", "animate-pulse");
+        countdownElement.classList.remove("text-yellow-600");
+      } else if (timeLeft <= 300) {
+        // Last 5 minutes
+        countdownElement.classList.add("text-orange-600");
+        countdownElement.classList.remove("text-yellow-600");
+      }
+
+      timeLeft--;
+    }, 1000);
+  }
+
+  // Form submission
+  document
+    .getElementById("paymentForm")
+    .addEventListener("submit", function (e) {
+      if (!selectedMethod) {
+        e.preventDefault();
+        alert("Please select a payment method.");
+        return;
+      }
+
+      // Add loading state
+      const payButton = document.getElementById("payButton");
+      payButton.innerHTML =
+        '<i class="fas fa-spinner fa-spin mr-2"></i>Processing Payment...';
+      payButton.disabled = true;
+
+      // For mobile banking, validate bank selection
+      if (selectedMethod === "mobile_banking") {
+        const bankSelect = document.querySelector('select[name="bank_name"]');
+        if (!bankSelect.value) {
+          e.preventDefault();
+          alert("Please select your bank.");
+          updatePayButton(selectedMethod);
+          return;
+        }
+      }
+    });
+
+  // Prevent page refresh/close during payment
+  window.addEventListener("beforeunload", function (e) {
+    if (selectedMethod && selectedMethod !== "bus_conductor") {
+      e.preventDefault();
+      e.returnValue = "Payment is in progress. Are you sure you want to leave?";
     }
-    
-    function startCountdown() {
-        const countdownElement = document.getElementById('countdown');
-        
-        countdownTimer = setInterval(function() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            
-            countdownElement.textContent = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
-            if (timeLeft <= 0) {
-                clearInterval(countdownTimer);
-                // Redirect to seat selection or show timeout message
-                alert('Session expired! Please select your seats again.');
-                window.location.href = '{% url "bookings:create_booking" booking.bus_schedule.id %}';
-            }
-            
-            // Change color when time is running out
-            if (timeLeft <= 120) { // Last 2 minutes
-                countdownElement.style.color = '#dc3545';
-                countdownElement.style.animation = 'blink 1s infinite';
-            } else if (timeLeft <= 300) { // Last 5 minutes
-                countdownElement.style.color = '#ffc107';
-            }
-            
-            timeLeft--;
-        }, 1000);
+  });
+
+  // Auto-select first payment method for better UX
+  setTimeout(() => {
+    const firstMethod = document.querySelector(".payment-method");
+    if (firstMethod && !selectedMethod) {
+      firstMethod.click();
     }
-    
-    // Form submission
-    document.getElementById('paymentForm').addEventListener('submit', function(e) {
-        if (!selectedMethod) {
-            e.preventDefault();
-            alert('Please select a payment method.');
-            return;
-        }
-        
-        // Add loading state
-        const payButton = document.getElementById('payButton');
-        payButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
-        payButton.disabled = true;
-        
-        // For mobile banking, validate bank selection
-        if (selectedMethod === 'mobile_banking') {
-            const bankSelect = document.querySelector('select[name="bank_name"]');
-            if (!bankSelect.value) {
-                e.preventDefault();
-                alert('Please select your bank.');
-                updatePayButton(selectedMethod);
-                return;
-            }
-        }
-    });
-    
-    // Add CSS for blinking animation
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0.5; }
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // Prevent page refresh/close during payment
-    window.addEventListener('beforeunload', function(e) {
-        if (selectedMethod && selectedMethod !== 'cash') {
-            e.preventDefault();
-            e.returnValue = 'Payment is in progress. Are you sure you want to leave?';
-        }
-    });
-    
-    // Auto-select first payment method for better UX
-    setTimeout(() => {
-        const firstMethod = document.querySelector('.payment-method');
-        if (firstMethod && !selectedMethod) {
-            firstMethod.click();
-        }
-    }, 500);
+  }, 500);
 </script>
 {% endblock %}

@@ -3,244 +3,107 @@
 
 {% block title %}About Us - TravelMate{% endblock %}
 
-{% block extra_css %}
-<style>
-    .about-hero {
-        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{% static "img/about-hero.jpg" %}') no-repeat center center;
-        background-size: cover;
-        color: white;
-        padding: 80px 0;
-        margin-top: -1.5rem;
-    }
-    .team-member {
-        transition: transform 0.3s;
-    }
-    .team-member:hover {
-        transform: translateY(-5px);
-    }
-    .timeline {
-        position: relative;
-        padding-left: 30px;
-    }
-    .timeline::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 2px;
-        background-color: #0d6efd;
-    }
-    .timeline-item {
-        position: relative;
-        margin-bottom: 30px;
-    }
-    .timeline-item::before {
-        content: '';
-        position: absolute;
-        left: -34px;
-        top: 0;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background-color: #0d6efd;
-    }
-    .value-icon {
-        font-size: 2.5rem;
-        color: #0d6efd;
-        margin-bottom: 1rem;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
 <!-- Hero Section -->
-<section class="about-hero">
-    <div class="container text-center">
-        <h1 class="display-4 fw-bold mb-4">About TravelMate</h1>
-        <p class="lead mb-0">Your Trusted Partner for Safe and Comfortable Bus Travel</p>
+<section class="relative bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white py-24 overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-full h-full" style="background-image: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.1"><circle cx="30" cy="30" r="4"/></g></g></svg>');"></div>
+    </div>
+    
+    <!-- Animated Elements -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-white opacity-5 rounded-full animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-white opacity-5 rounded-full animate-pulse delay-1000"></div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            About <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">TravelMate</span>
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
+            Your Trusted Partner for Safe and Comfortable Bus Travel Across Nepal
+        </p>
+        
+        <!-- Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16">
+            <div class="text-center">
+                <div class="text-3xl md:text-4xl font-bold text-yellow-400 mb-2">500+</div>
+                <div class="text-gray-300">Daily Routes</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl md:text-4xl font-bold text-green-400 mb-2">50K+</div>
+                <div class="text-gray-300">Happy Customers</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl md:text-4xl font-bold text-blue-400 mb-2">100+</div>
+                <div class="text-gray-300">Bus Partners</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl md:text-4xl font-bold text-purple-400 mb-2">4+</div>
+                <div class="text-gray-300">Years Experience</div>
+            </div>
+        </div>
     </div>
 </section>
 
 <!-- Our Story -->
-<section class="py-5">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6 mb-4 mb-lg-0">
-                <img src="{% static 'img/about-story.jpg' %}" alt="Our Story" class="img-fluid rounded">
-            </div>
-            <div class="col-lg-6">
-                <h2 class="mb-4">Our Story</h2>
-                <p>TravelMate was founded in 2020 with a simple mission: to make bus travel more accessible, comfortable, and enjoyable for everyone across Nepal. What started as a small startup with just a handful of bus partners has now grown into one of Nepal's leading bus booking platforms.</p>
-                <p>Our journey began when our founders experienced firsthand the challenges of booking bus tickets in Nepal - long queues, lack of information about bus amenities, and uncertainty about schedules. They envisioned a platform that would eliminate these pain points and provide travelers with a seamless booking experience throughout the beautiful landscapes of Nepal.</p>
-                <p>Today, TravelMate connects thousands of travelers with hundreds of bus operators across Nepal, offering a wide range of options to suit every budget and preference. From the bustling streets of Kathmandu to the serene hills of Pokhara, we continue to innovate and improve our services to ensure that our customers have the best possible travel experience.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Our Mission & Vision -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6 mb-4 mb-md-0">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="text-center mb-4">
-                            <i class="fas fa-bullseye fa-3x text-primary"></i>
-                        </div>
-                        <h3 class="text-center mb-4">Our Mission</h3>
-                        <p>To revolutionize the bus travel industry in Nepal by providing a transparent, reliable, and user-friendly platform that connects travelers with quality bus services. We aim to make bus travel the preferred mode of transportation across Nepal by enhancing the booking experience and ensuring customer satisfaction at every step of the journey.</p>
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="order-2 lg:order-1">
+                <div class="relative">
+                    <div class="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-8 shadow-2xl transform rotate-3">
+                        <img src="{% static 'images/Kathmandu.jpg' %}" alt="Our Story" 
+                             class="w-full h-80 object-cover rounded-xl">
                     </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="text-center mb-4">
-                            <i class="fas fa-eye fa-3x text-primary"></i>
-                        </div>
-                        <h3 class="text-center mb-4">Our Vision</h3>
-                        <p>To become the leading bus booking platform in Nepal and the region, known for innovation, reliability, and exceptional customer service. We envision a future where bus travel across Nepal is seamless, comfortable, and accessible to all, contributing to sustainable transportation solutions and connecting communities throughout the country.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Our Values -->
-<section class="py-5">
-    <div class="container">
-        <h2 class="text-center mb-5">Our Core Values</h2>
-        <div class="row g-4">
-            <div class="col-md-4 text-center">
-                <div class="value-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h4>Customer First</h4>
-                <p>We prioritize our customers' needs and strive to exceed their expectations in every interaction. Our decisions are guided by what's best for our users.</p>
-            </div>
-            <div class="col-md-4 text-center">
-                <div class="value-icon">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <h4>Trust & Reliability</h4>
-                <p>We build trust through transparency, honesty, and consistent delivery of our promises. Reliability is at the core of our service.</p>
-            </div>
-            <div class="col-md-4 text-center">
-                <div class="value-icon">
-                    <i class="fas fa-lightbulb"></i>
-                </div>
-                <h4>Innovation</h4>
-                <p>We continuously seek new ways to improve our platform and services. We embrace change and are not afraid to challenge the status quo.</p>
-            </div>
-            <div class="col-md-4 text-center">
-                <div class="value-icon">
-                    <i class="fas fa-handshake"></i>
-                </div>
-                <h4>Collaboration</h4>
-                <p>We believe in the power of partnerships. We work closely with bus operators, technology partners, and other stakeholders to create a better travel ecosystem.</p>
-            </div>
-            <div class="col-md-4 text-center">
-                <div class="value-icon">
-                    <i class="fas fa-globe"></i>
-                </div>
-                <h4>Sustainability</h4>
-                <p>We are committed to promoting sustainable travel options and reducing the environmental impact of transportation.</p>
-            </div>
-            <div class="col-md-4 text-center">
-                <div class="value-icon">
-                    <i class="fas fa-heart"></i>
-                </div>
-                <h4>Passion</h4>
-                <p>We are passionate about what we do and are dedicated to making a positive difference in the travel industry.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Our Journey -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <h2 class="text-center mb-5">Our Journey</h2>
-        <div class="timeline">
-            <div class="timeline-item">
-                <h4>2020: The Beginning</h4>
-                <p>TravelMate was founded with a vision to transform the bus booking experience. We launched our platform with 10 bus operators and 50 routes.</p>
-            </div>
-            <div class="timeline-item">
-                <h4>2021: Expansion</h4>
-                <p>We expanded our network to include 100+ bus operators and 500+ routes. We also introduced our mobile app, making it easier for users to book tickets on the go.</p>
-            </div>
-            <div class="timeline-item">
-                <h4>2022: Innovation</h4>
-                <p>We implemented advanced features like seat selection, real-time tracking, and personalized recommendations. Our user base grew to 100,000+ active users.</p>
-            </div>
-            <div class="timeline-item">
-                <h4>2023: Recognition</h4>
-                <p>TravelMate was recognized as one of the top travel tech startups. We received funding to further expand our operations and improve our technology.</p>
-            </div>
-            <div class="timeline-item">
-                <h4>2024: Present Day</h4>
-                <p>Today, TravelMate connects millions of travelers with hundreds of bus operators across the country. We continue to innovate and improve our services to provide the best possible travel experience.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Our Team -->
-<section class="py-5">
-    <div class="container">
-        <h2 class="text-center mb-5">Meet Our Team</h2>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card team-member h-100">
-                    <img src="{% static 'img/team-placeholder.jpg' %}" class="card-img-top" alt="Team Member">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Rajesh Sharma</h5>
-                        <p class="text-muted">Co-Founder & CEO</p>
-                        <p class="card-text">Rajesh has over 15 years of experience in Nepal's transportation industry and is passionate about creating innovative solutions for travelers across Nepal.</p>
-                        <div class="contact-info mb-3">
-                            <p class="mb-1"><i class="fas fa-phone text-primary me-2"></i>+977 9847435111</p>
-                            <p class="mb-1"><i class="fas fa-envelope text-primary me-2"></i>info@travelmate.com</p>
-                            <p class="mb-0"><i class="fas fa-map-marker-alt text-primary me-2"></i>Patan, Lalitpur, Nepal</p>
-                        </div>
-                        <div class="social-icons">
-                            <a href="#" class="text-primary me-2"><i class="fab fa-linkedin"></i></a>
-                            <a href="#" class="text-primary me-2"><i class="fab fa-twitter"></i></a>
-                            <a href="#" class="text-primary"><i class="fas fa-envelope"></i></a>
+                    <div class="absolute -bottom-6 -right-6 bg-white rounded-2xl p-6 shadow-xl border border-gray-100">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">2020</div>
+                            <div class="text-sm text-gray-600">Founded</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card team-member h-100">
-                    <img src="{% static 'img/team-placeholder.jpg' %}" class="card-img-top" alt="Team Member">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Priya Thapa</h5>
-                        <p class="text-muted">Co-Founder & CTO</p>
-                        <p class="card-text">Priya is a tech enthusiast with a background in software development. She leads our technology initiatives and ensures a seamless user experience for travelers in Nepal.</p>
-                        <div class="social-icons">
-                            <a href="#" class="text-primary me-2"><i class="fab fa-linkedin"></i></a>
-                            <a href="#" class="text-primary me-2"><i class="fab fa-twitter"></i></a>
-                            <a href="#" class="text-primary"><i class="fas fa-envelope"></i></a>
-                        </div>
-                    </div>
+            
+            <div class="order-1 lg:order-2">
+                <div class="mb-6">
+                    <span class="inline-block bg-blue-100 text-blue-600 px-4 py-2 rounded-full text-sm font-semibold mb-4">
+                        Our Journey
+                    </span>
+                    <h2 class="text-4xl font-bold text-gray-900 mb-6">Our Story</h2>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card team-member h-100">
-                    <img src="{% static 'img/team-placeholder.jpg' %}" class="card-img-top" alt="Team Member">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Arjun Gurung</h5>
-                        <p class="text-muted">Chief Marketing Officer</p>
-                        <p class="card-text">Arjun brings his marketing expertise to TravelMate, helping us reach more travelers across Nepal and build a strong brand presence in the local market.</p>
-                        <div class="social-icons">
-                            <a href="#" class="text-primary me-2"><i class="fab fa-linkedin"></i></a>
-                            <a href="#" class="text-primary me-2"><i class="fab fa-twitter"></i></a>
-                            <a href="#" class="text-primary"><i class="fas fa-envelope"></i></a>
-                        </div>
+                
+                <div class="space-y-6 text-gray-600 leading-relaxed">
+                    <p class="text-lg">
+                        TravelMate was founded in 2020 with a simple yet powerful mission: to revolutionize bus travel across Nepal. 
+                        What started as a small startup with just a handful of bus partners has now grown into one of Nepal's 
+                        leading bus booking platforms.
+                    </p>
+                    
+                    <p>
+                        Our journey began when our founders experienced firsthand the challenges of booking bus tickets in Nepal - 
+                        long queues, lack of information about bus amenities, and uncertainty about schedules. They envisioned a 
+                        platform that would eliminate these pain points and provide travelers with a seamless booking experience 
+                        throughout the beautiful landscapes of Nepal.
+                    </p>
+                    
+                    <p>
+                        Today, TravelMate connects thousands of travelers with hundreds of bus operators across Nepal, offering a 
+                        wide range of options to suit every budget and preference. From the bustling streets of Kathmandu to the 
+                        serene hills of Pokhara, we continue to innovate and improve our services.
+                    </p>
+                </div>
+                
+                <!-- Key Achievements -->
+                <div class="grid grid-cols-2 gap-4 mt-8">
+                    <div class="bg-blue-50 rounded-lg p-4 text-center">
+                        <div class="text-2xl font-bold text-blue-600">99.9%</div>
+                        <div class="text-sm text-gray-600">Uptime</div>
+                    </div>
+                    <div class="bg-green-50 rounded-lg p-4 text-center">
+                        <div class="text-2xl font-bold text-green-600">4.8/5</div>
+                        <div class="text-sm text-gray-600">Customer Rating</div>
                     </div>
                 </div>
             </div>
@@ -248,12 +111,409 @@
     </div>
 </section>
 
-<!-- Join Us -->
-<section class="py-5 bg-primary text-white">
-    <div class="container text-center">
-        <h2 class="mb-4">Join Our Journey</h2>
-        <p class="lead mb-4">We're always looking for talented individuals who share our passion for transforming the travel industry. Check out our current openings and become part of our growing team.</p>
-        <a href="#" class="btn btn-light btn-lg">View Career Opportunities</a>
+<!-- Mission & Vision -->
+<section class="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">Mission & Vision</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Driving the future of bus travel in Nepal with innovation and dedication
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Mission -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-shadow duration-300 border border-gray-100">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                        <i class="fas fa-bullseye text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900">Our Mission</h3>
+                </div>
+                <p class="text-gray-600 leading-relaxed text-center">
+                    To revolutionize the bus travel industry in Nepal by providing a transparent, reliable, and user-friendly 
+                    platform that connects travelers with quality bus services. We aim to make bus travel the preferred mode of 
+                    transportation across Nepal by enhancing the booking experience and ensuring customer satisfaction at every 
+                    step of the journey.
+                </p>
+            </div>
+            
+            <!-- Vision -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-shadow duration-300 border border-gray-100">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                        <i class="fas fa-eye text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900">Our Vision</h3>
+                </div>
+                <p class="text-gray-600 leading-relaxed text-center">
+                    To become the leading bus booking platform in Nepal and the region, known for innovation, reliability, and 
+                    exceptional customer service. We envision a future where bus travel across Nepal is seamless, comfortable, 
+                    and accessible to all, contributing to sustainable transportation solutions and connecting communities 
+                    throughout the country.
+                </p>
+            </div>
+        </div>
     </div>
 </section>
+
+<!-- Core Values -->
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">Our Core Values</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                The principles that guide everything we do at TravelMate
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Value 1 -->
+            <div class="text-center group hover:transform hover:scale-105 transition-all duration-300">
+                <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl">
+                    <i class="fas fa-users text-3xl text-white"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900 mb-4">Customer First</h4>
+                <p class="text-gray-600 leading-relaxed">
+                    We prioritize our customers' needs and strive to exceed their expectations in every interaction. 
+                    Our decisions are guided by what's best for our users.
+                </p>
+            </div>
+            
+            <!-- Value 2 -->
+            <div class="text-center group hover:transform hover:scale-105 transition-all duration-300">
+                <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl">
+                    <i class="fas fa-shield-alt text-3xl text-white"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900 mb-4">Trust & Reliability</h4>
+                <p class="text-gray-600 leading-relaxed">
+                    We build trust through transparency, honesty, and consistent delivery of our promises. 
+                    Reliability is at the core of our service.
+                </p>
+            </div>
+            
+            <!-- Value 3 -->
+            <div class="text-center group hover:transform hover:scale-105 transition-all duration-300">
+                <div class="w-20 h-20 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl">
+                    <i class="fas fa-lightbulb text-3xl text-white"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900 mb-4">Innovation</h4>
+                <p class="text-gray-600 leading-relaxed">
+                    We continuously seek new ways to improve our platform and services. We embrace change and 
+                    are not afraid to challenge the status quo.
+                </p>
+            </div>
+            
+            <!-- Value 4 -->
+            <div class="text-center group hover:transform hover:scale-105 transition-all duration-300">
+                <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl">
+                    <i class="fas fa-handshake text-3xl text-white"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900 mb-4">Collaboration</h4>
+                <p class="text-gray-600 leading-relaxed">
+                    We believe in the power of partnerships. We work closely with bus operators, technology partners, 
+                    and other stakeholders to create a better travel ecosystem.
+                </p>
+            </div>
+            
+            <!-- Value 5 -->
+            <div class="text-center group hover:transform hover:scale-105 transition-all duration-300">
+                <div class="w-20 h-20 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl">
+                    <i class="fas fa-globe text-3xl text-white"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900 mb-4">Sustainability</h4>
+                <p class="text-gray-600 leading-relaxed">
+                    We are committed to promoting sustainable travel options and reducing the environmental 
+                    impact of transportation.
+                </p>
+            </div>
+            
+            <!-- Value 6 -->
+            <div class="text-center group hover:transform hover:scale-105 transition-all duration-300">
+                <div class="w-20 h-20 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl">
+                    <i class="fas fa-heart text-3xl text-white"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900 mb-4">Community</h4>
+                <p class="text-gray-600 leading-relaxed">
+                    We are deeply rooted in the Nepali community and committed to contributing to the growth 
+                    and development of our beautiful country.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Timeline -->
+<section class="py-20 bg-gradient-to-br from-gray-50 to-purple-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">Our Journey</h2>
+            <p class="text-xl text-gray-600">Key milestones in our growth story</p>
+        </div>
+        
+        <div class="relative">
+            <!-- Timeline Line -->
+            <div class="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
+            
+            <!-- Timeline Items -->
+            <div class="space-y-16">
+                <!-- 2020 -->
+                <div class="flex items-center">
+                    <div class="w-1/2 pr-8 text-right">
+                        <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                            <h4 class="text-xl font-semibold text-gray-900 mb-2">TravelMate Founded</h4>
+                            <p class="text-gray-600">Started with a vision to revolutionize bus travel in Nepal</p>
+                        </div>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                            2020
+                        </div>
+                    </div>
+                    <div class="w-1/2 pl-8"></div>
+                </div>
+                
+                <!-- 2021 -->
+                <div class="flex items-center">
+                    <div class="w-1/2 pr-8"></div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                            2021
+                        </div>
+                    </div>
+                    <div class="w-1/2 pl-8">
+                        <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                            <h4 class="text-xl font-semibold text-gray-900 mb-2">Platform Launch</h4>
+                            <p class="text-gray-600">Officially launched our booking platform with 50+ bus partners</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 2022 -->
+                <div class="flex items-center">
+                    <div class="w-1/2 pr-8 text-right">
+                        <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                            <h4 class="text-xl font-semibold text-gray-900 mb-2">Mobile App Release</h4>
+                            <p class="text-gray-600">Launched mobile applications for iOS and Android platforms</p>
+                        </div>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                            2022
+                        </div>
+                    </div>
+                    <div class="w-1/2 pl-8"></div>
+                </div>
+                
+                <!-- 2023 -->
+                <div class="flex items-center">
+                    <div class="w-1/2 pr-8"></div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                            2023
+                        </div>
+                    </div>
+                    <div class="w-1/2 pl-8">
+                        <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                            <h4 class="text-xl font-semibold text-gray-900 mb-2">50K+ Customers</h4>
+                            <p class="text-gray-600">Reached milestone of serving over 50,000 happy customers</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 2024 -->
+                <div class="flex items-center">
+                    <div class="w-1/2 pr-8 text-right">
+                        <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                            <h4 class="text-xl font-semibold text-gray-900 mb-2">AI Integration</h4>
+                            <p class="text-gray-600">Introduced AI-powered recommendations and smart booking features</p>
+                        </div>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                            2024
+                        </div>
+                    </div>
+                    <div class="w-1/2 pl-8"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">Meet Our Team</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                The passionate individuals behind TravelMate's success
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Team Member 1 -->
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group">
+                <div class="relative">
+                    <div class="bg-gradient-to-br from-blue-400 to-purple-500 h-64 flex items-center justify-center">
+                        <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-4xl text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                </div>
+                <div class="p-6 text-center">
+                    <h5 class="text-xl font-semibold text-gray-900 mb-1">Ram Sharma</h5>
+                    <p class="text-blue-600 font-medium mb-3">Founder & CEO</p>
+                    <p class="text-gray-600 text-sm mb-4 leading-relaxed">
+                        Ram is a visionary entrepreneur with over 10 years of experience in the travel industry. 
+                        He founded TravelMate to make bus travel more accessible across Nepal.
+                    </p>
+                    <div class="flex justify-center space-x-3">
+                        <a href="#" class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-200 transition-colors">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-200 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-200 transition-colors">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Team Member 2 -->
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group">
+                <div class="relative">
+                    <div class="bg-gradient-to-br from-green-400 to-teal-500 h-64 flex items-center justify-center">
+                        <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-4xl text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                </div>
+                <div class="p-6 text-center">
+                    <h5 class="text-xl font-semibold text-gray-900 mb-1">Priya Thapa</h5>
+                    <p class="text-blue-600 font-medium mb-3">Co-Founder & CTO</p>
+                    <p class="text-gray-600 text-sm mb-4 leading-relaxed">
+                        Priya is a tech enthusiast with a background in software development. She leads our technology 
+                        initiatives and ensures a seamless user experience.
+                    </p>
+                    <div class="flex justify-center space-x-3">
+                        <a href="#" class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-200 transition-colors">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-200 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-200 transition-colors">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Team Member 3 -->
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group">
+                <div class="relative">
+                    <div class="bg-gradient-to-br from-purple-400 to-pink-500 h-64 flex items-center justify-center">
+                        <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-4xl text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                </div>
+                <div class="p-6 text-center">
+                    <h5 class="text-xl font-semibold text-gray-900 mb-1">Arjun Gurung</h5>
+                    <p class="text-blue-600 font-medium mb-3">Chief Marketing Officer</p>
+                    <p class="text-gray-600 text-sm mb-4 leading-relaxed">
+                        Arjun brings his marketing expertise to TravelMate, helping us reach more travelers across 
+                        Nepal and build a strong brand presence.
+                    </p>
+                    <div class="flex justify-center space-x-3">
+                        <a href="#" class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-200 transition-colors">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-200 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-200 transition-colors">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 bg-gradient-to-r from-blue-600 via-purple-700 to-blue-800 relative overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-full h-full" style="background-image: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.1"><circle cx="30" cy="30" r="4"/></g></g></svg>');"></div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+            Ready to Experience the Difference?
+        </h2>
+        <p class="text-xl text-blue-100 mb-10 max-w-3xl mx-auto leading-relaxed">
+            Join thousands of satisfied customers who trust TravelMate for their bus travel needs. 
+            Start your journey with us today!
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'routes:route_search' %}"
+               class="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <i class="fas fa-ticket-alt mr-2"></i>Book Your Ticket
+            </a>
+            <a href="{% url 'home:contact' %}"
+               class="border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300">
+                <i class="fas fa-phone mr-2"></i>Contact Us
+            </a>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in-up');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe elements for animation
+        document.querySelectorAll('.group, .bg-white, .timeline-item').forEach(el => {
+            observer.observe(el);
+        });
+    });
+</script>
+
+<style>
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+}
+</style>
 {% endblock %}

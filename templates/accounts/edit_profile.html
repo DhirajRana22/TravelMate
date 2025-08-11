@@ -1,349 +1,539 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Edit Profile - TravelMate{% endblock %}
-
-{% block extra_css %}
-<style>
-    .edit-profile-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem 0;
-        margin-top: -1.5rem;
-    }
-    .form-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
-    }
-    .form-card .card-header {
-        background: #f8f9fa;
-        border-bottom: 1px solid #dee2e6;
-        border-radius: 15px 15px 0 0;
-        padding: 1.5rem;
-    }
-    .form-card .card-body {
-        padding: 2rem;
-    }
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    .form-label {
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.5rem;
-    }
-    .form-control {
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        transition: all 0.3s ease;
-    }
-    .form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    .btn-save {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        border-radius: 8px;
-        padding: 12px 30px;
-        color: white;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    .btn-save:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        color: white;
-    }
-    .btn-cancel {
-        background: #6c757d;
-        border: none;
-        border-radius: 8px;
-        padding: 12px 30px;
-        color: white;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-    .btn-cancel:hover {
-        background: #5a6268;
-        color: white;
-        text-decoration: none;
-    }
-    .profile-picture-preview {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        border: 4px solid #e9ecef;
-        object-fit: cover;
-        margin-bottom: 1rem;
-    }
-    .file-input-wrapper {
-        position: relative;
-        overflow: hidden;
-        display: inline-block;
-    }
-    .file-input-wrapper input[type=file] {
-        position: absolute;
-        left: -9999px;
-    }
-    .file-input-label {
-        background: #667eea;
-        color: white;
-        padding: 8px 16px;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    .file-input-label:hover {
-        background: #5a67d8;
-    }
-    .error-message {
-        color: #dc3545;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-    }
-    .success-message {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<!-- Edit Profile Header -->
-<section class="edit-profile-header">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <h1 class="mb-2"><i class="fas fa-user-edit me-2"></i>Edit Profile</h1>
-                <p class="mb-0">Update your personal information and preferences</p>
-            </div>
-        </div>
+{% extends 'base.html' %} {% load static %} {% block title %}Edit Profile -
+TravelMate{% endblock %} {% block content %}
+<!-- Header -->
+<section
+  class="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-16 -mt-6"
+>
+  <div class="container mx-auto px-4">
+    <div class="text-center">
+      <h1 class="text-3xl md:text-4xl font-bold mb-2">Edit Profile</h1>
+      <p class="text-xl opacity-90">
+        Update your personal information and preferences
+      </p>
     </div>
+  </div>
 </section>
 
-<!-- Edit Profile Form -->
-<section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    {% endfor %}
+<!-- Profile Edit Form -->
+<section class="py-12 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <div class="max-w-4xl mx-auto">
+      <form
+        method="post"
+        enctype="multipart/form-data"
+        class="space-y-8"
+        id="profileForm"
+      >
+        {% csrf_token %}
+
+        <!-- Profile Picture Section -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+            <h3 class="text-xl font-semibold text-gray-800">
+              <i class="fas fa-camera mr-2 text-blue-500"></i>Profile Picture
+            </h3>
+          </div>
+          <div class="p-6">
+            <div
+              class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6"
+            >
+              <div class="flex-shrink-0">
+                {% if user.profile.profile_picture %}
+                <img
+                  src="{{ user.profile.profile_picture.url }}"
+                  alt="Profile Picture"
+                  id="profilePreview"
+                  class="w-32 h-32 rounded-full border-4 border-gray-200 object-cover shadow-lg"
+                />
+                {% else %}
+                <div
+                  id="profilePreview"
+                  class="w-32 h-32 rounded-full border-4 border-gray-200 bg-gray-100 flex items-center justify-center shadow-lg"
+                >
+                  <i class="fas fa-user text-4xl text-gray-400"></i>
+                </div>
                 {% endif %}
-                
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    
-                    <!-- User Information -->
-                    <div class="form-card">
-                        <div class="card-header">
-                            <h4 class="mb-0"><i class="fas fa-user me-2"></i>Basic Information</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="{{ user_form.first_name.id_for_label }}" class="form-label">
-                                            <i class="fas fa-user me-1"></i>First Name
-                                        </label>
-                                        {{ user_form.first_name }}
-                                        {% if user_form.first_name.errors %}
-                                            <div class="error-message">{{ user_form.first_name.errors.0 }}</div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="{{ user_form.last_name.id_for_label }}" class="form-label">
-                                            <i class="fas fa-user me-1"></i>Last Name
-                                        </label>
-                                        {{ user_form.last_name }}
-                                        {% if user_form.last_name.errors %}
-                                            <div class="error-message">{{ user_form.last_name.errors.0 }}</div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="{{ user_form.email.id_for_label }}" class="form-label">
-                                    <i class="fas fa-envelope me-1"></i>Email Address
-                                </label>
-                                {{ user_form.email }}
-                                {% if user_form.email.errors %}
-                                    <div class="error-message">{{ user_form.email.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Profile Information -->
-                    <div class="form-card">
-                        <div class="card-header">
-                            <h4 class="mb-0"><i class="fas fa-id-card me-2"></i>Profile Details</h4>
-                        </div>
-                        <div class="card-body">
-                            <!-- Profile Picture -->
-                            <div class="form-group text-center">
-                                <label class="form-label">Profile Picture</label>
-                                <div class="mb-3">
-                                    {% if profile_form.instance.profile_picture %}
-                                        <img src="{{ profile_form.instance.profile_picture.url }}" alt="Current Profile Picture" class="profile-picture-preview" id="profilePreview">
-                                    {% else %}
-                                        <div class="profile-picture-preview d-flex align-items-center justify-content-center" style="background: #f8f9fa;" id="profilePreview">
-                                            <i class="fas fa-user fa-3x text-muted"></i>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="file-input-wrapper">
-                                    {{ profile_form.profile_picture }}
-                                    <label for="{{ profile_form.profile_picture.id_for_label }}" class="file-input-label">
-                                        <i class="fas fa-camera me-1"></i>Choose Photo
-                                    </label>
-                                </div>
-                                {% if profile_form.profile_picture.errors %}
-                                    <div class="error-message">{{ profile_form.profile_picture.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="{{ profile_form.phone_number.id_for_label }}" class="form-label">
-                                            <i class="fas fa-phone me-1"></i>Phone Number
-                                        </label>
-                                        {{ profile_form.phone_number }}
-                                        {% if profile_form.phone_number.errors %}
-                                            <div class="error-message">{{ profile_form.phone_number.errors.0 }}</div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="{{ profile_form.date_of_birth.id_for_label }}" class="form-label">
-                                            <i class="fas fa-birthday-cake me-1"></i>Date of Birth
-                                        </label>
-                                        {{ profile_form.date_of_birth }}
-                                        {% if profile_form.date_of_birth.errors %}
-                                            <div class="error-message">{{ profile_form.date_of_birth.errors.0 }}</div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="{{ profile_form.address.id_for_label }}" class="form-label">
-                                    <i class="fas fa-map-marker-alt me-1"></i>Address
-                                </label>
-                                {{ profile_form.address }}
-                                {% if profile_form.address.errors %}
-                                    <div class="error-message">{{ profile_form.address.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Form Actions -->
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-save me-3">
-                            <i class="fas fa-save me-2"></i>Save Changes
-                        </button>
-                        <a href="{% url 'accounts:profile' %}" class="btn btn-cancel">
-                            <i class="fas fa-times me-2"></i>Cancel
-                        </a>
-                    </div>
-                </form>
+              </div>
+              <div class="text-center md:text-left">
+                <h4 class="text-lg font-semibold text-gray-800 mb-2">
+                  Change Profile Picture
+                </h4>
+                <p class="text-gray-600 mb-4">
+                  Upload a new profile picture. Recommended size: 400x400px
+                </p>
+                <div class="flex flex-col sm:flex-row gap-2">
+                  <label
+                    for="{{ form.profile_picture.id_for_label }}"
+                    class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors cursor-pointer inline-flex items-center justify-center"
+                  >
+                    <i class="fas fa-upload mr-2"></i>Choose File
+                  </label>
+                  <button
+                    type="button"
+                    id="removePhoto"
+                    class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+                  >
+                    <i class="fas fa-trash mr-2"></i>Remove
+                  </button>
+                </div>
+                {{ form.profile_picture }} {% if form.profile_picture.errors %}
+                <div
+                  class="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+                >
+                  {{ form.profile_picture.errors.0 }}
+                </div>
+                {% endif %}
+              </div>
             </div>
+          </div>
         </div>
-    </div>
-</section>
-{% endblock %}
 
-{% block extra_js %}
+        <!-- Personal Information -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+            <h3 class="text-xl font-semibold text-gray-800">
+              <i class="fas fa-user mr-2 text-green-500"></i>Personal
+              Information
+            </h3>
+          </div>
+          <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label
+                  for="{{ form.first_name.id_for_label }}"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  First Name <span class="text-red-500">*</span>
+                </label>
+                {{ form.first_name }} {% if form.first_name.errors %}
+                <div
+                  class="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+                >
+                  {{ form.first_name.errors.0 }}
+                </div>
+                {% endif %}
+              </div>
+
+              <div>
+                <label
+                  for="{{ form.last_name.id_for_label }}"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Last Name <span class="text-red-500">*</span>
+                </label>
+                {{ form.last_name }} {% if form.last_name.errors %}
+                <div
+                  class="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+                >
+                  {{ form.last_name.errors.0 }}
+                </div>
+                {% endif %}
+              </div>
+
+              <div>
+                <label
+                  for="{{ form.email.id_for_label }}"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Email Address <span class="text-red-500">*</span>
+                </label>
+                {{ form.email }} {% if form.email.errors %}
+                <div
+                  class="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+                >
+                  {{ form.email.errors.0 }}
+                </div>
+                {% endif %}
+                <p class="mt-1 text-xs text-gray-500">
+                  We'll send important updates to this email
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="{{ form.phone_number.id_for_label }}"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Phone Number
+                </label>
+                {{ form.phone_number }} {% if form.phone_number.errors %}
+                <div
+                  class="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+                >
+                  {{ form.phone_number.errors.0 }}
+                </div>
+                {% endif %}
+                <p class="mt-1 text-xs text-gray-500">
+                  10-digit Nepali phone number
+                </p>
+              </div>
+
+              <div>
+                <label
+                  for="{{ form.date_of_birth.id_for_label }}"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Date of Birth
+                </label>
+                {{ form.date_of_birth }} {% if form.date_of_birth.errors %}
+                <div
+                  class="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+                >
+                  {{ form.date_of_birth.errors.0 }}
+                </div>
+                {% endif %}
+              </div>
+
+              <div>
+                <label
+                  for="{{ form.gender.id_for_label }}"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Gender
+                </label>
+                {{ form.gender }} {% if form.gender.errors %}
+                <div
+                  class="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+                >
+                  {{ form.gender.errors.0 }}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <label
+                for="{{ form.address.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Address
+              </label>
+              {{ form.address }} {% if form.address.errors %}
+              <div
+                class="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+              >
+                {{ form.address.errors.0 }}
+              </div>
+              {% endif %}
+              <p class="mt-1 text-xs text-gray-500">
+                Your current residential address
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Travel Preferences -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+            <h3 class="text-xl font-semibold text-gray-800">
+              <i class="fas fa-cog mr-2 text-purple-500"></i>Travel Preferences
+            </h3>
+          </div>
+          <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                  Preferred Seat Type
+                </label>
+                <div class="space-y-2">
+                  <label class="flex items-center">
+                    <input
+                      type="radio"
+                      name="seat_preference"
+                      value="window"
+                      class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                    />
+                    <span class="ml-2 text-sm text-gray-700">Window Seat</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input
+                      type="radio"
+                      name="seat_preference"
+                      value="aisle"
+                      class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                    />
+                    <span class="ml-2 text-sm text-gray-700">Aisle Seat</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input
+                      type="radio"
+                      name="seat_preference"
+                      value="any"
+                      class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                      checked
+                    />
+                    <span class="ml-2 text-sm text-gray-700"
+                      >No Preference</span
+                    >
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                  Notification Preferences
+                </label>
+                <div class="space-y-2">
+                  <label class="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="email_notifications"
+                      class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      checked
+                    />
+                    <span class="ml-2 text-sm text-gray-700"
+                      >Email Notifications</span
+                    >
+                  </label>
+                  <label class="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="sms_notifications"
+                      class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      checked
+                    />
+                    <span class="ml-2 text-sm text-gray-700"
+                      >SMS Notifications</span
+                    >
+                  </label>
+                  <label class="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="promotional_emails"
+                      class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <span class="ml-2 text-sm text-gray-700"
+                      >Promotional Emails</span
+                    >
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row justify-between gap-4">
+          <a
+            href="{% url 'accounts:profile' %}"
+            class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors text-center font-medium"
+          >
+            <i class="fas fa-times mr-2"></i>Cancel
+          </a>
+
+          <div class="flex flex-col sm:flex-row gap-2">
+            <button
+              type="button"
+              id="resetForm"
+              class="bg-yellow-500 text-white px-6 py-3 rounded-lg hover:bg-yellow-600 transition-colors font-medium"
+            >
+              <i class="fas fa-undo mr-2"></i>Reset Changes
+            </button>
+
+            <button
+              type="submit"
+              class="bg-gradient-to-r from-blue-600 to-purple-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-800 transition-all duration-200 transform hover:scale-105 font-medium"
+            >
+              <i class="fas fa-save mr-2"></i>Save Changes
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_js %}
 <script>
-    $(document).ready(function() {
-        // Add Bootstrap classes to form fields
-        $('input[type="text"], input[type="email"], input[type="date"], textarea').addClass('form-control');
-        $('input[type="file"]').addClass('form-control-file');
-        
-        // Add placeholders
-        $('#id_first_name').attr('placeholder', 'Enter your first name');
-        $('#id_last_name').attr('placeholder', 'Enter your last name');
-        $('#id_email').attr('placeholder', 'Enter your email address');
-        $('#id_phone_number').attr('placeholder', 'Enter your phone number');
-        $('#id_address').attr('placeholder', 'Enter your full address');
-        
-        // Profile picture preview
-        $('#id_profile_picture').change(function() {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    $('#profilePreview').html('<img src="' + e.target.result + '" alt="Profile Preview" class="profile-picture-preview">');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-        
-        // Form validation
-        $('form').submit(function(e) {
-            let isValid = true;
-            
-            // Check required fields
-            $('input[required], textarea[required]').each(function() {
-                if (!$(this).val().trim()) {
-                    isValid = false;
-                    $(this).addClass('is-invalid');
-                } else {
-                    $(this).removeClass('is-invalid');
-                }
-            });
-            
-            // Email validation
-            const email = $('#id_email').val();
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (email && !emailRegex.test(email)) {
-                isValid = false;
-                $('#id_email').addClass('is-invalid');
-            }
-            
-            // Phone validation (Nepal format)
-            const phone = $('#id_phone_number').val();
-            const phoneRegex = /^(\+977)?[9][0-9]{9}$/;
-            if (phone && !phoneRegex.test(phone.replace(/\s+/g, ''))) {
-                isValid = false;
-                $('#id_phone_number').addClass('is-invalid');
-                if (!$('#id_phone_number').next('.error-message').length) {
-                    $('#id_phone_number').after('<div class="error-message">Please enter a valid Nepali phone number</div>');
-                }
-            }
-            
-            if (!isValid) {
-                e.preventDefault();
-                $('html, body').animate({
-                    scrollTop: $('.is-invalid').first().offset().top - 100
-                }, 500);
-            }
-        });
-        
-        // Remove validation errors on input
-        $('input, textarea').on('input', function() {
-            $(this).removeClass('is-invalid');
-            $(this).next('.error-message').remove();
-        });
-    });
+  document.addEventListener('DOMContentLoaded', function() {
+      // Style form inputs with Tailwind classes
+      const textInputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="date"], select, textarea');
+      textInputs.forEach(input => {
+          input.className = 'w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white';
+      });
+
+      // Hide file input
+      const fileInput = document.getElementById('{{ form.profile_picture.id_for_label }}');
+      if (fileInput) {
+          fileInput.className = 'hidden';
+      }
+
+      // Profile picture preview
+      if (fileInput) {
+          fileInput.addEventListener('change', function(e) {
+              const file = e.target.files[0];
+              if (file) {
+                  const reader = new FileReader();
+                  reader.onload = function(e) {
+                      const preview = document.getElementById('profilePreview');
+                      if (preview.tagName === 'IMG') {
+                          preview.src = e.target.result;
+                      } else {
+                          preview.innerHTML = `<img src="${e.target.result}" class="w-32 h-32 rounded-full object-cover">`;
+                      }
+                  };
+                  reader.readAsDataURL(file);
+              }
+          });
+      }
+
+      // Remove photo functionality
+      const removePhotoBtn = document.getElementById('removePhoto');
+      if (removePhotoBtn) {
+          removePhotoBtn.addEventListener('click', function() {
+              const preview = document.getElementById('profilePreview');
+              if (preview.tagName === 'IMG') {
+                  preview.outerHTML = `<div id="profilePreview" class="w-32 h-32 rounded-full border-4 border-gray-200 bg-gray-100 flex items-center justify-center shadow-lg"><i class="fas fa-user text-4xl text-gray-400"></i></div>`;
+              } else {
+                  preview.innerHTML = '<i class="fas fa-user text-4xl text-gray-400"></i>';
+              }
+              if (fileInput) {
+                  fileInput.value = '';
+              }
+          });
+      }
+
+      // Phone number formatting
+      const phoneInput = document.getElementById('{{ form.phone_number.id_for_label }}');
+      if (phoneInput) {
+          phoneInput.addEventListener('input', function() {
+              let value = this.value.replace(/\D/g, '');
+              if (value.length > 10) {
+                  value = value.slice(0, 10);
+              }
+              if (value.length > 0) {
+                  if (value.length <= 3) {
+                      value = value;
+                  } else if (value.length <= 6) {
+                      value = value.slice(0, 3) + '-' + value.slice(3);
+                  } else {
+                      value = value.slice(0, 3) + '-' + value.slice(3, 6) + '-' + value.slice(6, 10);
+                  }
+              }
+              this.value = value;
+          });
+      }
+
+      // Form validation
+      const form = document.getElementById('profileForm');
+      form.addEventListener('submit', function(e) {
+          let isValid = true;
+
+          // Check required fields
+          const requiredFields = form.querySelectorAll('input[required], textarea[required]');
+          requiredFields.forEach(field => {
+              if (!field.value.trim()) {
+                  isValid = false;
+                  field.classList.add('border-red-500', 'ring-red-500');
+                  field.classList.remove('border-gray-300');
+              } else {
+                  field.classList.remove('border-red-500', 'ring-red-500');
+                  field.classList.add('border-gray-300');
+              }
+          });
+
+          // Email validation
+          const emailInput = document.getElementById('{{ form.email.id_for_label }}');
+          if (emailInput && emailInput.value) {
+              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              if (!emailRegex.test(emailInput.value)) {
+                  isValid = false;
+                  emailInput.classList.add('border-red-500', 'ring-red-500');
+                  emailInput.classList.remove('border-gray-300');
+              }
+          }
+
+          // Phone validation
+          if (phoneInput && phoneInput.value) {
+              const phoneRegex = /^(\+977)?[9][0-9]{9}$/;
+              const cleanPhone = phoneInput.value.replace(/\s+/g, '').replace(/-/g, '');
+              if (!phoneRegex.test(cleanPhone)) {
+                  isValid = false;
+                  phoneInput.classList.add('border-red-500', 'ring-red-500');
+                  phoneInput.classList.remove('border-gray-300');
+              }
+          }
+
+          if (!isValid) {
+              e.preventDefault();
+              // Scroll to first invalid field
+              const firstInvalid = form.querySelector('.border-red-500');
+              if (firstInvalid) {
+                  firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  firstInvalid.focus();
+              }
+          }
+      });
+
+      // Real-time validation feedback
+      const inputs = form.querySelectorAll('input, textarea');
+      inputs.forEach(input => {
+          input.addEventListener('input', function() {
+              if (this.classList.contains('border-red-500')) {
+                  if (this.value.trim()) {
+                      this.classList.remove('border-red-500', 'ring-red-500');
+                      this.classList.add('border-gray-300');
+                  }
+              }
+          });
+
+          input.addEventListener('blur', function() {
+              validateField(this);
+          });
+      });
+
+      function validateField(field) {
+          const value = field.value.trim();
+          let isValid = true;
+
+          if (field.hasAttribute('required') && !value) {
+              isValid = false;
+          }
+
+          if (field.type === 'email' && value && !isValidEmail(value)) {
+              isValid = false;
+          }
+
+          if (isValid) {
+              field.classList.remove('border-red-500', 'ring-red-500');
+              field.classList.add('border-green-500', 'ring-green-500');
+          } else {
+              field.classList.remove('border-green-500', 'ring-green-500');
+              field.classList.add('border-red-500', 'ring-red-500');
+          }
+      }
+
+      function isValidEmail(email) {
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+
+      // Reset form functionality
+      const resetBtn = document.getElementById('resetForm');
+      if (resetBtn) {
+          resetBtn.addEventListener('click', function() {
+              if (confirm('Are you sure you want to reset all changes? This will restore the original values.')) {
+                  form.reset();
+                  // Reset profile picture preview
+                  const preview = document.getElementById('profilePreview');
+                  {% if user.profile.profile_picture %}
+                      if (preview.tagName !== 'IMG') {
+                          preview.outerHTML = `<img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" id="profilePreview" class="w-32 h-32 rounded-full border-4 border-gray-200 object-cover shadow-lg">`;
+                      } else {
+                          preview.src = '{{ user.profile.profile_picture.url }}';
+                      }
+                  {% else %}
+                      if (preview.tagName === 'IMG') {
+                          preview.outerHTML = `<div id="profilePreview" class="w-32 h-32 rounded-full border-4 border-gray-200 bg-gray-100 flex items-center justify-center shadow-lg"><i class="fas fa-user text-4xl text-gray-400"></i></div>`;
+                      }
+                  {% endif %}
+
+                  // Remove validation classes
+                  inputs.forEach(input => {
+                      input.classList.remove('border-red-500', 'ring-red-500', 'border-green-500', 'ring-green-500');
+                      input.classList.add('border-gray-300');
+                  });
+              }
+          });
+      }
+  });
 </script>
 {% endblock %}

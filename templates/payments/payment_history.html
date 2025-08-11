@@ -3,272 +3,245 @@
 
 {% block title %}Payment History - TravelMate{% endblock %}
 
-{% block extra_css %}
-<style>
-    .payment-card {
-        transition: transform 0.2s, box-shadow 0.2s;
-        border: none;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .payment-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    }
-    .payment-status {
-        font-size: 0.875rem;
-        font-weight: 600;
-    }
-    .payment-amount {
-        font-size: 1.25rem;
-        font-weight: bold;
-    }
-    .filter-section {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-    .stats-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 15px;
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-    .transaction-id {
-        font-family: 'Courier New', monospace;
-        font-size: 0.875rem;
-        background: #e9ecef;
-        padding: 2px 6px;
-        border-radius: 4px;
-    }
-    .payment-method-icon {
-        width: 24px;
-        height: 24px;
-        border-radius: 4px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        color: white;
-        margin-right: 8px;
-    }
-    .loading-spinner {
-        display: none;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="container py-4">
-    <!-- Page Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="h3 mb-0">Payment History</h1>
-                    <p class="text-muted">Track all your payments and transactions</p>
-                </div>
-                <div>
-                    <button class="btn btn-outline-primary" onclick="exportPayments()">
-                        <i class="fas fa-download"></i> Export
-                    </button>
-                    <button class="btn btn-primary" onclick="refreshPayments()">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
-                </div>
+<!-- Header -->
+<section class="bg-gradient-to-r from-purple-600 to-blue-700 text-white py-12 -mt-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold mb-2">Payment History</h1>
+                <p class="text-xl opacity-90">Track all your payments and transactions</p>
+            </div>
+            <div class="flex gap-3 mt-4 md:mt-0">
+                <button onclick="exportPayments()" 
+                        class="bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-colors">
+                    <i class="fas fa-download mr-2"></i>Export
+                </button>
+                <button onclick="refreshPayments()" 
+                        class="bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-colors">
+                    <i class="fas fa-sync-alt mr-2"></i>Refresh
+                </button>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- Payment Statistics -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card stats-card">
-                <div class="d-flex justify-content-between align-items-center">
+<!-- Statistics -->
+<section class="py-8 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Payments -->
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl">
+                <div class="flex justify-between items-center">
                     <div>
-                        <h4 class="mb-0">{{ total_payments|default:0 }}</h4>
-                        <small>Total Payments</small>
+                        <div class="text-2xl font-bold">{{ total_payments|default:0 }}</div>
+                        <div class="text-purple-100">Total Payments</div>
                     </div>
-                    <i class="fas fa-credit-card fa-2x opacity-75"></i>
+                    <i class="fas fa-credit-card text-3xl text-purple-200"></i>
+                </div>
+            </div>
+            
+            <!-- Successful Payments -->
+            <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <div class="text-2xl font-bold">{{ successful_payments|default:0 }}</div>
+                        <div class="text-green-100">Successful</div>
+                    </div>
+                    <i class="fas fa-check-circle text-3xl text-green-200"></i>
+                </div>
+            </div>
+            
+            <!-- Total Amount -->
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <div class="text-2xl font-bold">रू{{ total_amount|default:0|floatformat:0 }}</div>
+                        <div class="text-blue-100">Total Amount</div>
+                    </div>
+                    <i class="fas fa-money-bill-wave text-3xl text-blue-200"></i>
+                </div>
+            </div>
+            
+            <!-- Pending Refunds -->
+            <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-6 rounded-xl">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <div class="text-2xl font-bold">{{ pending_refunds|default:0 }}</div>
+                        <div class="text-orange-100">Pending Refunds</div>
+                    </div>
+                    <i class="fas fa-undo text-3xl text-orange-200"></i>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card bg-success text-white" style="border-radius: 15px; padding: 20px;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="mb-0">NPR {{ total_amount|default:0|floatformat:0 }}</h4>
-                        <small>Total Spent</small>
-                    </div>
-                    <i class="fas fa-rupee-sign fa-2x opacity-75"></i>
+        
+        <!-- Filters -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                <i class="fas fa-filter mr-2 text-blue-500"></i>Filter Payments
+            </h3>
+            
+            <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                    <input type="text" name="search" value="{{ request.GET.search }}" 
+                           placeholder="Transaction ID, Booking ID..." 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card bg-info text-white" style="border-radius: 15px; padding: 20px;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="mb-0">{{ successful_payments|default:0 }}</h4>
-                        <small>Successful</small>
-                    </div>
-                    <i class="fas fa-check-circle fa-2x opacity-75"></i>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card bg-warning text-white" style="border-radius: 15px; padding: 20px;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="mb-0">{{ pending_refunds|default:0 }}</h4>
-                        <small>Pending Refunds</small>
-                    </div>
-                    <i class="fas fa-undo fa-2x opacity-75"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filters -->
-    <div class="filter-section">
-        <form method="get" id="filter-form">
-            <div class="row">
-                <div class="col-md-3 mb-3">
-                    <label for="payment_method" class="form-label">Payment Method</label>
-                    <select name="payment_method" id="payment_method" class="form-select">
-                        <option value="">All Methods</option>
-                        <option value="esewa" {% if request.GET.payment_method == 'esewa' %}selected{% endif %}>eSewa</option>
-                        <option value="khalti" {% if request.GET.payment_method == 'khalti' %}selected{% endif %}>Khalti</option>
-                        <option value="bus_conductor" {% if request.GET.payment_method == 'bus_conductor' %}selected{% endif %}>Pay to Bus Conductor</option>
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label for="status" class="form-label">Status</label>
-                    <select name="status" id="status" class="form-select">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option value="">All Status</option>
-                        <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
                         <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
                         <option value="failed" {% if request.GET.status == 'failed' %}selected{% endif %}>Failed</option>
                         <option value="refunded" {% if request.GET.status == 'refunded' %}selected{% endif %}>Refunded</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label for="date_from" class="form-label">From Date</label>
-                    <input type="date" name="date_from" id="date_from" class="form-control" value="{{ request.GET.date_from }}">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                    <select name="method" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">All Methods</option>
+                        <option value="esewa" {% if request.GET.method == 'esewa' %}selected{% endif %}>eSewa</option>
+                        <option value="khalti" {% if request.GET.method == 'khalti' %}selected{% endif %}>Khalti</option>
+                        <option value="ime_pay" {% if request.GET.method == 'ime_pay' %}selected{% endif %}>IME Pay</option>
+                        <option value="bus_conductor" {% if request.GET.method == 'bus_conductor' %}selected{% endif %}>Bus Conductor</option>
+                    </select>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label for="date_to" class="form-label">To Date</label>
-                    <input type="date" name="date_to" id="date_to" class="form-control" value="{{ request.GET.date_to }}">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+                    <select name="date_range" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">All Time</option>
+                        <option value="today" {% if request.GET.date_range == 'today' %}selected{% endif %}>Today</option>
+                        <option value="week" {% if request.GET.date_range == 'week' %}selected{% endif %}>This Week</option>
+                        <option value="month" {% if request.GET.date_range == 'month' %}selected{% endif %}>This Month</option>
+                        <option value="year" {% if request.GET.date_range == 'year' %}selected{% endif %}>This Year</option>
+                    </select>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="search" class="form-label">Search</label>
-                    <input type="text" name="search" id="search" class="form-control" placeholder="Search by transaction ID, booking ID..." value="{{ request.GET.search }}">
-                </div>
-                <div class="col-md-6 mb-3 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary me-2">
-                        <i class="fas fa-search"></i> Filter
+                
+                <div class="md:col-span-4 flex gap-2">
+                    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-search mr-2"></i>Apply Filters
                     </button>
-                    <a href="{% url 'accounts:payment_history' %}" class="btn btn-outline-secondary">
-                        <i class="fas fa-times"></i> Clear
-                    </a>
+                    
+                    {% if request.GET %}
+                        <a href="{% url 'payments:payment_history' %}" 
+                           class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                            <i class="fas fa-times mr-2"></i>Clear Filters
+                        </a>
+                    {% endif %}
                 </div>
-            </div>
-        </form>
-    </div>
-
-    <!-- Loading Spinner -->
-    <div class="text-center loading-spinner" id="loading-spinner">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+            </form>
         </div>
-        <p class="mt-2 text-muted">Loading payments...</p>
     </div>
+</section>
 
-    <!-- Payment List -->
-    <div id="payment-list">
+<!-- Payment List -->
+<section class="py-8 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {% if payments %}
-            <div class="row">
+            <div id="payment-list" class="space-y-6">
                 {% for payment in payments %}
-                <div class="col-lg-6 mb-4">
-                    <div class="card payment-card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div>
-                                    <h6 class="card-title mb-1">
-                                        <span class="payment-method-icon bg-primary">
-                                            {% if payment.payment_method == 'esewa' %}
-                                                <i class="fas fa-wallet"></i>
-                                            {% elif payment.payment_method == 'khalti' %}
-                                                <i class="fas fa-mobile-alt"></i>
-                                            {% elif payment.payment_method == 'ime_pay' %}
-                                                <i class="fas fa-credit-card"></i>
-                                            {% elif payment.payment_method == 'fone_pay' %}
-                                                <i class="fas fa-phone"></i>
-                                            {% elif payment.payment_method == 'mobile_banking' %}
-                                                <i class="fas fa-university"></i>
-                                            {% else %}
-                                                <i class="fas fa-money-bill"></i>
-                                            {% endif %}
-                                        </span>
-                                        {{ payment.get_payment_method_display }}
-                                    </h6>
-                                    <p class="text-muted mb-0 small">{{ payment.payment_date|date:"M d, Y H:i" }}</p>
+                <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                            <!-- Payment Info -->
+                            <div class="lg:col-span-2">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900 mb-1">
+                                            {{ payment.booking.bus_schedule.route.source }} → {{ payment.booking.bus_schedule.route.destination }}
+                                        </h3>
+                                        <p class="text-sm text-gray-600">{{ payment.booking.travel_date|date:"M d, Y" }}</p>
+                                    </div>
+                                    
+                                    <div class="text-right">
+                                        <div class="text-2xl font-bold text-gray-900">रू{{ payment.amount|floatformat:2 }}</div>
+                                        <div class="text-sm text-gray-600">{{ payment.payment_date|date:"M d, Y" }}</div>
+                                    </div>
                                 </div>
-                                <div class="text-end">
-                                    <div class="payment-amount text-success">NPR {{ payment.amount|floatformat:2 }}</div>
-                                    <span class="badge bg-{% if payment.payment_status == 'completed' %}success{% elif payment.payment_status == 'pending' %}warning{% elif payment.payment_status == 'failed' %}danger{% else %}secondary{% endif %} payment-status">
-                                        {{ payment.get_payment_status_display }}
-                                    </span>
+                                
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="text-gray-600">Booking ID:</span>
+                                        <span class="font-semibold text-gray-900">{{ payment.booking.booking_id }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">Transaction ID:</span>
+                                        <span class="font-mono font-semibold text-gray-900 bg-gray-100 px-2 py-1 rounded">{{ payment.transaction_id }}</span>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div class="row mb-2">
-                                <div class="col-sm-4"><small class="text-muted">Transaction ID:</small></div>
-                                <div class="col-sm-8">
-                                    <span class="transaction-id">{{ payment.transaction_id }}</span>
-                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="copyToClipboard('{{ payment.transaction_id }}')" title="Copy">
-                                        <i class="fas fa-copy"></i>
+                            <!-- Payment Method & Status -->
+                            <div class="flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center mb-2">
+                                        {% if payment.payment_method == 'esewa' %}
+                                            <div class="w-6 h-6 bg-green-500 rounded flex items-center justify-center mr-2">
+                                                <i class="fas fa-mobile-alt text-white text-xs"></i>
+                                            </div>
+                                        {% elif payment.payment_method == 'khalti' %}
+                                            <div class="w-6 h-6 bg-purple-500 rounded flex items-center justify-center mr-2">
+                                                <i class="fas fa-wallet text-white text-xs"></i>
+                                            </div>
+                                        {% elif payment.payment_method == 'ime_pay' %}
+                                            <div class="w-6 h-6 bg-blue-500 rounded flex items-center justify-center mr-2">
+                                                <i class="fas fa-university text-white text-xs"></i>
+                                            </div>
+                                        {% else %}
+                                            <div class="w-6 h-6 bg-yellow-500 rounded flex items-center justify-center mr-2">
+                                                <i class="fas fa-money-bill text-white text-xs"></i>
+                                            </div>
+                                        {% endif %}
+                                        <span class="font-medium text-gray-900">{{ payment.get_payment_method_display }}</span>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        {% if payment.payment_status == 'completed' %}
+                                            <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
+                                                <i class="fas fa-check-circle mr-1"></i>Completed
+                                            </span>
+                                        {% elif payment.payment_status == 'pending' %}
+                                            <span class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">
+                                                <i class="fas fa-clock mr-1"></i>Pending
+                                            </span>
+                                        {% elif payment.payment_status == 'failed' %}
+                                            <span class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
+                                                <i class="fas fa-times-circle mr-1"></i>Failed
+                                            </span>
+                                        {% elif payment.payment_status == 'refunded' %}
+                                            <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+                                                <i class="fas fa-undo mr-1"></i>Refunded
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Actions -->
+                            <div class="flex flex-col gap-2">
+                                <a href="{% url 'payments:payment_detail' payment.payment_id %}" 
+                                   class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-center text-sm font-medium">
+                                    <i class="fas fa-eye mr-2"></i>View Details
+                                </a>
+                                
+                                {% if payment.payment_status == 'completed' and not payment.refund_requested %}
+                                    <button onclick="requestRefund({{ payment.id }})" 
+                                            class="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium">
+                                        <i class="fas fa-undo mr-2"></i>Request Refund
                                     </button>
-                                </div>
-                            </div>
-                            
-                            <div class="row mb-2">
-                                <div class="col-sm-4"><small class="text-muted">Booking ID:</small></div>
-                                <div class="col-sm-8">
-                                    <a href="{% url 'booking_detail' payment.booking.booking_id %}" class="text-decoration-none">
-                                        {{ payment.booking.booking_id }}
+                                {% endif %}
+                                
+                                {% if payment.payment_status == 'completed' %}
+                                    <a href="{% url 'bookings:ticket' payment.booking.booking_id %}" 
+                                       class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-center text-sm font-medium">
+                                        <i class="fas fa-download mr-2"></i>Download Ticket
                                     </a>
-                                </div>
-                            </div>
-                            
-                            <div class="row mb-3">
-                                <div class="col-sm-4"><small class="text-muted">Route:</small></div>
-                                <div class="col-sm-8">
-                                    <small>{{ payment.booking.bus_schedule.route.source }} → {{ payment.booking.bus_schedule.route.destination }}</small>
-                                </div>
-                            </div>
-                            
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    {% if payment.payment_status == 'completed' %}
-                                        <button class="btn btn-sm btn-outline-primary" onclick="downloadReceipt('{{ payment.id }}')">
-                                            <i class="fas fa-download"></i> Receipt
-                                        </button>
-                                    {% elif payment.payment_status == 'failed' %}
-                                        <button class="btn btn-sm btn-outline-warning" onclick="retryPayment('{{ payment.booking.booking_id }}')">
-                                            <i class="fas fa-redo"></i> Retry
-                                        </button>
-                                    {% endif %}
-                                </div>
-                                <div>
-                                    {% if payment.payment_status == 'completed' and payment.booking.booking_status == 'confirmed' %}
-                                        <button class="btn btn-sm btn-outline-danger" onclick="requestRefund('{{ payment.id }}')">
-                                            <i class="fas fa-undo"></i> Refund
-                                        </button>
-                                    {% endif %}
-                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -278,78 +251,113 @@
             
             <!-- Pagination -->
             {% if is_paginated %}
-            <nav aria-label="Payment pagination">
-                <ul class="pagination justify-content-center">
-                    {% if page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">&laquo; First</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">&lsaquo; Previous</a>
-                        </li>
-                    {% endif %}
-                    
-                    <li class="page-item active">
-                        <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-                    </li>
-                    
-                    {% if page_obj.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next &rsaquo;</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </nav>
+                <div class="flex justify-center mt-8">
+                    <nav class="flex space-x-2">
+                        {% if page_obj.has_previous %}
+                            <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                               class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                               class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        {% endif %}
+                        
+                        <span class="bg-blue-500 text-white px-3 py-2 rounded">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </span>
+                        
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                               class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                               class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        {% endif %}
+                    </nav>
+                </div>
             {% endif %}
         {% else %}
-            <div class="text-center py-5">
-                <i class="fas fa-credit-card fa-4x text-muted mb-3"></i>
-                <h4 class="text-muted">No Payments Found</h4>
-                <p class="text-muted">You haven't made any payments yet or no payments match your filters.</p>
-                <a href="{% url 'routes:route_search' %}" class="btn btn-primary">
-                    <i class="fas fa-search"></i> Book Your First Trip
-                </a>
+            <!-- Empty State -->
+            <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                <div class="max-w-md mx-auto">
+                    <i class="fas fa-credit-card text-6xl text-gray-300 mb-6"></i>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">No Payments Found</h3>
+                    <p class="text-gray-600 mb-6">
+                        {% if request.GET %}
+                            No payments match your search criteria. Try adjusting your filters.
+                        {% else %}
+                            You haven't made any payments yet. Start by booking a bus ticket.
+                        {% endif %}
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                        <a href="{% url 'routes:route_search' %}" 
+                           class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                            <i class="fas fa-search mr-2"></i>Book a Ticket
+                        </a>
+                        {% if request.GET %}
+                            <a href="{% url 'payments:payment_history' %}" 
+                               class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
+                                <i class="fas fa-times mr-2"></i>Clear Filters
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         {% endif %}
     </div>
-</div>
+</section>
 
 <!-- Refund Request Modal -->
-<div class="modal fade" id="refundModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Request Refund</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div id="refundModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-2xl p-8 max-w-md mx-4 w-full">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+            <i class="fas fa-undo text-orange-500 mr-2"></i>Request Refund
+        </h3>
+        
+        <form id="refundForm">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Reason for Refund</label>
+                <select name="reason" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                    <option value="">Select a reason</option>
+                    <option value="trip_cancelled">Trip Cancelled</option>
+                    <option value="emergency">Emergency</option>
+                    <option value="schedule_change">Schedule Change</option>
+                    <option value="other">Other</option>
+                </select>
             </div>
-            <form id="refund-form">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="refund_reason" class="form-label">Reason for Refund</label>
-                        <select class="form-select" id="refund_reason" name="reason" required>
-                            <option value="">Select a reason</option>
-                            <option value="trip_cancelled">Trip Cancelled</option>
-                            <option value="emergency">Emergency</option>
-                            <option value="schedule_change">Schedule Change</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="refund_details" class="form-label">Additional Details</label>
-                        <textarea class="form-control" id="refund_details" name="details" rows="3" placeholder="Please provide additional details about your refund request..."></textarea>
-                    </div>
-                    <div class="alert alert-info">
-                        <small><i class="fas fa-info-circle"></i> Refund processing may take 3-5 business days. Refund amount may be subject to cancellation charges as per our policy.</small>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Submit Refund Request</button>
-                </div>
-            </form>
+            
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Additional Details</label>
+                <textarea name="details" rows="3" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                          placeholder="Please provide additional details about your refund request..."></textarea>
+            </div>
+            
+            <div class="flex gap-4">
+                <button type="submit" 
+                        class="flex-1 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors">
+                    Submit Request
+                </button>
+                <button type="button" onclick="hideRefundModal()" 
+                        class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-400 transition-colors">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Loading Spinner -->
+<div id="loading-spinner" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-6">
+        <div class="flex items-center">
+            <i class="fas fa-spinner fa-spin text-blue-500 text-2xl mr-3"></i>
+            <span class="text-gray-700 font-medium">Loading...</span>
         </div>
     </div>
 </div>
@@ -357,49 +365,30 @@
 
 {% block extra_js %}
 <script>
-    // Auto-submit form on filter change
-    document.querySelectorAll('#filter-form select').forEach(select => {
-        select.addEventListener('change', function() {
-            document.getElementById('filter-form').submit();
-        });
-    });
-
-    // Copy to clipboard function
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(function() {
-            showToast('Copied to clipboard!', 'success');
-        }).catch(function(err) {
-            console.error('Could not copy text: ', err);
-            showToast('Failed to copy', 'error');
-        });
-    }
-
-    // Download receipt
-    function downloadReceipt(paymentId) {
-        window.open(`/payments/receipt/${paymentId}/`, '_blank');
-    }
-
-    // Retry payment
-    function retryPayment(bookingId) {
-        if (confirm('Do you want to retry the payment for this booking?')) {
-            window.location.href = `/payments/retry/${bookingId}/`;
-        }
-    }
-
+    let currentPaymentId = null;
+    
     // Request refund
     function requestRefund(paymentId) {
-        document.getElementById('refund-form').setAttribute('data-payment-id', paymentId);
-        new bootstrap.Modal(document.getElementById('refundModal')).show();
+        currentPaymentId = paymentId;
+        document.getElementById('refundModal').classList.remove('hidden');
     }
-
+    
+    // Hide refund modal
+    function hideRefundModal() {
+        document.getElementById('refundModal').classList.add('hidden');
+        currentPaymentId = null;
+        document.getElementById('refundForm').reset();
+    }
+    
     // Handle refund form submission
-    document.getElementById('refund-form').addEventListener('submit', function(e) {
+    document.getElementById('refundForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        const paymentId = this.getAttribute('data-payment-id');
+        
+        if (!currentPaymentId) return;
+        
         const formData = new FormData(this);
         
-        // Here you would typically make an AJAX call to submit the refund request
-        fetch(`/payments/refund/${paymentId}/`, {
+        fetch(`/payments/refund/${currentPaymentId}/`, {
             method: 'POST',
             body: formData,
             headers: {
@@ -410,7 +399,7 @@
         .then(data => {
             if (data.success) {
                 showToast('Refund request submitted successfully!', 'success');
-                bootstrap.Modal.getInstance(document.getElementById('refundModal')).hide();
+                hideRefundModal();
                 setTimeout(() => location.reload(), 2000);
             } else {
                 showToast(data.message || 'Failed to submit refund request', 'error');
@@ -421,65 +410,69 @@
             showToast('An error occurred. Please try again.', 'error');
         });
     });
-
+    
     // Export payments
     function exportPayments() {
         const params = new URLSearchParams(window.location.search);
         params.set('export', 'csv');
         window.location.href = `${window.location.pathname}?${params.toString()}`;
     }
-
+    
     // Refresh payments
     function refreshPayments() {
         showLoading();
         location.reload();
     }
-
+    
     // Show loading spinner
     function showLoading() {
-        document.getElementById('loading-spinner').style.display = 'block';
-        document.getElementById('payment-list').style.opacity = '0.5';
+        document.getElementById('loading-spinner').classList.remove('hidden');
     }
-
+    
     // Show toast notification
     function showToast(message, type) {
-        const toastContainer = document.getElementById('toast-container') || createToastContainer();
         const toast = document.createElement('div');
-        toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
-        toast.setAttribute('role', 'alert');
+        toast.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+            type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        } min-w-80 transform translate-x-full transition-transform duration-300`;
+        
         toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle mr-2"></i>
+                    ${message}
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         `;
         
-        toastContainer.appendChild(toast);
-        const bsToast = new bootstrap.Toast(toast);
-        bsToast.show();
+        document.body.appendChild(toast);
         
-        toast.addEventListener('hidden.bs.toast', function() {
-            toast.remove();
-        });
+        // Animate in
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full');
+        }, 100);
+        
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            toast.classList.add('translate-x-full');
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 300);
+        }, 3000);
     }
-
-    // Create toast container
-    function createToastContainer() {
-        const container = document.createElement('div');
-        container.id = 'toast-container';
-        container.className = 'toast-container position-fixed top-0 end-0 p-3';
-        container.style.zIndex = '1055';
-        document.body.appendChild(container);
-        return container;
-    }
-
+    
     // Keyboard shortcuts
     document.addEventListener('keydown', function(e) {
         if (e.ctrlKey || e.metaKey) {
             switch(e.key) {
                 case 'f':
                     e.preventDefault();
-                    document.getElementById('search').focus();
+                    document.querySelector('input[name="search"]').focus();
                     break;
                 case 'r':
                     e.preventDefault();
@@ -488,5 +481,12 @@
             }
         }
     });
+    
+    // Auto-refresh every 5 minutes for pending payments
+    if (document.querySelector('.bg-yellow-100')) {
+        setInterval(() => {
+            refreshPayments();
+        }, 300000); // 5 minutes
+    }
 </script>
 {% endblock %}

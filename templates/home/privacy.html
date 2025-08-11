@@ -3,294 +3,341 @@
 
 {% block title %}Privacy Policy - TravelMate{% endblock %}
 
-{% block extra_css %}
-<style>
-    .privacy-hero {
-        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{% static "img/privacy-hero.jpg" %}') no-repeat center center;
-        background-size: cover;
-        color: white;
-        padding: 80px 0;
-        margin-top: -1.5rem;
-    }
-    .privacy-section {
-        margin-bottom: 2rem;
-    }
-    .privacy-section h3 {
-        color: #0d6efd;
-        margin-bottom: 1rem;
-    }
-    .privacy-nav {
-        position: sticky;
-        top: 100px;
-    }
-    .privacy-nav .nav-link {
-        color: #495057;
-        border-radius: 0;
-        padding: 0.5rem 1rem;
-    }
-    .privacy-nav .nav-link.active {
-        color: #0d6efd;
-        background-color: #e7f1ff;
-        border-left: 3px solid #0d6efd;
-    }
-    .privacy-content {
-        font-size: 1rem;
-        line-height: 1.6;
-    }
-    .privacy-content ul, .privacy-content ol {
-        padding-left: 1.5rem;
-    }
-    .privacy-content li {
-        margin-bottom: 0.5rem;
-    }
-    .last-updated {
-        font-style: italic;
-        color: #6c757d;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
 <!-- Hero Section -->
-<section class="privacy-hero">
-    <div class="container text-center">
-        <h1 class="display-4 fw-bold mb-4">Privacy Policy</h1>
-        <p class="lead mb-0">How we collect, use, and protect your personal information</p>
+<section class="relative bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white py-24 overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-full h-full" style="background-image: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.1"><circle cx="30" cy="30" r="4"/></g></g></svg>');"></div>
+    </div>
+    
+    <!-- Animated Elements -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-white opacity-5 rounded-full animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-white opacity-5 rounded-full animate-pulse delay-1000"></div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-shield-alt text-3xl"></i>
+        </div>
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            Privacy <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">Policy</span>
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
+            How we collect, use, and protect your personal information
+        </p>
+        <p class="text-sm text-blue-200 mt-4">Last Updated: May 15, 2024</p>
     </div>
 </section>
 
 <!-- Privacy Content -->
-<section class="py-5">
-    <div class="container">
-        <div class="row">
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-12">
             <!-- Sidebar Navigation -->
-            <div class="col-lg-3 mb-4 mb-lg-0">
-                <div class="privacy-nav">
-                    <div class="card">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Table of Contents</h5>
-                        </div>
-                        <div class="card-body p-0">
-                            <nav class="nav flex-column">
-                                <a class="nav-link active" href="#introduction">Introduction</a>
-                                <a class="nav-link" href="#information">Information We Collect</a>
-                                <a class="nav-link" href="#use">How We Use Your Information</a>
-                                <a class="nav-link" href="#sharing">Information Sharing</a>
-                                <a class="nav-link" href="#cookies">Cookies and Tracking</a>
-                                <a class="nav-link" href="#security">Data Security</a>
-                                <a class="nav-link" href="#rights">Your Rights</a>
-                                <a class="nav-link" href="#children">Children's Privacy</a>
-                                <a class="nav-link" href="#international">International Data Transfers</a>
-                                <a class="nav-link" href="#changes">Changes to Privacy Policy</a>
-                                <a class="nav-link" href="#contact">Contact Us</a>
-                            </nav>
-                        </div>
-                    </div>
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6 border-b border-gray-200 pb-3">
+                        <i class="fas fa-list mr-2 text-blue-500"></i>Table of Contents
+                    </h3>
+                    <nav class="space-y-2">
+                        <a href="#introduction" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link active">
+                            1. Introduction
+                        </a>
+                        <a href="#information" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            2. Information We Collect
+                        </a>
+                        <a href="#use" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            3. How We Use Information
+                        </a>
+                        <a href="#sharing" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            4. Information Sharing
+                        </a>
+                        <a href="#cookies" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            5. Cookies & Tracking
+                        </a>
+                        <a href="#security" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            6. Data Security
+                        </a>
+                        <a href="#rights" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            7. Your Rights
+                        </a>
+                        <a href="#children" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            8. Children's Privacy
+                        </a>
+                        <a href="#international" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            9. International Transfers
+                        </a>
+                        <a href="#changes" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            10. Policy Changes
+                        </a>
+                        <a href="#contact" class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors nav-link">
+                            11. Contact Us
+                        </a>
+                    </nav>
                 </div>
             </div>
             
             <!-- Privacy Content -->
-            <div class="col-lg-9">
-                <div class="privacy-content">
-                    <p class="last-updated">Last Updated: May 15, 2024</p>
-                    
-                    <div id="introduction" class="privacy-section">
-                        <h3>1. Introduction</h3>
-                        <p>At TravelMate, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website, mobile applications, and services (collectively, the "Services").</p>
-                        <p>By accessing or using our Services, you consent to the collection, use, and disclosure of your information as described in this Privacy Policy. If you do not agree with our policies and practices, please do not use our Services.</p>
-                        <p>This Privacy Policy applies to all users of our Services, including bus operators, passengers, and visitors to our website or mobile applications.</p>
+            <div class="lg:col-span-3">
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+                    <!-- Introduction -->
+                    <div id="introduction" class="privacy-section mb-12">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-info-circle text-blue-500 mr-3"></i>1. Introduction
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <p class="mb-4">
+                                At TravelMate, we are committed to protecting your privacy and ensuring the security of your personal information. 
+                                This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website, 
+                                mobile applications, and services (collectively, the "Services").
+                            </p>
+                            <p class="mb-4">
+                                By accessing or using our Services, you consent to the collection, use, and disclosure of your information as described 
+                                in this Privacy Policy. If you do not agree with our policies and practices, please do not use our Services.
+                            </p>
+                            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                                <p class="text-blue-800 font-medium">
+                                    <i class="fas fa-lightbulb mr-2"></i>
+                                    We believe in transparency and want you to understand exactly how your data is handled.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div id="information" class="privacy-section">
-                        <h3>2. Information We Collect</h3>
-                        <p>We collect several types of information from and about users of our Services, including:</p>
-                        
-                        <h4>2.1 Personal Information</h4>
-                        <p>Personal information is information that identifies you as an individual. We collect the following types of personal information:</p>
-                        <ul>
-                            <li><strong>Contact Information:</strong> Name, email address, phone number, and mailing address</li>
-                            <li><strong>Account Information:</strong> Username, password, and profile information</li>
-                            <li><strong>Identity Information:</strong> Date of birth, gender, and government-issued ID details (when required for booking)</li>
-                            <li><strong>Payment Information:</strong> Credit card details, bank account information, and billing address</li>
-                            <li><strong>Travel Information:</strong> Booking history, travel preferences, and feedback</li>
-                        </ul>
-                        
-                        <h4>2.2 Non-Personal Information</h4>
-                        <p>Non-personal information is information that does not directly identify you. We collect the following types of non-personal information:</p>
-                        <ul>
-                            <li><strong>Device Information:</strong> IP address, device type, operating system, browser type, and mobile network information</li>
-                            <li><strong>Usage Information:</strong> Pages visited, time spent on pages, links clicked, and search queries</li>
-                            <li><strong>Location Information:</strong> General location based on IP address or more precise location if you grant permission</li>
-                            <li><strong>Log Data:</strong> Server logs, error reports, and performance data</li>
-                        </ul>
-                        
-                        <h4>2.3 Information Collection Methods</h4>
-                        <p>We collect information through various methods, including:</p>
-                        <ul>
-                            <li><strong>Direct Collection:</strong> Information you provide when creating an account, making a booking, contacting customer support, or participating in surveys</li>
-                            <li><strong>Automated Collection:</strong> Information collected automatically through cookies, web beacons, and similar technologies</li>
-                            <li><strong>Third-Party Sources:</strong> Information from business partners, social media platforms, and other third-party sources</li>
-                        </ul>
+                    <!-- Information We Collect -->
+                    <div id="information" class="privacy-section mb-12">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-database text-green-500 mr-3"></i>2. Information We Collect
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <p class="mb-6">We collect information about you in several ways:</p>
+                            
+                            <h4 class="text-xl font-semibold text-gray-800 mb-4">Personal Information You Provide</h4>
+                            <ul class="list-disc list-inside space-y-2 mb-6">
+                                <li>Name, email address, and phone number</li>
+                                <li>Payment information (credit card details, billing address)</li>
+                                <li>Travel preferences and booking history</li>
+                                <li>Profile information and account settings</li>
+                                <li>Communication preferences</li>
+                            </ul>
+                            
+                            <h4 class="text-xl font-semibold text-gray-800 mb-4">Information Collected Automatically</h4>
+                            <ul class="list-disc list-inside space-y-2 mb-6">
+                                <li>Device information (IP address, browser type, operating system)</li>
+                                <li>Usage data (pages visited, time spent, click patterns)</li>
+                                <li>Location information (with your permission)</li>
+                                <li>Cookies and similar tracking technologies</li>
+                            </ul>
+                            
+                            <h4 class="text-xl font-semibold text-gray-800 mb-4">Information from Third Parties</h4>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>Social media platforms (when you connect your accounts)</li>
+                                <li>Payment processors and financial institutions</li>
+                                <li>Bus operators and travel partners</li>
+                                <li>Marketing and analytics partners</li>
+                            </ul>
+                        </div>
                     </div>
                     
-                    <div id="use" class="privacy-section">
-                        <h3>3. How We Use Your Information</h3>
-                        <p>We use the information we collect for various purposes, including:</p>
-                        
-                        <h4>3.1 Providing and Improving Our Services</h4>
-                        <ul>
-                            <li>Processing and confirming bookings</li>
-                            <li>Facilitating payments and refunds</li>
-                            <li>Providing customer support</li>
-                            <li>Personalizing your experience</li>
-                            <li>Improving our website, mobile applications, and services</li>
-                            <li>Developing new features and offerings</li>
-                        </ul>
-                        
-                        <h4>3.2 Communication</h4>
-                        <ul>
-                            <li>Sending booking confirmations and updates</li>
-                            <li>Providing important service announcements</li>
-                            <li>Responding to your inquiries and requests</li>
-                            <li>Sending promotional emails and newsletters (with your consent)</li>
-                            <li>Conducting surveys and collecting feedback</li>
-                        </ul>
-                        
-                        <h4>3.3 Security and Fraud Prevention</h4>
-                        <ul>
-                            <li>Verifying your identity</li>
-                            <li>Detecting and preventing fraudulent activities</li>
-                            <li>Protecting the security of our Services</li>
-                            <li>Enforcing our Terms and Conditions</li>
-                        </ul>
-                        
-                        <h4>3.4 Legal and Compliance</h4>
-                        <ul>
-                            <li>Complying with legal obligations</li>
-                            <li>Responding to legal requests and preventing harm</li>
-                            <li>Establishing, exercising, or defending legal claims</li>
-                        </ul>
-                        
-                        <h4>3.5 Analytics and Research</h4>
-                        <ul>
-                            <li>Analyzing usage patterns and trends</li>
-                            <li>Measuring the effectiveness of our marketing campaigns</li>
-                            <li>Conducting research to improve our Services</li>
-                        </ul>
+                    <!-- How We Use Your Information -->
+                    <div id="use" class="privacy-section mb-12">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-cogs text-purple-500 mr-3"></i>3. How We Use Your Information
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <p class="mb-6">We use the information we collect for various purposes:</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="bg-gray-50 p-6 rounded-lg">
+                                    <h4 class="text-lg font-semibold text-gray-800 mb-3">
+                                        <i class="fas fa-ticket-alt text-blue-500 mr-2"></i>Service Provision
+                                    </h4>
+                                    <ul class="list-disc list-inside space-y-1 text-sm">
+                                        <li>Process bookings and payments</li>
+                                        <li>Provide customer support</li>
+                                        <li>Send booking confirmations</li>
+                                        <li>Manage your account</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-gray-50 p-6 rounded-lg">
+                                    <h4 class="text-lg font-semibold text-gray-800 mb-3">
+                                        <i class="fas fa-chart-line text-green-500 mr-2"></i>Improvement & Analytics
+                                    </h4>
+                                    <ul class="list-disc list-inside space-y-1 text-sm">
+                                        <li>Analyze usage patterns</li>
+                                        <li>Improve our services</li>
+                                        <li>Develop new features</li>
+                                        <li>Personalize your experience</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-gray-50 p-6 rounded-lg">
+                                    <h4 class="text-lg font-semibold text-gray-800 mb-3">
+                                        <i class="fas fa-bullhorn text-orange-500 mr-2"></i>Marketing & Communication
+                                    </h4>
+                                    <ul class="list-disc list-inside space-y-1 text-sm">
+                                        <li>Send promotional offers</li>
+                                        <li>Newsletter and updates</li>
+                                        <li>Targeted advertising</li>
+                                        <li>Market research</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-gray-50 p-6 rounded-lg">
+                                    <h4 class="text-lg font-semibold text-gray-800 mb-3">
+                                        <i class="fas fa-shield-alt text-red-500 mr-2"></i>Legal & Security
+                                    </h4>
+                                    <ul class="list-disc list-inside space-y-1 text-sm">
+                                        <li>Comply with legal obligations</li>
+                                        <li>Prevent fraud and abuse</li>
+                                        <li>Protect user safety</li>
+                                        <li>Resolve disputes</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div id="sharing" class="privacy-section">
-                        <h3>4. Information Sharing</h3>
-                        <p>We may share your information with the following categories of recipients:</p>
-                        
-                        <h4>4.1 Bus Operators</h4>
-                        <p>We share necessary booking information with the bus operators to facilitate your travel. This includes passenger names, contact information, and booking details.</p>
-                        
-                        <h4>4.2 Service Providers</h4>
-                        <p>We engage various service providers to perform functions on our behalf, such as payment processing, customer support, data analysis, email delivery, and hosting services. These service providers have access to your information only to perform these tasks on our behalf and are obligated not to disclose or use it for any other purpose.</p>
-                        
-                        <h4>4.3 Business Partners</h4>
-                        <p>We may share your information with business partners who offer services that may be of interest to you. These partners include travel insurance providers, accommodation providers, and other travel-related service providers.</p>
-                        
-                        <h4>4.4 Legal and Regulatory Authorities</h4>
-                        <p>We may disclose your information to legal and regulatory authorities, or other third parties as required by law, to comply with a subpoena, court order, or other legal process, or to establish, protect, or exercise our legal rights or defend against legal claims.</p>
-                        
-                        <h4>4.5 Corporate Transactions</h4>
-                        <p>In the event of a merger, acquisition, reorganization, bankruptcy, or other similar event, your information may be transferred to a successor entity or to a third party in connection with such transaction.</p>
-                        
-                        <h4>4.6 With Your Consent</h4>
-                        <p>We may share your information with other third parties with your explicit consent.</p>
+                    <!-- Information Sharing -->
+                    <div id="sharing" class="privacy-section mb-12">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-share-alt text-indigo-500 mr-3"></i>4. Information Sharing
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <p class="mb-6">We may share your information in the following circumstances:</p>
+                            
+                            <div class="space-y-4">
+                                <div class="border-l-4 border-blue-500 pl-4">
+                                    <h4 class="font-semibold text-gray-800">Service Providers</h4>
+                                    <p class="text-sm">We share information with trusted third-party service providers who help us operate our business.</p>
+                                </div>
+                                
+                                <div class="border-l-4 border-green-500 pl-4">
+                                    <h4 class="font-semibold text-gray-800">Bus Operators</h4>
+                                    <p class="text-sm">We share necessary booking information with bus operators to facilitate your travel.</p>
+                                </div>
+                                
+                                <div class="border-l-4 border-yellow-500 pl-4">
+                                    <h4 class="font-semibold text-gray-800">Legal Requirements</h4>
+                                    <p class="text-sm">We may disclose information when required by law or to protect our rights and safety.</p>
+                                </div>
+                                
+                                <div class="border-l-4 border-red-500 pl-4">
+                                    <h4 class="font-semibold text-gray-800">Business Transfers</h4>
+                                    <p class="text-sm">Information may be transferred in connection with mergers, acquisitions, or asset sales.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div id="cookies" class="privacy-section">
-                        <h3>5. Cookies and Tracking</h3>
-                        <p>We use cookies, web beacons, and similar tracking technologies to collect information about your browsing activities on our website and mobile applications. These technologies help us analyze trends, administer the website, track users' movements around the website, and gather demographic information about our user base as a whole.</p>
-                        
-                        <h4>5.1 Types of Cookies We Use</h4>
-                        <ul>
-                            <li><strong>Essential Cookies:</strong> Necessary for the operation of our website and Services</li>
-                            <li><strong>Analytical/Performance Cookies:</strong> Allow us to recognize and count the number of visitors and see how visitors move around our website</li>
-                            <li><strong>Functionality Cookies:</strong> Enable us to personalize content and remember your preferences</li>
-                            <li><strong>Targeting Cookies:</strong> Record your visit to our website, the pages you have visited, and the links you have followed to deliver more relevant advertisements</li>
-                        </ul>
-                        
-                        <h4>5.2 Cookie Management</h4>
-                        <p>You can control and manage cookies in various ways. Most web browsers allow you to delete cookies, block all cookies, or block specific types of cookies. Please note that if you choose to block all cookies, you may not be able to access all or parts of our website, or some features may not function properly.</p>
-                        
-                        <h4>5.3 Do Not Track</h4>
-                        <p>Some web browsers have a "Do Not Track" feature that signals to websites that you visit that you do not want to have your online activity tracked. Our website does not currently respond to "Do Not Track" signals.</p>
+                    <!-- Data Security -->
+                    <div id="security" class="privacy-section mb-12">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-lock text-red-500 mr-3"></i>6. Data Security
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <p class="mb-6">We implement comprehensive security measures to protect your personal information:</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="text-center p-4 bg-green-50 rounded-lg">
+                                    <i class="fas fa-certificate text-green-500 text-2xl mb-3"></i>
+                                    <h4 class="font-semibold text-gray-800 mb-2">SSL Encryption</h4>
+                                    <p class="text-sm">All data transmission is encrypted using industry-standard SSL technology.</p>
+                                </div>
+                                
+                                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                                    <i class="fas fa-server text-blue-500 text-2xl mb-3"></i>
+                                    <h4 class="font-semibold text-gray-800 mb-2">Secure Servers</h4>
+                                    <p class="text-sm">Our servers are protected by firewalls and advanced security protocols.</p>
+                                </div>
+                                
+                                <div class="text-center p-4 bg-purple-50 rounded-lg">
+                                    <i class="fas fa-user-shield text-purple-500 text-2xl mb-3"></i>
+                                    <h4 class="font-semibold text-gray-800 mb-2">Access Control</h4>
+                                    <p class="text-sm">Strict access controls ensure only authorized personnel can access your data.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div id="security" class="privacy-section">
-                        <h3>6. Data Security</h3>
-                        <p>We implement appropriate technical and organizational measures to protect your personal information against unauthorized or unlawful processing, accidental loss, destruction, or damage. These measures include:</p>
-                        <ul>
-                            <li>Encryption of sensitive information</li>
-                            <li>Secure Socket Layer (SSL) technology for data transmission</li>
-                            <li>Access controls and authentication mechanisms</li>
-                            <li>Regular security assessments and audits</li>
-                            <li>Employee training on data protection and security</li>
-                        </ul>
-                        <p>While we strive to protect your personal information, no method of transmission over the Internet or method of electronic storage is 100% secure. Therefore, we cannot guarantee its absolute security.</p>
+                    <!-- Your Rights -->
+                    <div id="rights" class="privacy-section mb-12">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-user-check text-teal-500 mr-3"></i>7. Your Rights
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <p class="mb-6">You have several rights regarding your personal information:</p>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <i class="fas fa-eye text-blue-500 mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Right to Access</h4>
+                                        <p class="text-sm">Request a copy of the personal information we hold about you.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <i class="fas fa-edit text-green-500 mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Right to Rectification</h4>
+                                        <p class="text-sm">Request correction of inaccurate or incomplete information.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <i class="fas fa-trash text-red-500 mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Right to Erasure</h4>
+                                        <p class="text-sm">Request deletion of your personal information under certain circumstances.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <i class="fas fa-download text-purple-500 mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Right to Portability</h4>
+                                        <p class="text-sm">Request transfer of your data to another service provider.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div id="rights" class="privacy-section">
-                        <h3>7. Your Rights</h3>
-                        <p>Depending on your location, you may have certain rights regarding your personal information. These rights may include:</p>
-                        
-                        <h4>7.1 Access and Information</h4>
-                        <p>You have the right to request access to the personal information we hold about you and to receive information about how we process it.</p>
-                        
-                        <h4>7.2 Correction</h4>
-                        <p>You have the right to request that we correct any inaccurate or incomplete personal information we hold about you.</p>
-                        
-                        <h4>7.3 Deletion</h4>
-                        <p>You have the right to request that we delete your personal information in certain circumstances, such as when it is no longer necessary for the purposes for which it was collected.</p>
-                        
-                        <h4>7.4 Restriction of Processing</h4>
-                        <p>You have the right to request that we restrict the processing of your personal information in certain circumstances, such as when you contest the accuracy of the information.</p>
-                        
-                        <h4>7.5 Data Portability</h4>
-                        <p>You have the right to receive your personal information in a structured, commonly used, and machine-readable format, and to transmit that information to another controller.</p>
-                        
-                        <h4>7.6 Objection</h4>
-                        <p>You have the right to object to the processing of your personal information in certain circumstances, such as for direct marketing purposes.</p>
-                        
-                        <h4>7.7 Withdrawal of Consent</h4>
-                        <p>If we rely on your consent to process your personal information, you have the right to withdraw that consent at any time.</p>
-                        
-                        <h4>7.8 Exercising Your Rights</h4>
-                        <p>To exercise any of these rights, please contact us using the contact information provided at the end of this Privacy Policy. We may need to verify your identity before responding to your request.</p>
-                    </div>
-                    
-                    <div id="children" class="privacy-section">
-                        <h3>8. Children's Privacy</h3>
-                        <p>Our Services are not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us, and we will delete such information from our systems.</p>
-                    </div>
-                    
-                    <div id="international" class="privacy-section">
-                        <h3>9. International Data Transfers</h3>
-                        <p>We may transfer your personal information to countries other than the country in which you reside. These countries may have different data protection laws than your country of residence. When we transfer your personal information internationally, we take appropriate safeguards to ensure that your information receives an adequate level of protection.</p>
-                        <p>By using our Services, you consent to the transfer of your personal information to countries outside your country of residence, including the United States, which may have different data protection rules than those of your country.</p>
-                    </div>
-                    
-                    <div id="changes" class="privacy-section">
-                        <h3>10. Changes to Privacy Policy</h3>
-                        <p>We may update this Privacy Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. We will notify you of any material changes by posting the new Privacy Policy on this page and updating the "Last Updated" date at the top of this Privacy Policy.</p>
-                        <p>We encourage you to review this Privacy Policy periodically to stay informed about how we are protecting your information.</p>
-                    </div>
-                    
+                    <!-- Contact Us -->
                     <div id="contact" class="privacy-section">
-                        <h3>11. Contact Us</h3>
-                        <p>If you have any questions or concerns about this Privacy Policy or our privacy practices, please contact us at:</p>
-                        <address>
-                            TravelMate Inc.<br>
-                            123 Travel Street, Suite 456<br>
-                            New York, NY 10001<br>
-                            United States<br><br>
-                            Email: <a href="mailto:privacy@travelmate.com">privacy@travelmate.com</a><br>
-                            Phone: +977 9847435111
-                        </address>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-envelope text-pink-500 mr-3"></i>11. Contact Us
+                        </h2>
+                        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
+                            <p class="mb-6">If you have any questions or concerns about this Privacy Policy or our privacy practices, please contact us:</p>
+                            
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800 mb-3">Contact Information</h4>
+                                        <div class="space-y-2 text-sm">
+                                            <p><i class="fas fa-building mr-2 text-blue-500"></i>TravelMate Inc.</p>
+                                            <p><i class="fas fa-map-marker-alt mr-2 text-red-500"></i>Patan, Lalitpur, Nepal</p>
+                                            <p><i class="fas fa-envelope mr-2 text-green-500"></i>privacy@travelmate.com</p>
+                                            <p><i class="fas fa-phone mr-2 text-purple-500"></i>+977 9847435111</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800 mb-3">Data Protection Officer</h4>
+                                        <div class="space-y-2 text-sm">
+                                            <p><i class="fas fa-user mr-2 text-indigo-500"></i>Chief Privacy Officer</p>
+                                            <p><i class="fas fa-envelope mr-2 text-green-500"></i>dpo@travelmate.com</p>
+                                            <p><i class="fas fa-clock mr-2 text-orange-500"></i>Response within 48 hours</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -299,37 +346,101 @@
 </section>
 
 <!-- Acceptance Banner -->
-<section class="py-4 bg-light">
-    <div class="container text-center">
-        <p class="mb-0">By using TravelMate services, you acknowledge that you have read and understood this Privacy Policy and agree to the collection, use, and disclosure of your information as described herein.</p>
+<section class="py-12 bg-gradient-to-r from-blue-600 via-purple-700 to-blue-800 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="max-w-4xl mx-auto">
+            <h3 class="text-2xl font-bold mb-4">Your Privacy Matters</h3>
+            <p class="text-blue-100 leading-relaxed">
+                By using TravelMate services, you acknowledge that you have read and understood this Privacy Policy 
+                and agree to the collection, use, and disclosure of your information as described herein. 
+                We are committed to protecting your privacy and maintaining the highest standards of data security.
+            </p>
+        </div>
     </div>
 </section>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
         // Smooth scroll for anchor links
-        $('a[href^="#"]').on('click', function(e) {
-            e.preventDefault();
-            var target = $(this.hash);
-            if (target.length) {
-                $('html, body').animate({
-                    scrollTop: target.offset().top - 100
-                }, 500);
-            }
-        });
-        
-        // Update active nav link on scroll
-        $(window).on('scroll', function() {
-            $('.privacy-section').each(function() {
-                if ($(window).scrollTop() >= $(this).offset().top - 150) {
-                    var id = $(this).attr('id');
-                    $('.privacy-nav .nav-link').removeClass('active');
-                    $('.privacy-nav .nav-link[href="#' + id + '"]').addClass('active');
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 }
             });
         });
+        
+        // Update active nav link on scroll
+        const sections = document.querySelectorAll('.privacy-section');
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        function updateActiveLink() {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active', 'text-blue-600', 'bg-blue-50');
+                link.classList.add('text-gray-600');
+                
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active', 'text-blue-600', 'bg-blue-50');
+                    link.classList.remove('text-gray-600');
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', updateActiveLink);
+        updateActiveLink(); // Initial call
+        
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in-up');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe elements for animation
+        document.querySelectorAll('.privacy-section').forEach(el => {
+            observer.observe(el);
+        });
     });
 </script>
+
+<style>
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+}
+</style>
 {% endblock %}

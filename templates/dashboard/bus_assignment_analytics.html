@@ -1,364 +1,425 @@
-{% extends 'dashboard/base.html' %}
-{% load static %}
-
-{% block dashboard_title %}Bus Assignment Analytics{% endblock %}
-
-{% block extra_css %}
-<style>
-  .analytics-header {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    color: white;
-    border-radius: 15px;
-    padding: 30px;
-    margin-bottom: 30px;
-  }
-  .metric-card {
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    height: 100%;
-  }
-  .metric-card:hover {
-    transform: translateY(-3px);
-  }
-  .utilization-bar {
-    height: 8px;
-    background: #e9ecef;
-    border-radius: 4px;
-    overflow: hidden;
-    margin: 10px 0;
-  }
-  .utilization-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #28a745, #20c997, #17a2b8);
-    transition: width 0.5s ease;
-  }
-  .assignment-type-chart {
-    max-width: 300px;
-    margin: 0 auto;
-  }
-  .bus-item,
-  .route-item {
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 10px;
-    transition: all 0.3s ease;
-  }
-  .bus-item:hover,
-  .route-item:hover {
-    border-color: #4facfe;
-    box-shadow: 0 2px 4px rgba(79, 172, 254, 0.2);
-  }
-  .high-utilization {
-    border-left: 4px solid #28a745;
-  }
-  .medium-utilization {
-    border-left: 4px solid #ffc107;
-  }
-  .low-utilization {
-    border-left: 4px solid #dc3545;
-  }
-</style>
-{% endblock %} {% block dashboard_content %}
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-chart-line"></i> Bus Assignment Analytics</h2>
-        <!-- Removed links to weekly assignments and scheduler control as features were removed -->
+{% extends "dashboard/base.html" %} {% load static %} {% block title %}Bus
+Assignment Analytics - Dashboard{% endblock %} {% block dashboard_content %}
+<div class="container mx-auto px-4 sm:px-8">
+  <div class="py-8">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h2 class="text-2xl font-semibold leading-tight text-gray-800">
+          <i class="fas fa-chart-line mr-2"></i>Bus Assignment Analytics
+        </h2>
+        <p class="text-gray-600">
+          Comprehensive insights into bus utilization and route assignments
+        </p>
       </div>
+      <div class="flex space-x-2">
+        <a
+          href="{% url 'dashboard:analytics' %}"
+          class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+        >
+          <i class="fas fa-arrow-left mr-2"></i>Back to Analytics
+        </a>
+        <button
+          onclick="refreshData()"
+          class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+        >
+          <i class="fas fa-sync-alt mr-2"></i>Refresh
+        </button>
+      </div>
+    </div>
 
-      <!-- Analytics Header -->
-      <div class="analytics-header">
-        <div class="row align-items-center">
-          <div class="col-md-8">
-            <h3><i class="fas fa-analytics"></i> Bus Assignment Analytics</h3>
-            <p class="mb-0">
-              Comprehensive insights into bus utilization, route assignments,
-              and scheduling patterns.
-            </p>
-            <small
-              >Data from {{ start_date|date:"M d, Y" }} to {{ end_date|date:"M
-              d, Y" }}</small
-            >
+    <!-- Analytics Header Card -->
+    <div
+      class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg p-6 mb-6"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-xl font-semibold mb-2">
+            <i class="fas fa-analytics mr-2"></i>Bus Assignment Analytics
+          </h3>
+          <p class="mb-2">
+            Comprehensive insights into bus utilization, route assignments, and
+            scheduling patterns.
+          </p>
+          <p class="text-sm opacity-90">
+            Data from {{ start_date|date:"M d, Y" }} to {{ end_date|date:"M d,
+            Y" }}
+          </p>
+        </div>
+        <div class="hidden md:block">
+          <i class="fas fa-chart-bar text-6xl opacity-30"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div
+        class="bg-white rounded-lg shadow p-6 border-t-4 border-blue-500 hover:shadow-lg transition-shadow"
+      >
+        <div class="flex items-center">
+          <div
+            class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4"
+          >
+            <i class="fas fa-bus text-blue-600 text-xl"></i>
           </div>
-          <div class="col-md-4 text-end">
-            <i class="fas fa-chart-bar fa-4x opacity-50"></i>
+          <div>
+            <div class="text-2xl font-bold text-gray-800">
+              {{ total_buses|default:0 }}
+            </div>
+            <div class="text-sm text-gray-600">Total Buses</div>
           </div>
         </div>
       </div>
 
-      <div class="row">
-        <!-- Bus Utilization -->
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-header">
-              <h5 class="mb-0"><i class="fas fa-bus"></i> Bus Utilization</h5>
-            </div>
-            <div class="card-body">
-              {% if bus_utilization %} {% for bus in bus_utilization %}
-              <div
-                class="bus-item {% if bus.daily_assignments >= 20 %}high-utilization{% elif bus.daily_assignments >= 10 %}medium-utilization{% else %}low-utilization{% endif %}"
-              >
-                <div class="row align-items-center">
-                  <div class="col-md-4">
-                    <strong>{{ bus.bus_number }}</strong><br />
-                    <small class="text-muted">{{ bus.bus_type }}</small>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="text-center">
-                      <div class="h5 mb-0">{{ bus.daily_assignments }}</div>
-                      <small class="text-muted">Daily Assignments</small>
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="text-center">
-                      <div class="h6 mb-0">{{ bus.weekly_assignments }}</div>
-                      <small class="text-muted">Weekly Assignments</small>
-                    </div>
-                  </div>
-                </div>
-                <div class="utilization-bar">
-                  <div
-                    class="utilization-fill"
-                    style="width: {% widthratio bus.daily_assignments 30 100 %}%"
-                  ></div>
-                </div>
-              </div>
-              {% endfor %} {% else %}
-              <div class="text-center text-muted py-4">
-                <i class="fas fa-bus fa-3x mb-3"></i>
-                <p>No bus utilization data available</p>
-              </div>
-              {% endif %}
-            </div>
+      <div
+        class="bg-white rounded-lg shadow p-6 border-t-4 border-green-500 hover:shadow-lg transition-shadow"
+      >
+        <div class="flex items-center">
+          <div
+            class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4"
+          >
+            <i class="fas fa-route text-green-600 text-xl"></i>
           </div>
-        </div>
-
-        <!-- Route Assignments -->
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-header">
-              <h5 class="mb-0">
-                <i class="fas fa-route"></i> Route Assignments
-              </h5>
+          <div>
+            <div class="text-2xl font-bold text-gray-800">
+              {{ active_assignments|default:0 }}
             </div>
-            <div class="card-body">
-              {% if route_assignments %} {% for route in route_assignments %}
-              <div
-                class="route-item {% if route.daily_assignments >= 15 %}high-utilization{% elif route.daily_assignments >= 8 %}medium-utilization{% else %}low-utilization{% endif %}"
-              >
-                <div class="row align-items-center">
-                  <div class="col-md-6">
-                    <strong>{{ route.source.name }}</strong><br />
-                    <i class="fas fa-arrow-right text-muted"></i>
-                    <strong>{{ route.destination.name }}</strong><br />
-                    <small class="text-muted">
-                      <i class="fas fa-clock"></i> {{ route.estimated_duration
-                      }} hrs
-                    </small>
-                  </div>
-                  <div class="col-md-3">
-                    <div class="text-center">
-                      <div class="h5 mb-0">{{ route.daily_assignments }}</div>
-                      <small class="text-muted">Daily</small>
-                    </div>
-                  </div>
-                  <div class="col-md-3">
-                    <div class="text-center">
-                      <div class="h6 mb-0">{{ route.weekly_assignments }}</div>
-                      <small class="text-muted">Weekly</small>
-                    </div>
-                  </div>
-                </div>
-                <div class="utilization-bar">
-                  <div
-                    class="utilization-fill"
-                    style="width: {% widthratio route.daily_assignments 20 100 %}%"
-                  ></div>
-                </div>
-              </div>
-              {% endfor %} {% else %}
-              <div class="text-center text-muted py-4">
-                <i class="fas fa-route fa-3x mb-3"></i>
-                <p>No route assignment data available</p>
-              </div>
-              {% endif %}
-            </div>
+            <div class="text-sm text-gray-600">Active Assignments</div>
           </div>
         </div>
       </div>
 
-      <!-- Assignment Types Distribution -->
-      <div class="row mt-4">
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">
-              <h5 class="mb-0">
-                <i class="fas fa-pie-chart"></i> Assignment Type Distribution
-              </h5>
+      <div
+        class="bg-white rounded-lg shadow p-6 border-t-4 border-yellow-500 hover:shadow-lg transition-shadow"
+      >
+        <div class="flex items-center">
+          <div
+            class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4"
+          >
+            <i class="fas fa-percentage text-yellow-600 text-xl"></i>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-gray-800">
+              {{ avg_utilization|floatformat:1|default:0 }}%
             </div>
-            <div class="card-body">
-              {% if assignment_types %}
-              <div class="assignment-type-chart">
-                {% for type in assignment_types %}
-                <div
-                  class="d-flex justify-content-between align-items-center mb-3"
+            <div class="text-sm text-gray-600">Avg Utilization</div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white rounded-lg shadow p-6 border-t-4 border-purple-500 hover:shadow-lg transition-shadow"
+      >
+        <div class="flex items-center">
+          <div
+            class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4"
+          >
+            <i class="fas fa-clock text-purple-600 text-xl"></i>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-gray-800">
+              {{ total_hours|default:0 }}
+            </div>
+            <div class="text-sm text-gray-600">Total Hours</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <!-- Bus Utilization -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3
+          class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+        >
+          <i class="fas fa-bus mr-2 text-blue-500"></i>Bus Utilization
+        </h3>
+
+        <div class="space-y-4">
+          {% for bus in bus_utilization %}
+          <div
+            class="border rounded-lg p-4 {% if bus.utilization >= 80 %}border-l-4 border-l-green-500{% elif bus.utilization >= 50 %}border-l-4 border-l-yellow-500{% else %}border-l-4 border-l-red-500{% endif %} hover:shadow-md transition-shadow"
+          >
+            <div class="flex justify-between items-center mb-2">
+              <div>
+                <h4 class="font-semibold text-gray-800">
+                  {{ bus.bus_number }}
+                </h4>
+                <p class="text-sm text-gray-600">{{ bus.bus_name }}</p>
+              </div>
+              <div class="text-right">
+                <span
+                  class="text-lg font-bold {% if bus.utilization >= 80 %}text-green-600{% elif bus.utilization >= 50 %}text-yellow-600{% else %}text-red-600{% endif %}"
                 >
-                  <div>
-                    <span class="badge bg-primary"
-                      >{{ type.assignment_type|title }}</span
-                    >
-                  </div>
-                  <div class="flex-grow-1 mx-3">
-                    <div class="progress" style="height: 8px">
-                      <div
-                        class="progress-bar"
-                        style="width: {% widthratio type.count assignment_types.0.count 100 %}%"
-                      ></div>
-                    </div>
-                  </div>
-                  <div>
-                    <strong>{{ type.count }}</strong>
-                  </div>
-                </div>
-                {% endfor %}
+                  {{ bus.utilization|floatformat:1 }}%
+                </span>
+                <p class="text-xs text-gray-500">
+                  {{ bus.hours_assigned }}h assigned
+                </p>
               </div>
-              {% else %}
-              <div class="text-center text-muted py-4">
-                <i class="fas fa-chart-pie fa-3x mb-3"></i>
-                <p>No assignment type data available</p>
-              </div>
-              {% endif %}
             </div>
-          </div>
-        </div>
 
-        <!-- Key Metrics -->
-        <div class="col-md-6">
-          <div class="row">
-            <div class="col-12 mb-3">
-              <div class="metric-card">
-                <div class="row align-items-center">
-                  <div class="col-8">
-                    <h6 class="text-muted mb-1">Total Active Buses</h6>
-                    <h3 class="mb-0">{{ bus_utilization|length }}</h3>
-                  </div>
-                  <div class="col-4 text-end">
-                    <i class="fas fa-bus fa-2x text-primary"></i>
-                  </div>
-                </div>
-              </div>
+            <!-- Utilization Bar -->
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div
+                class="{% if bus.utilization >= 80 %}bg-green-500{% elif bus.utilization >= 50 %}bg-yellow-500{% else %}bg-red-500{% endif %} h-2 rounded-full transition-all duration-500"
+                style="width: {{ bus.utilization }}%"
+              ></div>
             </div>
-            <div class="col-12 mb-3">
-              <div class="metric-card">
-                <div class="row align-items-center">
-                  <div class="col-8">
-                    <h6 class="text-muted mb-1">Active Routes</h6>
-                    <h3 class="mb-0">{{ route_assignments|length }}</h3>
-                  </div>
-                  <div class="col-4 text-end">
-                    <i class="fas fa-route fa-2x text-success"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-12">
-              <div class="metric-card">
-                <div class="row align-items-center">
-                  <div class="col-8">
-                    <h6 class="text-muted mb-1">Avg Utilization</h6>
-                    <h3 class="mb-0">
-                      {% if bus_utilization %} {% widthratio
-                      bus_utilization.0.daily_assignments 1 1 %}% {% else %} 0%
-                      {% endif %}
-                    </h3>
-                  </div>
-                  <div class="col-4 text-end">
-                    <i class="fas fa-percentage fa-2x text-info"></i>
-                  </div>
-                </div>
-              </div>
+
+            <div class="mt-2 text-xs text-gray-500">
+              Routes: {{ bus.route_count|default:0 }} | Bookings: {{
+              bus.booking_count|default:0 }}
             </div>
           </div>
+          {% empty %}
+          <div class="text-center py-8">
+            <i class="fas fa-bus text-6xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500">No bus utilization data available</p>
+          </div>
+          {% endfor %}
         </div>
       </div>
 
-      <!-- Recommendations -->
-      <div class="row mt-4">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header">
-              <h5 class="mb-0">
-                <i class="fas fa-lightbulb"></i> Optimization Recommendations
-              </h5>
+      <!-- Route Assignments -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3
+          class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+        >
+          <i class="fas fa-route mr-2 text-green-500"></i>Route Assignments
+        </h3>
+
+        <div class="space-y-4">
+          {% for route in route_assignments %}
+          <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-center mb-2">
+              <div>
+                <h4 class="font-semibold text-gray-800">
+                  {{ route.source }} → {{ route.destination }}
+                </h4>
+                <p class="text-sm text-gray-600">{{ route.distance }} km</p>
+              </div>
+              <div class="text-right">
+                <span class="text-lg font-bold text-blue-600"
+                  >{{ route.bus_count }}</span
+                >
+                <p class="text-xs text-gray-500">buses assigned</p>
+              </div>
             </div>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-4">
-                  <div class="alert alert-info">
-                    <h6>
-                      <i class="fas fa-info-circle"></i> High Utilization Buses
-                    </h6>
-                    <p class="mb-0 small">
-                      {% with high_util=bus_utilization|slice:":3" %} {% if
-                      high_util %} Consider adding backup buses for: {% for bus
-                      in high_util %} {{ bus.bus_number }}{% if not forloop.last
-                      %}, {% endif %} {% endfor %} {% else %} All buses have
-                      optimal utilization. {% endif %} {% endwith %}
-                    </p>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="alert alert-warning">
-                    <h6>
-                      <i class="fas fa-exclamation-triangle"></i> Popular Routes
-                    </h6>
-                    <p class="mb-0 small">
-                      {% with popular=route_assignments|slice:":2" %} {% if
-                      popular %} Consider increasing frequency for: {% for route
-                      in popular %} {{ route.source.name }}-{{
-                      route.destination.name }}{% if not forloop.last %}, {%
-                      endif %} {% endfor %} {% else %} Route distribution is
-                      balanced. {% endif %} {% endwith %}
-                    </p>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="alert alert-success">
-                    <h6>
-                      <i class="fas fa-check-circle"></i> Scheduler Performance
-                    </h6>
-                    <p class="mb-0 small">
-                      The intelligent scheduler is optimizing assignments based
-                      on travel duration and bus availability patterns.
-                    </p>
-                  </div>
-                </div>
+
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span class="text-gray-500">Daily Trips:</span>
+                <span class="font-medium"
+                  >{{ route.daily_trips|default:0 }}</span
+                >
+              </div>
+              <div>
+                <span class="text-gray-500">Avg Load:</span>
+                <span class="font-medium"
+                  >{{ route.avg_load|floatformat:1|default:0 }}%</span
+                >
+              </div>
+            </div>
+
+            <!-- Load Factor Bar -->
+            <div class="mt-2">
+              <div class="w-full bg-gray-200 rounded-full h-1.5">
+                <div
+                  class="bg-blue-500 h-1.5 rounded-full transition-all duration-500"
+                  style="width: {{ route.avg_load }}%"
+                ></div>
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center py-8">
+            <i class="fas fa-route text-6xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500">No route assignment data available</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Assignment Type Distribution -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <h3
+        class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+      >
+        <i class="fas fa-chart-pie mr-2 text-purple-500"></i>Assignment
+        Distribution
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="text-center">
+          <div class="w-32 h-32 mx-auto mb-4">
+            <canvas id="assignmentChart"></canvas>
+          </div>
+          <h4 class="font-semibold text-gray-800">Assignment Types</h4>
+        </div>
+
+        <div class="md:col-span-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                <span class="text-sm font-medium text-gray-700"
+                  >Regular Routes</span
+                >
+              </div>
+              <div class="text-2xl font-bold text-blue-600 mt-1">
+                {{ assignment_types.regular|default:0 }}
+              </div>
+            </div>
+
+            <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                <span class="text-sm font-medium text-gray-700"
+                  >Express Routes</span
+                >
+              </div>
+              <div class="text-2xl font-bold text-green-600 mt-1">
+                {{ assignment_types.express|default:0 }}
+              </div>
+            </div>
+
+            <div
+              class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500"
+            >
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+                <span class="text-sm font-medium text-gray-700"
+                  >Night Services</span
+                >
+              </div>
+              <div class="text-2xl font-bold text-yellow-600 mt-1">
+                {{ assignment_types.night|default:0 }}
+              </div>
+            </div>
+
+            <div
+              class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500"
+            >
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
+                <span class="text-sm font-medium text-gray-700"
+                  >Special Services</span
+                >
+              </div>
+              <div class="text-2xl font-bold text-purple-600 mt-1">
+                {{ assignment_types.special|default:0 }}
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Insights and Recommendations -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h4 class="font-semibold text-blue-800 mb-2">
+          <i class="fas fa-info-circle mr-2"></i>High Utilization Buses
+        </h4>
+        <p class="text-sm text-blue-700">
+          {% with high_util=bus_utilization|slice:":3" %} {% if high_util %}
+          Consider adding backup buses for: {% for bus in high_util %} {{
+          bus.bus_number }}{% if not forloop.last %}, {% endif %} {% endfor %}
+          {% else %} All buses have optimal utilization. {% endif %} {% endwith
+          %}
+        </p>
+      </div>
+
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <h4 class="font-semibold text-yellow-800 mb-2">
+          <i class="fas fa-exclamation-triangle mr-2"></i>Popular Routes
+        </h4>
+        <p class="text-sm text-yellow-700">
+          {% with popular=route_assignments|slice:":2" %} {% if popular %}
+          Consider increasing frequency for: {% for route in popular %} {{
+          route.source }}-{{ route.destination }}{% if not forloop.last %}, {%
+          endif %} {% endfor %} {% else %} Route distribution is balanced. {%
+          endif %} {% endwith %}
+        </p>
+      </div>
+
+      <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+        <h4 class="font-semibold text-green-800 mb-2">
+          <i class="fas fa-check-circle mr-2"></i>Scheduler Performance
+        </h4>
+        <p class="text-sm text-green-700">
+          The intelligent scheduler is optimizing assignments based on travel
+          duration and bus availability patterns.
+        </p>
+      </div>
+    </div>
   </div>
 </div>
-{% endblock %} {% block extra_js %}
+{% endblock %} {% block dashboard_extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  $(document).ready(function () {
-    // Animate utilization bars
-    $(".utilization-fill").each(function () {
-      const width = $(this).css("width");
-      $(this).css("width", "0").animate({ width: width }, 1000);
-    });
+  document.addEventListener('DOMContentLoaded', function() {
+      // Assignment Type Chart
+      const ctx = document.getElementById('assignmentChart').getContext('2d');
+      const assignmentChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+              labels: ['Regular', 'Express', 'Night', 'Special'],
+              datasets: [{
+                  data: [
+                      {{ assignment_types.regular|default:0 }},
+                      {{ assignment_types.express|default:0 }},
+                      {{ assignment_types.night|default:0 }},
+                      {{ assignment_types.special|default:0 }}
+                  ],
+                  backgroundColor: [
+                      '#3B82F6',
+                      '#10B981',
+                      '#F59E0B',
+                      '#8B5CF6'
+                  ]
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                  legend: {
+                      display: false
+                  }
+              }
+          }
+      });
 
-    // Auto-refresh every 10 minutes
-    setTimeout(function () {
-      location.reload();
-    }, 600000);
+      // Animate utilization bars
+      const utilizationBars = document.querySelectorAll('[style*="width:"]');
+      utilizationBars.forEach(bar => {
+          const width = bar.style.width;
+          bar.style.width = '0%';
+          setTimeout(() => {
+              bar.style.width = width;
+          }, 500);
+      });
   });
+
+  // Refresh data function
+  function refreshData() {
+      const btn = event.target;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Refreshing...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+          location.reload();
+      }, 1000);
+  }
+
+  // Auto-refresh every 10 minutes
+  setTimeout(function() {
+      location.reload();
+  }, 600000);
 </script>
 {% endblock %}

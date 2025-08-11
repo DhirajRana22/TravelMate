@@ -1,268 +1,435 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Payment Successful - TravelMate{% endblock %}
-
-{% block extra_css %}
-<style>
-    .success-container {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-    .success-icon {
-        font-size: 4rem;
-        color: #28a745;
-        animation: bounce 1s ease-in-out;
-    }
-    @keyframes bounce {
-        0%, 20%, 50%, 80%, 100% {
-            transform: translateY(0);
-        }
-        40% {
-            transform: translateY(-10px);
-        }
-        60% {
-            transform: translateY(-5px);
-        }
-    }
-    .payment-details {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
-        margin: 20px 0;
-    }
-    .action-buttons .btn {
-        margin: 5px;
-        min-width: 150px;
-    }
-    .transaction-id {
-        font-family: 'Courier New', monospace;
-        background: #e9ecef;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-weight: bold;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="container py-5">
-    <div class="success-container">
-        <!-- Success Header -->
-        <div class="text-center mb-4">
-            <div class="success-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h1 class="h2 text-success mt-3">Payment Successful!</h1>
-            <p class="text-muted">Your booking has been confirmed and payment processed successfully.</p>
-        </div>
-
-        <!-- Payment Details Card -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="fas fa-receipt"></i> Payment Details</h5>
-            </div>
-            <div class="card-body">
-                <div class="payment-details">
-                    <div class="row mb-3">
-                        <div class="col-sm-4"><strong>Booking ID:</strong></div>
-                        <div class="col-sm-8">{{ booking.booking_id }}</div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-4"><strong>Transaction ID:</strong></div>
-                        <div class="col-sm-8">
-                            <span class="transaction-id">{{ payment.transaction_id }}</span>
-                            <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyTransactionId()" title="Copy Transaction ID">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-4"><strong>Payment Method:</strong></div>
-                        <div class="col-sm-8">
-                            <span class="badge bg-primary">{{ payment.get_payment_method_display }}</span>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-4"><strong>Amount Paid:</strong></div>
-                        <div class="col-sm-8">
-                            <span class="h5 text-success">NPR {{ payment.amount|floatformat:2 }}</span>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-4"><strong>Payment Date:</strong></div>
-                        <div class="col-sm-8">{{ payment.payment_date|date:"M d, Y H:i" }}</div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-4"><strong>Status:</strong></div>
-                        <div class="col-sm-8">
-                            <span class="badge bg-success">{{ payment.get_payment_status_display }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Journey Details -->
-                <div class="border-top pt-3">
-                    <h6 class="text-muted mb-3"><i class="fas fa-route"></i> Journey Details</h6>
-                    <div class="row mb-2">
-                        <div class="col-sm-4"><strong>Route:</strong></div>
-                        <div class="col-sm-8">{{ booking.bus_schedule.route.source }} → {{ booking.bus_schedule.route.destination }}</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-sm-4"><strong>Travel Date:</strong></div>
-                        <div class="col-sm-8">{{ booking.travel_date|date:"M d, Y" }}</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-sm-4"><strong>Departure:</strong></div>
-                        <div class="col-sm-8">{{ booking.bus_schedule.departure_time|time:"H:i" }}</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-sm-4"><strong>Bus:</strong></div>
-                        <div class="col-sm-8">{{ booking.bus_schedule.bus.bus_name }} ({{ booking.bus_schedule.bus.bus_number }})</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-sm-4"><strong>Seats:</strong></div>
-                        <div class="col-sm-8">
-                            {% for seat in booking.selected_seats.all %}
-                                <span class="badge bg-info me-1">{{ seat.seat_number }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="action-buttons text-center mt-4">
-            <a href="{% url 'booking_detail' booking.booking_id %}" class="btn btn-primary">
-                <i class="fas fa-eye"></i> View Booking Details
-            </a>
-            <a href="{% url 'download_ticket' booking.booking_id %}" class="btn btn-success">
-                <i class="fas fa-download"></i> Download Ticket
-            </a>
-            <button class="btn btn-info" onclick="printTicket()">
-                <i class="fas fa-print"></i> Print Ticket
-            </button>
-        </div>
-
-        <!-- Additional Actions -->
-        <div class="text-center mt-3">
-            <a href="{% url 'routes:route_search' %}" class="btn btn-outline-primary">
-                <i class="fas fa-search"></i> Book Another Trip
-            </a>
-            <a href="{% url 'accounts:booking_history' %}" class="btn btn-outline-secondary">
-                <i class="fas fa-history"></i> My Bookings
-            </a>
-            <a href="{% url 'home:home' %}" class="btn btn-outline-dark">
-                <i class="fas fa-home"></i> Go Home
-            </a>
-        </div>
-
-        <!-- Important Notes -->
-        <div class="alert alert-info mt-4">
-            <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Important Notes:</h6>
-            <ul class="mb-0">
-                <li>Please arrive at the boarding point at least 15 minutes before departure time.</li>
-                <li>Carry a valid ID proof during your journey.</li>
-                <li>Keep your ticket and transaction ID safe for future reference.</li>
-                <li>For any queries, contact our customer support at +977 9847435111.</li>
-            </ul>
-        </div>
-
-        <!-- Contact Information -->
-        <div class="text-center mt-4">
-            <p class="text-muted">
-                <i class="fas fa-phone"></i> Need help? Call us at 
-                <a href="tel:+9779847435111" class="text-decoration-none">+977 9847435111</a>
-                or email 
-                <a href="mailto:support@travelmate.com" class="text-decoration-none">support@travelmate.com</a>
-            </p>
-        </div>
+{% extends 'base.html' %} {% load static %} {% block title %}Payment Successful
+- TravelMate{% endblock %} {% block content %}
+<!-- Success Header -->
+<section
+  class="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-16 -mt-6"
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div
+      class="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce"
+    >
+      <i class="fas fa-check-circle text-4xl text-white"></i>
     </div>
-</div>
-{% endblock %}
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">Payment Successful!</h1>
+    <p class="text-xl opacity-90 max-w-2xl mx-auto">
+      Your booking has been confirmed and payment processed successfully. You
+      will receive a confirmation email and SMS shortly.
+    </p>
+  </div>
+</section>
 
-{% block extra_js %}
+<!-- Payment Details -->
+<section class="py-12 bg-gray-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+      <!-- Header -->
+      <div class="bg-green-500 text-white p-6">
+        <h2 class="text-2xl font-bold flex items-center">
+          <i class="fas fa-receipt mr-3"></i>Payment Details
+        </h2>
+      </div>
+
+      <!-- Content -->
+      <div class="p-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Payment Information -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-6">
+              Transaction Information
+            </h3>
+
+            <div class="space-y-4">
+              <div
+                class="flex justify-between items-center p-4 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Booking ID</span>
+                <span class="font-bold text-gray-900"
+                  >{{ booking.booking_id }}</span
+                >
+              </div>
+
+              <div
+                class="flex justify-between items-center p-4 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Transaction ID</span>
+                <div class="flex items-center">
+                  <span
+                    class="font-mono font-bold text-gray-900 bg-gray-200 px-3 py-1 rounded mr-2"
+                    >{{ payment.transaction_id }}</span
+                  >
+                  <button
+                    onclick="copyTransactionId()"
+                    class="text-blue-500 hover:text-blue-600 transition-colors"
+                    title="Copy Transaction ID"
+                  >
+                    <i class="fas fa-copy"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div
+                class="flex justify-between items-center p-4 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Payment Method</span>
+                <span
+                  class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
+                >
+                  {{ payment.get_payment_method_display }}
+                </span>
+              </div>
+
+              <div
+                class="flex justify-between items-center p-4 bg-green-50 rounded-lg border border-green-200"
+              >
+                <span class="text-gray-600 font-medium">Amount Paid</span>
+                <span class="text-2xl font-bold text-green-600"
+                  >रू{{ payment.amount|floatformat:2 }}</span
+                >
+              </div>
+
+              <div
+                class="flex justify-between items-center p-4 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Payment Date</span>
+                <span class="font-semibold text-gray-900"
+                  >{{ payment.payment_date|date:"M d, Y H:i" }}</span
+                >
+              </div>
+
+              <div
+                class="flex justify-between items-center p-4 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Status</span>
+                <span
+                  class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
+                >
+                  <i class="fas fa-check mr-1"></i>{{
+                  payment.get_payment_status_display }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Booking Information -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-6">
+              Booking Information
+            </h3>
+
+            <div class="space-y-4">
+              <!-- Route -->
+              <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div class="text-center">
+                  <div class="flex items-center justify-center mb-2">
+                    <span class="text-lg font-bold text-gray-800"
+                      >{{ booking.bus_schedule.route.source }}</span
+                    >
+                    <i class="fas fa-arrow-right text-blue-500 mx-3"></i>
+                    <span class="text-lg font-bold text-gray-800"
+                      >{{ booking.bus_schedule.route.destination }}</span
+                    >
+                  </div>
+                  <div class="text-sm text-gray-600">
+                    {{ booking.travel_date|date:"l, M d, Y" }}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="flex justify-between items-center p-4 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Bus Number</span>
+                <span class="font-bold text-gray-900"
+                  >{{ booking.bus_schedule.bus.bus_number }}</span
+                >
+              </div>
+
+              <div
+                class="flex justify-between items-center p-4 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Departure Time</span>
+                <span class="font-semibold text-gray-900"
+                  >{{ booking.departure_time|time:"g:i A" }}</span
+                >
+              </div>
+
+              <div
+                class="flex justify-between items-center p-4 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Passenger Name</span>
+                <span class="font-semibold text-gray-900"
+                  >{{ booking.passenger_name }}</span
+                >
+              </div>
+
+              <div
+                class="flex justify-between items-center p-4 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Contact Number</span>
+                <span class="font-semibold text-gray-900"
+                  >{{ booking.passenger_phone }}</span
+                >
+              </div>
+
+              <!-- Seats -->
+              <div class="p-4 bg-gray-50 rounded-lg">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-gray-600 font-medium">Selected Seats</span>
+                  <span class="text-sm text-gray-500"
+                    >{{ booking.seats.count }} seat{{
+                    booking.seats.count|pluralize }}</span
+                  >
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  {% for seat in booking.seats.all %}
+                  <span
+                    class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
+                  >
+                    {{ seat.seat_number }}
+                  </span>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Action Buttons -->
+<section class="py-12 bg-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center">
+      <h3 class="text-2xl font-bold text-gray-900 mb-8">What's Next?</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Download Ticket -->
+        <a
+          href="{% url 'bookings:ticket' booking.booking_id %}"
+          class="bg-green-500 text-white px-6 py-4 rounded-xl font-semibold hover:bg-green-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
+        >
+          <i class="fas fa-download mb-2 text-xl block"></i>
+          Download Ticket
+        </a>
+
+        <!-- Print Ticket -->
+        <button
+          onclick="printTicket()"
+          class="bg-blue-500 text-white px-6 py-4 rounded-xl font-semibold hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
+        >
+          <i class="fas fa-print mb-2 text-xl block"></i>
+          Print Ticket
+        </button>
+
+        <!-- View Bookings -->
+        <a
+          href="{% url 'accounts:booking_history' %}"
+          class="bg-purple-500 text-white px-6 py-4 rounded-xl font-semibold hover:bg-purple-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
+        >
+          <i class="fas fa-history mb-2 text-xl block"></i>
+          My Bookings
+        </a>
+
+        <!-- Book Another -->
+        <a
+          href="{% url 'routes:route_search' %}"
+          class="bg-orange-500 text-white px-6 py-4 rounded-xl font-semibold hover:bg-orange-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
+        >
+          <i class="fas fa-plus mb-2 text-xl block"></i>
+          Book Another
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Important Information -->
+<section class="py-12 bg-blue-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-2xl shadow-lg p-8">
+      <h3 class="text-xl font-bold text-gray-900 mb-6">
+        <i class="fas fa-info-circle text-blue-500 mr-2"></i>Important
+        Information
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-semibold text-gray-800 mb-3">Before Your Journey</h4>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+              Arrive at the departure point 15 minutes early
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+              Carry a valid photo ID for verification
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+              Keep your ticket (digital or printed) ready
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+              Check weather conditions and dress accordingly
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold text-gray-800 mb-3">Need Help?</h4>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start">
+              <i class="fas fa-phone text-blue-500 mr-2 mt-1"></i>
+              24/7 Customer Support: +977 9847435111
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-envelope text-blue-500 mr-2 mt-1"></i>
+              Email: support@travelmate.com
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-comments text-blue-500 mr-2 mt-1"></i>
+              Live chat available on our website
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-undo text-blue-500 mr-2 mt-1"></i>
+              Cancellation policy applies for refunds
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Confirmation Messages -->
+<section class="py-8 bg-green-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div class="bg-green-100 border border-green-200 rounded-lg p-6">
+      <h4 class="text-lg font-semibold text-green-800 mb-2">
+        <i class="fas fa-envelope text-green-600 mr-2"></i>Confirmation Sent
+      </h4>
+      <p class="text-green-700">
+        A confirmation email has been sent to
+        <strong>{{ booking.passenger_email|default:user.email }}</strong> and
+        SMS to <strong>{{ booking.passenger_phone }}</strong> with your ticket
+        details.
+      </p>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_js %}
 <script>
-    // Copy transaction ID to clipboard
-    function copyTransactionId() {
-        const transactionId = '{{ payment.transaction_id }}';
-        navigator.clipboard.writeText(transactionId).then(function() {
-            // Show success message
-            const btn = event.target.closest('button');
-            const originalIcon = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check"></i>';
-            btn.classList.add('btn-success');
-            btn.classList.remove('btn-outline-secondary');
-            
-            setTimeout(function() {
-                btn.innerHTML = originalIcon;
-                btn.classList.remove('btn-success');
-                btn.classList.add('btn-outline-secondary');
-            }, 2000);
-            
-            // Show toast notification
-            showToast('Transaction ID copied to clipboard!', 'success');
-        }).catch(function(err) {
-            console.error('Could not copy text: ', err);
-            showToast('Failed to copy transaction ID', 'error');
-        });
-    }
+  document.addEventListener("DOMContentLoaded", function () {
+    // Show success animation
+    setTimeout(() => {
+      const successIcon = document.querySelector(".animate-bounce");
+      if (successIcon) {
+        successIcon.classList.remove("animate-bounce");
+        successIcon.classList.add("animate-pulse");
+      }
+    }, 2000);
+  });
 
-    // Print ticket function
-    function printTicket() {
-        window.open('{% url "print_ticket" booking.booking_id %}', '_blank');
-    }
+  // Copy transaction ID function
+  function copyTransactionId() {
+    const transactionId = "{{ payment.transaction_id }}";
 
-    // Show toast notification
-    function showToast(message, type) {
-        const toastContainer = document.getElementById('toast-container') || createToastContainer();
-        const toast = document.createElement('div');
-        toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
-        toast.setAttribute('role', 'alert');
-        toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    navigator.clipboard
+      .writeText(transactionId)
+      .then(function () {
+        // Update button appearance
+        const btn = event.target.closest("button");
+        const icon = btn.querySelector("i");
+
+        icon.classList.remove("fa-copy");
+        icon.classList.add("fa-check");
+        btn.classList.add("text-green-500");
+        btn.classList.remove("text-blue-500");
+
+        // Reset after 2 seconds
+        setTimeout(() => {
+          icon.classList.remove("fa-check");
+          icon.classList.add("fa-copy");
+          btn.classList.remove("text-green-500");
+          btn.classList.add("text-blue-500");
+        }, 2000);
+
+        // Show toast notification
+        showToast("Transaction ID copied to clipboard!", "success");
+      })
+      .catch(function (err) {
+        console.error("Could not copy text: ", err);
+        showToast("Failed to copy transaction ID", "error");
+      });
+  }
+
+  // Print ticket function
+  function printTicket() {
+    window.open('{% url "bookings:ticket" booking.booking_id %}', "_blank");
+  }
+
+  // Show toast notification
+  function showToast(message, type) {
+    const toast = document.createElement("div");
+    toast.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+    } min-w-80 transform translate-x-full transition-transform duration-300`;
+
+    toast.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-${
+                      type === "success" ? "check" : "exclamation"
+                    }-circle mr-2"></i>
+                    ${message}
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         `;
-        
-        toastContainer.appendChild(toast);
-        const bsToast = new bootstrap.Toast(toast);
-        bsToast.show();
-        
-        // Remove toast after it's hidden
-        toast.addEventListener('hidden.bs.toast', function() {
-            toast.remove();
-        });
-    }
 
-    // Create toast container if it doesn't exist
-    function createToastContainer() {
-        const container = document.createElement('div');
-        container.id = 'toast-container';
-        container.className = 'toast-container position-fixed top-0 end-0 p-3';
-        container.style.zIndex = '1055';
-        document.body.appendChild(container);
-        return container;
-    }
+    document.body.appendChild(toast);
 
-    // Auto-redirect after 30 seconds (optional)
-    setTimeout(function() {
-        if (confirm('Would you like to go to your bookings page?')) {
-            window.location.href = '{% url "booking_history" %}';
+    // Animate in
+    setTimeout(() => {
+      toast.classList.remove("translate-x-full");
+    }, 100);
+
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+      toast.classList.add("translate-x-full");
+      setTimeout(() => {
+        if (toast.parentElement) {
+          toast.remove();
         }
-    }, 30000);
+      }, 300);
+    }, 3000);
+  }
 
-    // Prevent accidental page refresh
-    window.addEventListener('beforeunload', function(e) {
-        e.preventDefault();
-        e.returnValue = '';
-    });
+  // Auto-redirect after 60 seconds (optional)
+  setTimeout(function () {
+    if (confirm("Would you like to go to your bookings page?")) {
+      window.location.href = '{% url "accounts:booking_history" %}';
+    }
+  }, 60000);
 
-    // Remove the beforeunload listener after 5 minutes
-    setTimeout(function() {
-        window.removeEventListener('beforeunload', function() {});
-    }, 300000);
+  // Prevent accidental page refresh for first 5 minutes
+  let preventRefresh = true;
+
+  window.addEventListener("beforeunload", function (e) {
+    if (preventRefresh) {
+      e.preventDefault();
+      e.returnValue =
+        "Are you sure you want to leave? Your payment confirmation is displayed on this page.";
+    }
+  });
+
+  // Remove the beforeunload listener after 5 minutes
+  setTimeout(function () {
+    preventRefresh = false;
+  }, 300000);
 </script>
 {% endblock %}

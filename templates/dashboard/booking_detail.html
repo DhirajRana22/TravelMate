@@ -1,449 +1,181 @@
-{% extends 'base.html' %}
+{% extends "dashboard/base.html" %}
 {% load static %}
 
-{% block title %}Admin - Booking Details - {{ booking.booking_id }}{% endblock %}
+{% block title %}Booking Details - {{ booking.booking_id }} - Admin Dashboard{% endblock %}
 
-{% block extra_css %}
-<style>
-    .admin-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem 0;
-        margin-bottom: 2rem;
-    }
-    
-    .admin-card {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        border: 1px solid #e9ecef;
-    }
-    
-    .admin-card h5 {
-        color: #495057;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #e9ecef;
-        font-weight: 600;
-    }
-    
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1rem;
-    }
-    
-    .info-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.75rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-        border-left: 4px solid #667eea;
-    }
-    
-    .info-label {
-        font-weight: 500;
-        color: #6c757d;
-        display: flex;
-        align-items: center;
-    }
-    
-    .info-label i {
-        margin-right: 0.5rem;
-        width: 20px;
-        color: #667eea;
-    }
-    
-    .info-value {
-        font-weight: 600;
-        color: #495057;
-    }
-    
-    .status-badge {
-        display: inline-block;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.5px;
-    }
-    
-    .status-confirmed {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-    
-    .status-pending {
-        background: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeaa7;
-    }
-    
-    .status-cancelled {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
-    
-    .payment-completed {
-        background: #d4edda;
-        color: #155724;
-    }
-    
-    .payment-pending {
-        background: #fff3cd;
-        color: #856404;
-    }
-    
-    .payment-failed {
-        background: #f8d7da;
-        color: #721c24;
-    }
-    
-    .seat-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
-        gap: 0.5rem;
-        margin-top: 0.5rem;
-    }
-    
-    .seat-item {
-        background: #28a745;
-        color: white;
-        padding: 0.5rem;
-        border-radius: 6px;
-        text-align: center;
-        font-weight: 600;
-        font-size: 0.875rem;
-    }
-    
-    .admin-actions {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-        margin-top: 1.5rem;
-    }
-    
-    .btn-admin {
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        font-weight: 500;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
-    }
-    
-    .btn-primary {
-        background: #667eea;
-        color: white;
-    }
-    
-    .btn-primary:hover {
-        background: #5a6fd8;
-        color: white;
-    }
-    
-    .btn-success {
-        background: #28a745;
-        color: white;
-    }
-    
-    .btn-success:hover {
-        background: #218838;
-        color: white;
-    }
-    
-    .btn-warning {
-        background: #ffc107;
-        color: #212529;
-    }
-    
-    .btn-warning:hover {
-        background: #e0a800;
-        color: #212529;
-    }
-    
-    .btn-danger {
-        background: #dc3545;
-        color: white;
-    }
-    
-    .btn-danger:hover {
-        background: #c82333;
-        color: white;
-    }
-    
-    .btn-outline {
-        background: transparent;
-        color: #667eea;
-        border: 1px solid #667eea;
-    }
-    
-    .btn-outline:hover {
-        background: #667eea;
-        color: white;
-    }
-    
-    .route-display {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 1rem;
-        border-radius: 8px;
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-    
-    .route-cities {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 1.1rem;
-        font-weight: 600;
-        gap: 1rem;
-    }
-    
-    .payment-details {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-top: 1rem;
-    }
-    
-    .refund-details {
-        background: #fff3cd;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-top: 1rem;
-        border-left: 4px solid #ffc107;
-    }
-    
-    .timeline {
-        position: relative;
-        padding-left: 2rem;
-    }
-    
-    .timeline::before {
-        content: '';
-        position: absolute;
-        left: 0.5rem;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background: #e9ecef;
-    }
-    
-    .timeline-item {
-        position: relative;
-        margin-bottom: 1rem;
-    }
-    
-    .timeline-item::before {
-        content: '';
-        position: absolute;
-        left: -1.75rem;
-        top: 0.25rem;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: #667eea;
-    }
-    
-    .timeline-content {
-        background: white;
-        padding: 0.75rem;
-        border-radius: 6px;
-        border: 1px solid #e9ecef;
-        border-left: 3px solid #667eea;
-    }
-    
-    .timeline-time {
-        font-size: 0.75rem;
-        color: #6c757d;
-        margin-bottom: 0.25rem;
-    }
-    
-    .timeline-title {
-        font-weight: 600;
-        color: #495057;
-        margin: 0;
-    }
-    
-    @media (max-width: 768px) {
-        .info-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .admin-actions {
-            flex-direction: column;
-        }
-        
-        .route-cities {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<!-- Admin Header -->
-<section class="admin-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="mb-2"><i class="fas fa-ticket-alt me-2"></i>Booking Management</h1>
-                <p class="mb-0">Detailed view and management of booking {{ booking.booking_id }}</p>
+{% block dashboard_content %}
+<div class="container mx-auto px-4 sm:px-8">
+    <div class="py-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-2xl font-semibold leading-tight text-gray-800">Booking Details</h2>
+                <p class="text-gray-600">Detailed view and management of booking {{ booking.booking_id }}</p>
             </div>
-            <div class="col-md-4 text-md-end">
-                <a href="{% url 'dashboard:booking_management' %}" class="btn btn-light">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Bookings
-                </a>
-            </div>
+            <a href="{% url 'dashboard:booking_management' %}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Bookings
+            </a>
         </div>
-    </div>
-</section>
 
-<!-- Booking Details Content -->
-<section class="py-4">
-    <div class="container">
-        <div class="row">
-            <!-- Main Booking Information -->
-            <div class="col-lg-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-6">
                 <!-- Booking Overview -->
-                <div class="admin-card">
-                    <h5><i class="fas fa-info-circle me-2"></i>Booking Overview</h5>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fas fa-info-circle mr-2 text-blue-500"></i>Booking Overview
+                    </h3>
                     
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="flex justify-between items-start mb-4">
                         <div>
-                            <h6 class="mb-1">Booking ID: <strong>{{ booking.booking_id }}</strong></h6>
-                            <small class="text-muted">Created on {{ booking.created_at|date:"F d, Y g:i A" }}</small>
+                            <h4 class="text-xl font-bold text-gray-800">{{ booking.booking_id }}</h4>
+                            <p class="text-sm text-gray-600">Created on {{ booking.created_at|date:"F d, Y g:i A" }}</p>
                         </div>
-                        <div class="text-end">
-                            <div class="status-badge status-{{ booking.booking_status }}">{{ booking.get_booking_status_display }}</div>
+                        <div class="text-right">
+                            <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold
+                                {% if booking.booking_status == 'confirmed' %}bg-green-100 text-green-800
+                                {% elif booking.booking_status == 'pending' %}bg-yellow-100 text-yellow-800
+                                {% elif booking.booking_status == 'cancelled' %}bg-red-100 text-red-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ booking.get_booking_status_display }}
+                            </span>
                             <br>
-                            <small class="status-badge payment-{{ booking.payment_status|lower }}">{{ booking.get_payment_status_display }}</small>
+                            <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold mt-1
+                                {% if booking.payment_status == 'paid' %}bg-green-100 text-green-800
+                                {% elif booking.payment_status == 'pending' %}bg-yellow-100 text-yellow-800
+                                {% elif booking.payment_status == 'failed' %}bg-red-100 text-red-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ booking.get_payment_status_display }}
+                            </span>
                         </div>
                     </div>
                     
-                    <div class="route-display">
-                        <div class="route-cities">
+                    <!-- Route Display -->
+                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-lg mb-4">
+                        <div class="flex justify-center items-center text-lg font-semibold">
                             <span>{{ booking.bus_schedule.route.source.name }}</span>
-                            <i class="fas fa-arrow-right"></i>
+                            <i class="fas fa-arrow-right mx-4"></i>
                             <span>{{ booking.bus_schedule.route.destination.name }}</span>
                         </div>
-                        <small>{{ booking.travel_date|date:"l, F d, Y" }}</small>
+                        <p class="text-center text-sm mt-1">{{ booking.travel_date|date:"l, F d, Y" }}</p>
                     </div>
                     
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">
-                                <i class="fas fa-bus"></i>
-                                Bus Number
+                    <!-- Info Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-blue-500">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 flex items-center">
+                                    <i class="fas fa-bus mr-2 text-blue-500"></i>Bus Number
+                                </span>
+                                <span class="font-semibold">{{ booking.bus_schedule.bus.bus_number }}</span>
                             </div>
-                            <div class="info-value">{{ booking.bus_schedule.bus.bus_number }}</div>
                         </div>
                         
-                        <div class="info-item">
-                            <div class="info-label">
-                                <i class="fas fa-clock"></i>
-                                Departure
+                        <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-blue-500">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 flex items-center">
+                                    <i class="fas fa-clock mr-2 text-blue-500"></i>Departure
+                                </span>
+                                <span class="font-semibold">{{ booking.bus_schedule.departure_time|time:"g:i A" }}</span>
                             </div>
-                            <div class="info-value">{{ booking.bus_schedule.departure_time|time:"g:i A" }}</div>
                         </div>
                         
-                        <div class="info-item">
-                            <div class="info-label">
-                                <i class="fas fa-clock"></i>
-                                Arrival
+                        <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-blue-500">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 flex items-center">
+                                    <i class="fas fa-clock mr-2 text-blue-500"></i>Arrival
+                                </span>
+                                <span class="font-semibold">{{ booking.bus_schedule.arrival_time|time:"g:i A" }}</span>
                             </div>
-                            <div class="info-value">{{ booking.bus_schedule.arrival_time|time:"g:i A" }}</div>
                         </div>
                         
-                        <div class="info-item">
-                            <div class="info-label">
-                                <i class="fas fa-chair"></i>
-                                Seats
+                        <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-blue-500">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 flex items-center">
+                                    <i class="fas fa-chair mr-2 text-blue-500"></i>Seats
+                                </span>
+                                <span class="font-semibold">{{ booking.seats.count }} seat{{ booking.seats.count|pluralize }}</span>
                             </div>
-                            <div class="info-value">{{ booking.seats.count }} seat{{ booking.seats.count|pluralize }}</div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Passenger Information -->
-                <div class="admin-card">
-                    <h5><i class="fas fa-user me-2"></i>Passenger Information</h5>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fas fa-user mr-2 text-blue-500"></i>Passenger Information
+                    </h3>
                     
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">
-                                <i class="fas fa-user"></i>
-                                Full Name
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-blue-500">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 flex items-center">
+                                    <i class="fas fa-user mr-2 text-blue-500"></i>Full Name
+                                </span>
+                                <span class="font-semibold">{{ booking.passenger_name }}</span>
                             </div>
-                            <div class="info-value">{{ booking.passenger_name }}</div>
                         </div>
                         
-                        <div class="info-item">
-                            <div class="info-label">
-                                <i class="fas fa-envelope"></i>
-                                Email
+                        <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-blue-500">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 flex items-center">
+                                    <i class="fas fa-envelope mr-2 text-blue-500"></i>Email
+                                </span>
+                                <span class="font-semibold">{{ booking.passenger_email }}</span>
                             </div>
-                            <div class="info-value">{{ booking.passenger_email }}</div>
                         </div>
                         
-                        <div class="info-item">
-                            <div class="info-label">
-                                <i class="fas fa-phone"></i>
-                                Phone
+                        <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-blue-500">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 flex items-center">
+                                    <i class="fas fa-phone mr-2 text-blue-500"></i>Phone
+                                </span>
+                                <span class="font-semibold">{{ booking.passenger_phone }}</span>
                             </div>
-                            <div class="info-value">{{ booking.passenger_phone }}</div>
                         </div>
                         
                         {% if booking.passenger_age %}
-                        <div class="info-item">
-                            <div class="info-label">
-                                <i class="fas fa-birthday-cake"></i>
-                                Age
+                        <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-blue-500">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 flex items-center">
+                                    <i class="fas fa-birthday-cake mr-2 text-blue-500"></i>Age
+                                </span>
+                                <span class="font-semibold">{{ booking.passenger_age }} years</span>
                             </div>
-                            <div class="info-value">{{ booking.passenger_age }} years</div>
                         </div>
                         {% endif %}
                         
-                        <div class="info-item">
-                            <div class="info-label">
-                                <i class="fas fa-user-circle"></i>
-                                User Account
-                            </div>
-                            <div class="info-value">
-                                <a href="{% url 'dashboard:user_detail' booking.user.id %}" class="text-decoration-none">
-                                    {{ booking.user.get_full_name|default:booking.user.username }}
-                                </a>
+                        <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-blue-500">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 flex items-center">
+                                    <i class="fas fa-user-circle mr-2 text-blue-500"></i>User Account
+                                </span>
+                                <span class="font-semibold">
+                                    <a href="{% url 'dashboard:user_detail' booking.user.id %}" class="text-blue-600 hover:text-blue-800">
+                                        {{ booking.user.get_full_name|default:booking.user.username }}
+                                    </a>
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Seat Details -->
-                <div class="admin-card">
-                    <h5><i class="fas fa-chair me-2"></i>Seat Details</h5>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fas fa-chair mr-2 text-blue-500"></i>Seat Details
+                    </h3>
                     
-                    <div class="info-item">
-                        <div class="info-label">
-                            <i class="fas fa-list"></i>
-                            Selected Seats
-                        </div>
-                        <div class="info-value">
-                            <div class="seat-grid">
+                    <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-blue-500">
+                        <div class="flex justify-between items-start">
+                            <span class="text-gray-600 flex items-center">
+                                <i class="fas fa-list mr-2 text-blue-500"></i>Selected Seats
+                            </span>
+                            <div class="grid grid-cols-4 gap-2">
                                 {% for seat in seats %}
-                                    <div class="seat-item">{{ seat.seat_number }}</div>
+                                    <div class="bg-green-500 text-white px-3 py-1 rounded text-center font-semibold text-sm">
+                                        {{ seat.seat_number }}
+                                    </div>
                                 {% endfor %}
                             </div>
                         </div>
@@ -452,103 +184,108 @@
                 
                 <!-- Payment Information -->
                 {% if payment %}
-                <div class="admin-card">
-                    <h5><i class="fas fa-credit-card me-2"></i>Payment Information</h5>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fas fa-credit-card mr-2 text-blue-500"></i>Payment Information
+                    </h3>
                     
-                    <div class="payment-details">
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <div class="info-label">
-                                    <i class="fas fa-hashtag"></i>
-                                    Transaction ID
-                                </div>
-                                <div class="info-value">{{ payment.transaction_id }}</div>
-                            </div>
-                            
-                            <div class="info-item">
-                                <div class="info-label">
-                                    <i class="fas fa-credit-card"></i>
-                                    Payment Method
-                                </div>
-                                <div class="info-value">{{ payment.get_payment_method_display }}</div>
-                            </div>
-                            
-                            <div class="info-item">
-                                <div class="info-label">
-                                    <i class="fas fa-money-bill"></i>
-                                    Amount
-                                </div>
-                                <div class="info-value">रू {{ payment.amount }}</div>
-                            </div>
-                            
-                            <div class="info-item">
-                                <div class="info-label">
-                                    <i class="fas fa-calendar"></i>
-                                    Payment Date
-                                </div>
-                                <div class="info-value">{{ payment.payment_date|date:"M d, Y g:i A" }}</div>
-                            </div>
-                            
-                            <div class="info-item">
-                                <div class="info-label">
-                                    <i class="fas fa-info-circle"></i>
-                                    Status
-                                </div>
-                                <div class="info-value">
-                                    <span class="status-badge payment-{{ payment.payment_status|lower }}">{{ payment.get_payment_status_display }}</span>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-white p-3 rounded border-l-4 border-blue-500">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600 flex items-center">
+                                        <i class="fas fa-hashtag mr-2 text-blue-500"></i>Transaction ID
+                                    </span>
+                                    <span class="font-semibold">{{ payment.transaction_id }}</span>
                                 </div>
                             </div>
                             
-                            {% if payment.gateway_response %}
-                            <div class="info-item">
-                                <div class="info-label">
-                                    <i class="fas fa-server"></i>
-                                    Gateway Response
-                                </div>
-                                <div class="info-value">
-                                    <small class="text-muted">{{ payment.gateway_response|truncatechars:50 }}</small>
+                            <div class="bg-white p-3 rounded border-l-4 border-blue-500">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600 flex items-center">
+                                        <i class="fas fa-credit-card mr-2 text-blue-500"></i>Payment Method
+                                    </span>
+                                    <span class="font-semibold">{{ payment.get_payment_method_display }}</span>
                                 </div>
                             </div>
-                            {% endif %}
+                            
+                            <div class="bg-white p-3 rounded border-l-4 border-blue-500">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600 flex items-center">
+                                        <i class="fas fa-money-bill mr-2 text-blue-500"></i>Amount
+                                    </span>
+                                    <span class="font-semibold">रू{{ payment.amount }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white p-3 rounded border-l-4 border-blue-500">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600 flex items-center">
+                                        <i class="fas fa-calendar mr-2 text-blue-500"></i>Payment Date
+                                    </span>
+                                    <span class="font-semibold">{{ payment.payment_date|date:"M d, Y g:i A" }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white p-3 rounded border-l-4 border-blue-500">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600 flex items-center">
+                                        <i class="fas fa-info-circle mr-2 text-blue-500"></i>Status
+                                    </span>
+                                    <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold
+                                        {% if payment.payment_status == 'completed' %}bg-green-100 text-green-800
+                                        {% elif payment.payment_status == 'pending' %}bg-yellow-100 text-yellow-800
+                                        {% elif payment.payment_status == 'failed' %}bg-red-100 text-red-800
+                                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                        {{ payment.get_payment_status_display }}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Refund Information -->
                     {% if refund %}
-                    <div class="refund-details">
-                        <h6><i class="fas fa-undo me-2"></i>Refund Information</h6>
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <div class="info-label">
-                                    <i class="fas fa-money-bill"></i>
-                                    Refund Amount
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4 rounded">
+                        <h4 class="text-lg font-semibold text-yellow-800 mb-3">
+                            <i class="fas fa-undo mr-2"></i>Refund Information
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-white p-3 rounded border-l-4 border-yellow-400">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600 flex items-center">
+                                        <i class="fas fa-money-bill mr-2 text-yellow-500"></i>Refund Amount
+                                    </span>
+                                    <span class="font-semibold">रू{{ refund.refund_amount }}</span>
                                 </div>
-                                <div class="info-value">रू {{ refund.refund_amount }}</div>
                             </div>
                             
-                            <div class="info-item">
-                                <div class="info-label">
-                                    <i class="fas fa-calendar"></i>
-                                    Refund Date
+                            <div class="bg-white p-3 rounded border-l-4 border-yellow-400">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600 flex items-center">
+                                        <i class="fas fa-calendar mr-2 text-yellow-500"></i>Refund Date
+                                    </span>
+                                    <span class="font-semibold">{{ refund.refund_date|date:"M d, Y g:i A" }}</span>
                                 </div>
-                                <div class="info-value">{{ refund.refund_date|date:"M d, Y g:i A" }}</div>
                             </div>
                             
-                            <div class="info-item">
-                                <div class="info-label">
-                                    <i class="fas fa-info-circle"></i>
-                                    Status
+                            <div class="bg-white p-3 rounded border-l-4 border-yellow-400">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600 flex items-center">
+                                        <i class="fas fa-info-circle mr-2 text-yellow-500"></i>Status
+                                    </span>
+                                    <span class="font-semibold">{{ refund.get_refund_status_display }}</span>
                                 </div>
-                                <div class="info-value">{{ refund.get_refund_status_display }}</div>
                             </div>
                             
                             {% if refund.reason %}
-                            <div class="info-item">
-                                <div class="info-label">
-                                    <i class="fas fa-comment"></i>
-                                    Reason
+                            <div class="bg-white p-3 rounded border-l-4 border-yellow-400">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600 flex items-center">
+                                        <i class="fas fa-comment mr-2 text-yellow-500"></i>Reason
+                                    </span>
+                                    <span class="font-semibold">{{ refund.reason }}</span>
                                 </div>
-                                <div class="info-value">{{ refund.reason }}</div>
                             </div>
                             {% endif %}
                         </div>
@@ -559,65 +296,77 @@
             </div>
             
             <!-- Sidebar -->
-            <div class="col-lg-4">
+            <div class="space-y-6">
                 <!-- Quick Stats -->
-                <div class="admin-card">
-                    <h5><i class="fas fa-chart-bar me-2"></i>Quick Stats</h5>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fas fa-chart-bar mr-2 text-blue-500"></i>Quick Stats
+                    </h3>
                     
-                    <div class="info-item">
-                        <div class="info-label">
-                            <i class="fas fa-money-bill"></i>
-                            Base Fare ({{ booking.seats.count }} seats)
+                    <div class="space-y-3">
+                        <div class="bg-gray-50 p-3 rounded-lg border-l-4 border-blue-500">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 flex items-center">
+                                    <i class="fas fa-money-bill mr-2 text-blue-500"></i>Base Fare ({{ booking.seats.count }} seats)
+                                </span>
+                                <span class="font-semibold">रू{{ booking.bus_schedule.base_fare|floatformat:2 }} × {{ booking.seats.count }}</span>
+                            </div>
                         </div>
-                        <div class="info-value">रू {{ booking.bus_schedule.base_fare|floatformat:2 }} × {{ booking.seats.count }}</div>
-                    </div>
-                    
-                    <div class="info-item" style="border-left-color: #28a745; background: #d4edda;">
-                        <div class="info-label">
-                            <i class="fas fa-calculator"></i>
-                            <strong>Total Fare</strong>
-                        </div>
-                        <div class="info-value">
-                            <strong style="color: #28a745;">रू {{ booking.total_fare }}</strong>
+                        
+                        <div class="bg-green-50 p-3 rounded-lg border-l-4 border-green-500">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 flex items-center font-bold">
+                                    <i class="fas fa-calculator mr-2 text-green-500"></i>Total Fare
+                                </span>
+                                <span class="font-bold text-green-600 text-lg">रू{{ booking.total_fare }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Booking Timeline -->
-                <div class="admin-card">
-                    <h5><i class="fas fa-history me-2"></i>Activity Timeline</h5>
+                <!-- Activity Timeline -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fas fa-history mr-2 text-blue-500"></i>Activity Timeline
+                    </h3>
                     
-                    <div class="timeline">
-                        <div class="timeline-item">
-                            <div class="timeline-content">
-                                <div class="timeline-time">{{ booking.created_at|date:"M d, Y g:i A" }}</div>
-                                <div class="timeline-title">Booking Created</div>
+                    <div class="relative">
+                        <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                        
+                        <div class="relative mb-4">
+                            <div class="absolute left-2 w-4 h-4 bg-blue-500 rounded-full"></div>
+                            <div class="ml-8 bg-white p-3 rounded border border-gray-200 border-l-4 border-l-blue-500">
+                                <div class="text-xs text-gray-500 mb-1">{{ booking.created_at|date:"M d, Y g:i A" }}</div>
+                                <div class="font-semibold text-gray-800">Booking Created</div>
                             </div>
                         </div>
                         
                         {% if payment %}
-                        <div class="timeline-item">
-                            <div class="timeline-content">
-                                <div class="timeline-time">{{ payment.payment_date|date:"M d, Y g:i A" }}</div>
-                                <div class="timeline-title">Payment {{ payment.get_payment_status_display }}</div>
+                        <div class="relative mb-4">
+                            <div class="absolute left-2 w-4 h-4 bg-blue-500 rounded-full"></div>
+                            <div class="ml-8 bg-white p-3 rounded border border-gray-200 border-l-4 border-l-blue-500">
+                                <div class="text-xs text-gray-500 mb-1">{{ payment.payment_date|date:"M d, Y g:i A" }}</div>
+                                <div class="font-semibold text-gray-800">Payment {{ payment.get_payment_status_display }}</div>
                             </div>
                         </div>
                         {% endif %}
                         
                         {% if booking.booking_status == 'confirmed' %}
-                        <div class="timeline-item">
-                            <div class="timeline-content">
-                                <div class="timeline-time">{{ booking.updated_at|date:"M d, Y g:i A" }}</div>
-                                <div class="timeline-title">Booking Confirmed</div>
+                        <div class="relative mb-4">
+                            <div class="absolute left-2 w-4 h-4 bg-blue-500 rounded-full"></div>
+                            <div class="ml-8 bg-white p-3 rounded border border-gray-200 border-l-4 border-l-blue-500">
+                                <div class="text-xs text-gray-500 mb-1">{{ booking.updated_at|date:"M d, Y g:i A" }}</div>
+                                <div class="font-semibold text-gray-800">Booking Confirmed</div>
                             </div>
                         </div>
                         {% endif %}
                         
                         {% if refund %}
-                        <div class="timeline-item">
-                            <div class="timeline-content">
-                                <div class="timeline-time">{{ refund.refund_date|date:"M d, Y g:i A" }}</div>
-                                <div class="timeline-title">Refund {{ refund.get_refund_status_display }}</div>
+                        <div class="relative mb-4">
+                            <div class="absolute left-2 w-4 h-4 bg-blue-500 rounded-full"></div>
+                            <div class="ml-8 bg-white p-3 rounded border border-gray-200 border-l-4 border-l-blue-500">
+                                <div class="text-xs text-gray-500 mb-1">{{ refund.refund_date|date:"M d, Y g:i A" }}</div>
+                                <div class="font-semibold text-gray-800">Refund {{ refund.get_refund_status_display }}</div>
                             </div>
                         </div>
                         {% endif %}
@@ -625,56 +374,57 @@
                 </div>
                 
                 <!-- Admin Actions -->
-                <div class="admin-card">
-                    <h5><i class="fas fa-tools me-2"></i>Admin Actions</h5>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fas fa-tools mr-2 text-blue-500"></i>Admin Actions
+                    </h3>
                     
-                    <div class="admin-actions">
+                    <div class="space-y-2">
                         {% if booking.booking_status == 'pending' %}
-                            <button class="btn-admin btn-success" onclick="confirmBooking('{{ booking.booking_id }}')">
-                                <i class="fas fa-check me-2"></i>Confirm Booking
+                            <button onclick="confirmBooking('{{ booking.booking_id }}')" class="w-full bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                                <i class="fas fa-check mr-2"></i>Confirm Booking
                             </button>
                         {% endif %}
                         
                         {% if booking.booking_status != 'cancelled' %}
-                            <button class="btn-admin btn-danger" onclick="cancelBooking('{{ booking.booking_id }}')">
-                                <i class="fas fa-times me-2"></i>Cancel Booking
+                            <button onclick="cancelBooking('{{ booking.booking_id }}')" class="w-full bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                                <i class="fas fa-times mr-2"></i>Cancel Booking
                             </button>
                         {% endif %}
                         
                         {% if payment and payment.payment_status == 'completed' and not refund %}
-                            <button class="btn-admin btn-warning" onclick="initiateRefund('{{ booking.booking_id }}')">
-                                <i class="fas fa-undo me-2"></i>Initiate Refund
+                            <button onclick="initiateRefund('{{ booking.booking_id }}')" class="w-full bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
+                                <i class="fas fa-undo mr-2"></i>Initiate Refund
                             </button>
                         {% endif %}
                         
-                        <a href="{% url 'dashboard:user_detail' booking.user.id %}" class="btn-admin btn-outline">
-                            <i class="fas fa-user me-2"></i>View User
+                        <a href="{% url 'dashboard:user_detail' booking.user.id %}" class="w-full block bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 text-center">
+                            <i class="fas fa-user mr-2"></i>View User
                         </a>
                         
-                        <a href="{% url 'dashboard:bus_detail' booking.bus_schedule.bus.id %}" class="btn-admin btn-outline">
-                            <i class="fas fa-bus me-2"></i>View Bus
+                        <a href="{% url 'dashboard:bus_detail' booking.bus_schedule.bus.id %}" class="w-full block bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 text-center">
+                            <i class="fas fa-bus mr-2"></i>View Bus
                         </a>
                         
-                        <button class="btn-admin btn-primary" onclick="window.print()">
-                            <i class="fas fa-print me-2"></i>Print Details
+                        <button onclick="window.print()" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                            <i class="fas fa-print mr-2"></i>Print Details
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
+</div>
 {% endblock %}
 
-{% block extra_js %}
+{% block dashboard_extra_js %}
 <script>
     function confirmBooking(bookingId) {
         if (confirm('Are you sure you want to confirm this booking?')) {
-            // Add AJAX call to confirm booking
             fetch(`/dashboard/bookings/${bookingId}/confirm/`, {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'X-CSRFToken': getCsrfToken(),
                     'Content-Type': 'application/json',
                 },
             })
@@ -699,7 +449,7 @@
             fetch(`/dashboard/bookings/${bookingId}/cancel/`, {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'X-CSRFToken': getCsrfToken(),
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ reason: reason })
@@ -727,7 +477,7 @@
                 fetch(`/dashboard/bookings/${bookingId}/refund/`, {
                     method: 'POST',
                     headers: {
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'X-CSRFToken': getCsrfToken(),
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({ 
@@ -751,9 +501,12 @@
         }
     }
     
+    function getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}';
+    }
+    
     // Add CSRF token to all requests
     document.addEventListener('DOMContentLoaded', function() {
-        // Create hidden CSRF token input if it doesn't exist
         if (!document.querySelector('[name=csrfmiddlewaretoken]')) {
             const csrfToken = document.createElement('input');
             csrfToken.type = 'hidden';

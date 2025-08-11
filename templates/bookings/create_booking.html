@@ -1,768 +1,453 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Create Booking{% endblock %}
-
-{% block extra_css %}
-<style>
-  .booking-header {
-    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-    color: white;
-    padding: 2rem 0;
-    margin-bottom: 2rem;
-  }
-
-  .booking-container {
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  .booking-card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e9ecef;
-    overflow: hidden;
-  }
-
-  .booking-steps {
-    display: flex;
-    background: #f8f9fa;
-    padding: 1rem;
-    border-bottom: 1px solid #e9ecef;
-  }
-
-  .step {
-    flex: 1;
-    text-align: center;
-    position: relative;
-    padding: 0.5rem;
-  }
-
-  .step::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    right: -1px;
-    width: 2px;
-    height: 20px;
-    background: #dee2e6;
-    transform: translateY(-50%);
-  }
-
-  .step:last-child::after {
-    display: none;
-  }
-
-  .step-number {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #dee2e6;
-    color: #6c757d;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.875rem;
-    font-weight: 600;
-    margin: 0 auto 0.5rem;
-    transition: all 0.3s ease;
-  }
-
-  .step.active .step-number {
-    background: #28a745;
-    color: white;
-  }
-
-  .step.completed .step-number {
-    background: #007bff;
-    color: white;
-  }
-
-  .step-title {
-    font-size: 0.75rem;
-    color: #6c757d;
-    font-weight: 600;
-  }
-
-  .step.active .step-title {
-    color: #28a745;
-  }
-
-  .step.completed .step-title {
-    color: #007bff;
-  }
-
-  .booking-content {
-    padding: 2rem;
-  }
-
-  .journey-summary {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    border: 1px solid #e9ecef;
-  }
-
-  .summary-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .route-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    padding: 1rem;
-    background: white;
-    border-radius: 8px;
-  }
-
-  .route-location {
-    text-align: center;
-    flex: 1;
-  }
-
-  .location-name {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 0.25rem;
-  }
-
-  .location-time {
-    font-size: 0.875rem;
-    color: #6c757d;
-  }
-
-  .route-arrow {
-    color: #28a745;
-    font-size: 1.25rem;
-  }
-
-  .journey-details {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-  }
-
-  .detail-item {
-    text-align: center;
-    padding: 0.75rem;
-    background: white;
-    border-radius: 8px;
-  }
-
-  .detail-label {
-    font-size: 0.75rem;
-    color: #6c757d;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 0.25rem;
-  }
-
-  .detail-value {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #495057;
-  }
-
-  .passenger-form {
-    margin-bottom: 2rem;
-  }
-
-  .form-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .passenger-card {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid #e9ecef;
-  }
-
-  .passenger-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid #e9ecef;
-  }
-
-  .passenger-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #495057;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .seat-info {
-    background: #28a745;
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-
-  .form-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .form-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #495057;
-  }
-
-  .form-control {
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 0.875rem 1rem;
-    font-size: 0.875rem;
-    transition: all 0.3s ease;
-    background: white;
-  }
-
-  .form-control:focus {
-    border-color: #28a745;
-    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-    background: white;
-    outline: none;
-  }
-
-  .form-control.error {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-  }
-
-  .error-message {
-    font-size: 0.75rem;
-    color: #dc3545;
-    margin-top: 0.25rem;
-  }
-
-  .contact-section {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    border: 1px solid #e9ecef;
-  }
-
-  .contact-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .contact-info {
-    background: rgba(40, 167, 69, 0.1);
-    border: 1px solid rgba(40, 167, 69, 0.3);
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .contact-text {
-    font-size: 0.875rem;
-    color: #155724;
-    margin: 0;
-  }
-
-  .fare-summary {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    border: 1px solid #e9ecef;
-  }
-
-  .fare-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .fare-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid #e9ecef;
-  }
-
-  .fare-item:last-child {
-    border-bottom: none;
-    padding-top: 1rem;
-    margin-top: 0.5rem;
-    border-top: 2px solid #28a745;
-    font-weight: 600;
-    font-size: 1.125rem;
-  }
-
-  .fare-label {
-    color: #495057;
-  }
-
-  .fare-value {
-    color: #495057;
-    font-weight: 600;
-  }
-
-  .booking-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .btn-back {
-    background: transparent;
-    border: 1px solid #6c757d;
-    padding: 0.875rem 1.5rem;
-    border-radius: 8px;
-    color: #6c757d;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-  }
-
-  .btn-back:hover {
-    background: #6c757d;
-    color: white;
-    text-decoration: none;
-  }
-
-  .btn-continue {
-    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-    border: none;
-    padding: 0.875rem 2rem;
-    border-radius: 8px;
-    color: white;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .btn-continue:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-  }
-
-  .btn-continue:disabled {
-    background: #6c757d;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-  }
-
-  @media (max-width: 768px) {
-    .booking-steps {
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .step::after {
-      display: none;
-    }
-
-    .route-info {
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .route-arrow {
-      transform: rotate(90deg);
-    }
-
-    .journey-details {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .form-row {
-      grid-template-columns: 1fr;
-    }
-
-    .booking-actions {
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .btn-back,
-    .btn-continue {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .booking-content {
-      padding: 1rem;
-    }
-
-    .journey-details {
-      grid-template-columns: 1fr;
-    }
-
-    .passenger-card {
-      padding: 1rem;
-    }
-  }
-</style>
-{% endblock %} {% block content %}
+{% extends 'base.html' %} {% load static %} {% block title %}Create Booking -
+TravelMate{% endblock %} {% block content %}
 <!-- Header -->
-<section class="booking-header">
-  <div class="container">
+<section
+  class="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-16 -mt-6"
+>
+  <div class="container mx-auto px-4">
     <div class="text-center">
-      <h1 class="mb-2"><i class="fas fa-ticket-alt me-2"></i>Create Booking</h1>
-      <p class="mb-0">Complete your passenger details to proceed</p>
+      <h1 class="text-3xl md:text-4xl font-bold mb-2">Create Booking</h1>
+      <p class="text-xl opacity-90">Complete your bus ticket reservation</p>
     </div>
   </div>
 </section>
 
-<!-- Content -->
-<section class="py-4">
-  <div class="container">
-    <div class="booking-container">
-      <div class="booking-card">
-        <!-- Booking Steps -->
-        <div class="booking-steps">
-          <div class="step completed">
-            <div class="step-number">1</div>
-            <div class="step-title">Select Seats</div>
+<!-- Booking Process -->
+<section class="py-8 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <div class="max-w-4xl mx-auto">
+      <!-- Progress Steps -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div
+              class="flex items-center justify-center w-10 h-10 bg-blue-500 text-white rounded-full font-semibold"
+            >
+              <i class="fas fa-check"></i>
+            </div>
+            <span class="text-sm font-medium text-blue-600"
+              >Route Selected</span
+            >
           </div>
-          <div class="step active">
-            <div class="step-number">2</div>
-            <div class="step-title">Passenger Details</div>
+
+          <div class="flex-1 h-1 bg-gray-200 mx-4">
+            <div class="h-1 bg-blue-500 w-1/3"></div>
           </div>
-          <div class="step">
-            <div class="step-number">3</div>
-            <div class="step-title">Payment</div>
+
+          <div class="flex items-center space-x-4">
+            <div
+              class="flex items-center justify-center w-10 h-10 bg-green-500 text-white rounded-full font-semibold"
+            >
+              2
+            </div>
+            <span class="text-sm font-medium text-green-600"
+              >Passenger Details</span
+            >
           </div>
-          <div class="step">
-            <div class="step-number">4</div>
-            <div class="step-title">Confirmation</div>
+
+          <div class="flex-1 h-1 bg-gray-200 mx-4">
+            <div class="h-1 bg-gray-200 w-0"></div>
+          </div>
+
+          <div class="flex items-center space-x-4">
+            <div
+              class="flex items-center justify-center w-10 h-10 bg-gray-300 text-gray-600 rounded-full font-semibold"
+            >
+              3
+            </div>
+            <span class="text-sm font-medium text-gray-500">Payment</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Journey Summary -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h3
+          class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+        >
+          <i class="fas fa-route mr-2 text-blue-500"></i>Journey Summary
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="flex items-center">
+            <div
+              class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-map-marker-alt text-blue-600"></i>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">From</p>
+              <p class="font-semibold text-gray-800">
+                {{ schedule.route.source }}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center">
+            <div
+              class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-map-marker-alt text-green-600"></i>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">To</p>
+              <p class="font-semibold text-gray-800">
+                {{ schedule.route.destination }}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center">
+            <div
+              class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-calendar text-purple-600"></i>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Date</p>
+              <p class="font-semibold text-gray-800">
+                {{ travel_date|date:"M d, Y" }}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center">
+            <div
+              class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-clock text-orange-600"></i>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Departure</p>
+              <p class="font-semibold text-gray-800">
+                {{ schedule.departure_time|time:"g:i A" }}
+              </p>
+            </div>
           </div>
         </div>
 
-        <div class="booking-content">
-          <!-- Journey Summary -->
-          <div class="journey-summary">
-            <div class="summary-title">
-              <i class="fas fa-route"></i>
-              Journey Summary
+        <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm text-gray-600">
+                Bus:
+                <span class="font-semibold">{{ schedule.bus.bus_number }}</span>
+              </p>
+              <p class="text-sm text-gray-600">
+                Type:
+                <span class="font-semibold">{{ schedule.bus.bus_type }}</span>
+              </p>
             </div>
-
-            <div class="route-info">
-              <div class="route-location">
-                <div class="location-name">
-                  {{ schedule.route.source.name }}
-                </div>
-                <div class="location-time">
-                  {{ schedule.departure_time|time:"H:i" }}
-                </div>
-              </div>
-              <div class="route-arrow">
-                <i class="fas fa-arrow-right"></i>
-              </div>
-              <div class="route-location">
-                <div class="location-name">
-                  {{ schedule.route.destination.name }}
-                </div>
-                <div class="location-time">
-                  {{ schedule.arrival_time|time:"H:i" }}
-                </div>
-              </div>
-            </div>
-
-            <div class="journey-details">
-              <div class="detail-item">
-                <div class="detail-label">Travel Date</div>
-                <div class="detail-value">{{ travel_date|date:"M d, Y" }}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">Bus Number</div>
-                <div class="detail-value">{{ schedule.bus.bus_number }}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">Bus Type</div>
-                <div class="detail-value">
-                  {{ schedule.bus.bus_type.name }}
-                </div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">Selected Seats</div>
-                <div class="detail-value">
-                  {% for seat in selected_seats %}{{ seat }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                </div>
-              </div>
+            <div class="text-right">
+              <p class="text-sm text-gray-600">
+                Selected Seats:
+                <span class="font-semibold"
+                  >{{ selected_seats|join:", " }}</span
+                >
+              </p>
+              <p class="text-lg font-bold text-green-600">
+                Total: रू{{ total_fare }}
+              </p>
             </div>
           </div>
+        </div>
+      </div>
 
-          <!-- Passenger Form -->
-          <form method="POST" id="booking-form">
+      <!-- Passenger Details Form -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+          <h3 class="text-xl font-semibold text-gray-800">
+            <i class="fas fa-users mr-2 text-green-500"></i>Passenger Details
+          </h3>
+          <p class="text-sm text-gray-600 mt-1">
+            Please provide accurate information for all passengers
+          </p>
+        </div>
+
+        <div class="p-6">
+          <form method="post" id="bookingForm" class="space-y-8">
             {% csrf_token %}
+
+            <!-- Hidden fields -->
             <input type="hidden" name="schedule_id" value="{{ schedule.id }}" />
-            <input
-              type="hidden"
-              name="travel_date"
-              value="{{ travel_date|date:'Y-m-d' }}"
-            />
+            <input type="hidden" name="travel_date" value="{{ travel_date }}" />
             <input
               type="hidden"
               name="selected_seats"
-              value="{% for seat in selected_seats %}{{ seat.id }}{% if not forloop.last %},{% endif %}{% endfor %}"
+              value="{{ selected_seats|join:',' }}"
             />
 
-            <div class="passenger-form">
-              <div class="form-title">
-                <i class="fas fa-users"></i>
-                Passenger Details
+            <!-- Passenger Information -->
+            {% for seat in selected_seats %}
+            <div
+              class="passenger-section border border-gray-200 rounded-lg p-6"
+            >
+              <h4
+                class="text-lg font-semibold text-gray-800 mb-4 flex items-center"
+              >
+                <div
+                  class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center mr-3 text-sm font-bold"
+                >
+                  {{ forloop.counter }}
+                </div>
+                Passenger {{ forloop.counter }} - Seat {{ seat }}
+              </h4>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Full Name <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="passenger_{{ forloop.counter0 }}_name"
+                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+                    placeholder="Enter full name"
+                    required
+                  />
+                  <div
+                    class="error-message text-red-600 text-sm mt-1 hidden"
+                    id="error-passenger-{{ forloop.counter0 }}-name"
+                  ></div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Age <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="passenger_{{ forloop.counter0 }}_age"
+                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+                    placeholder="Enter age"
+                    min="1"
+                    max="120"
+                    required
+                  />
+                  <div
+                    class="error-message text-red-600 text-sm mt-1 hidden"
+                    id="error-passenger-{{ forloop.counter0 }}-age"
+                  ></div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Gender <span class="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="passenger_{{ forloop.counter0 }}_gender"
+                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+                    required
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <div
+                    class="error-message text-red-600 text-sm mt-1 hidden"
+                    id="error-passenger-{{ forloop.counter0 }}-gender"
+                  ></div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number {% if forloop.first %}<span
+                      class="text-red-500"
+                      >*</span
+                    >{% endif %}
+                  </label>
+                  <input
+                    type="tel"
+                    name="passenger_{{ forloop.counter0 }}_phone"
+                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+                    placeholder="Enter phone number"
+                    {%
+                    if
+                    forloop.first
+                    %}required{%
+                    endif
+                    %}
+                  />
+                  <div
+                    class="error-message text-red-600 text-sm mt-1 hidden"
+                    id="error-passenger-{{ forloop.counter0 }}-phone"
+                  ></div>
+                </div>
+
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address {% if forloop.first %}<span
+                      class="text-red-500"
+                      >*</span
+                    >{% endif %}
+                  </label>
+                  <input
+                    type="email"
+                    name="passenger_{{ forloop.counter0 }}_email"
+                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+                    placeholder="Enter email address"
+                    {%
+                    if
+                    forloop.first
+                    %}required{%
+                    endif
+                    %}
+                  />
+                  <div
+                    class="error-message text-red-600 text-sm mt-1 hidden"
+                    id="error-passenger-{{ forloop.counter0 }}-email"
+                  ></div>
+                </div>
               </div>
-
-              {% for seat in selected_seats %}
-              <div class="passenger-card">
-                <div class="passenger-header">
-                  <div class="passenger-title">
-                    <i class="fas fa-user"></i>
-                    Passenger {{ forloop.counter }}
-                  </div>
-                  <div class="seat-info">Seat {{ seat }}</div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label class="form-label">Full Name *</label>
-                    <input
-                      type="text"
-                      name="passenger_{{ forloop.counter0 }}_name"
-                      class="form-control"
-                      placeholder="Enter full name"
-                      required
-                    />
-                    <div
-                      class="error-message"
-                      id="error-passenger-{{ forloop.counter0 }}-name"
-                    ></div>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">Age *</label>
-                    <input
-                      type="number"
-                      name="passenger_{{ forloop.counter0 }}_age"
-                      class="form-control"
-                      placeholder="Age"
-                      min="1"
-                      max="120"
-                      required
-                    />
-                    <div
-                      class="error-message"
-                      id="error-passenger-{{ forloop.counter0 }}-age"
-                    ></div>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">Gender *</label>
-                    <select
-                      name="passenger_{{ forloop.counter0 }}_gender"
-                      class="form-control"
-                      required
-                    >
-                      <option value="">Select Gender</option>
-                      <option value="M">Male</option>
-                      <option value="F">Female</option>
-                      <option value="O">Other</option>
-                    </select>
-                    <div
-                      class="error-message"
-                      id="error-passenger-{{ forloop.counter0 }}-gender"
-                    ></div>
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label class="form-label">Phone Number</label>
-                    <input
-                      type="tel"
-                      name="passenger_{{ forloop.counter0 }}_phone"
-                      class="form-control"
-                      placeholder="Enter phone number"
-                    />
-                    <div
-                      class="error-message"
-                      id="error-passenger-{{ forloop.counter0 }}-phone"
-                    ></div>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input
-                      type="email"
-                      name="passenger_{{ forloop.counter0 }}_email"
-                      class="form-control"
-                      placeholder="Enter email address"
-                    />
-                    <div
-                      class="error-message"
-                      id="error-passenger-{{ forloop.counter0 }}-email"
-                    ></div>
-                  </div>
-                </div>
-              </div>
-              {% endfor %}
             </div>
+            {% endfor %}
 
             <!-- Contact Information -->
-            <div class="contact-section">
-              <div class="contact-title">
-                <i class="fas fa-address-book"></i>
+            <div class="border border-gray-200 rounded-lg p-6">
+              <h4
+                class="text-lg font-semibold text-gray-800 mb-4 flex items-center"
+              >
+                <i class="fas fa-phone mr-3 text-green-500"></i>
                 Contact Information
-              </div>
+              </h4>
+              <p class="text-sm text-gray-600 mb-4">
+                This information will be used for booking confirmations and
+                updates
+              </p>
 
-              <div class="contact-info">
-                <p class="contact-text">
-                  <i class="fas fa-info-circle me-2"></i>
-                  This information will be used for booking confirmation and
-                  updates.
-                </p>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Primary Contact Number *</label>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Contact Phone <span class="text-red-500">*</span>
+                  </label>
                   <input
                     type="tel"
                     name="contact_phone"
-                    class="form-control"
-                    placeholder="Enter primary contact number"
-                    value="{% if user.is_authenticated %}{{ user.phone|default:'' }}{% endif %}"
+                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+                    placeholder="Primary contact number"
                     required
                   />
-                  <div class="error-message" id="error-contact-phone"></div>
+                  <div
+                    class="error-message text-red-600 text-sm mt-1 hidden"
+                    id="error-contact-phone"
+                  ></div>
                 </div>
 
-                <div class="form-group">
-                  <label class="form-label">Email Address *</label>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Contact Email <span class="text-red-500">*</span>
+                  </label>
                   <input
                     type="email"
                     name="contact_email"
-                    class="form-control"
-                    placeholder="Enter email address"
-                    value="{% if user.is_authenticated %}{{ user.email|default:'' }}{% endif %}"
+                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+                    placeholder="Primary email address"
                     required
                   />
-                  <div class="error-message" id="error-contact-email"></div>
+                  <div
+                    class="error-message text-red-600 text-sm mt-1 hidden"
+                    id="error-contact-email"
+                  ></div>
                 </div>
               </div>
             </div>
 
-            <!-- Payment Method -->
-            <div class="contact-section">
-              <div class="contact-title">
-                <i class="fas fa-credit-card"></i>
-                Payment Method
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Select Payment Method *</label>
-                  <select name="payment_method" class="form-control" required>
-                    <option value="">Choose Payment Method</option>
-                    <optgroup label="Online Payment">
-                      <option value="esewa">eSewa</option>
-                      <option value="khalti">Khalti</option>
-                    </optgroup>
-                    <optgroup label="Offline Payment">
-                      <option value="bus_conductor">Pay to Bus Conductor</option>
-                    </optgroup>
-                  </select>
-                  <div class="error-message" id="error-payment-method"></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Fare Summary -->
-            <div class="fare-summary">
-              <div class="fare-title">
-                <i class="fas fa-calculator"></i>
-                Fare Summary
-              </div>
-
-              <div class="fare-item">
-                <span class="fare-label"
-                  >Base Fare ({{ selected_seats|length }} seat{{
-                  selected_seats|length|pluralize }})</span
-                >
-                <span class="fare-value">रू{{ schedule.base_fare|floatformat:2 }} × {{ selected_seats|length }}</span>
-              </div>
-
-              <div class="fare-item">
-                <span class="fare-label">Total Amount</span>
-                <span class="fare-value">रू{{ total_fare|floatformat:2 }}</span>
-              </div>
-            </div>
-
-            <!-- Booking Actions -->
-            <div class="booking-actions">
-              <a
-                href="{% url 'bookings:create_booking' schedule.id %}?date={{ travel_date|date:'Y-m-d' }}"
-                class="btn-back"
+            <!-- Special Requirements -->
+            <div class="border border-gray-200 rounded-lg p-6">
+              <h4
+                class="text-lg font-semibold text-gray-800 mb-4 flex items-center"
               >
-                <i class="fas fa-arrow-left"></i>
-                Back to Seat Selection
+                <i class="fas fa-clipboard-list mr-3 text-purple-500"></i>
+                Special Requirements (Optional)
+              </h4>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="wheelchair_accessible"
+                      class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                    />
+                    <span class="ml-2 text-sm text-gray-700"
+                      >Wheelchair accessible seating required</span
+                    >
+                  </label>
+                </div>
+
+                <div>
+                  <label class="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="meal_preference"
+                      class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                    />
+                    <span class="ml-2 text-sm text-gray-700"
+                      >Special meal requirements</span
+                    >
+                  </label>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Additional Notes
+                  </label>
+                  <textarea
+                    name="special_notes"
+                    rows="3"
+                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+                    placeholder="Any special requirements or notes..."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Terms and Conditions -->
+            <div class="border border-gray-200 rounded-lg p-6">
+              <div class="flex items-start">
+                <input
+                  type="checkbox"
+                  id="terms_accepted"
+                  name="terms_accepted"
+                  class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mt-1"
+                  required
+                />
+                <label
+                  for="terms_accepted"
+                  class="ml-2 block text-sm text-gray-700"
+                >
+                  I agree to the
+                  <a
+                    href="#"
+                    class="text-green-600 hover:text-green-500 font-medium"
+                    >Terms and Conditions</a
+                  >
+                  and
+                  <a
+                    href="#"
+                    class="text-green-600 hover:text-green-500 font-medium"
+                    >Cancellation Policy</a
+                  >
+                </label>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row justify-between gap-4 pt-4">
+              <a
+                href="{% url 'bookings:seat_selection' schedule.id %}?date={{ travel_date }}"
+                class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors text-center font-medium"
+              >
+                <i class="fas fa-arrow-left mr-2"></i>Back to Seat Selection
               </a>
 
-              <button type="submit" class="btn-continue" id="continue-btn">
-                <i class="fas fa-arrow-right"></i>
-                Continue to Payment
+              <button
+                type="submit"
+                id="continueBtn"
+                class="bg-gradient-to-r from-green-600 to-emerald-700 text-white px-8 py-3 rounded-lg hover:from-green-700 hover:to-emerald-800 transition-all duration-200 transform hover:scale-105 font-medium"
+              >
+                <i class="fas fa-credit-card mr-2"></i>Continue to Payment
               </button>
             </div>
           </form>
@@ -773,79 +458,73 @@
 </section>
 {% endblock %} {% block extra_js %}
 <script>
-  // Clear seat selection localStorage when booking form loads
-  if (window.clearSeatSelection) {
-    window.clearSeatSelection();
-  } else {
-    // Fallback if function not available
-    localStorage.removeItem('selectedSeats_{{ schedule.id }}');
-  }
-  
   document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("booking-form");
-    const continueBtn = document.getElementById("continue-btn");
+    const form = document.getElementById("bookingForm");
+    const continueBtn = document.getElementById("continueBtn");
     const requiredFields = form.querySelectorAll(
       "input[required], select[required]"
     );
 
-    // Form validation
-    function validateForm() {
-      let isValid = true;
-
-      // Clear previous errors
-      document.querySelectorAll(".error-message").forEach((error) => {
-        error.textContent = "";
-      });
-
-      document.querySelectorAll(".form-control").forEach((field) => {
-        field.classList.remove("error");
-      });
-
-      // Validate required fields
-      requiredFields.forEach((field) => {
-        if (!field.value.trim()) {
-          showError(field, "This field is required");
-          isValid = false;
-        }
-      });
-
-      // Validate phone numbers
-      const phoneFields = form.querySelectorAll('input[type="tel"]');
-      phoneFields.forEach((field) => {
-        if (field.value && !isValidPhone(field.value)) {
-          showError(field, "Please enter a valid phone number");
-          isValid = false;
-        }
-      });
-
-      // Validate email addresses
-      const emailFields = form.querySelectorAll('input[type="email"]');
-      emailFields.forEach((field) => {
-        if (field.value && !isValidEmail(field.value)) {
-          showError(field, "Please enter a valid email address");
-          isValid = false;
-        }
-      });
-
-      // Validate age
-      const ageFields = form.querySelectorAll('input[type="number"]');
-      ageFields.forEach((field) => {
-        if (field.value && (field.value < 1 || field.value > 120)) {
-          showError(field, "Age must be between 1 and 120");
-          isValid = false;
-        }
-      });
-
-      return isValid;
-    }
-
+    // Validation functions
     function showError(field, message) {
-      field.classList.add("error");
+      field.classList.add("border-red-500", "ring-red-500");
+      field.classList.remove("border-gray-300");
+
       const errorId = "error-" + field.name.replace(/_/g, "-");
       const errorElement = document.getElementById(errorId);
       if (errorElement) {
         errorElement.textContent = message;
+        errorElement.classList.remove("hidden");
       }
+    }
+
+    function clearError(field) {
+      field.classList.remove("border-red-500", "ring-red-500");
+      field.classList.add("border-gray-300");
+
+      const errorId = "error-" + field.name.replace(/_/g, "-");
+      const errorElement = document.getElementById(errorId);
+      if (errorElement) {
+        errorElement.textContent = "";
+        errorElement.classList.add("hidden");
+      }
+    }
+
+    function validateForm() {
+      let isValid = true;
+
+      requiredFields.forEach((field) => {
+        if (!field.value.trim()) {
+          showError(field, "This field is required");
+          isValid = false;
+        } else {
+          clearError(field);
+
+          // Additional validation
+          if (field.type === "email" && !isValidEmail(field.value)) {
+            showError(field, "Please enter a valid email address");
+            isValid = false;
+          } else if (field.type === "tel" && !isValidPhone(field.value)) {
+            showError(field, "Please enter a valid phone number");
+            isValid = false;
+          } else if (field.type === "number") {
+            const age = parseInt(field.value);
+            if (age < 1 || age > 120) {
+              showError(field, "Please enter a valid age (1-120)");
+              isValid = false;
+            }
+          }
+        }
+      });
+
+      // Check terms acceptance
+      const termsCheckbox = document.getElementById("terms_accepted");
+      if (!termsCheckbox.checked) {
+        alert("Please accept the terms and conditions to continue.");
+        isValid = false;
+      }
+
+      return isValid;
     }
 
     function isValidPhone(phone) {
@@ -864,12 +543,13 @@
         if (!this.value.trim()) {
           showError(this, "This field is required");
         } else {
-          this.classList.remove("error");
-          const errorId = "error-" + this.name.replace(/_/g, "-");
-          const errorElement = document.getElementById(errorId);
-          if (errorElement) {
-            errorElement.textContent = "";
-          }
+          clearError(this);
+        }
+      });
+
+      field.addEventListener("input", function () {
+        if (this.classList.contains("border-red-500") && this.value.trim()) {
+          clearError(this);
         }
       });
     });
@@ -881,29 +561,6 @@
         // Remove non-numeric characters except +
         this.value = this.value.replace(/[^+0-9]/g, "");
       });
-    });
-
-    // Form submission
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      if (!validateForm()) {
-        // Scroll to first error
-        const firstError = document.querySelector(".form-control.error");
-        if (firstError) {
-          firstError.scrollIntoView({ behavior: "smooth", block: "center" });
-          firstError.focus();
-        }
-        return;
-      }
-
-      // Show loading state
-      continueBtn.disabled = true;
-      continueBtn.innerHTML =
-        '<i class="fas fa-spinner fa-spin"></i> Processing...';
-
-      // Submit form
-      this.submit();
     });
 
     // Auto-fill contact info from first passenger
@@ -931,6 +588,42 @@
         }
       });
     }
+
+    // Form submission
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      if (!validateForm()) {
+        // Scroll to first error
+        const firstError = document.querySelector(".border-red-500");
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+          firstError.focus();
+        }
+        return;
+      }
+
+      // Show loading state
+      continueBtn.disabled = true;
+      continueBtn.innerHTML =
+        '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+
+      // Submit form
+      this.submit();
+    });
+
+    // Add smooth animations to passenger sections
+    const passengerSections = document.querySelectorAll(".passenger-section");
+    passengerSections.forEach((section, index) => {
+      section.style.opacity = "0";
+      section.style.transform = "translateY(20px)";
+
+      setTimeout(() => {
+        section.style.transition = "all 0.5s ease";
+        section.style.opacity = "1";
+        section.style.transform = "translateY(0)";
+      }, index * 200);
+    });
   });
 </script>
 {% endblock %}

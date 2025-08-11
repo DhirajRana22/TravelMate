@@ -1,71 +1,52 @@
-{% extends 'dashboard/base.html' %}
+{% extends "dashboard/base.html" %}
 {% load static %}
 
 {% block title %}{{ title }}{% endblock %}
 
-{% block extra_css %}
-<style>
-    .form-container {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-    .image-preview {
-        max-width: 300px;
-        max-height: 200px;
-        object-fit: cover;
-        border-radius: 8px;
-        border: 2px solid #dee2e6;
-    }
-    .current-image {
-        margin-bottom: 15px;
-    }
-    .form-section {
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-    }
-    .section-title {
-        color: #495057;
-        font-weight: 600;
-        margin-bottom: 15px;
-        border-bottom: 2px solid #dee2e6;
-        padding-bottom: 8px;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="container-fluid">
-    <div class="form-container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="fas fa-{% if destination %}edit{% else %}plus{% endif %} me-2"></i>{{ title }}</h2>
-            <a href="{% url 'dashboard:popular_destinations_management' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Back to List
-            </a>
-        </div>
-
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+{% block dashboard_content %}
+<div class="container mx-auto px-4 sm:px-8">
+    <div class="py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-semibold leading-tight text-gray-800">
+                        <i class="fas fa-{% if destination %}edit{% else %}plus{% endif %} mr-2"></i>{{ title }}
+                    </h2>
+                    <p class="text-gray-600">{% if destination %}Update destination information{% else %}Add a new popular destination{% endif %}</p>
                 </div>
-            {% endfor %}
-        {% endif %}
+                <a href="{% url 'dashboard:popular_destinations_management' %}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to List
+                </a>
+            </div>
 
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            
-            <!-- Basic Information Section -->
-            <div class="form-section">
-                <h5 class="section-title"><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-100 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800 border border-yellow-200{% else %}bg-blue-100 text-blue-800 border border-blue-200{% endif %}">
+                        <div class="flex justify-between items-center">
+                            <span>{{ message }}</span>
+                            <button onclick="this.parentElement.parentElement.remove()" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
                 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="location" class="form-label">Location *</label>
-                            <select class="form-select" id="location" name="location" required>
+                <!-- Basic Information Section -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                        <i class="fas fa-info-circle mr-2 text-blue-500"></i>Basic Information
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="location" class="block text-sm font-medium text-gray-700 mb-2">Location *</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" id="location" name="location" required>
                                 <option value="">Select a location</option>
                                 {% for location in locations %}
                                     <option value="{{ location.id }}" 
@@ -75,120 +56,132 @@
                                 {% endfor %}
                             </select>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="title" class="form-label">Display Title *</label>
-                            <input type="text" class="form-control" id="title" name="title" 
+                        
+                        <div>
+                            <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Display Title *</label>
+                            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" 
+                                   id="title" name="title" 
                                    value="{% if destination %}{{ destination.title }}{% endif %}" 
                                    placeholder="e.g., Beautiful Kathmandu" required>
                         </div>
                     </div>
+                    
+                    <div class="mt-6">
+                        <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" 
+                                  id="description" name="description" rows="3" 
+                                  placeholder="Brief description to attract visitors...">{% if destination %}{{ destination.description }}{% endif %}</textarea>
+                    </div>
                 </div>
-                
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" name="description" rows="3" 
-                              placeholder="Brief description to attract visitors...">{% if destination %}{{ destination.description }}{% endif %}</textarea>
-                </div>
-            </div>
 
-            <!-- Display Settings Section -->
-            <div class="form-section">
-                <h5 class="section-title"><i class="fas fa-cog me-2"></i>Display Settings</h5>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="display_order" class="form-label">Display Order</label>
-                            <input type="number" class="form-control" id="display_order" name="display_order" 
+                <!-- Display Settings Section -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                        <i class="fas fa-cog mr-2 text-blue-500"></i>Display Settings
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="display_order" class="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
+                            <input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" 
+                                   id="display_order" name="display_order" 
                                    value="{% if destination %}{{ destination.display_order }}{% else %}0{% endif %}" 
                                    min="0" placeholder="0">
-                            <div class="form-text">Lower numbers appear first</div>
+                            <p class="text-sm text-gray-500 mt-1">Lower numbers appear first</p>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <div class="form-check form-switch mt-4">
-                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
+                        
+                        <div class="flex items-center">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="is_active" name="is_active" 
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                                        {% if not destination or destination.is_active %}checked{% endif %}>
-                                <label class="form-check-label" for="is_active">
+                                <label for="is_active" class="ml-2 block text-sm text-gray-700">
                                     Show on Homepage
                                 </label>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Image Section -->
-            <div class="form-section">
-                <h5 class="section-title"><i class="fas fa-image me-2"></i>Destination Image</h5>
-                
-                {% if destination and destination.image %}
-                    <div class="current-image">
-                        <label class="form-label">Current Image:</label><br>
-                        <img src="{{ destination.image.url }}" alt="{{ destination.title }}" class="image-preview">
+                <!-- Image Section -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                        <i class="fas fa-image mr-2 text-blue-500"></i>Destination Image
+                    </h3>
+                    
+                    {% if destination and destination.image %}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Current Image:</label>
+                            <img src="{{ destination.image.url }}" alt="{{ destination.title }}" 
+                                 class="max-w-sm h-48 object-cover rounded-lg border-2 border-gray-200">
+                        </div>
+                    {% endif %}
+                    
+                    <div>
+                        <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
+                            {% if destination %}New Image (leave empty to keep current){% else %}Image *{% endif %}
+                        </label>
+                        <input type="file" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" 
+                               id="image" name="image" accept="image/*" {% if not destination %}required{% endif %}>
+                        <p class="text-sm text-gray-500 mt-1">Upload an attractive image for this destination (JPG, PNG, WebP)</p>
                     </div>
-                {% endif %}
-                
-                <div class="mb-3">
-                    <label for="image" class="form-label">
-                        {% if destination %}New Image (leave empty to keep current){% else %}Image *{% endif %}
-                    </label>
-                    <input type="file" class="form-control" id="image" name="image" 
-                           accept="image/*" {% if not destination %}required{% endif %}>
-                    <div class="form-text">Upload an attractive image for this destination (JPG, PNG, WebP)</div>
+                    
+                    <!-- Image Preview Container -->
+                    <div id="imagePreview" class="mt-4 hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">New Image Preview:</label>
+                        <img id="previewImg" class="max-w-sm h-48 object-cover rounded-lg border-2 border-gray-200">
+                    </div>
                 </div>
-            </div>
 
-            <!-- Action Buttons -->
-            <div class="d-flex justify-content-end gap-2">
-                <a href="{% url 'dashboard:popular_destinations_management' %}" class="btn btn-secondary">
-                    <i class="fas fa-times me-2"></i>Cancel
-                </a>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save me-2"></i>
-                    {% if destination %}Update Destination{% else %}Add Destination{% endif %}
-                </button>
-            </div>
-        </form>
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-4">
+                    <a href="{% url 'dashboard:popular_destinations_management' %}" 
+                       class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors">
+                        <i class="fas fa-times mr-2"></i>Cancel
+                    </a>
+                    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-save mr-2"></i>
+                        {% if destination %}Update Destination{% else %}Add Destination{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block dashboard_extra_js %}
 <script>
     // Image preview functionality
     document.getElementById('image').addEventListener('change', function(e) {
         const file = e.target.files[0];
+        const previewContainer = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Remove existing preview if any
-                const existingPreview = document.querySelector('.new-image-preview');
-                if (existingPreview) {
-                    existingPreview.remove();
-                }
-                
-                // Create new preview
-                const preview = document.createElement('div');
-                preview.className = 'new-image-preview mt-2';
-                preview.innerHTML = `
-                    <label class="form-label">New Image Preview:</label><br>
-                    <img src="${e.target.result}" alt="Preview" class="image-preview">
-                `;
-                
-                // Insert after the file input
-                e.target.parentNode.appendChild(preview);
+                previewImg.src = e.target.result;
+                previewContainer.classList.remove('hidden');
             };
             reader.readAsDataURL(file);
+        } else {
+            previewContainer.classList.add('hidden');
         }
     });
     
-    // Auto-dismiss alerts
+    // Auto-dismiss alerts after 5 seconds
     setTimeout(function() {
-        $('.alert').alert('close');
-    }, 5000);
+        const alerts = document.querySelectorAll('[class*="bg-green-100"], [class*="bg-red-100"], [class*="bg-yellow-100"], [class*="bg-blue-100"]');
+        alerts.forEach(alert => {
+            if (alert.querySelector('button')) {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    alert.style.transition = 'opacity 0.5s';
+                    setTimeout(() => alert.remove(), 500);
+                }, 5000);
+            }
+        });
+    }, 100);
 </script>
 {% endblock %}

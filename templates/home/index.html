@@ -1,769 +1,437 @@
-{% extends 'base.html' %} {% load static %} {% block extra_css %}
-<style>
-  .hero-section {
-    /* Background image with overlay */
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-      url("https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80")
-        no-repeat center center;
-    background-size: cover;
-    background-attachment: fixed;
-    color: white;
-    padding: 100px 0;
-    margin-top: -1.5rem;
-    position: relative;
-    overflow: hidden;
-    min-height: 100vh;
-  }
+{% extends 'base.html' %}
+{% load static %}
 
-  /* Video background styling */
-  .hero-video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -2;
-  }
-
-  /* Video overlay for readability */
-  .video-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: -1;
-  }
-
-  /* Ensure content stays above background */
-  .hero-section .container {
-    position: relative;
-    z-index: 2;
-  }
-
-  /* Parallax effect for image background */
-  @media (min-width: 768px) {
-    .hero-section {
-      background-attachment: fixed;
-    }
-  }
-
-  /* Mobile optimization */
-  @media (max-width: 767px) {
-    .hero-section {
-      background-attachment: scroll;
-      min-height: 80vh;
-    }
-
-    .hero-video {
-      display: none; /* Hide video on mobile for performance */
-    }
-  }
-  .destination-card {
-    transition: transform 0.3s;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  .destination-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  }
-  .destination-img {
-    height: 200px;
-    object-fit: cover;
-  }
-  .feature-icon {
-    font-size: 2.5rem;
-    color: #0d6efd;
-    margin-bottom: 1rem;
-  }
-  .testimonial-card {
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    padding: 20px;
-  }
-  .search-box {
-    background: rgba(255, 255, 255, 0.4);
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  /* Custom Input Styling */
-  .custom-input-wrapper {
-    position: relative;
-    margin-bottom: 1rem;
-  }
-
-  .custom-input-wrapper .form-label,
-  .custom-date-wrapper .form-label {
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .custom-input-wrapper .form-label i,
-  .custom-date-wrapper .form-label i {
-    color: #0d6efd;
-    font-size: 1.1rem;
-  }
-
-  .custom-input {
-    background: linear-gradient(145deg, #ffffff, #f8f9fa);
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    padding: 15px 20px;
-    font-size: 16px;
-    font-weight: 500;
-    color: #495057;
-    width: 100%;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  }
-
-  .custom-input:focus {
-    outline: none;
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1), 0 4px 15px rgba(0, 0, 0, 0.1);
-    transform: translateY(-1px);
-  }
-
-  .custom-input:hover {
-    border-color: #0d6efd;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  }
-
-  .custom-input::placeholder {
-    color: #6c757d;
-    opacity: 0.8;
-  }
-
-  /* Date Input Styling */
-  .custom-date-wrapper {
-    position: relative;
-    margin-bottom: 1rem;
-  }
-
-  .custom-date {
-    background: linear-gradient(145deg, #ffffff, #f8f9fa);
-    border: 2px solid rgb(240, 239, 239);
-    border-radius: 12px;
-    padding: 15px 20px;
-    font-size: 16px;
-    font-weight: 500;
-    color: #495057;
-    width: 100%;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  }
-
-  .custom-date:focus {
-    outline: none;
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1), 0 4px 15px rgba(0, 0, 0, 0.1);
-    transform: translateY(-1px);
-  }
-
-  .custom-date:hover {
-    border-color: #0d6efd;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  }
-
-  /* Search Button Enhancement */
-  .btn-search-enhanced {
-    background: linear-gradient(135deg, #0d6efd, #0056b3);
-    border: none;
-    border-radius: 12px;
-    padding: 15px 30px;
-    font-size: 16px;
-    font-weight: 600;
-    color: white;
-    width: 100%;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .btn-search-enhanced:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4);
-    background: linear-gradient(135deg, #0056b3, #004085);
-  }
-
-  .btn-search-enhanced:active {
-    transform: translateY(0);
-  }
-
-  /* Swap Button */
-  .swap-locations {
-    position: absolute;
-    right: -15px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: linear-gradient(135deg, #28a745, #20c997);
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3);
-    z-index: 10;
-  }
-
-  .swap-locations:hover {
-    transform: translateY(-50%) rotate(180deg) scale(1.1);
-    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
-  }
-
-  .location-row {
-    position: relative;
-  }
-
-  /* Animation for form elements */
-  @keyframes slideInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .search-box .custom-input-wrapper,
-  .search-box .custom-date-wrapper {
-    animation: slideInUp 0.6s ease forwards;
-  }
-
-  .search-box .custom-input-wrapper:nth-child(2) {
-    animation-delay: 0.1s;
-  }
-
-  .search-box .custom-date-wrapper {
-    animation-delay: 0.2s;
-  }
-
-  .search-box .btn-search-enhanced {
-    animation: slideInUp 0.6s ease forwards;
-    animation-delay: 0.3s;
-  }
-</style>
-{% endblock %} {% block content %}
+{% block content %}
 <!-- Hero Section -->
-<section class="hero-section">
-  <!-- Video Background (uncomment to use video instead of image) -->
-  <!-- 
-  <video autoplay muted loop class="hero-video">
-    <source src="{% static 'videos/bus-travel.mp4' %}" type="video/mp4">
-    <source src="{% static 'videos/bus-travel.webm' %}" type="video/webm">
-    Your browser does not support the video tag.
-  </video>
-  <div class="video-overlay"></div>
-  -->
-
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-6">
-        <h1 class="display-4 fw-bold mb-4">Travel with Comfort and Safety</h1>
-        <p class="lead mb-4">
-          Book your bus tickets online with TravelMate - the most trusted bus
-          booking platform with the best prices and widest selection of buses.
-        </p>
-        <a href="{% url 'routes:route_search' %}" class="btn btn-primary btn-lg"
-          >Book Now</a
-        >
-      </div>
-      <div class="col-lg-6">
-        <div class="search-box mt-4 mt-lg-0">
-          <h3 class="text-dark mb-4">
-            <i class="fas fa-search me-2"></i>Find Your Bus
-          </h3>
-          <form action="{% url 'routes:route_search' %}" method="get">
-            <div class="location-row">
-              <div class="custom-input-wrapper">
-                <label for="id_source" class="form-label">
-                  <i class="fas fa-map-marker-alt"></i>From
-                </label>
-                <input
-                  type="text"
-                  name="source"
-                  required
-                  id="id_source"
-                  class="custom-input"
-                  placeholder="Enter source city"
-                  list="source-list"
-                  autocomplete="off"
-                />
-                <datalist id="source-list">
-                  {% for location in all_locations %}
-                  <option value="{{ location.name }}">{% endfor %}</option>
-                </datalist>
-              </div>
-
-              <button
-                type="button"
-                class="swap-locations"
-                onclick="swapLocations()"
-                title="Swap locations"
-              >
-                <i class="fas fa-exchange-alt"></i>
-              </button>
-            </div>
-
-            <div class="custom-input-wrapper">
-              <label for="id_destination" class="form-label">
-                <i class="fas fa-flag-checkered"></i>To
-              </label>
-              <input
-                type="text"
-                name="destination"
-                required
-                id="id_destination"
-                class="custom-input"
-                placeholder="Enter destination city"
-                list="destination-list"
-                autocomplete="off"
-              />
-              <datalist id="destination-list">
-                {% for location in all_locations %}
-                <option value="{{ location.name }}">{% endfor %}</option>
-              </datalist>
-            </div>
-
-            <div class="custom-date-wrapper">
-              <label for="id_travel_date" class="form-label">
-                <i class="fas fa-calendar-alt"></i>Date of Journey
-              </label>
-              <input
-                type="date"
-                name="travel_date"
-                required
-                id="id_travel_date"
-                class="custom-date"
-                min="{{ today|date:'Y-m-d' }}"
-              />
-            </div>
-
-            <button type="submit" class="btn-search-enhanced">
-              <i class="fas fa-search me-2"></i>Search Buses
-            </button>
-          </form>
-        </div>
-      </div>
+<section class="relative min-h-screen flex items-center bg-gradient-to-br from-blue-800 via-blue-700 to-purple-800 overflow-hidden">
+    <!-- Background Image with Overlay -->
+    <div class="absolute inset-0">
+        <img src="{% static 'images/Kathmandu.jpg' %}" alt="Nepal Bus Travel" 
+             class="w-full h-full object-cover opacity-40">
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-800/60 to-purple-800/60"></div>
     </div>
-  </div>
+    
+    <!-- Animated Background Elements -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-white opacity-5 rounded-full animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-white opacity-5 rounded-full animate-pulse delay-1000"></div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Left Content -->
+            <div class="text-center lg:text-left">
+                <h1 class="text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+                    Simple Bus Booking
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">Made Easy</span>
+                </h1>
+                <p class="text-xl text-gray-200 mb-8 leading-relaxed max-w-lg">
+                    Book your bus tickets quickly and securely. Travel with comfort across 
+                    Nepal with our trusted bus partners and enjoy a seamless journey.
+                </p>
+                
+                <!-- Feature Highlights -->
+                <div class="flex flex-wrap gap-4 mb-8">
+                    <div class="flex items-center text-white">
+                        <i class="fas fa-shield-alt text-green-400 mr-2"></i>
+                        <span class="text-sm">Secure Booking</span>
+                    </div>
+                    <div class="flex items-center text-white">
+                        <i class="fas fa-clock text-blue-400 mr-2"></i>
+                        <span class="text-sm">Instant Confirmation</span>
+                    </div>
+                    <div class="flex items-center text-white">
+                        <i class="fas fa-headset text-purple-400 mr-2"></i>
+                        <span class="text-sm">24/7 Support</span>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="{% url 'routes:route_search' %}"
+                       class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-orange-600 hover:to-red-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-center">
+                        <i class="fas fa-ticket-alt mr-2"></i>Book Your Ticket
+                    </a>
+                    <a href="{% url 'home:about' %}"
+                       class="border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 text-center">
+                        <i class="fas fa-info-circle mr-2"></i>Learn More
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Content - Enhanced Search Form -->
+            <div class="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20">
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Find Your Perfect Bus</h3>
+                    <p class="text-gray-600">Search and book in just a few clicks</p>
+                </div>
+                
+                <form action="{% url 'routes:route_search' %}" method="get" class="space-y-6">
+                    <!-- From Location -->
+                    <div class="relative">
+                        <label for="id_source" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>From
+                        </label>
+                        <input type="text" name="source" required id="id_source"
+                               class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                               placeholder="Enter departure city" list="source-list" autocomplete="off">
+                        <datalist id="source-list">
+                            {% for location in all_locations %}
+                            <option value="{{ location.name }}"></option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+
+                    <!-- Swap Button -->
+                    <div class="flex justify-center">
+                        <button type="button" onclick="swapLocations()" 
+                                class="bg-blue-500 text-white p-3 rounded-full hover:bg-blue-600 transition-colors shadow-lg hover:shadow-xl transform hover:scale-110">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                    </div>
+
+                    <!-- To Location -->
+                    <div class="relative">
+                        <label for="id_destination" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-map-marker-alt text-red-500 mr-2"></i>To
+                        </label>
+                        <input type="text" name="destination" required id="id_destination"
+                               class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                               placeholder="Enter destination city" list="destination-list" autocomplete="off">
+                        <datalist id="destination-list">
+                            {% for location in all_locations %}
+                            <option value="{{ location.name }}"></option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+
+                    <!-- Travel Date -->
+                    <div class="relative">
+                        <label for="id_travel_date" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-calendar text-green-500 mr-2"></i>Travel Date
+                        </label>
+                        <input type="date" name="travel_date" required id="id_travel_date"
+                               class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white">
+                    </div>
+
+                    <!-- Search Button -->
+                    <button type="submit" 
+                            class="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-800 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-search mr-2"></i>Search Buses
+                    </button>
+                </form>
+                
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-600">500+</div>
+                        <div class="text-xs text-gray-600">Daily Routes</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-600">50K+</div>
+                        <div class="text-xs text-gray-600">Happy Customers</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-purple-600">24/7</div>
+                        <div class="text-xs text-gray-600">Support</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
 <!-- Features Section -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <h2 class="text-center mb-5">Why Choose TravelMate?</h2>
-    <div class="row g-4">
-      <div class="col-md-4 text-center">
-        <div class="feature-icon">
-          <i class="fas fa-ticket-alt"></i>
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Why Choose TravelMate?</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Experience the best in bus travel with our comprehensive platform designed for your comfort and convenience.
+            </p>
         </div>
-        <h4>Easy Booking</h4>
-        <p>
-          Book your bus tickets in just a few clicks. Simple, fast, and secure
-          booking process.
-        </p>
-      </div>
-      <div class="col-md-4 text-center">
-        <div class="feature-icon">
-          <i class="fas fa-bus"></i>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Feature 1 -->
+            <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 text-center group">
+                <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-200 transition-colors">
+                    <i class="fas fa-shield-alt text-2xl text-blue-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">Secure Booking</h3>
+                <p class="text-gray-600">Your payments and personal information are protected with bank-level security.</p>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 text-center group">
+                <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-green-200 transition-colors">
+                    <i class="fas fa-clock text-2xl text-green-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">Instant Confirmation</h3>
+                <p class="text-gray-600">Get your tickets confirmed instantly with SMS and email notifications.</p>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 text-center group">
+                <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-purple-200 transition-colors">
+                    <i class="fas fa-route text-2xl text-purple-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">Wide Network</h3>
+                <p class="text-gray-600">Access to 500+ routes covering all major cities and destinations across Nepal.</p>
+            </div>
+            
+            <!-- Feature 4 -->
+            <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 text-center group">
+                <div class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-orange-200 transition-colors">
+                    <i class="fas fa-headset text-2xl text-orange-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">24/7 Support</h3>
+                <p class="text-gray-600">Round-the-clock customer support to assist you with any queries or issues.</p>
+            </div>
         </div>
-        <h4>Wide Selection</h4>
-        <p>
-          Choose from thousands of buses and routes across the country with
-          various amenities.
-        </p>
-      </div>
-      <div class="col-md-4 text-center">
-        <div class="feature-icon">
-          <i class="fas fa-headset"></i>
-        </div>
-        <h4>24/7 Support</h4>
-        <p>
-          Our customer support team is available round the clock to assist you
-          with any queries.
-        </p>
-      </div>
     </div>
-  </div>
 </section>
 
 <!-- Popular Destinations -->
-<section class="py-5">
-  <div class="container">
-    <h2 class="text-center mb-5">Popular Destinations</h2>
-    <div class="row g-4">
-      {% for destination in popular_destinations %}
-      <div class="col-md-4 col-lg-4">
-        <div class="card destination-card h-100">
-          <img
-            src="{{ destination.image.url }}"
-            class="card-img-top destination-img"
-            alt="{{ destination.title }}"
-          />
-          <div class="card-body">
-            <h5 class="card-title">{{ destination.title }}</h5>
-            <p class="card-text">
-              {% if destination.description %}
-                {{ destination.description|truncatechars:100 }}
-              {% else %}
-                {{ destination.route_count }} routes available
-              {% endif %}
-            </p>
-            <a
-              href="{% url 'routes:route_search' %}?destination={{ destination.location.id }}"
-              class="btn btn-outline-primary"
-              >Explore Routes</a
-            >
-          </div>
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Popular Destinations</h2>
+            <p class="text-xl text-gray-600">Discover the most traveled routes across Nepal</p>
         </div>
-      </div>
-      {% empty %}
-      <div class="col-12 text-center">
-        <p>No destinations available at the moment.</p>
-      </div>
-      {% endfor %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Destination 1 -->
+            <div class="relative group overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300">
+                <img src="{% static 'images/Kathmandu.jpg' %}" alt="Kathmandu" 
+                     class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                <div class="absolute bottom-6 left-6 text-white">
+                    <h3 class="text-2xl font-bold mb-2">Kathmandu</h3>
+                    <p class="text-gray-200 mb-3">Capital city with rich culture and heritage</p>
+                    <a href="{% url 'routes:route_search' %}?destination=Kathmandu" 
+                       class="bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-colors">
+                        Explore Routes
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Destination 2 -->
+            <div class="relative group overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300">
+                <img src="{% static 'images/Butwal.jpg' %}" alt="Butwal" 
+                     class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                <div class="absolute bottom-6 left-6 text-white">
+                    <h3 class="text-2xl font-bold mb-2">Butwal</h3>
+                    <p class="text-gray-200 mb-3">Gateway to western Nepal</p>
+                    <a href="{% url 'routes:route_search' %}?destination=Butwal" 
+                       class="bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-colors">
+                        Explore Routes
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Destination 3 -->
+            <div class="relative group overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300">
+                <img src="{% static 'images/Dhangadhi.jpg' %}" alt="Dhangadhi" 
+                     class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                <div class="absolute bottom-6 left-6 text-white">
+                    <h3 class="text-2xl font-bold mb-2">Dhangadhi</h3>
+                    <p class="text-gray-200 mb-3">Beautiful far-western city</p>
+                    <a href="{% url 'routes:route_search' %}?destination=Dhangadhi" 
+                       class="bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-colors">
+                        Explore Routes
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </section>
 
-<!-- Popular Routes -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <h2 class="text-center mb-5">Popular Routes</h2>
-    <div class="table-responsive">
-      <table class="table table-hover">
-        <thead class="table-primary">
-          <tr>
-            <th>From</th>
-            <th>To</th>
-            <th>Distance</th>
-            <th>Duration</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for route in popular_routes %}
-          <tr>
-            <td>{{ route.source.name }}</td>
-            <td>{{ route.destination.name }}</td>
-            <td>{{ route.distance }} km</td>
-            <td>{{ route.duration }} hours</td>
-            <td>
-              <a
-                href="{% url 'routes:route_search' %}?source={{ route.source.id }}&destination={{ route.destination.id }}"
-                class="btn btn-sm btn-primary"
-                >View Schedules</a
-              >
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="5" class="text-center">
-              No routes available at the moment.
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<!-- Bus Types -->
-<section class="py-5">
-  <div class="container">
-    <h2 class="text-center mb-5">Our Bus Types</h2>
-    <div class="row g-4">
-      {% for bus_type in bus_types %}
-      <div class="col-md-6 col-lg-3">
-        <div class="card h-100">
-          <img
-            src="{% static 'img/bus-placeholder.jpg' %}"
-            class="card-img-top"
-            alt="{{ bus_type.name }}"
-          />
-          <div class="card-body">
-            <h5 class="card-title">{{ bus_type.name }}</h5>
-            <p class="card-text">
-              {{ bus_type.description|truncatechars:100 }}
-            </p>
-          </div>
-          <div class="card-footer bg-transparent border-0">
-            <a
-              href="{% url 'buses:bus_list' %}?bus_type={{ bus_type.id }}"
-              class="btn btn-outline-primary w-100"
-              >View Buses</a
-            >
-          </div>
+<!-- How It Works -->
+<section class="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">How It Works</h2>
+            <p class="text-xl text-gray-600">Book your bus ticket in just 3 simple steps</p>
         </div>
-      </div>
-      {% empty %}
-      <div class="col-12 text-center">
-        <p>No bus types available at the moment.</p>
-      </div>
-      {% endfor %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Step 1 -->
+            <div class="text-center relative">
+                <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold shadow-lg">
+                    1
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">Search & Select</h3>
+                <p class="text-gray-600">Enter your travel details and browse available buses with real-time seat availability.</p>
+                
+
+            </div>
+            
+            <!-- Step 2 -->
+            <div class="text-center relative">
+                <div class="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold shadow-lg">
+                    2
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">Book & Pay</h3>
+                <p class="text-gray-600">Choose your preferred seats and make secure payment using multiple payment options.</p>
+                
+
+            </div>
+            
+            <!-- Step 3 -->
+            <div class="text-center">
+                <div class="w-20 h-20 bg-gradient-to-r from-pink-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold shadow-lg">
+                    3
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">Travel & Enjoy</h3>
+                <p class="text-gray-600">Get instant confirmation and enjoy your comfortable journey with our trusted partners.</p>
+            </div>
+        </div>
     </div>
-  </div>
 </section>
 
 <!-- Testimonials -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <h2 class="text-center mb-5">What Our Customers Say</h2>
-    <div class="row g-4">
-      {% for testimonial in testimonials %}
-      <div class="col-md-4">
-        <div class="testimonial-card h-100">
-          <div class="d-flex align-items-center mb-3">
-            <img
-              src="{% if testimonial.avatar %}{{ testimonial.avatar.url }}{% else %}{% static 'img/avatar-placeholder.svg' %}{% endif %}"
-              alt="{{ testimonial.name }}"
-              class="rounded-circle me-3"
-              width="60"
-            />
-            <div>
-              <h5 class="mb-0">{{ testimonial.name }}</h5>
-              <small class="text-muted">{{ testimonial.designation }}</small>
+{% if testimonials %}
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">What Our Customers Say</h2>
+            <p class="text-xl text-gray-600">Real experiences from thousands of satisfied travelers</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for testimonial in testimonials %}
+            <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+                <div class="flex items-center mb-6">
+                    <img src="{% if testimonial.avatar %}{{ testimonial.avatar.url }}{% else %}{% static 'img/avatar-placeholder.svg' %}{% endif %}"
+                         alt="{{ testimonial.name }}" 
+                         class="w-16 h-16 rounded-full object-cover mr-4 border-2 border-gray-200">
+                    <div>
+                        <h4 class="font-semibold text-gray-800 text-lg">{{ testimonial.name }}</h4>
+                        <p class="text-gray-600">{{ testimonial.designation }}</p>
+                    </div>
+                </div>
+                
+                <p class="text-gray-700 mb-6 italic leading-relaxed">"{{ testimonial.testimonial_text }}"</p>
+                
+                <div class="flex text-yellow-400">
+                    {% for star in testimonial.get_star_range %}
+                    <i class="fas fa-star"></i>
+                    {% endfor %}
+                    {% for empty_star in testimonial.get_empty_star_range %}
+                    <i class="far fa-star"></i>
+                    {% endfor %}
+                </div>
             </div>
-          </div>
-          <p class="mb-0">"{{ testimonial.testimonial_text }}"</p>
-          <div class="mt-3 text-warning">
-            {% for star in testimonial.get_star_range %}
-            <i class="fas fa-star"></i>
-            {% endfor %} {% for empty_star in testimonial.get_empty_star_range %}
-            <i class="far fa-star"></i>
             {% endfor %}
-          </div>
         </div>
-      </div>
-      {% empty %}
-      <div class="col-12 text-center">
-        <p>No testimonials available at the moment.</p>
-      </div>
-      {% endfor %}
     </div>
-  </div>
 </section>
+{% endif %}
 
-<!-- FAQ Section -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-8 mx-auto text-center mb-5">
-        <h2 class="display-5 fw-bold mb-3">Frequently Asked Questions</h2>
-        <p class="lead text-muted">
-          Quick answers to common questions about TravelMate
+<!-- CTA Section -->
+<section class="py-20 bg-gradient-to-r from-blue-600 via-purple-700 to-blue-800 relative overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-full h-full" style="background-image: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.1"><circle cx="30" cy="30" r="4"/></g></g></svg>');"></div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+            Ready to Start Your Journey?
+        </h2>
+        <p class="text-xl text-blue-100 mb-10 max-w-3xl mx-auto leading-relaxed">
+            Join thousands of satisfied customers who trust TravelMate for their bus travel needs. 
+            Experience comfort, reliability, and convenience like never before.
         </p>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-lg-10 mx-auto">
-        <div class="accordion" id="homeFAQAccordion">
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="faqHeading1">
-              <button
-                class="accordion-button"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#faqCollapse1"
-                aria-expanded="true"
-                aria-controls="faqCollapse1"
-              >
-                How do I book a bus ticket on TravelMate?
-              </button>
-            </h2>
-            <div
-              id="faqCollapse1"
-              class="accordion-collapse collapse show"
-              aria-labelledby="faqHeading1"
-              data-bs-parent="#homeFAQAccordion"
-            >
-              <div class="accordion-body">
-                <p>
-                  Booking is simple: Enter your source, destination, and travel
-                  date, browse available buses, select your seat, enter
-                  passenger details, and complete payment. You'll receive your
-                  e-ticket after booking and you can download to show in Bus
-                  during travel.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="faqHeading2">
-              <button
-                class="accordion-button collapsed"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#faqCollapse2"
-                aria-expanded="false"
-                aria-controls="faqCollapse2"
-              >
-                Can I cancel or modify my booking?
-              </button>
-            </h2>
-            <div
-              id="faqCollapse2"
-              class="accordion-collapse collapse"
-              aria-labelledby="faqHeading2"
-              data-bs-parent="#homeFAQAccordion"
-            >
-              <div class="accordion-body">
-                <p>
-                  Yes, you can cancel or modify your booking up to 2 hours
-                  before departure. Cancellation charges may apply based on the
-                  timing. Visit "My Bookings" in your account to manage your
-                  reservations.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="faqHeading3">
-              <button
-                class="accordion-button collapsed"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#faqCollapse3"
-                aria-expanded="false"
-                aria-controls="faqCollapse3"
-              >
-                What payment methods do you accept?
-              </button>
-            </h2>
-            <div
-              id="faqCollapse3"
-              class="accordion-collapse collapse"
-              aria-labelledby="faqHeading3"
-              data-bs-parent="#homeFAQAccordion"
-            >
-              <div class="accordion-body">
-                <p>
-                  We accept online payment through eSewa, Khalti and Offline
-                  through cash to conductor.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="faqHeading4">
-              <button
-                class="accordion-button collapsed"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#faqCollapse4"
-                aria-expanded="false"
-                aria-controls="faqCollapse4"
-              >
-                Do I need to print my ticket?
-              </button>
-            </h2>
-            <div
-              id="faqCollapse4"
-              class="accordion-collapse collapse"
-              aria-labelledby="faqHeading4"
-              data-bs-parent="#homeFAQAccordion"
-            >
-              <div class="accordion-body">
-                <p>
-                  No, you don't need to print your ticket. You can show your
-                  e-ticket on your mobile device or provide your booking
-                  reference number and ID proof to the conductor.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="faqHeading5">
-              <button
-                class="accordion-button collapsed"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#faqCollapse5"
-                aria-expanded="false"
-                aria-controls="faqCollapse5"
-              >
-                How can I contact customer support?
-              </button>
-            </h2>
-            <div
-              id="faqCollapse5"
-              class="accordion-collapse collapse"
-              aria-labelledby="faqHeading5"
-              data-bs-parent="#homeFAQAccordion"
-            >
-              <div class="accordion-body">
-                <p>
-                  You can reach our 24/7 customer support via phone at +977
-                  9847435111 ,email at info@travelmate.com.
-                </p>
-              </div>
-            </div>
-          </div>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'routes:route_search' %}"
+               class="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <i class="fas fa-ticket-alt mr-2"></i>Book Your Ticket Now
+            </a>
+            <a href="{% url 'home:contact' %}"
+               class="border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300">
+                <i class="fas fa-phone mr-2"></i>Contact Support
+            </a>
         </div>
-        <div class="text-center mt-4">
-          <a href="{% url 'home:faq' %}" class="btn btn-outline-primary btn-lg"
-            >View All FAQs</a
-          >
-        </div>
-      </div>
+        
+
     </div>
-  </div>
 </section>
 
-{% endblock %} {% block extra_js %}
 <script>
-  // Swap locations functionality
-  function swapLocations() {
-    // Get current values from text inputs
-    var sourceValue = $("#id_source").val();
-    var destinationValue = $("#id_destination").val();
+    // Enhanced location swap functionality
+    function swapLocations() {
+        const source = document.getElementById('id_source');
+        const destination = document.getElementById('id_destination');
+        const temp = source.value;
+        source.value = destination.value;
+        destination.value = temp;
+        
+        // Add visual feedback
+        const button = event.target.closest('button');
+        button.classList.add('animate-spin');
+        setTimeout(() => {
+            button.classList.remove('animate-spin');
+        }, 300);
+    }
 
-    // Swap the values
-    $("#id_source").val(destinationValue);
-    $("#id_destination").val(sourceValue);
-
-    // Add a nice animation effect
-    $(".swap-locations").addClass("rotate-animation");
-    setTimeout(() => {
-      $(".swap-locations").removeClass("rotate-animation");
-    }, 300);
-  }
-
-  // Initialize date picker for travel date
-  $(document).ready(function () {
-    // Add hover effects for form elements
-    $(".custom-input, .custom-date").hover(
-      function () {
-        $(this).addClass("hover-effect");
-      },
-      function () {
-        $(this).removeClass("hover-effect");
-      }
-    );
-  });
+    // Set minimum date to today and add enhanced functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateInput = document.getElementById('id_travel_date');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+        
+        // Add smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in-up');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe elements for animation
+        document.querySelectorAll('.group, .bg-white').forEach(el => {
+            observer.observe(el);
+        });
+    });
 </script>
+
+<style>
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+}
+</style>
 {% endblock %}

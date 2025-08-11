@@ -1,733 +1,376 @@
-{% extends 'base.html' %} {% load static %} {% block title %}Cancel Booking{%
-endblock %} {% block extra_css %}
-<style>
-  .cancel-header {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-    padding: 2rem 0;
-    margin-bottom: 2rem;
-  }
-
-  .cancel-container {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  .cancel-card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e9ecef;
-    overflow: hidden;
-  }
-
-  .cancel-content {
-    padding: 2rem;
-  }
-
-  .warning-section {
-    background: rgba(220, 53, 69, 0.1);
-    border: 1px solid rgba(220, 53, 69, 0.3);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-
-  .warning-icon {
-    font-size: 3rem;
-    color: #dc3545;
-    margin-bottom: 1rem;
-  }
-
-  .warning-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #721c24;
-    margin-bottom: 0.5rem;
-  }
-
-  .warning-text {
-    color: #721c24;
-    margin: 0;
-  }
-
-  .booking-summary {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    border: 1px solid #e9ecef;
-  }
-
-  .summary-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .booking-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .info-item {
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-  }
-
-  .info-label {
-    font-size: 0.75rem;
-    color: #6c757d;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 0.25rem;
-  }
-
-  .info-value {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #495057;
-  }
-
-  .route-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: white;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-  }
-
-  .route-location {
-    text-align: center;
-    flex: 1;
-  }
-
-  .location-name {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 0.25rem;
-  }
-
-  .location-time {
-    font-size: 0.875rem;
-    color: #6c757d;
-  }
-
-  .route-arrow {
-    color: #dc3545;
-    font-size: 1.25rem;
-  }
-
-  .passenger-list {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    border: 1px solid #e9ecef;
-  }
-
-  .passenger-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .passenger-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1rem;
-    background: white;
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
-    border: 1px solid #e9ecef;
-  }
-
-  .passenger-item:last-child {
-    margin-bottom: 0;
-  }
-
-  .passenger-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .passenger-name {
-    font-weight: 600;
-    color: #495057;
-  }
-
-  .passenger-details {
-    font-size: 0.875rem;
-    color: #6c757d;
-  }
-
-  .seat-number {
-    background: #dc3545;
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-
-  .cancellation-policy {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    border: 1px solid #e9ecef;
-  }
-
-  .policy-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .policy-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    padding: 1rem;
-    background: white;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-  }
-
-  .policy-item:last-child {
-    margin-bottom: 0;
-  }
-
-  .policy-icon {
-    color: #dc3545;
-    margin-top: 0.125rem;
-    flex-shrink: 0;
-  }
-
-  .policy-text {
-    font-size: 0.875rem;
-    color: #495057;
-    margin: 0;
-  }
-
-  .refund-calculation {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    border: 1px solid #e9ecef;
-  }
-
-  .refund-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .refund-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid #e9ecef;
-  }
-
-  .refund-item:last-child {
-    border-bottom: none;
-    padding-top: 1rem;
-    margin-top: 0.5rem;
-    border-top: 2px solid #dc3545;
-    font-weight: 600;
-    font-size: 1.125rem;
-  }
-
-  .refund-label {
-    color: #495057;
-  }
-
-  .refund-value {
-    color: #495057;
-    font-weight: 600;
-  }
-
-  .refund-positive {
-    color: #28a745;
-  }
-
-  .refund-negative {
-    color: #dc3545;
-  }
-
-  .cancel-form {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    border: 1px solid #e9ecef;
-  }
-
-  .form-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .form-group {
-    margin-bottom: 1rem;
-  }
-
-  .form-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 0.5rem;
-    display: block;
-  }
-
-  .form-control {
-    width: 100%;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 0.875rem 1rem;
-    font-size: 0.875rem;
-    transition: all 0.3s ease;
-    background: white;
-  }
-
-  .form-control:focus {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-    background: white;
-    outline: none;
-  }
-
-  .form-control.error {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-  }
-
-  .error-message {
-    font-size: 0.75rem;
-    color: #dc3545;
-    margin-top: 0.25rem;
-  }
-
-  .checkbox-group {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    background: rgba(220, 53, 69, 0.1);
-    border: 1px solid rgba(220, 53, 69, 0.3);
-    border-radius: 8px;
-  }
-
-  .checkbox-input {
-    margin-top: 0.125rem;
-    flex-shrink: 0;
-  }
-
-  .checkbox-label {
-    font-size: 0.875rem;
-    color: #721c24;
-    margin: 0;
-    cursor: pointer;
-  }
-
-  .cancel-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .btn-back {
-    background: transparent;
-    border: 1px solid #6c757d;
-    padding: 0.875rem 1.5rem;
-    border-radius: 8px;
-    color: #6c757d;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-  }
-
-  .btn-back:hover {
-    background: #6c757d;
-    color: white;
-    text-decoration: none;
-  }
-
-  .btn-cancel {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    border: none;
-    padding: 0.875rem 2rem;
-    border-radius: 8px;
-    color: white;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .btn-cancel:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-  }
-
-  .btn-cancel:disabled {
-    background: #6c757d;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-  }
-
-  @media (max-width: 768px) {
-    .booking-info {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .route-info {
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .route-arrow {
-      transform: rotate(90deg);
-    }
-
-    .passenger-item {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
-    }
-
-    .cancel-actions {
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .btn-back,
-    .btn-cancel {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .cancel-content {
-      padding: 1rem;
-    }
-
-    .booking-info {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>
-{% endblock %} {% block content %}
+{% extends 'base.html' %} {% load static %} {% block title %}Cancel Booking -
+TravelMate{% endblock %} {% block content %}
 <!-- Header -->
-<section class="cancel-header">
-  <div class="container">
+<section
+  class="bg-gradient-to-r from-red-600 to-red-700 text-white py-16 -mt-6"
+>
+  <div class="container mx-auto px-4">
     <div class="text-center">
-      <h1 class="mb-2">
-        <i class="fas fa-times-circle me-2"></i>Cancel Booking
-      </h1>
-      <p class="mb-0">Review your booking details and cancellation policy</p>
+      <div
+        class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4"
+      >
+        <i class="fas fa-exclamation-triangle text-3xl"></i>
+      </div>
+      <h1 class="text-3xl md:text-4xl font-bold mb-2">Cancel Booking</h1>
+      <p class="text-xl opacity-90">
+        Request cancellation for your bus reservation
+      </p>
     </div>
   </div>
 </section>
 
-<!-- Content -->
-<section class="py-4">
-  <div class="container">
-    <div class="cancel-container">
-      <div class="cancel-card">
-        <div class="cancel-content">
-          <!-- Warning Section -->
-          <div class="warning-section">
-            <div class="warning-icon">
-              <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div class="warning-title">Booking Cancellation</div>
-            <p class="warning-text">
-              Once cancelled, this booking cannot be restored. Please review the
-              cancellation policy before proceeding.
-            </p>
-          </div>
+<!-- Cancellation Form -->
+<section class="py-12 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <div class="max-w-4xl mx-auto">
+      <!-- Warning Section -->
+      <div
+        class="bg-red-50 border border-red-200 rounded-xl p-8 mb-8 text-center"
+      >
+        <div
+          class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"
+        >
+          <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-red-800 mb-2">
+          Important Notice
+        </h3>
+        <p class="text-red-700 mb-4">
+          Cancelling your booking may result in cancellation charges as per our
+          policy. Please review the details below before proceeding.
+        </p>
+        <div class="bg-white rounded-lg p-4 inline-block">
+          <p class="text-sm text-red-600 font-medium">
+            Cancellation charges may apply based on the time remaining until
+            departure
+          </p>
+        </div>
+      </div>
 
-          <!-- Booking Summary -->
-          <div class="booking-summary">
-            <div class="summary-title">
-              <i class="fas fa-ticket-alt"></i>
-              Booking Summary
-            </div>
+      <!-- Booking Summary -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+          <h3 class="text-xl font-semibold text-gray-800">
+            <i class="fas fa-ticket-alt mr-2 text-blue-500"></i>Booking Summary
+          </h3>
+        </div>
 
-            <div class="booking-info">
-              <div class="info-item">
-                <div class="info-label">Booking ID</div>
-                <div class="info-value">{{ booking.booking_id }}</div>
-              </div>
-              <div class="info-item">
-                <div class="info-label">Booking Date</div>
-                <div class="info-value">
-                  {{ booking.created_at|date:"M d, Y" }}
+        <div class="p-6">
+          <!-- Journey Information -->
+          <div class="bg-gray-50 rounded-lg p-4 mb-6">
+            <div class="flex items-center justify-center mb-4">
+              <div class="text-center">
+                <div class="text-xl font-bold text-gray-800">
+                  {{ booking.route.source }}
+                </div>
+                <div class="text-sm text-gray-500">
+                  {{ booking.departure_time|time:"g:i A" }}
                 </div>
               </div>
-              <div class="info-item">
-                <div class="info-label">Status</div>
-                <div class="info-value">{{ booking.get_status_display }}</div>
+              <div class="mx-6">
+                <i class="fas fa-arrow-right text-blue-500 text-2xl"></i>
               </div>
-              <div class="info-item">
-                <div class="info-label">Total Amount</div>
-                <div class="info-value">
-                  रू{{ booking.total_fare|floatformat:2 }}
+              <div class="text-center">
+                <div class="text-xl font-bold text-gray-800">
+                  {{ booking.route.destination }}
                 </div>
-              </div>
-            </div>
-
-            <div class="route-info">
-              <div class="route-location">
-                <div class="location-name">
-                  {{ booking.bus_schedule.route.source.name }}
-                </div>
-                <div class="location-time">
-                  {{ booking.bus_schedule.departure_time|time:"H:i" }}
-                </div>
-              </div>
-              <div class="route-arrow">
-                <i class="fas fa-arrow-right"></i>
-              </div>
-              <div class="route-location">
-                <div class="location-name">
-                  {{ booking.bus_schedule.route.destination.name }}
-                </div>
-                <div class="location-time">
-                  {{ booking.bus_schedule.arrival_time|time:"H:i" }}
+                <div class="text-sm text-gray-500">
+                  {{ booking.arrival_time|time:"g:i A" }}
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Passenger List -->
-          <div class="passenger-list">
-            <div class="passenger-title">
-              <i class="fas fa-users"></i>
-              Passengers ({{ booking.passengers.count }})
+          <!-- Booking Details Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+              <div class="text-xs text-gray-500 mb-1">Booking ID</div>
+              <div class="font-semibold text-gray-800">
+                {{ booking.booking_id }}
+              </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+              <div class="text-xs text-gray-500 mb-1">Travel Date</div>
+              <div class="font-semibold text-gray-800">
+                {{ booking.travel_date|date:"M d, Y" }}
+              </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+              <div class="text-xs text-gray-500 mb-1">Seats</div>
+              <div class="font-semibold text-gray-800">
+                {{ booking.seat_numbers }}
+              </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+              <div class="text-xs text-gray-500 mb-1">Passengers</div>
+              <div class="font-semibold text-gray-800">
+                {{ booking.passenger_count }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cancellation Policy -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+          <h3 class="text-xl font-semibold text-gray-800">
+            <i class="fas fa-file-contract mr-2 text-purple-500"></i
+            >Cancellation Policy
+          </h3>
+        </div>
+
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 class="font-semibold text-gray-800 mb-3">
+                Cancellation Charges
+              </h4>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">More than 24 hours:</span>
+                  <span class="font-medium">10% of fare</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">12-24 hours:</span>
+                  <span class="font-medium">25% of fare</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">6-12 hours:</span>
+                  <span class="font-medium">50% of fare</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Less than 6 hours:</span>
+                  <span class="font-medium text-red-600">No refund</span>
+                </div>
+              </div>
             </div>
 
-            {% for passenger in booking.passengers.all %}
-            <div class="passenger-item">
-              <div class="passenger-info">
-                <div>
-                  <div class="passenger-name">{{ passenger.name }}</div>
-                  <div class="passenger-details">
-                    {{ passenger.get_gender_display }}, {{ passenger.age }}
-                    years
+            <div>
+              <h4 class="font-semibold text-gray-800 mb-3">
+                Your Cancellation
+              </h4>
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Original Fare:</span>
+                    <span class="font-medium">रू{{ booking.total_fare }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Cancellation Charge:</span>
+                    <span class="font-medium text-red-600"
+                      >रू{{ cancellation_charge|default:0 }}</span
+                    >
+                  </div>
+                  <hr class="border-gray-300" />
+                  <div class="flex justify-between text-lg">
+                    <span class="font-semibold text-gray-800"
+                      >Refund Amount:</span
+                    >
+                    <span class="font-bold text-green-600"
+                      >रू{{ refund_amount|default:0 }}</span
+                    >
                   </div>
                 </div>
               </div>
-              <div class="seat-number">Seat {{ passenger.seat_number }}</div>
-            </div>
-            {% endfor %}
-          </div>
-
-          <!-- Cancellation Policy -->
-          <div class="cancellation-policy">
-            <div class="policy-title">
-              <i class="fas fa-file-contract"></i>
-              Cancellation Policy
-            </div>
-
-            <div class="policy-item">
-              <div class="policy-icon">
-                <i class="fas fa-clock"></i>
-              </div>
-              <p class="policy-text">
-                <strong>Free Cancellation:</strong> Cancel up to 24 hours before
-                departure for a full refund minus processing fee.
-              </p>
-            </div>
-
-            <div class="policy-item">
-              <div class="policy-icon">
-                <i class="fas fa-percentage"></i>
-              </div>
-              <p class="policy-text">
-                <strong>Partial Refund:</strong> Cancel 6-24 hours before
-                departure for 75% refund of the ticket price.
-              </p>
-            </div>
-
-            <div class="policy-item">
-              <div class="policy-icon">
-                <i class="fas fa-ban"></i>
-              </div>
-              <p class="policy-text">
-                <strong>No Refund:</strong> Cancellations within 6 hours of
-                departure are not eligible for refund.
-              </p>
-            </div>
-
-            <div class="policy-item">
-              <div class="policy-icon">
-                <i class="fas fa-credit-card"></i>
-              </div>
-              <p class="policy-text">
-                <strong>Processing Fee:</strong> A processing fee of रू50 per
-                ticket will be deducted from all refunds.
+              <p class="text-xs text-gray-500 mt-2">
+                Refund will be processed within 5-7 business days
               </p>
             </div>
           </div>
+        </div>
+      </div>
 
-          <!-- Refund Calculation -->
-          <div class="refund-calculation">
-            <div class="refund-title">
-              <i class="fas fa-calculator"></i>
-              Refund Calculation
-            </div>
+      <!-- Cancellation Form -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+          <h3 class="text-xl font-semibold text-gray-800">
+            <i class="fas fa-edit mr-2 text-red-500"></i>Cancellation Request
+          </h3>
+        </div>
 
-            <div class="refund-item">
-              <span class="refund-label">Original Amount</span>
-              <span class="refund-value"
-                >रू{{ booking.total_fare|floatformat:2 }}</span
-              >
-            </div>
-
-            <div class="refund-item">
-              <span class="refund-label">Cancellation Charges</span>
-              <span class="refund-value refund-negative"
-                >-रू{{ cancellation_charges|floatformat:2 }}</span
-              >
-            </div>
-
-            <div class="refund-item">
-              <span class="refund-label">Processing Fee</span>
-              <span class="refund-value refund-negative"
-                >-रू{{ processing_fee|floatformat:2 }}</span
-              >
-            </div>
-
-            <div class="refund-item">
-              <span class="refund-label">Refund Amount</span>
-              <span
-                class="refund-value {% if refund_amount > 0 %}refund-positive{% else %}refund-negative{% endif %}"
-              >
-                रू{{ refund_amount|floatformat:2 }}
-              </span>
-            </div>
-          </div>
-
-          <!-- Cancellation Form -->
-          <form method="POST" id="cancel-form">
+        <div class="p-6">
+          <form method="post" id="cancellationForm" class="space-y-6">
             {% csrf_token %}
 
-            <div class="cancel-form">
-              <div class="form-title">
-                <i class="fas fa-comment"></i>
-                Cancellation Reason
-              </div>
+            <!-- Cancellation Reason -->
+            <div>
+              <label
+                for="reason"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Reason for Cancellation <span class="text-red-500">*</span>
+              </label>
+              <select
+                id="reason"
+                name="reason"
+                class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                required
+              >
+                <option value="">Select a reason</option>
+                <option value="change_of_plans">Change of Plans</option>
+                <option value="emergency">Emergency</option>
+                <option value="schedule_conflict">Schedule Conflict</option>
+                <option value="health_issues">Health Issues</option>
+                <option value="weather_conditions">Weather Conditions</option>
+                <option value="other">Other</option>
+              </select>
+              <div
+                id="error-reason"
+                class="text-red-600 text-sm mt-1 hidden"
+              ></div>
+            </div>
 
-              <div class="form-group">
-                <label class="form-label">Reason for Cancellation *</label>
-                <select
-                  name="cancellation_reason"
-                  class="form-control"
-                  required
-                >
-                  <option value="">Select a reason</option>
-                  <option value="change_of_plans">Change of Plans</option>
-                  <option value="emergency">Emergency</option>
-                  <option value="illness">Illness</option>
-                  <option value="work_commitment">Work Commitment</option>
-                  <option value="weather_conditions">Weather Conditions</option>
-                  <option value="better_option">Found Better Option</option>
-                  <option value="other">Other</option>
-                </select>
-                <div class="error-message" id="error-reason"></div>
-              </div>
+            <!-- Additional Comments -->
+            <div>
+              <label
+                for="comments"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Additional Comments (Optional)
+              </label>
+              <textarea
+                id="comments"
+                name="comments"
+                rows="4"
+                class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 resize-none"
+                placeholder="Please provide any additional details about your cancellation..."
+              ></textarea>
+              <p class="text-xs text-gray-500 mt-1">
+                This information helps us improve our services
+              </p>
+            </div>
 
-              <div class="form-group">
-                <label class="form-label">Additional Comments (Optional)</label>
-                <textarea
-                  name="comments"
-                  class="form-control"
-                  rows="3"
-                  placeholder="Please provide any additional details about your cancellation..."
-                ></textarea>
-              </div>
-
-              <div class="checkbox-group">
-                <input
-                  type="checkbox"
-                  id="confirm-cancellation"
-                  name="confirm_cancellation"
-                  class="checkbox-input"
-                  required
-                />
-                <label for="confirm-cancellation" class="checkbox-label">
-                  I understand that this booking will be cancelled permanently
-                  and cannot be restored. I have read and agree to the
-                  cancellation policy and refund terms.
+            <!-- Refund Method -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-3">
+                Preferred Refund Method
+              </label>
+              <div class="space-y-3">
+                <label class="flex items-center">
+                  <input
+                    type="radio"
+                    name="refund_method"
+                    value="original_payment"
+                    class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
+                    checked
+                  />
+                  <span class="ml-2 text-sm text-gray-700">
+                    <span class="font-medium">Original Payment Method</span>
+                    <span class="text-gray-500 block"
+                      >Refund to the original payment source</span
+                    >
+                  </span>
+                </label>
+                <label class="flex items-center">
+                  <input
+                    type="radio"
+                    name="refund_method"
+                    value="bank_transfer"
+                    class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
+                  />
+                  <span class="ml-2 text-sm text-gray-700">
+                    <span class="font-medium">Bank Transfer</span>
+                    <span class="text-gray-500 block"
+                      >Direct transfer to your bank account</span
+                    >
+                  </span>
+                </label>
+                <label class="flex items-center">
+                  <input
+                    type="radio"
+                    name="refund_method"
+                    value="wallet"
+                    class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
+                  />
+                  <span class="ml-2 text-sm text-gray-700">
+                    <span class="font-medium">TravelMate Wallet</span>
+                    <span class="text-gray-500 block"
+                      >Credit to your TravelMate wallet for future
+                      bookings</span
+                    >
+                  </span>
                 </label>
               </div>
             </div>
 
-            <!-- Cancel Actions -->
-            <div class="cancel-actions">
+            <!-- Confirmation Checkbox -->
+            <div class="border border-gray-200 rounded-lg p-4">
+              <div class="flex items-start">
+                <input
+                  type="checkbox"
+                  id="confirm"
+                  name="confirm"
+                  class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded mt-1"
+                  required
+                />
+                <label for="confirm" class="ml-2 block text-sm text-gray-700">
+                  I understand and agree to the cancellation policy. I confirm
+                  that:
+                  <ul class="mt-2 space-y-1 text-xs text-gray-600 ml-4">
+                    <li>
+                      • Cancellation charges will be deducted as per the policy
+                    </li>
+                    <li>• Refund will be processed within 5-7 business days</li>
+                    <li>• This action cannot be undone once confirmed</li>
+                    <li>
+                      • I have read and understood the terms and conditions
+                    </li>
+                  </ul>
+                </label>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row justify-between gap-4 pt-4">
               <a
                 href="{% url 'bookings:booking_detail' booking.booking_id %}"
-                class="btn-back"
+                class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors text-center font-medium"
               >
-                <i class="fas fa-arrow-left"></i>
-                Back to Booking
+                <i class="fas fa-arrow-left mr-2"></i>Back to Booking
               </a>
 
-              <button type="submit" class="btn-cancel" id="cancel-btn" disabled>
-                <i class="fas fa-times-circle"></i>
-                Cancel Booking
+              <button
+                type="submit"
+                id="cancelBtn"
+                disabled
+                class="bg-red-500 text-white px-8 py-3 rounded-lg hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
+              >
+                <i class="fas fa-times mr-2"></i>Cancel Booking
               </button>
             </div>
           </form>
+        </div>
+      </div>
+
+      <!-- Support Information -->
+      <div class="bg-blue-50 rounded-xl p-6 mt-8 border border-blue-200">
+        <h4 class="text-lg font-semibold text-blue-800 mb-3">
+          <i class="fas fa-headset mr-2"></i>Need Help?
+        </h4>
+        <p class="text-sm text-blue-700 mb-4">
+          If you have any questions about the cancellation process or need
+          assistance, our customer support team is here to help.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a
+            href="tel:+977-1-4567890"
+            class="text-blue-600 hover:text-blue-700 font-medium text-sm"
+          >
+            <i class="fas fa-phone mr-2"></i>+977-1-4567890
+          </a>
+          <a
+            href="mailto:support@travelmate.com"
+            class="text-blue-600 hover:text-blue-700 font-medium text-sm"
+          >
+            <i class="fas fa-envelope mr-2"></i>support@travelmate.com
+          </a>
+          <a
+            href="#"
+            class="text-blue-600 hover:text-blue-700 font-medium text-sm"
+          >
+            <i class="fas fa-comments mr-2"></i>Live Chat
+          </a>
         </div>
       </div>
     </div>
@@ -736,36 +379,55 @@ endblock %} {% block extra_css %}
 {% endblock %} {% block extra_js %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("cancel-form");
-    const cancelBtn = document.getElementById("cancel-btn");
-    const confirmCheckbox = document.getElementById("confirm-cancellation");
-    const reasonSelect = form.querySelector(
-      'select[name="cancellation_reason"]'
-    );
+    const form = document.getElementById("cancellationForm");
+    const reasonSelect = document.getElementById("reason");
+    const confirmCheckbox = document.getElementById("confirm");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const commentsTextarea = document.getElementById("comments");
 
-    // Enable/disable cancel button based on confirmation
+    // Update cancel button state
     function updateCancelButton() {
       const isReasonSelected = reasonSelect.value !== "";
       const isConfirmed = confirmCheckbox.checked;
 
       cancelBtn.disabled = !(isReasonSelected && isConfirmed);
+
+      if (isReasonSelected && isConfirmed) {
+        cancelBtn.classList.remove("bg-gray-300", "cursor-not-allowed");
+        cancelBtn.classList.add("bg-red-500", "hover:bg-red-600");
+      } else {
+        cancelBtn.classList.add("bg-gray-300", "cursor-not-allowed");
+        cancelBtn.classList.remove("bg-red-500", "hover:bg-red-600");
+      }
     }
 
     // Event listeners
     confirmCheckbox.addEventListener("change", updateCancelButton);
     reasonSelect.addEventListener("change", updateCancelButton);
 
+    // Auto-resize textarea
+    if (commentsTextarea) {
+      commentsTextarea.addEventListener("input", function () {
+        this.style.height = "auto";
+        this.style.height = this.scrollHeight + "px";
+      });
+    }
+
     // Form validation
     function validateForm() {
       let isValid = true;
 
       // Clear previous errors
-      document.querySelectorAll(".error-message").forEach((error) => {
-        error.textContent = "";
+      document.querySelectorAll(".text-red-600").forEach((error) => {
+        if (error.id.startsWith("error-")) {
+          error.textContent = "";
+          error.classList.add("hidden");
+        }
       });
 
-      document.querySelectorAll(".form-control").forEach((field) => {
-        field.classList.remove("error");
+      document.querySelectorAll("input, select").forEach((field) => {
+        field.classList.remove("border-red-500", "ring-red-500");
+        field.classList.add("border-gray-300");
       });
 
       // Validate reason selection
@@ -784,10 +446,13 @@ endblock %} {% block extra_css %}
     }
 
     function showError(field, message) {
-      field.classList.add("error");
+      field.classList.add("border-red-500", "ring-red-500");
+      field.classList.remove("border-gray-300");
+
       const errorElement = document.getElementById("error-reason");
       if (errorElement) {
         errorElement.textContent = message;
+        errorElement.classList.remove("hidden");
       }
     }
 
@@ -810,24 +475,28 @@ endblock %} {% block extra_css %}
         // Show loading state
         cancelBtn.disabled = true;
         cancelBtn.innerHTML =
-          '<i class="fas fa-spinner fa-spin"></i> Cancelling...';
+          '<i class="fas fa-spinner fa-spin mr-2"></i>Cancelling...';
 
         // Submit form
         this.submit();
       }
     });
 
-    // Auto-resize textarea
-    const textarea = form.querySelector('textarea[name="comments"]');
-    if (textarea) {
-      textarea.addEventListener("input", function () {
-        this.style.height = "auto";
-        this.style.height = this.scrollHeight + "px";
-      });
-    }
-
     // Initialize button state
     updateCancelButton();
+
+    // Add smooth animations to cards
+    const cards = document.querySelectorAll(".bg-white");
+    cards.forEach((card, index) => {
+      card.style.opacity = "0";
+      card.style.transform = "translateY(20px)";
+
+      setTimeout(() => {
+        card.style.transition = "all 0.5s ease";
+        card.style.opacity = "1";
+        card.style.transform = "translateY(0)";
+      }, index * 200);
+    });
   });
 </script>
 {% endblock %}

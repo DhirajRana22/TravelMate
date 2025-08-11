@@ -1,711 +1,527 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Payment Details{% endblock %}
-
-{% block extra_css %}
-<style>
-    .payment-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem 0;
-        margin-bottom: 2rem;
-    }
-    
-    .payment-container {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-    
-    .payment-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        padding: 2rem;
-        margin-bottom: 2rem;
-        border: 1px solid #e9ecef;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .payment-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .payment-status {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.875rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 1rem;
-    }
-    
-    .status-completed {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-    
-    .status-pending {
-        background: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeaa7;
-    }
-    
-    .status-failed {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
-    
-    .status-refunded {
-        background: #d1ecf1;
-        color: #0c5460;
-        border: 1px solid #bee5eb;
-    }
-    
-    .payment-id {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #495057;
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .payment-amount {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #28a745;
-        margin-bottom: 1rem;
-    }
-    
-    .payment-details {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .detail-section {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 1.5rem;
-        border-left: 4px solid #667eea;
-    }
-    
-    .section-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .section-title i {
-        color: #667eea;
-    }
-    
-    .detail-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #e9ecef;
-    }
-    
-    .detail-row:last-child {
-        border-bottom: none;
-    }
-    
-    .detail-label {
-        font-size: 0.875rem;
-        color: #6c757d;
-        font-weight: 500;
-    }
-    
-    .detail-value {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #495057;
-        text-align: right;
-    }
-    
-    .booking-info {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        border: 1px solid #e9ecef;
-    }
-    
-    .booking-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #e9ecef;
-    }
-    
-    .booking-route {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #495057;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-    
-    .route-arrow {
-        color: #667eea;
-        font-size: 1.5rem;
-    }
-    
-    .booking-date {
-        font-size: 0.875rem;
-        color: #6c757d;
-        background: #f8f9fa;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-    }
-    
-    .booking-details {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-    
-    .booking-detail {
-        text-align: center;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-    }
-    
-    .booking-detail-label {
-        font-size: 0.75rem;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.5rem;
-    }
-    
-    .booking-detail-value {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #495057;
-    }
-    
-    .refund-section {
-        background: #fff3cd;
-        border: 1px solid #ffeaa7;
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .refund-header {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .refund-header i {
-        color: #856404;
-        font-size: 1.25rem;
-    }
-    
-    .refund-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #856404;
-    }
-    
-    .refund-details {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-    
-    .refund-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem 0;
-    }
-    
-    .refund-label {
-        font-size: 0.875rem;
-        color: #856404;
-        font-weight: 500;
-    }
-    
-    .refund-value {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #495057;
-    }
-    
-    .action-buttons {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-        margin-top: 2rem;
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        color: white;
-        text-decoration: none;
-        font-size: 0.875rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .btn-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn-secondary {
-        background: transparent;
-        border: 1px solid #6c757d;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        color: #6c757d;
-        text-decoration: none;
-        font-size: 0.875rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .btn-secondary:hover {
-        background: #6c757d;
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn-danger {
-        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        color: white;
-        text-decoration: none;
-        font-size: 0.875rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .btn-danger:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-    
-    .transaction-timeline {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .timeline-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .timeline-title i {
-        color: #667eea;
-    }
-    
-    .timeline-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 1rem;
-        padding: 1rem 0;
-        border-bottom: 1px solid #f8f9fa;
-        position: relative;
-    }
-    
-    .timeline-item:last-child {
-        border-bottom: none;
-    }
-    
-    .timeline-item::before {
-        content: '';
-        position: absolute;
-        left: 1rem;
-        top: 2.5rem;
-        bottom: -1rem;
-        width: 2px;
-        background: #e9ecef;
-    }
-    
-    .timeline-item:last-child::before {
-        display: none;
-    }
-    
-    .timeline-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: #667eea;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.875rem;
-        flex-shrink: 0;
-        z-index: 1;
-        position: relative;
-    }
-    
-    .timeline-content {
-        flex: 1;
-    }
-    
-    .timeline-event {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.25rem;
-    }
-    
-    .timeline-time {
-        font-size: 0.75rem;
-        color: #6c757d;
-    }
-    
-    @media (max-width: 768px) {
-        .payment-details {
-            grid-template-columns: 1fr;
-        }
-        
-        .booking-route {
-            flex-direction: column;
-            text-align: center;
-            gap: 0.5rem;
-        }
-        
-        .booking-details {
-            grid-template-columns: 1fr;
-        }
-        
-        .action-buttons {
-            flex-direction: column;
-        }
-        
-        .refund-details {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block title %}Payment Details -
+TravelMate{% endblock %} {% block content %}
 <!-- Header -->
-<section class="payment-header">
-    <div class="container">
-        <div class="payment-container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="mb-2"><i class="fas fa-credit-card me-2"></i>Payment Details</h1>
-                    <p class="mb-0">Complete payment information and transaction history</p>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    <a href="{% url 'accounts:payment_history' %}" class="btn btn-light">
-                        <i class="fas fa-history me-2"></i>Payment History
-                    </a>
-                </div>
-            </div>
-        </div>
+<section
+  class="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-12 -mt-6"
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center">
+      <div
+        class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4"
+      >
+        <i class="fas fa-receipt text-2xl"></i>
+      </div>
+      <h1 class="text-3xl md:text-4xl font-bold mb-2">Payment Details</h1>
+      <p class="text-xl opacity-90">
+        Complete information about your payment transaction
+      </p>
     </div>
+  </div>
 </section>
 
-<!-- Content -->
-<section class="py-4">
-    <div class="container">
-        <div class="payment-container">
-            <!-- Payment Information -->
-            <div class="payment-card">
-                <div class="payment-status status-{{ payment.payment_status|lower }}">
-                    {% if payment.payment_status == 'completed' %}
-                        <i class="fas fa-check-circle me-2"></i>Payment Completed
-                    {% elif payment.payment_status == 'pending' %}
-                        <i class="fas fa-clock me-2"></i>Payment Pending
-                    {% elif payment.payment_status == 'failed' %}
-                        <i class="fas fa-times-circle me-2"></i>Payment Failed
-                    {% elif payment.payment_status == 'refunded' %}
-                        <i class="fas fa-undo me-2"></i>Payment Refunded
-                    {% endif %}
-                </div>
-                
-                <div class="payment-id">
-                    <i class="fas fa-hashtag"></i>
-                    {{ payment.payment_id }}
-                    <button class="btn btn-sm btn-outline-secondary" onclick="copyToClipboard('{{ payment.payment_id }}')"
-                            title="Copy Payment ID">
-                        <i class="fas fa-copy"></i>
-                    </button>
-                </div>
-                
-                <div class="payment-amount">रू{{ payment.amount|floatformat:2 }}</div>
-                
-                <div class="payment-details">
-                    <div class="detail-section">
-                        <div class="section-title">
-                            <i class="fas fa-info-circle"></i>
-                            Payment Information
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Payment Method</span>
-                            <span class="detail-value">{{ payment.get_payment_method_display }}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Transaction ID</span>
-                            <span class="detail-value">{{ payment.transaction_id|default:"N/A" }}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Payment Date</span>
-                            <span class="detail-value">{{ payment.payment_date|date:"M d, Y H:i" }}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Gateway Response</span>
-                            <span class="detail-value">{{ payment.gateway_response|default:"N/A" }}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="detail-section">
-                        <div class="section-title">
-                            <i class="fas fa-calculator"></i>
-                            Amount Breakdown
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Base Fare ({{ booking.seats.count }} seats)</span>
-                            <span class="detail-value">रू{{ booking.bus_schedule.base_fare|floatformat:2 }} × {{ booking.seats.count }}</span>
-                        </div>
-                        <div class="detail-row" style="border-top: 2px solid #667eea; font-weight: 700;">
-                            <span class="detail-label">Total Amount</span>
-                            <span class="detail-value">रू{{ payment.amount|floatformat:2 }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Booking Information -->
-            <div class="booking-info">
-                <div class="booking-header">
-                    <div class="booking-route">
-                        <span>{{ booking.bus_schedule.route.source.name }}</span>
-                        <i class="fas fa-arrow-right route-arrow"></i>
-                        <span>{{ booking.bus_schedule.route.destination.name }}</span>
-                    </div>
-                    <div class="booking-date">
-                        <i class="fas fa-calendar-alt me-1"></i>
-                        {{ booking.travel_date|date:"M d, Y" }}
-                    </div>
-                </div>
-                
-                <div class="booking-details">
-                    <div class="booking-detail">
-                        <div class="booking-detail-label">Booking ID</div>
-                        <div class="booking-detail-value">{{ booking.booking_id }}</div>
-                    </div>
-                    <div class="booking-detail">
-                        <div class="booking-detail-label">Bus Number</div>
-                        <div class="booking-detail-value">{{ booking.bus_schedule.bus.bus_number }}</div>
-                    </div>
-                    <div class="booking-detail">
-                        <div class="booking-detail-label">Departure Time</div>
-                        <div class="booking-detail-value">{{ booking.bus_schedule.departure_time|time:"H:i" }}</div>
-                    </div>
-                    <div class="booking-detail">
-                        <div class="booking-detail-label">Seats</div>
-                        <div class="booking-detail-value">
-                            {% for seat in booking.seats.all %}
-                                {{ seat.seat_number }}{% if not forloop.last %}, {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="booking-detail">
-                        <div class="booking-detail-label">Passenger</div>
-                        <div class="booking-detail-value">{{ booking.passenger_name }}</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Refund Information (if applicable) -->
-            {% if refund %}
-            <div class="refund-section">
-                <div class="refund-header">
-                    <i class="fas fa-undo"></i>
-                    <span class="refund-title">Refund Information</span>
-                </div>
-                
-                <div class="refund-details">
-                    <div class="refund-item">
-                        <span class="refund-label">Refund Amount</span>
-                        <span class="refund-value">रू{{ refund.refund_amount|floatformat:2 }}</span>
-                    </div>
-                    <div class="refund-item">
-                        <span class="refund-label">Refund Status</span>
-                        <span class="refund-value">{{ refund.get_refund_status_display }}</span>
-                    </div>
-                    <div class="refund-item">
-                        <span class="refund-label">Refund Date</span>
-                        <span class="refund-value">{{ refund.refund_date|date:"M d, Y H:i" }}</span>
-                    </div>
-                    <div class="refund-item">
-                        <span class="refund-label">Reason</span>
-                        <span class="refund-value">{{ refund.reason|default:"N/A" }}</span>
-                    </div>
-                </div>
-            </div>
+<!-- Payment Details -->
+<section class="py-12 bg-gray-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Payment Status Card -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
+      <!-- Status Header -->
+      <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6">
+        <div
+          class="flex flex-col md:flex-row justify-between items-start md:items-center"
+        >
+          <div>
+            <h2 class="text-2xl font-bold mb-2 flex items-center">
+              <i class="fas fa-credit-card mr-3"></i>Payment #{{
+              payment.payment_id }}
+              <button
+                onclick="copyToClipboard('{{ payment.payment_id }}')"
+                class="ml-2 text-white hover:text-gray-200 transition-colors"
+                title="Copy Payment ID"
+              >
+                <i class="fas fa-copy text-sm"></i>
+              </button>
+            </h2>
+            <p class="text-blue-100">
+              Transaction ID: {{ payment.transaction_id }}
+            </p>
+          </div>
+
+          <div class="mt-4 md:mt-0">
+            {% if payment.payment_status == 'completed' %}
+            <span
+              class="inline-flex items-center px-4 py-2 bg-green-500 bg-opacity-20 text-green-100 rounded-full text-sm font-semibold border border-green-400"
+            >
+              <i class="fas fa-check-circle mr-2"></i>Completed
+            </span>
+            {% elif payment.payment_status == 'pending' %}
+            <span
+              class="inline-flex items-center px-4 py-2 bg-yellow-500 bg-opacity-20 text-yellow-100 rounded-full text-sm font-semibold border border-yellow-400"
+            >
+              <i class="fas fa-clock mr-2"></i>Pending
+            </span>
+            {% elif payment.payment_status == 'failed' %}
+            <span
+              class="inline-flex items-center px-4 py-2 bg-red-500 bg-opacity-20 text-red-100 rounded-full text-sm font-semibold border border-red-400"
+            >
+              <i class="fas fa-times-circle mr-2"></i>Failed
+            </span>
+            {% elif payment.payment_status == 'refunded' %}
+            <span
+              class="inline-flex items-center px-4 py-2 bg-blue-500 bg-opacity-20 text-blue-100 rounded-full text-sm font-semibold border border-blue-400"
+            >
+              <i class="fas fa-undo mr-2"></i>Refunded
+            </span>
             {% endif %}
-            
-            <!-- Transaction Timeline -->
-            <div class="transaction-timeline">
-                <div class="timeline-title">
-                    <i class="fas fa-history"></i>
-                    Transaction Timeline
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Amount -->
+      <div class="p-8">
+        <div class="text-center mb-8">
+          <div class="text-4xl font-bold text-green-600 mb-2">
+            रू{{ payment.amount|floatformat:2 }}
+          </div>
+          <div class="text-gray-600">Payment Amount</div>
+        </div>
+
+        <!-- Payment Information Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Payment Details -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+              <i class="fas fa-info-circle text-blue-500 mr-2"></i>Payment
+              Information
+            </h3>
+
+            <div class="space-y-4">
+              <div
+                class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Payment Method</span>
+                <div class="flex items-center">
+                  {% if payment.payment_method == 'esewa' %}
+                  <div
+                    class="w-6 h-6 bg-green-500 rounded flex items-center justify-center mr-2"
+                  >
+                    <i class="fas fa-mobile-alt text-white text-xs"></i>
+                  </div>
+                  {% elif payment.payment_method == 'khalti' %}
+                  <div
+                    class="w-6 h-6 bg-purple-500 rounded flex items-center justify-center mr-2"
+                  >
+                    <i class="fas fa-wallet text-white text-xs"></i>
+                  </div>
+                  {% elif payment.payment_method == 'ime_pay' %}
+                  <div
+                    class="w-6 h-6 bg-blue-500 rounded flex items-center justify-center mr-2"
+                  >
+                    <i class="fas fa-university text-white text-xs"></i>
+                  </div>
+                  {% else %}
+                  <div
+                    class="w-6 h-6 bg-yellow-500 rounded flex items-center justify-center mr-2"
+                  >
+                    <i class="fas fa-money-bill text-white text-xs"></i>
+                  </div>
+                  {% endif %}
+                  <span class="font-semibold text-gray-900"
+                    >{{ payment.get_payment_method_display }}</span
+                  >
                 </div>
-                
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-                        <i class="fas fa-plus"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <div class="timeline-event">Payment Created</div>
-                        <div class="timeline-time">{{ payment.created_at|date:"M d, Y H:i" }}</div>
-                    </div>
-                </div>
-                
-                {% if payment.payment_status == 'completed' %}
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <div class="timeline-event">Payment Completed</div>
-                        <div class="timeline-time">{{ payment.payment_date|date:"M d, Y H:i" }}</div>
-                    </div>
-                </div>
-                {% elif payment.payment_status == 'failed' %}
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-                        <i class="fas fa-times"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <div class="timeline-event">Payment Failed</div>
-                        <div class="timeline-time">{{ payment.updated_at|date:"M d, Y H:i" }}</div>
-                    </div>
-                </div>
-                {% endif %}
-                
-                {% if refund %}
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-                        <i class="fas fa-undo"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <div class="timeline-event">Refund {{ refund.get_refund_status_display }}</div>
-                        <div class="timeline-time">{{ refund.refund_date|date:"M d, Y H:i" }}</div>
-                    </div>
-                </div>
-                {% endif %}
+              </div>
+
+              <div
+                class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Payment Date</span>
+                <span class="font-semibold text-gray-900"
+                  >{{ payment.payment_date|date:"M d, Y H:i" }}</span
+                >
+              </div>
+
+              <div
+                class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Transaction ID</span>
+                <span
+                  class="font-mono font-semibold text-gray-900 bg-gray-200 px-2 py-1 rounded"
+                  >{{ payment.transaction_id }}</span
+                >
+              </div>
+
+              {% if payment.gateway_response %}
+              <div
+                class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Gateway Response</span>
+                <span class="font-semibold text-gray-900"
+                  >{{ payment.gateway_response }}</span
+                >
+              </div>
+              {% endif %}
             </div>
-            
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <a href="{% url 'bookings:booking_detail' booking.booking_id %}" class="btn-primary">
-                    <i class="fas fa-ticket-alt"></i>
-                    View Booking
-                </a>
-                
-                {% if payment.payment_status == 'completed' and not refund %}
-                <a href="{% url 'payments:request_refund' payment.payment_id %}" class="btn-danger">
-                    <i class="fas fa-undo"></i>
-                    Request Refund
-                </a>
-                {% endif %}
-                
-                {% if payment.payment_status == 'failed' %}
-                <a href="{% url 'payments:process_payment' payment.payment_id %}" class="btn-primary">
-                    <i class="fas fa-redo"></i>
-                    Retry Payment
-                </a>
-                {% endif %}
-                
-                <a href="{% url 'accounts:payment_history' %}" class="btn-secondary">
-                    <i class="fas fa-history"></i>
-                    Payment History
-                </a>
-                
-                <button class="btn-secondary" onclick="window.print()">
-                    <i class="fas fa-print"></i>
-                    Print Receipt
+          </div>
+
+          <!-- Booking Details -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+              <i class="fas fa-bus text-green-500 mr-2"></i>Booking Information
+            </h3>
+
+            <div class="space-y-4">
+              <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div class="text-center">
+                  <div class="flex items-center justify-center mb-2">
+                    <span class="text-lg font-bold text-gray-800"
+                      >{{ booking.bus_schedule.route.source }}</span
+                    >
+                    <i class="fas fa-arrow-right text-blue-500 mx-3"></i>
+                    <span class="text-lg font-bold text-gray-800"
+                      >{{ booking.bus_schedule.route.destination }}</span
+                    >
+                  </div>
+                  <div class="text-sm text-gray-600">
+                    {{ booking.travel_date|date:"l, M d, Y" }}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Booking ID</span>
+                <span class="font-semibold text-gray-900"
+                  >{{ booking.booking_id }}</span
+                >
+              </div>
+
+              <div
+                class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Bus Number</span>
+                <span class="font-semibold text-gray-900"
+                  >{{ booking.bus_schedule.bus.bus_number }}</span
+                >
+              </div>
+
+              <div
+                class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+              >
+                <span class="text-gray-600 font-medium">Passenger</span>
+                <span class="font-semibold text-gray-900"
+                  >{{ booking.passenger_name }}</span
+                >
+              </div>
+
+              <!-- Seats -->
+              <div class="p-3 bg-gray-50 rounded-lg">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-gray-600 font-medium">Seats</span>
+                  <span class="text-sm text-gray-500"
+                    >{{ booking.seats.count }} seat{{
+                    booking.seats.count|pluralize }}</span
+                  >
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  {% for seat in booking.seats.all %}
+                  <span
+                    class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
+                  >
+                    {{ seat.seat_number }}
+                  </span>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Refund Information -->
+    {% if refund %}
+    <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+      <h3 class="text-xl font-bold text-gray-900 mb-6">
+        <i class="fas fa-undo text-orange-500 mr-2"></i>Refund Information
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <div
+            class="flex justify-between items-center p-3 bg-orange-50 rounded-lg"
+          >
+            <span class="text-gray-600 font-medium">Refund Amount</span>
+            <span class="text-xl font-bold text-orange-600"
+              >रू{{ refund.refund_amount|floatformat:2 }}</span
+            >
+          </div>
+
+          <div
+            class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+          >
+            <span class="text-gray-600 font-medium">Refund Status</span>
+            <span
+              class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
+            >
+              {{ refund.get_refund_status_display }}
+            </span>
+          </div>
+
+          <div
+            class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+          >
+            <span class="text-gray-600 font-medium">Refund Date</span>
+            <span class="font-semibold text-gray-900"
+              >{{ refund.refund_date|date:"M d, Y H:i" }}</span
+            >
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="p-3 bg-gray-50 rounded-lg">
+            <div class="text-gray-600 font-medium mb-2">Refund Reason</div>
+            <div class="text-gray-900">
+              {{ refund.reason|default:"Not specified" }}
+            </div>
+          </div>
+
+          {% if refund.admin_notes %}
+          <div class="p-3 bg-gray-50 rounded-lg">
+            <div class="text-gray-600 font-medium mb-2">Admin Notes</div>
+            <div class="text-gray-900">{{ refund.admin_notes }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Transaction Timeline -->
+    <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+      <h3 class="text-xl font-bold text-gray-900 mb-6">
+        <i class="fas fa-history text-purple-500 mr-2"></i>Transaction Timeline
+      </h3>
+
+      <div class="relative">
+        <!-- Timeline Line -->
+        <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+
+        <!-- Timeline Items -->
+        <div class="space-y-6">
+          <!-- Payment Created -->
+          <div class="relative flex items-start">
+            <div
+              class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center relative z-10"
+            >
+              <i class="fas fa-plus text-white"></i>
+            </div>
+            <div class="ml-6">
+              <div class="font-semibold text-gray-900">Payment Created</div>
+              <div class="text-sm text-gray-600">
+                {{ payment.created_at|date:"M d, Y H:i" }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Status -->
+          {% if payment.payment_status == 'completed' %}
+          <div class="relative flex items-start">
+            <div
+              class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center relative z-10"
+            >
+              <i class="fas fa-check text-white"></i>
+            </div>
+            <div class="ml-6">
+              <div class="font-semibold text-gray-900">Payment Completed</div>
+              <div class="text-sm text-gray-600">
+                {{ payment.payment_date|date:"M d, Y H:i" }}
+              </div>
+            </div>
+          </div>
+          {% elif payment.payment_status == 'failed' %}
+          <div class="relative flex items-start">
+            <div
+              class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center relative z-10"
+            >
+              <i class="fas fa-times text-white"></i>
+            </div>
+            <div class="ml-6">
+              <div class="font-semibold text-gray-900">Payment Failed</div>
+              <div class="text-sm text-gray-600">
+                {{ payment.updated_at|date:"M d, Y H:i" }}
+              </div>
+            </div>
+          </div>
+          {% elif payment.payment_status == 'pending' %}
+          <div class="relative flex items-start">
+            <div
+              class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center relative z-10"
+            >
+              <i class="fas fa-clock text-white"></i>
+            </div>
+            <div class="ml-6">
+              <div class="font-semibold text-gray-900">Payment Pending</div>
+              <div class="text-sm text-gray-600">Awaiting confirmation</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Refund Status -->
+          {% if refund %}
+          <div class="relative flex items-start">
+            <div
+              class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center relative z-10"
+            >
+              <i class="fas fa-undo text-white"></i>
+            </div>
+            <div class="ml-6">
+              <div class="font-semibold text-gray-900">
+                Refund {{ refund.get_refund_status_display }}
+              </div>
+              <div class="text-sm text-gray-600">
+                {{ refund.refund_date|date:"M d, Y H:i" }}
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="bg-white rounded-2xl shadow-lg p-8">
+      <h3 class="text-xl font-bold text-gray-900 mb-6">Actions</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- View Booking -->
+        <a
+          href="{% url 'bookings:booking_detail' booking.booking_id %}"
+          class="bg-blue-500 text-white px-6 py-4 rounded-xl font-semibold hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 shadow-lg text-center"
+        >
+          <i class="fas fa-ticket-alt mb-2 text-xl block"></i>
+          View Booking
+        </a>
+
+        <!-- Request Refund -->
+        {% if payment.payment_status == 'completed' and not refund %}
+        <a
+          href="{% url 'payments:request_refund' payment.id %}"
+          class="bg-red-500 text-white px-6 py-4 rounded-xl font-semibold hover:bg-red-600 transition-all duration-300 transform hover:scale-105 shadow-lg text-center"
+        >
+          <i class="fas fa-undo mb-2 text-xl block"></i>
+          Request Refund
+        </a>
+        {% endif %}
+
+        <!-- Retry Payment -->
+        {% if payment.payment_status == 'failed' %}
+        <a
+          href="{% url 'payments:payment_form' booking.id %}"
+          class="bg-green-500 text-white px-6 py-4 rounded-xl font-semibold hover:bg-green-600 transition-all duration-300 transform hover:scale-105 shadow-lg text-center"
+        >
+          <i class="fas fa-redo mb-2 text-xl block"></i>
+          Retry Payment
+        </a>
+        {% endif %}
+
+        <!-- Payment History -->
+        <a
+          href="{% url 'payments:payment_history' %}"
+          class="bg-purple-500 text-white px-6 py-4 rounded-xl font-semibold hover:bg-purple-600 transition-all duration-300 transform hover:scale-105 shadow-lg text-center"
+        >
+          <i class="fas fa-history mb-2 text-xl block"></i>
+          Payment History
+        </a>
+
+        <!-- Print Receipt -->
+        <button
+          onclick="window.print()"
+          class="bg-gray-500 text-white px-6 py-4 rounded-xl font-semibold hover:bg-gray-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
+        >
+          <i class="fas fa-print mb-2 text-xl block"></i>
+          Print Receipt
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Help Section -->
+<section class="py-12 bg-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <h3 class="text-2xl font-bold text-gray-900 mb-4">Need Help?</h3>
+    <p class="text-gray-600 mb-6">
+      If you have any questions about this payment or need assistance, our
+      support team is here to help.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a
+        href="tel:+9779847435111"
+        class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors"
+      >
+        <i class="fas fa-phone mr-2"></i>Call Support
+      </a>
+      <a
+        href="{% url 'home:contact' %}"
+        class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
+      >
+        <i class="fas fa-envelope mr-2"></i>Contact Us
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_js %}
+<script>
+  function copyToClipboard(text) {
+    navigator.clipboard
+      .writeText(text)
+      .then(function () {
+        showToast("Payment ID copied to clipboard!", "success");
+      })
+      .catch(function (err) {
+        console.error("Could not copy text: ", err);
+        showToast("Failed to copy payment ID", "error");
+      });
+  }
+
+  // Show toast notification
+  function showToast(message, type) {
+    const toast = document.createElement("div");
+    toast.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+    } min-w-80 transform translate-x-full transition-transform duration-300`;
+
+    toast.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-${
+                      type === "success" ? "check" : "exclamation"
+                    }-circle mr-2"></i>
+                    ${message}
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
-        </div>
-    </div>
-</section>
-{% endblock %}
+        `;
 
-{% block extra_js %}
-<script>
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(function() {
-            // Show success message
-            const toast = document.createElement('div');
-            toast.className = 'alert alert-success position-fixed';
-            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 250px;';
-            toast.innerHTML = '<i class="fas fa-check me-2"></i>Payment ID copied to clipboard!';
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        }).catch(function(err) {
-            console.error('Could not copy text: ', err);
-        });
-    }
+    document.body.appendChild(toast);
+
+    // Animate in
+    setTimeout(() => {
+      toast.classList.remove("translate-x-full");
+    }, 100);
+
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+      toast.classList.add("translate-x-full");
+      setTimeout(() => {
+        if (toast.parentElement) {
+          toast.remove();
+        }
+      }, 300);
+    }, 3000);
+  }
 </script>
 {% endblock %}

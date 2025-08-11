@@ -1,294 +1,417 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Profile - TravelMate{% endblock %}
-
-{% block extra_css %}
-<style>
-    .profile-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 3rem 0;
-        margin-top: -1.5rem;
-    }
-    .profile-avatar {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        border: 4px solid white;
-        object-fit: cover;
-    }
-    .profile-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
-    }
-    .profile-card .card-header {
-        background: #f8f9fa;
-        border-bottom: 1px solid #dee2e6;
-        border-radius: 15px 15px 0 0;
-        padding: 1.5rem;
-    }
-    .profile-card .card-body {
-        padding: 1.5rem;
-    }
-    .info-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1rem;
-        padding: 0.75rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-    }
-    .info-item i {
-        width: 20px;
-        color: #667eea;
-        margin-right: 1rem;
-    }
-    .info-item .label {
-        font-weight: 600;
-        color: #495057;
-        min-width: 120px;
-    }
-    .info-item .value {
-        color: #6c757d;
-    }
-    .btn-edit {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        border-radius: 8px;
-        padding: 8px 20px;
-        color: white;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-    .btn-edit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        color: white;
-        text-decoration: none;
-    }
-    .stats-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 15px;
-        padding: 1.5rem;
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-    .stats-number {
-        font-size: 2rem;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-    }
-    .stats-label {
-        font-size: 0.9rem;
-        opacity: 0.9;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block title %}Profile -
+TravelMate{% endblock %} {% block content %}
 <!-- Profile Header -->
-<section class="profile-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-3 text-center">
-                {% if user.profile.profile_picture %}
-                    <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="profile-avatar">
-                {% else %}
-                    <div class="profile-avatar d-flex align-items-center justify-content-center" style="background: rgba(255,255,255,0.2);">
-                        <i class="fas fa-user fa-3x"></i>
-                    </div>
-                {% endif %}
-            </div>
-            <div class="col-md-9">
-                <h1 class="mb-2">{{ user.get_full_name|default:user.username }}</h1>
-                <p class="mb-3">{{ user.email }}</p>
-                <a href="{% url 'accounts:edit_profile' %}" class="btn btn-light">
-                    <i class="fas fa-edit me-2"></i>Edit Profile
-                </a>
-            </div>
+<section
+  class="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-16 -mt-6"
+>
+  <div class="container mx-auto px-4">
+    <div
+      class="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8"
+    >
+      <div class="flex-shrink-0">
+        {% if user.profile.profile_picture %}
+        <img
+          src="{{ user.profile.profile_picture.url }}"
+          alt="Profile Picture"
+          class="w-32 h-32 rounded-full border-4 border-white object-cover shadow-lg"
+        />
+        {% else %}
+        <div
+          class="w-32 h-32 rounded-full border-4 border-white bg-white bg-opacity-20 flex items-center justify-center shadow-lg"
+        >
+          <i class="fas fa-user text-4xl text-white"></i>
         </div>
+        {% endif %}
+      </div>
+      <div class="text-center md:text-left">
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">
+          {{ user.get_full_name|default:user.username }}
+        </h1>
+        <p class="text-xl mb-4 opacity-90">{{ user.email }}</p>
+        <a
+          href="{% url 'accounts:edit_profile' %}"
+          class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center"
+        >
+          <i class="fas fa-edit mr-2"></i>Edit Profile
+        </a>
+      </div>
     </div>
+  </div>
 </section>
 
 <!-- Profile Content -->
-<section class="py-5">
-    <div class="container">
-        <div class="row">
-            <!-- Profile Information -->
-            <div class="col-lg-8">
-                <div class="profile-card">
-                    <div class="card-header">
-                        <h4 class="mb-0"><i class="fas fa-user me-2"></i>Personal Information</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="info-item">
-                            <i class="fas fa-user"></i>
-                            <span class="label">Full Name:</span>
-                            <span class="value">{{ user.get_full_name|default:"Not provided" }}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-envelope"></i>
-                            <span class="label">Email:</span>
-                            <span class="value">{{ user.email }}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-phone"></i>
-                            <span class="label">Phone:</span>
-                            <span class="value">{{ user.profile.phone_number|default:"Not provided" }}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-birthday-cake"></i>
-                            <span class="label">Date of Birth:</span>
-                            <span class="value">{{ user.profile.date_of_birth|default:"Not provided" }}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span class="label">Address:</span>
-                            <span class="value">{{ user.profile.address|default:"Not provided" }}</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span class="label">Member Since:</span>
-                            <span class="value">{{ user.date_joined|date:"F d, Y" }}</span>
-                        </div>
-                    </div>
+<section class="py-12 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Main Content -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- Personal Information -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+            <h3 class="text-xl font-semibold text-gray-800">
+              <i class="fas fa-user mr-2 text-blue-500"></i>Personal Information
+            </h3>
+          </div>
+          <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div
+                class="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <div class="flex items-center">
+                  <i class="fas fa-user text-blue-500 w-5 mr-3"></i>
+                  <div>
+                    <p class="text-sm font-medium text-gray-600">Full Name</p>
+                    <p class="text-gray-800 font-semibold">
+                      {{ user.get_full_name|default:"Not provided" }}
+                    </p>
+                  </div>
                 </div>
-                
-                <!-- Recent Bookings -->
-                <div class="profile-card">
-                    <div class="card-header">
-                        <h4 class="mb-0"><i class="fas fa-ticket-alt me-2"></i>Recent Bookings</h4>
-                    </div>
-                    <div class="card-body">
-                        {% if recent_bookings %}
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Booking ID</th>
-                                            <th>Route</th>
-                                            <th>Date</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for booking in recent_bookings %}
-                                        <tr>
-                                            <td><strong>{{ booking.booking_id }}</strong></td>
-                                            <td>{{ booking.bus_schedule.route }}</td>
-                                            <td>{{ booking.created_at|date:"M d, Y" }}</td>
-                                            <td>
-                                                <span class="badge bg-{% if booking.booking_status == 'confirmed' %}success{% elif booking.booking_status == 'pending' %}warning{% else %}danger{% endif %}">
-                                                    {{ booking.get_booking_status_display }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <a href="{% url 'bookings:booking_detail' booking.booking_id %}" class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="text-center mt-3">
-                                <a href="{% url 'accounts:booking_history' %}" class="btn btn-outline-primary">
-                                    <i class="fas fa-history me-2"></i>View All Bookings
-                                </a>
-                            </div>
-                        {% else %}
-                            <div class="text-center py-4">
-                                <i class="fas fa-ticket-alt fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">No bookings yet</h5>
-                                <p class="text-muted">Start your journey by booking your first bus ticket!</p>
-                                <a href="{% url 'routes:route_search' %}" class="btn btn-primary">
-                                    <i class="fas fa-search me-2"></i>Search Buses
-                                </a>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Sidebar -->
-            <div class="col-lg-4">
-                <!-- Statistics -->
-                <div class="stats-card">
-                    <div class="stats-number">{{ total_bookings }}</div>
-                    <div class="stats-label">Total Bookings</div>
-                </div>
-                
-                <div class="stats-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
-                    <div class="stats-number">रू {{ total_spent|floatformat:0 }}</div>
-                    <div class="stats-label">Total Spent</div>
-                </div>
-                
-                <div class="stats-card" style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);">
-                    <div class="stats-number">{{ favorite_route|default:"None" }}</div>
-                    <div class="stats-label">Favorite Route</div>
-                </div>
-                
-                <!-- Recommended for You -->
-                <div class="profile-card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-star me-2"></i>Recommended for You</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted mb-3">Based on your preferences and travel history</p>
-                        <div class="d-grid">
-                            <a href="{% url 'buses:bus_recommendations' %}" class="btn btn-primary">
-                                <i class="fas fa-route me-2"></i>View Recommendations
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Quick Actions -->
-                <div class="profile-card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-grid gap-2">
-                            <a href="{% url 'routes:route_search' %}" class="btn btn-outline-primary">
-                                <i class="fas fa-search me-2"></i>Search Buses
-                            </a>
-                            <a href="{% url 'accounts:booking_history' %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-history me-2"></i>Booking History
-                            </a>
-                            <a href="{% url 'accounts:payment_history' %}" class="btn btn-outline-info">
-                                <i class="fas fa-credit-card me-2"></i>Payment History
-                            </a>
-                            <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-warning">
-                                <i class="fas fa-key me-2"></i>Change Password
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-{% endblock %}
+              </div>
 
-{% block extra_js %}
+              <div
+                class="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <div class="flex items-center">
+                  <i class="fas fa-envelope text-blue-500 w-5 mr-3"></i>
+                  <div>
+                    <p class="text-sm font-medium text-gray-600">Email</p>
+                    <p class="text-gray-800 font-semibold">{{ user.email }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <div class="flex items-center">
+                  <i class="fas fa-phone text-blue-500 w-5 mr-3"></i>
+                  <div>
+                    <p class="text-sm font-medium text-gray-600">Phone</p>
+                    <p class="text-gray-800 font-semibold">
+                      {{ user.profile.phone_number|default:"Not provided" }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <div class="flex items-center">
+                  <i class="fas fa-birthday-cake text-blue-500 w-5 mr-3"></i>
+                  <div>
+                    <p class="text-sm font-medium text-gray-600">
+                      Date of Birth
+                    </p>
+                    <p class="text-gray-800 font-semibold">
+                      {{ user.profile.date_of_birth|default:"Not provided" }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors md:col-span-2"
+              >
+                <div class="flex items-center">
+                  <i class="fas fa-map-marker-alt text-blue-500 w-5 mr-3"></i>
+                  <div>
+                    <p class="text-sm font-medium text-gray-600">Address</p>
+                    <p class="text-gray-800 font-semibold">
+                      {{ user.profile.address|default:"Not provided" }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors md:col-span-2"
+              >
+                <div class="flex items-center">
+                  <i class="fas fa-calendar-alt text-blue-500 w-5 mr-3"></i>
+                  <div>
+                    <p class="text-sm font-medium text-gray-600">
+                      Member Since
+                    </p>
+                    <p class="text-gray-800 font-semibold">
+                      {{ user.date_joined|date:"F d, Y" }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+            <h3 class="text-xl font-semibold text-gray-800">
+              <i class="fas fa-ticket-alt mr-2 text-green-500"></i>Recent
+              Bookings
+            </h3>
+          </div>
+          <div class="p-6">
+            {% if recent_bookings %}
+            <div class="overflow-x-auto">
+              <table class="min-w-full">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th
+                      class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Booking ID
+                    </th>
+                    <th
+                      class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Route
+                    </th>
+                    <th
+                      class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Date
+                    </th>
+                    <th
+                      class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Status
+                    </th>
+                    <th
+                      class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                  {% for booking in recent_bookings %}
+                  <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <span class="font-semibold text-gray-900"
+                        >{{ booking.booking_id }}</span
+                      >
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap text-gray-600">
+                      {{ booking.bus_schedule.route }}
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap text-gray-600">
+                      {{ booking.created_at|date:"M d, Y" }}
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <span
+                        class="px-2 py-1 text-xs font-semibold rounded-full {% if booking.booking_status == 'confirmed' %}bg-green-100 text-green-800{% elif booking.booking_status == 'pending' %}bg-yellow-100 text-yellow-800{% else %}bg-red-100 text-red-800{% endif %}"
+                      >
+                        {{ booking.get_booking_status_display }}
+                      </span>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                      <a
+                        href="{% url 'bookings:booking_detail' booking.booking_id %}"
+                        class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors"
+                      >
+                        <i class="fas fa-eye"></i>
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="text-center mt-6">
+              <a
+                href="{% url 'accounts:booking_history' %}"
+                class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors inline-flex items-center"
+              >
+                <i class="fas fa-history mr-2"></i>View All Bookings
+              </a>
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+              <i class="fas fa-ticket-alt text-6xl text-gray-300 mb-4"></i>
+              <h4 class="text-xl font-semibold text-gray-600 mb-2">
+                No bookings yet
+              </h4>
+              <p class="text-gray-500 mb-6">
+                Start your journey by booking your first bus ticket!
+              </p>
+              <a
+                href="{% url 'routes:route_search' %}"
+                class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors inline-flex items-center"
+              >
+                <i class="fas fa-search mr-2"></i>Search Buses
+              </a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 gap-4">
+          <div
+            class="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl p-6 text-center"
+          >
+            <div class="text-3xl font-bold mb-2">
+              {{ total_bookings|default:0 }}
+            </div>
+            <div class="text-sm opacity-90">Total Bookings</div>
+          </div>
+
+          <div
+            class="bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-xl p-6 text-center"
+          >
+            <div class="text-3xl font-bold mb-2">
+              रू {{ total_spent|floatformat:0|default:0 }}
+            </div>
+            <div class="text-sm opacity-90">Total Spent</div>
+          </div>
+
+          <div
+            class="bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-xl p-6 text-center"
+          >
+            <div class="text-lg font-bold mb-2">
+              {{ favorite_route|default:"None" }}
+            </div>
+            <div class="text-sm opacity-90">Favorite Route</div>
+          </div>
+        </div>
+
+        <!-- Recommended for You -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+            <h4 class="text-lg font-semibold text-gray-800">
+              <i class="fas fa-star mr-2 text-yellow-500"></i>Recommended for
+              You
+            </h4>
+          </div>
+          <div class="p-6">
+            <p class="text-gray-600 mb-4">
+              Based on your preferences and travel history
+            </p>
+            <a
+              href="{% url 'buses:bus_recommendations' %}"
+              class="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors inline-flex items-center justify-center"
+            >
+              <i class="fas fa-route mr-2"></i>View Recommendations
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+            <h4 class="text-lg font-semibold text-gray-800">
+              <i class="fas fa-bolt mr-2 text-purple-500"></i>Quick Actions
+            </h4>
+          </div>
+          <div class="p-6">
+            <div class="space-y-3">
+              <a
+                href="{% url 'routes:route_search' %}"
+                class="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors inline-flex items-center justify-center"
+              >
+                <i class="fas fa-search mr-2"></i>Search Buses
+              </a>
+              <a
+                href="{% url 'accounts:booking_history' %}"
+                class="w-full bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors inline-flex items-center justify-center"
+              >
+                <i class="fas fa-history mr-2"></i>Booking History
+              </a>
+              <a
+                href="{% url 'accounts:payment_history' %}"
+                class="w-full bg-teal-500 text-white py-3 rounded-lg hover:bg-teal-600 transition-colors inline-flex items-center justify-center"
+              >
+                <i class="fas fa-credit-card mr-2"></i>Payment History
+              </a>
+              <a
+                href="{% url 'accounts:change_password' %}"
+                class="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition-colors inline-flex items-center justify-center"
+              >
+                <i class="fas fa-key mr-2"></i>Change Password
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Security -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+            <h4 class="text-lg font-semibold text-gray-800">
+              <i class="fas fa-shield-alt mr-2 text-green-500"></i>Account
+              Security
+            </h4>
+          </div>
+          <div class="p-6">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                  <span class="text-sm text-gray-600">Email Verified</span>
+                </div>
+                <span
+                  class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full"
+                  >Active</span
+                >
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <i class="fas fa-key text-blue-500 mr-2"></i>
+                  <span class="text-sm text-gray-600">Password</span>
+                </div>
+                <a
+                  href="{% url 'accounts:change_password' %}"
+                  class="text-xs text-blue-500 hover:text-blue-700"
+                  >Change</a
+                >
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <i class="fas fa-clock text-gray-400 mr-2"></i>
+                  <span class="text-sm text-gray-600">Last Login</span>
+                </div>
+                <span class="text-xs text-gray-500"
+                  >{{ user.last_login|date:"M d, Y" }}</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_js %}
 <script>
-    $(document).ready(function() {
-        // Add hover effects to info items
-        $('.info-item').hover(
-            function() {
-                $(this).css('background-color', '#e9ecef');
-            },
-            function() {
-                $(this).css('background-color', '#f8f9fa');
-            }
-        );
+  document.addEventListener("DOMContentLoaded", function () {
+    // Add smooth hover effects to info items
+    const infoItems = document.querySelectorAll(".bg-gray-50");
+    infoItems.forEach((item) => {
+      item.addEventListener("mouseenter", function () {
+        this.style.transform = "translateY(-1px)";
+        this.style.transition = "all 0.2s ease";
+      });
+
+      item.addEventListener("mouseleave", function () {
+        this.style.transform = "translateY(0)";
+      });
     });
+
+    // Add loading states to buttons
+    const actionButtons = document.querySelectorAll("a[href]");
+    actionButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        if (this.href && !this.href.includes("#")) {
+          const icon = this.querySelector("i");
+          if (icon) {
+            icon.className = "fas fa-spinner fa-spin mr-2";
+          }
+        }
+      });
+    });
+  });
 </script>
 {% endblock %}

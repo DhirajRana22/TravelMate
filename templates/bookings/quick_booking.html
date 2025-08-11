@@ -1,484 +1,415 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Quick Booking - TravelMate{% endblock %}
-
-{% block extra_css %}
-<style>
-    .quick-booking-container {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        padding: 2rem 0;
-    }
-    
-    .booking-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        overflow: hidden;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    
-    .journey-header {
-        background: linear-gradient(45deg, #667eea, #764ba2);
-        color: white;
-        padding: 2rem;
-        text-align: center;
-    }
-    
-    .booking-content {
-        display: grid;
-        grid-template-columns: 1fr 400px;
-        gap: 0;
-        min-height: 600px;
-    }
-    
-    .seat-section {
-        padding: 2rem;
-        background: #f8f9fa;
-    }
-    
-    .form-section {
-        padding: 2rem;
-        background: white;
-        border-left: 1px solid #e9ecef;
-    }
-    
-    .bus-layout {
-        background: white;
-        border-radius: 15px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    }
-    
-    .seat-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 0.5rem;
-        max-width: 300px;
-        margin: 0 auto;
-    }
-    
-    .seat {
-        width: 50px;
-        height: 50px;
-        border: 2px solid #ddd;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: bold;
-        font-size: 0.8rem;
-        position: relative;
-    }
-    
-    .seat.available {
-        background: #e8f5e8;
-        border-color: #28a745;
-        color: #28a745;
-    }
-    
-    .seat.available:hover {
-        background: #28a745;
-        color: white;
-        transform: scale(1.1);
-    }
-    
-    .seat.selected {
-        background: #667eea;
-        border-color: #667eea;
-        color: white;
-        transform: scale(1.1);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-    }
-    
-    .seat.booked {
-        background: #f8d7da;
-        border-color: #dc3545;
-        color: #dc3545;
-        cursor: not-allowed;
-    }
-    
-    .aisle {
-        grid-column: span 4;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #6c757d;
-        font-size: 0.75rem;
-        margin: 0.5rem 0;
-    }
-    
-    .booking-form {
-        background: #f8f9fa;
-        border-radius: 15px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .form-group {
-        margin-bottom: 1rem;
-    }
-    
-    .form-control {
-        border: 2px solid #e9ecef;
-        border-radius: 10px;
-        padding: 0.75rem;
-        transition: all 0.3s ease;
-    }
-    
-    .form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    
-    .selected-seats-display {
-        background: linear-gradient(45deg, #667eea, #764ba2);
-        color: white;
-        padding: 1rem;
-        border-radius: 10px;
-        margin-bottom: 1rem;
-        text-align: center;
-    }
-    
-    .seat-tag {
-        background: rgba(255,255,255,0.2);
-        padding: 0.25rem 0.5rem;
-        border-radius: 5px;
-        margin: 0.25rem;
-        display: inline-block;
-    }
-    
-    .price-summary {
-        background: #e8f5e8;
-        border-radius: 10px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-    
-    .price-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-    }
-    
-    .total-price {
-        font-size: 1.25rem;
-        font-weight: bold;
-        color: #28a745;
-        border-top: 2px solid #28a745;
-        padding-top: 0.5rem;
-    }
-    
-    .btn-book {
-        background: linear-gradient(45deg, #28a745, #20c997);
-        color: white;
-        border: none;
-        padding: 1rem 2rem;
-        border-radius: 10px;
-        font-size: 1.1rem;
-        font-weight: bold;
-        width: 100%;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    
-    .btn-book:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
-    }
-    
-    .btn-book:disabled {
-        background: #6c757d;
-        cursor: not-allowed;
-        transform: none;
-        box-shadow: none;
-    }
-    
-    .legend {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        margin-top: 1rem;
-        flex-wrap: wrap;
-    }
-    
-    .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.85rem;
-    }
-    
-    .legend-seat {
-        width: 20px;
-        height: 20px;
-        border-radius: 4px;
-        border: 1px solid #ddd;
-    }
-    
-    @media (max-width: 768px) {
-        .booking-content {
-            grid-template-columns: 1fr;
-        }
-        
-        .form-section {
-            border-left: none;
-            border-top: 1px solid #e9ecef;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="quick-booking-container">
-    <div class="container">
-        <div class="booking-card">
-            <!-- Journey Header -->
-            <div class="journey-header">
-                <h2><i class="fas fa-ticket-alt me-2"></i>Quick Booking</h2>
-                <div class="d-flex justify-content-center align-items-center mt-3">
-                    <div class="text-center">
-                        <h4>{{ schedule.route.source }}</h4>
-                        <small>{{ schedule.departure_time|time:"g:i A" }}</small>
-                    </div>
-                    <div class="mx-4">
-                        <i class="fas fa-arrow-right fa-2x"></i>
-                    </div>
-                    <div class="text-center">
-                        <h4>{{ schedule.route.destination }}</h4>
-                        <small>{{ schedule.arrival_time|time:"g:i A" }}</small>
-                    </div>
-                </div>
-                <p class="mt-2 mb-0">{{ schedule.bus.bus_number }} • {{ travel_date|date:"M d, Y" }} • रू {{ schedule.base_fare }}/seat</p>
-            </div>
-            
-            <!-- Main Content -->
-            <div class="booking-content">
-                <!-- Seat Selection Section -->
-                <div class="seat-section">
-                    <h5 class="mb-3"><i class="fas fa-chair me-2"></i>Select Your Seats</h5>
-                    
-                    <div class="bus-layout">
-                        <div class="text-center mb-3">
-                            <small class="text-muted"><i class="fas fa-user-tie me-1"></i>Driver</small>
-                        </div>
-                        
-                        <div class="seat-grid" id="seatGrid">
-                            {% for seat in seats %}
-                                {% if forloop.counter0|divisibleby:4 and forloop.counter0 > 0 %}
-                                    <div class="aisle">— AISLE —</div>
-                                {% endif %}
-                                <div class="seat {{ seat.status }}" 
-                                     data-seat-id="{{ seat.id }}" 
-                                     data-seat-number="{{ seat.seat_number }}"
-                                     data-price="{{ schedule.base_fare }}"
-                                     {% if seat.status == 'available' %}onclick="toggleSeat(this)"{% endif %}>
-                                    {{ seat.seat_number }}
-                                </div>
-                            {% endfor %}
-                        </div>
-                        
-                        <div class="legend">
-                            <div class="legend-item">
-                                <div class="legend-seat" style="background: #e8f5e8; border-color: #28a745;"></div>
-                                <span>Available</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-seat" style="background: #667eea; border-color: #667eea;"></div>
-                                <span>Selected</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-seat" style="background: #f8d7da; border-color: #dc3545;"></div>
-                                <span>Booked</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Booking Form Section -->
-                <div class="form-section">
-                    <h5 class="mb-3"><i class="fas fa-user me-2"></i>Passenger Details</h5>
-                    
-                    <!-- Selected Seats Display -->
-                    <div class="selected-seats-display" id="selectedSeatsDisplay" style="display: none;">
-                        <h6 class="mb-2">Selected Seats</h6>
-                        <div id="seatTags"></div>
-                        <small>Click seats to select/deselect</small>
-                    </div>
-                    
-                    <!-- Booking Form -->
-                    <form method="post" id="quickBookingForm" class="booking-form">
-                        {% csrf_token %}
-                        <input type="hidden" name="selected_seats" id="selectedSeatsInput">
-                        <input type="hidden" name="travel_date" value="{{ travel_date|date:'Y-m-d' }}">
-                        <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
-                        
-                        <div class="form-group">
-                            <label for="passenger_name">Full Name *</label>
-                            <input type="text" class="form-control" id="passenger_name" name="passenger_name" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="passenger_phone">Phone Number *</label>
-                            <input type="tel" class="form-control" id="passenger_phone" name="passenger_phone" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="passenger_email">Email Address</label>
-                            <input type="email" class="form-control" id="passenger_email" name="passenger_email">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="emergency_contact">Emergency Contact</label>
-                            <input type="tel" class="form-control" id="emergency_contact" name="emergency_contact">
-                        </div>
-                    </form>
-                    
-                    <!-- Price Summary -->
-                    <div class="price-summary" id="priceSummary" style="display: none;">
-                        <div class="price-row">
-                            <span>Seats (<span id="seatCount">0</span>):</span>
-                            <span>रू <span id="subtotal">0</span></span>
-                        </div>
-                        <div class="price-row">
-                            <span>Service Fee (2%):</span>
-                            <span>रू <span id="serviceFee">0</span></span>
-                        </div>
-                        <div class="price-row total-price">
-                            <span>Total Amount:</span>
-                            <span>रू <span id="totalAmount">0</span></span>
-                        </div>
-                    </div>
-                    
-                    <!-- Book Button -->
-                    <button type="submit" form="quickBookingForm" class="btn-book" id="bookButton" disabled>
-                        <i class="fas fa-ticket-alt me-2"></i>Select Seats to Continue
-                    </button>
-                    
-                    <div class="text-center mt-3">
-                        <small class="text-muted">
-                            <i class="fas fa-shield-alt me-1"></i>
-                            Secure booking with instant confirmation
-                        </small>
-                    </div>
-                </div>
-            </div>
+{% extends 'base.html' %} {% load static %} {% block title %}Quick Booking -
+TravelMate{% endblock %} {% block content %}
+<!-- Quick Booking Container -->
+<section
+  class="min-h-screen bg-gradient-to-br from-blue-600 via-purple-700 to-indigo-800 py-12 px-4 -mt-6"
+>
+  <div class="container mx-auto">
+    <div class="max-w-6xl mx-auto">
+      <!-- Header -->
+      <div class="text-center text-white mb-8">
+        <div
+          class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4"
+        >
+          <i class="fas fa-bolt text-2xl"></i>
         </div>
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">Quick Booking</h1>
+        <p class="text-xl opacity-90">Express booking for your convenience</p>
+      </div>
+
+      <!-- Journey Info -->
+      <div
+        class="bg-white bg-opacity-95 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden border border-white border-opacity-20"
+      >
+        <!-- Journey Header -->
+        <div
+          class="bg-gradient-to-r from-blue-600 to-purple-700 text-white p-6"
+        >
+          <div class="flex items-center justify-center">
+            <div class="text-center">
+              <div class="text-2xl font-bold">{{ schedule.route.source }}</div>
+              <div class="text-sm opacity-90">
+                {{ schedule.departure_time|time:"g:i A" }}
+              </div>
+            </div>
+            <div class="mx-8">
+              <i class="fas fa-arrow-right text-2xl"></i>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold">
+                {{ schedule.route.destination }}
+              </div>
+              <div class="text-sm opacity-90">
+                {{ schedule.arrival_time|time:"g:i A" }}
+              </div>
+            </div>
+          </div>
+          <div class="text-center mt-4">
+            <p class="text-sm opacity-90">
+              {{ travel_date|date:"l, F d, Y" }} • {{ schedule.bus.bus_number }}
+              • {{ schedule.bus.bus_type }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Booking Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-0 min-h-96">
+          <!-- Seat Selection -->
+          <div class="lg:col-span-2 bg-gray-50 p-6">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">
+              <i class="fas fa-chair mr-2 text-purple-500"></i>Select Your Seats
+            </h3>
+
+            <!-- Seat Legend -->
+            <div
+              class="flex flex-wrap justify-center gap-4 mb-6 p-4 bg-white rounded-lg"
+            >
+              <div class="flex items-center">
+                <div class="w-4 h-4 bg-green-500 rounded mr-2"></div>
+                <span class="text-sm text-gray-700">Available</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-4 h-4 bg-blue-500 rounded mr-2"></div>
+                <span class="text-sm text-gray-700">Selected</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-4 h-4 bg-red-500 rounded mr-2"></div>
+                <span class="text-sm text-gray-700">Booked</span>
+              </div>
+            </div>
+
+            <!-- Bus Layout -->
+            <div class="bg-white rounded-xl p-6 max-w-sm mx-auto">
+              <!-- Driver Section -->
+              <div
+                class="bg-gray-300 text-gray-700 p-2 rounded text-center mb-4 text-sm"
+              >
+                <i class="fas fa-steering-wheel mr-2"></i>Driver
+              </div>
+
+              <!-- Seat Grid -->
+              <div class="grid grid-cols-4 gap-2" id="seatGrid">
+                {% for seat in seats %}
+                <div
+                  class="seat w-12 h-12 rounded border-2 flex items-center justify-center cursor-pointer transition-all duration-200 text-xs font-semibold hover:scale-105 transform {% if seat.is_booked %}bg-red-500 border-red-600 text-white cursor-not-allowed {% else %}bg-green-500 border-green-600 text-white hover:bg-green-600{% endif %}"
+                  data-seat-id="{{ seat.id }}"
+                  data-seat-number="{{ seat.number }}"
+                  {%
+                  if
+                  not
+                  seat.is_booked
+                  %}onclick="toggleSeat(this)"
+                  {%
+                  endif
+                  %}
+                >
+                  {{ seat.number }}
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Selected Seats Display -->
+            <div id="selectedSeatsDisplay" class="mt-6 hidden">
+              <h4 class="text-lg font-semibold text-gray-800 mb-2">
+                Selected Seats:
+              </h4>
+              <div id="seatTags" class="flex flex-wrap gap-2"></div>
+            </div>
+          </div>
+
+          <!-- Booking Form -->
+          <div class="bg-white p-6 border-l border-gray-200">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">
+              <i class="fas fa-user mr-2 text-green-500"></i>Passenger Details
+            </h3>
+
+            <form method="post" id="quickBookingForm" class="space-y-4">
+              {% csrf_token %}
+              <input
+                type="hidden"
+                name="schedule_id"
+                value="{{ schedule.id }}"
+              />
+              <input
+                type="hidden"
+                name="travel_date"
+                value="{{ travel_date }}"
+              />
+              <input
+                type="hidden"
+                name="selected_seats"
+                id="selectedSeatsInput"
+                value=""
+              />
+
+              <!-- Passenger Name -->
+              <div>
+                <label
+                  for="passenger_name"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Full Name <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="passenger_name"
+                  name="passenger_name"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter full name"
+                  required
+                />
+              </div>
+
+              <!-- Passenger Phone -->
+              <div>
+                <label
+                  for="passenger_phone"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Phone Number <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  id="passenger_phone"
+                  name="passenger_phone"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter phone number"
+                  required
+                />
+              </div>
+
+              <!-- Passenger Email -->
+              <div>
+                <label
+                  for="passenger_email"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="passenger_email"
+                  name="passenger_email"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter email address"
+                />
+              </div>
+
+              <!-- Price Summary -->
+              <div id="priceSummary" class="hidden bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-gray-800 mb-2">
+                  Booking Summary
+                </h4>
+                <div class="space-y-1 text-sm">
+                  <div class="flex justify-between">
+                    <span>Seats (<span id="seatCount">0</span>):</span>
+                    <span>रू<span id="subtotal">0</span></span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Service Fee:</span>
+                    <span>रू<span id="serviceFee">0</span></span>
+                  </div>
+                  <hr class="border-gray-300" />
+                  <div class="flex justify-between font-semibold">
+                    <span>Total:</span>
+                    <span class="text-green-600"
+                      >रू<span id="totalAmount">0</span></span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Terms Checkbox -->
+              <div class="flex items-start">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  name="terms"
+                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+                  required
+                />
+                <label for="terms" class="ml-2 block text-sm text-gray-700">
+                  I agree to the
+                  <a href="#" class="text-blue-600 hover:text-blue-500"
+                    >Terms & Conditions</a
+                  >
+                </label>
+              </div>
+
+              <!-- Book Button -->
+              <button
+                type="submit"
+                id="bookButton"
+                disabled
+                class="w-full bg-gradient-to-r from-green-600 to-emerald-700 text-white py-3 rounded-lg hover:from-green-700 hover:to-emerald-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 font-medium"
+              >
+                <i class="fas fa-chair mr-2"></i>Select Seats to Continue
+              </button>
+            </form>
+
+            <!-- Quick Booking Benefits -->
+            <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 class="text-sm font-semibold text-blue-800 mb-2">
+                <i class="fas fa-bolt mr-2"></i>Quick Booking Benefits
+              </h4>
+              <ul class="text-xs text-blue-700 space-y-1">
+                <li>• Instant seat selection</li>
+                <li>• Minimal form filling</li>
+                <li>• Fast checkout process</li>
+                <li>• Immediate confirmation</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Back to Search -->
+      <div class="text-center mt-8">
+        <a
+          href="{% url 'routes:route_search' %}"
+          class="text-white hover:text-gray-200 font-medium transition-colors"
+        >
+          <i class="fas fa-arrow-left mr-2"></i>Back to Route Search
+        </a>
+      </div>
     </div>
-</div>
+  </div>
+</section>
 
+<style>
+  .seat-tag {
+    @apply inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium;
+  }
+</style>
+{% endblock %} {% block extra_js %}
 <script>
-let selectedSeats = [];
-const baseFare = {{ schedule.base_fare }};
-const serviceFeeRate = 0.02;
+  let selectedSeats = [];
+  const baseFare = {{ schedule.base_fare }};
+  const serviceFeeRate = 0.05; // 5% service fee
 
-function toggleSeat(seatElement) {
-    const seatId = seatElement.getAttribute('data-seat-id');
-    const seatNumber = seatElement.getAttribute('data-seat-number');
-    
-    if (seatElement.classList.contains('selected')) {
-        // Deselect seat
-        seatElement.classList.remove('selected');
-        selectedSeats = selectedSeats.filter(seat => seat.id !== seatId);
-    } else {
-        // Select seat (limit to 6 seats)
-        if (selectedSeats.length >= 6) {
-            alert('You can select maximum 6 seats at a time.');
-            return;
-        }
-        seatElement.classList.add('selected');
-        selectedSeats.push({
-            id: seatId,
-            number: seatNumber
-        });
-    }
-    
-    updateBookingDisplay();
-}
+  function toggleSeat(seatElement) {
+      const seatId = seatElement.getAttribute('data-seat-id');
+      const seatNumber = seatElement.getAttribute('data-seat-number');
 
-function updateBookingDisplay() {
-    const seatCount = selectedSeats.length;
-    const subtotal = seatCount * baseFare;
-    const serviceFee = Math.round(subtotal * serviceFeeRate);
-    const total = subtotal + serviceFee;
-    
-    // Update selected seats display
-    const selectedSeatsDisplay = document.getElementById('selectedSeatsDisplay');
-    const seatTags = document.getElementById('seatTags');
-    
-    if (seatCount > 0) {
-        selectedSeatsDisplay.style.display = 'block';
-        seatTags.innerHTML = selectedSeats.map(seat => 
-            `<span class="seat-tag">${seat.number}</span>`
-        ).join('');
-    } else {
-        selectedSeatsDisplay.style.display = 'none';
-    }
-    
-    // Update price summary
-    const priceSummary = document.getElementById('priceSummary');
-    if (seatCount > 0) {
-        priceSummary.style.display = 'block';
-        document.getElementById('seatCount').textContent = seatCount;
-        document.getElementById('subtotal').textContent = subtotal;
-        document.getElementById('serviceFee').textContent = serviceFee;
-        document.getElementById('totalAmount').textContent = total;
-    } else {
-        priceSummary.style.display = 'none';
-    }
-    
-    // Update hidden input
-    document.getElementById('selectedSeatsInput').value = selectedSeats.map(seat => seat.id).join(',');
-    
-    // Update book button
-    const bookButton = document.getElementById('bookButton');
-    if (seatCount > 0) {
-        bookButton.disabled = false;
-        bookButton.innerHTML = `<i class="fas fa-credit-card me-2"></i>Book Now - रू ${total}`;
-    } else {
-        bookButton.disabled = true;
-        bookButton.innerHTML = '<i class="fas fa-chair me-2"></i>Select Seats to Continue';
-    }
-}
+      if (seatElement.classList.contains('bg-red-500')) {
+          return; // Can't select booked seats
+      }
 
-// Form validation and submission
-document.getElementById('quickBookingForm').addEventListener('submit', function(e) {
-    if (selectedSeats.length === 0) {
-        e.preventDefault();
-        alert('Please select at least one seat.');
-        return;
-    }
-    
-    const passengerName = document.getElementById('passenger_name').value.trim();
-    const passengerPhone = document.getElementById('passenger_phone').value.trim();
-    
-    if (!passengerName || !passengerPhone) {
-        e.preventDefault();
-        alert('Please fill in all required fields.');
-        return;
-    }
-    
-    // Add loading state
-    const bookButton = document.getElementById('bookButton');
-    bookButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
-    bookButton.disabled = true;
-});
+      if (seatElement.classList.contains('bg-blue-500')) {
+          // Deselect seat
+          seatElement.classList.remove('bg-blue-500', 'border-blue-600');
+          seatElement.classList.add('bg-green-500', 'border-green-600');
 
-// Auto-fill user data if logged in
-document.addEventListener('DOMContentLoaded', function() {
-    {% if user.is_authenticated %}
-        document.getElementById('passenger_name').value = '{{ user.get_full_name|default:user.username }}';
-        document.getElementById('passenger_email').value = '{{ user.email }}';
-        {% if user.profile.phone %}
-            document.getElementById('passenger_phone').value = '{{ user.profile.phone }}';
-        {% endif %}
-    {% endif %}
-});
+          selectedSeats = selectedSeats.filter(seat => seat.id !== seatId);
+      } else {
+          // Select seat
+          seatElement.classList.remove('bg-green-500', 'border-green-600');
+          seatElement.classList.add('bg-blue-500', 'border-blue-600');
+
+          selectedSeats.push({
+              id: seatId,
+              number: seatNumber
+          });
+      }
+
+      updateBookingDisplay();
+  }
+
+  function updateBookingDisplay() {
+      const seatCount = selectedSeats.length;
+      const subtotal = seatCount * baseFare;
+      const serviceFee = Math.round(subtotal * serviceFeeRate);
+      const total = subtotal + serviceFee;
+
+      // Update selected seats display
+      const selectedSeatsDisplay = document.getElementById('selectedSeatsDisplay');
+      const seatTags = document.getElementById('seatTags');
+
+      if (seatCount > 0) {
+          selectedSeatsDisplay.classList.remove('hidden');
+          seatTags.innerHTML = selectedSeats.map(seat =>
+              `<span class="seat-tag">${seat.number}</span>`
+          ).join('');
+      } else {
+          selectedSeatsDisplay.classList.add('hidden');
+      }
+
+      // Update price summary
+      const priceSummary = document.getElementById('priceSummary');
+      if (seatCount > 0) {
+          priceSummary.classList.remove('hidden');
+          document.getElementById('seatCount').textContent = seatCount;
+          document.getElementById('subtotal').textContent = subtotal;
+          document.getElementById('serviceFee').textContent = serviceFee;
+          document.getElementById('totalAmount').textContent = total;
+      } else {
+          priceSummary.classList.add('hidden');
+      }
+
+      // Update hidden input
+      document.getElementById('selectedSeatsInput').value = selectedSeats.map(seat => seat.id).join(',');
+
+      // Update book button
+      const bookButton = document.getElementById('bookButton');
+      if (seatCount > 0) {
+          bookButton.disabled = false;
+          bookButton.innerHTML = `<i class="fas fa-credit-card mr-2"></i>Book Now - रू ${total}`;
+          bookButton.classList.remove('bg-gray-300', 'cursor-not-allowed');
+          bookButton.classList.add('bg-gradient-to-r', 'from-green-600', 'to-emerald-700');
+      } else {
+          bookButton.disabled = true;
+          bookButton.innerHTML = '<i class="fas fa-chair mr-2"></i>Select Seats to Continue';
+          bookButton.classList.add('bg-gray-300', 'cursor-not-allowed');
+          bookButton.classList.remove('bg-gradient-to-r', 'from-green-600', 'to-emerald-700');
+      }
+  }
+
+  // Form validation and submission
+  document.getElementById('quickBookingForm').addEventListener('submit', function(e) {
+      if (selectedSeats.length === 0) {
+          e.preventDefault();
+          alert('Please select at least one seat.');
+          return;
+      }
+
+      const passengerName = document.getElementById('passenger_name').value.trim();
+      const passengerPhone = document.getElementById('passenger_phone').value.trim();
+
+      if (!passengerName || !passengerPhone) {
+          e.preventDefault();
+          alert('Please fill in all required fields.');
+          return;
+      }
+
+      // Add loading state
+      const bookButton = document.getElementById('bookButton');
+      bookButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+      bookButton.disabled = true;
+  });
+
+  // Auto-fill user data if logged in
+  document.addEventListener('DOMContentLoaded', function() {
+      {% if user.is_authenticated %}
+          document.getElementById('passenger_name').value = '{{ user.get_full_name|default:user.username }}';
+          document.getElementById('passenger_email').value = '{{ user.email }}';
+          {% if user.profile.phone %}
+              document.getElementById('passenger_phone').value = '{{ user.profile.phone }}';
+          {% endif %}
+      {% endif %}
+
+      // Add smooth animations to seats
+      const seats = document.querySelectorAll('.seat');
+      seats.forEach((seat, index) => {
+          seat.style.opacity = '0';
+          seat.style.transform = 'scale(0.8)';
+
+          setTimeout(() => {
+              seat.style.transition = 'all 0.3s ease';
+              seat.style.opacity = '1';
+              seat.style.transform = 'scale(1)';
+          }, index * 50);
+      });
+  });
 </script>
 {% endblock %}

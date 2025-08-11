@@ -1,291 +1,165 @@
-{% extends 'base.html' %}
+{% extends "dashboard/base.html" %}
 {% load static %}
 
 {% block title %}Admin Dashboard - TravelMate{% endblock %}
 
-{% block extra_css %}
-<style>
-    .dashboard-card {
-        transition: transform 0.2s;
-        border: none;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .dashboard-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    }
-    .stat-icon {
-        font-size: 2.5rem;
-        opacity: 0.8;
-    }
-    .chart-container {
-        position: relative;
-        height: 300px;
-    }
-    .quick-action-btn {
-        border-radius: 10px;
-        padding: 15px;
-        margin: 5px;
-        transition: all 0.3s;
-    }
-    .quick-action-btn:hover {
-        transform: scale(1.05);
-    }
-    .metric-card {
-        background: #f8f9fa;
-        border-radius: 12px;
-        padding: 1.5rem;
-        border: 1px solid #e9ecef;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-    .metric-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .metric-icon {
-        font-size: 2rem;
-        width: 60px;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255,255,255,0.8);
-        border-radius: 50%;
-    }
-    .metric-content {
-        flex: 1;
-    }
-    .metric-title {
-        font-size: 0.875rem;
-        color: #6c757d;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-    }
-    .metric-value {
-        font-size: 2rem;
-        font-weight: bold;
-        color: #495057;
-        margin-bottom: 0.25rem;
-    }
-    .status-badge {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
-    }
-    .bg-pending {
-        background-color: #ffc107 !important;
-    }
-    .bg-confirmed {
-        background-color: #28a745 !important;
-    }
-    .bg-cancelled {
-        background-color: #dc3545 !important;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="container-fluid">
+{% block dashboard_content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Dashboard Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="h3 mb-0">Admin Dashboard</h1>
-                    <p class="text-muted">Welcome back, {{ user.get_full_name|default:user.username }}!</p>
-                </div>
-                <div class="text-end">
-                    <small class="text-muted">Last updated: <span id="last-updated">{{ current_time|date:"M d, Y H:i" }}</span></small>
-                    <br>
-                    <button class="btn btn-outline-primary btn-sm" onclick="refreshDashboard()">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
-                </div>
+    <div class="mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+                <p class="text-gray-600 mt-1">Welcome back, {{ user.get_full_name|default:user.username }}!</p>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-gray-500">Last updated: <span id="last-updated">{{ current_time|date:"M d, Y H:i" }}</span></p>
+                <button onclick="refreshDashboard()" class="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-sync-alt mr-2"></i>Refresh
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card dashboard-card bg-primary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="mb-0">{{ total_bookings|default:0 }}</h4>
-                            <p class="mb-0">Total Bookings</p>
-                            <small class="opacity-75">+{{ today_bookings|default:0 }} today</small>
-                        </div>
-                        <div class="stat-icon">
-                            <i class="fas fa-ticket-alt"></i>
-                        </div>
-                    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Total Bookings</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ total_bookings|default:0 }}</p>
+                    <p class="text-sm text-green-600 font-medium">+{{ today_bookings|default:0 }} today</p>
+                </div>
+                <div class="bg-blue-50 p-3 rounded-lg">
+                    <i class="fas fa-ticket-alt text-2xl text-blue-600"></i>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card dashboard-card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="mb-0">NPR {{ total_revenue|default:0|floatformat:0 }}</h4>
-                            <p class="mb-0">Total Revenue</p>
-                            <small class="opacity-75">+NPR {{ today_revenue|default:0|floatformat:0 }} today</small>
-                        </div>
-                        <div class="stat-icon">
-                            <i class="fas fa-rupee-sign"></i>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Total Users</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ total_users|default:0 }}</p>
+                    <p class="text-sm text-green-600 font-medium">+{{ new_users_today|default:0 }} new today</p>
+                </div>
+                <div class="bg-green-50 p-3 rounded-lg">
+                    <i class="fas fa-users text-2xl text-green-600"></i>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card dashboard-card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="mb-0">{{ total_buses|default:0 }}</h4>
-                            <p class="mb-0">Active Buses</p>
-                            <small class="opacity-75">{{ running_buses|default:0 }} running now</small>
-                        </div>
-                        <div class="stat-icon">
-                            <i class="fas fa-bus"></i>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Total Revenue</p>
+                    <p class="text-3xl font-bold text-gray-900">रू {{ total_revenue|floatformat:0|default:0 }}</p>
+                    <p class="text-sm text-green-600 font-medium">रू {{ today_revenue|floatformat:0|default:0 }} today</p>
+                </div>
+                <div class="bg-yellow-50 p-3 rounded-lg">
+                    <i class="fas fa-dollar-sign text-2xl text-yellow-600"></i>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card dashboard-card bg-warning text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="mb-0">{{ total_users|default:0 }}</h4>
-                            <p class="mb-0">Registered Users</p>
-                            <small class="opacity-75">+{{ new_users_today|default:0 }} today</small>
-                        </div>
-                        <div class="stat-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Active Routes</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ active_routes|default:0 }}</p>
+                    <p class="text-sm text-gray-600 font-medium">{{ total_buses|default:0 }} buses</p>
+                </div>
+                <div class="bg-purple-50 p-3 rounded-lg">
+                    <i class="fas fa-route text-2xl text-purple-600"></i>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Quick Actions -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
-                            <a href="{% url 'dashboard:admin_bookings' %}" class="btn btn-outline-primary quick-action-btn w-100">
-                                <i class="fas fa-ticket-alt d-block mb-2"></i>
-                                Manage Bookings
-                            </a>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
-                            <a href="{% url 'dashboard:admin_buses' %}" class="btn btn-outline-success quick-action-btn w-100">
-                                <i class="fas fa-bus d-block mb-2"></i>
-                                Manage Buses
-                            </a>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
-                            <a href="{% url 'dashboard:admin_routes' %}" class="btn btn-outline-info quick-action-btn w-100">
-                                <i class="fas fa-route d-block mb-2"></i>
-                                Manage Routes
-                            </a>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
-                            <a href="{% url 'dashboard:admin_users' %}" class="btn btn-outline-warning quick-action-btn w-100">
-                                <i class="fas fa-users d-block mb-2"></i>
-                                Manage Users
-                            </a>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
-                            <a href="{% url 'dashboard:admin_payments' %}" class="btn btn-outline-danger quick-action-btn w-100">
-                                <i class="fas fa-credit-card d-block mb-2"></i>
-                                Payments
-                            </a>
-                        </div>
-                        <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
-                            <a href="{% url 'dashboard:admin_reports' %}" class="btn btn-outline-secondary quick-action-btn w-100">
-                                <i class="fas fa-chart-bar d-block mb-2"></i>
-                                Reports
-                            </a>
-                        </div>
-                    </div>
-                    <!-- Removed Intelligent Bus Scheduling section as features were removed -->
-                    </div>
-                </div>
-            </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+            <i class="fas fa-bolt mr-3 text-yellow-500"></i>
+            Quick Actions
+        </h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <a href="{% url 'dashboard:admin_bookings' %}" class="flex flex-col items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors group">
+                <i class="fas fa-ticket-alt text-2xl text-blue-600 mb-2 group-hover:scale-110 transition-transform"></i>
+                <span class="text-sm font-medium text-gray-700 text-center">Manage Bookings</span>
+            </a>
+            <a href="{% url 'dashboard:admin_buses' %}" class="flex flex-col items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors group">
+                <i class="fas fa-bus text-2xl text-green-600 mb-2 group-hover:scale-110 transition-transform"></i>
+                <span class="text-sm font-medium text-gray-700 text-center">Manage Buses</span>
+            </a>
+            <a href="{% url 'dashboard:admin_routes' %}" class="flex flex-col items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors group">
+                <i class="fas fa-route text-2xl text-purple-600 mb-2 group-hover:scale-110 transition-transform"></i>
+                <span class="text-sm font-medium text-gray-700 text-center">Manage Routes</span>
+            </a>
+            <a href="{% url 'dashboard:admin_users' %}" class="flex flex-col items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors group">
+                <i class="fas fa-users text-2xl text-orange-600 mb-2 group-hover:scale-110 transition-transform"></i>
+                <span class="text-sm font-medium text-gray-700 text-center">Manage Users</span>
+            </a>
+            <a href="{% url 'dashboard:admin_payments' %}" class="flex flex-col items-center p-4 bg-red-50 hover:bg-red-100 rounded-lg transition-colors group">
+                <i class="fas fa-credit-card text-2xl text-red-600 mb-2 group-hover:scale-110 transition-transform"></i>
+                <span class="text-sm font-medium text-gray-700 text-center">Payments</span>
+            </a>
+            <a href="{% url 'dashboard:admin_reports' %}" class="flex flex-col items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group">
+                <i class="fas fa-chart-bar text-2xl text-gray-600 mb-2 group-hover:scale-110 transition-transform"></i>
+                <span class="text-sm font-medium text-gray-700 text-center">Reports</span>
+            </a>
         </div>
     </div>
 
     <!-- Charts and Recent Activity -->
-    <div class="row">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         <!-- Operational Metrics -->
-        <div class="col-lg-8 mb-4">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-tachometer-alt"></i> Operational Metrics</h5>
-                    <a href="{% url 'dashboard:analytics' %}" class="btn btn-sm btn-outline-primary">View Analytics</a>
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-tachometer-alt mr-3 text-blue-500"></i>
+                        Operational Metrics
+                    </h2>
+                    <a href="{% url 'dashboard:analytics' %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors">
+                        View Analytics →
+                    </a>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="metric-card">
-                                <div class="metric-icon">
-                                    <i class="fas fa-bus text-primary"></i>
-                                </div>
-                                <div class="metric-content">
-                                    <h6 class="metric-title">Active Buses</h6>
-                                    <h4 class="metric-value">{{ active_buses|default:0 }}</h4>
-                                    <small class="text-muted">Currently running</small>
-                                </div>
-                            </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex items-center p-4 bg-blue-50 rounded-lg">
+                        <div class="bg-blue-100 p-3 rounded-lg mr-4">
+                            <i class="fas fa-bus text-2xl text-blue-600"></i>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="metric-card">
-                                <div class="metric-icon">
-                                    <i class="fas fa-route text-success"></i>
-                                </div>
-                                <div class="metric-content">
-                                    <h6 class="metric-title">Active Routes</h6>
-                                    <h4 class="metric-value">{{ active_routes|default:0 }}</h4>
-                                    <small class="text-muted">In operation</small>
-                                </div>
-                            </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-600">Active Buses</h3>
+                            <p class="text-2xl font-bold text-gray-900">{{ active_buses|default:0 }}</p>
+                            <p class="text-sm text-gray-500">Currently running</p>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="metric-card">
-                                <div class="metric-icon">
-                                    <i class="fas fa-check-circle text-success"></i>
-                                </div>
-                                <div class="metric-content">
-                                    <h6 class="metric-title">Confirmed Bookings</h6>
-                                    <h4 class="metric-value">{{ confirmed_bookings|default:0 }}</h4>
-                                    <small class="text-muted">Today</small>
-                                </div>
-                            </div>
+                    </div>
+                    <div class="flex items-center p-4 bg-green-50 rounded-lg">
+                        <div class="bg-green-100 p-3 rounded-lg mr-4">
+                            <i class="fas fa-route text-2xl text-green-600"></i>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="metric-card">
-                                <div class="metric-icon">
-                                    <i class="fas fa-clock text-warning"></i>
-                                </div>
-                                <div class="metric-content">
-                                    <h6 class="metric-title">Pending Bookings</h6>
-                                    <h4 class="metric-value">{{ pending_bookings|default:0 }}</h4>
-                                    <small class="text-muted">Awaiting payment</small>
-                                </div>
-                            </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-600">Active Routes</h3>
+                            <p class="text-2xl font-bold text-gray-900">{{ active_routes|default:0 }}</p>
+                            <p class="text-sm text-gray-500">In operation</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center p-4 bg-green-50 rounded-lg">
+                        <div class="bg-green-100 p-3 rounded-lg mr-4">
+                            <i class="fas fa-check-circle text-2xl text-green-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-600">Confirmed Bookings</h3>
+                            <p class="text-2xl font-bold text-gray-900">{{ confirmed_bookings|default:0 }}</p>
+                            <p class="text-sm text-gray-500">Today</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center p-4 bg-yellow-50 rounded-lg">
+                        <div class="bg-yellow-100 p-3 rounded-lg mr-4">
+                            <i class="fas fa-clock text-2xl text-yellow-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-600">Pending Bookings</h3>
+                            <p class="text-2xl font-bold text-gray-900">{{ pending_bookings|default:0 }}</p>
+                            <p class="text-sm text-gray-500">Awaiting payment</p>
                         </div>
                     </div>
                 </div>
@@ -293,95 +167,86 @@
         </div>
 
         <!-- Recent Bookings -->
-        <div class="col-lg-4 mb-4">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-clock"></i> Recent Bookings</h5>
-                    <a href="{% url 'dashboard:admin_bookings' %}" class="btn btn-sm btn-outline-primary">View All</a>
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-clock mr-3 text-gray-500"></i>
+                        Recent Bookings
+                    </h2>
+                    <a href="{% url 'dashboard:admin_bookings' %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors">
+                        View All →
+                    </a>
                 </div>
-                <div class="card-body p-0">
-                    <div class="list-group list-group-flush">
-                        {% for booking in recent_booking_list|slice:":5" %}
-                        <div class="list-group-item">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">{{ booking.booking_id }}</h6>
-                                    <p class="mb-1 small text-muted">{{ booking.user.get_full_name|default:booking.user.username }}</p>
-                                    <small class="text-muted">{{ booking.bus_schedule.route.source }} → {{ booking.bus_schedule.route.destination }}</small>
-                                </div>
-                                <div class="text-end">
-                                    <span class="badge bg-{{ booking.booking_status }}">{{ booking.get_booking_status_display }}</span>
-                                    <br>
-                                    <small class="text-muted">NPR {{ booking.total_fare }}</small>
-                                </div>
+                <div class="space-y-4">
+                    {% for booking in recent_booking_list|slice:":5" %}
+                    <div class="border-b border-gray-100 pb-4 last:border-b-0 last:pb-0">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="font-medium text-gray-900 text-sm">{{ booking.booking_id }}</h3>
+                                <p class="text-sm text-gray-600">{{ booking.user.get_full_name|default:booking.user.username }}</p>
+                                <p class="text-xs text-gray-500">{{ booking.bus_schedule.route.source }} → {{ booking.bus_schedule.route.destination }}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {% if booking.booking_status == 'confirmed' %}bg-green-100 text-green-800{% elif booking.booking_status == 'pending' %}bg-yellow-100 text-yellow-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ booking.get_booking_status_display }}
+                                </span>
+                                <p class="text-xs text-gray-500 mt-1">रू {{ booking.total_fare }}</p>
                             </div>
                         </div>
-                        {% empty %}
-                        <div class="list-group-item text-center text-muted">
-                            <i class="fas fa-inbox fa-2x mb-2"></i>
-                            <p class="mb-0">No recent bookings</p>
-                        </div>
-                        {% endfor %}
                     </div>
+                    {% empty %}
+                    <div class="text-center py-8">
+                        <i class="fas fa-inbox text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">No recent bookings</p>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
 
     <!-- System Status -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-server"></i> System Status</h5>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+            <i class="fas fa-server mr-3 text-gray-500"></i>
+            System Status
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="flex items-center p-4 bg-green-50 rounded-lg">
+                <div class="bg-green-100 p-3 rounded-lg mr-4">
+                    <i class="fas fa-database text-2xl text-green-600"></i>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <div class="d-flex align-items-center">
-                                <div class="me-3">
-                                    <i class="fas fa-database fa-2x text-success"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-0">Database</h6>
-                                    <small class="text-success">Online</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="d-flex align-items-center">
-                                <div class="me-3">
-                                    <i class="fas fa-credit-card fa-2x text-success"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-0">Payment Gateway</h6>
-                                    <small class="text-success">Active</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="d-flex align-items-center">
-                                <div class="me-3">
-                                    <i class="fas fa-envelope fa-2x text-success"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-0">Email Service</h6>
-                                    <small class="text-success">Running</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="d-flex align-items-center">
-                                <div class="me-3">
-                                    <i class="fas fa-bell fa-2x text-warning"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-0">Notifications</h6>
-                                    <small class="text-warning">{{ pending_notifications|default:0 }} pending</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div>
+                    <h3 class="font-medium text-gray-900">Database</h3>
+                    <p class="text-sm text-green-600 font-medium">Online</p>
+                </div>
+            </div>
+            <div class="flex items-center p-4 bg-green-50 rounded-lg">
+                <div class="bg-green-100 p-3 rounded-lg mr-4">
+                    <i class="fas fa-credit-card text-2xl text-green-600"></i>
+                </div>
+                <div>
+                    <h3 class="font-medium text-gray-900">Payment Gateway</h3>
+                    <p class="text-sm text-green-600 font-medium">Active</p>
+                </div>
+            </div>
+            <div class="flex items-center p-4 bg-green-50 rounded-lg">
+                <div class="bg-green-100 p-3 rounded-lg mr-4">
+                    <i class="fas fa-envelope text-2xl text-green-600"></i>
+                </div>
+                <div>
+                    <h3 class="font-medium text-gray-900">Email Service</h3>
+                    <p class="text-sm text-green-600 font-medium">Running</p>
+                </div>
+            </div>
+            <div class="flex items-center p-4 bg-yellow-50 rounded-lg">
+                <div class="bg-yellow-100 p-3 rounded-lg mr-4">
+                    <i class="fas fa-bell text-2xl text-yellow-600"></i>
+                </div>
+                <div>
+                    <h3 class="font-medium text-gray-900">Notifications</h3>
+                    <p class="text-sm text-yellow-600 font-medium">{{ pending_notifications|default:0 }} pending</p>
                 </div>
             </div>
         </div>
@@ -389,7 +254,7 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block dashboard_extra_js %}
 <script>
     // Refresh Dashboard
     function refreshDashboard() {

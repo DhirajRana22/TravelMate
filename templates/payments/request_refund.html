@@ -1,687 +1,490 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Request Refund{% endblock %}
-
-{% block extra_css %}
-<style>
-    .refund-header {
-        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        color: white;
-        padding: 2rem 0;
-        margin-bottom: 2rem;
-    }
-    
-    .refund-container {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-    
-    .payment-summary {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        padding: 2rem;
-        margin-bottom: 2rem;
-        border: 1px solid #e9ecef;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .payment-summary::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    }
-    
-    .summary-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #e9ecef;
-    }
-    
-    .payment-id {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #495057;
-    }
-    
-    .payment-amount {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #28a745;
-    }
-    
-    .summary-details {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-    
-    .summary-item {
-        text-align: center;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-    }
-    
-    .summary-label {
-        font-size: 0.75rem;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.5rem;
-    }
-    
-    .summary-value {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #495057;
-    }
-    
-    .booking-info {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        border: 1px solid #e9ecef;
-    }
-    
-    .booking-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #e9ecef;
-    }
-    
-    .booking-route {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: #495057;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-    
-    .route-arrow {
-        color: #dc3545;
-        font-size: 1.25rem;
-    }
-    
-    .booking-date {
-        font-size: 0.875rem;
-        color: #6c757d;
-        background: #f8f9fa;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-    }
-    
-    .booking-details {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
-    }
-    
-    .booking-detail {
-        text-align: center;
-        padding: 0.75rem;
-        background: #f8f9fa;
-        border-radius: 6px;
-    }
-    
-    .booking-detail-label {
-        font-size: 0.75rem;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.25rem;
-    }
-    
-    .booking-detail-value {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #495057;
-    }
-    
-    .refund-form {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        padding: 2rem;
-        margin-bottom: 2rem;
-        border: 1px solid #e9ecef;
-    }
-    
-    .form-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #495057;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .form-title i {
-        color: #dc3545;
-    }
-    
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    
-    .form-label {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.5rem;
-        display: block;
-    }
-    
-    .form-control {
-        width: 100%;
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        font-size: 0.875rem;
-        transition: all 0.3s ease;
-        background: #f8f9fa;
-    }
-    
-    .form-control:focus {
-        border-color: #dc3545;
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-        background: white;
-        outline: none;
-    }
-    
-    .form-select {
-        width: 100%;
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        font-size: 0.875rem;
-        background: #f8f9fa;
-        transition: all 0.3s ease;
-    }
-    
-    .form-select:focus {
-        border-color: #dc3545;
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-        background: white;
-        outline: none;
-    }
-    
-    .form-text {
-        font-size: 0.75rem;
-        color: #6c757d;
-        margin-top: 0.25rem;
-    }
-    
-    .refund-policy {
-        background: #fff3cd;
-        border: 1px solid #ffeaa7;
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .policy-header {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .policy-header i {
-        color: #856404;
-        font-size: 1.25rem;
-    }
-    
-    .policy-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #856404;
-    }
-    
-    .policy-content {
-        color: #856404;
-        font-size: 0.875rem;
-        line-height: 1.6;
-    }
-    
-    .policy-list {
-        margin: 1rem 0;
-        padding-left: 1.5rem;
-    }
-    
-    .policy-list li {
-        margin-bottom: 0.5rem;
-    }
-    
-    .refund-calculation {
-        background: #d4edda;
-        border: 1px solid #c3e6cb;
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .calculation-header {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .calculation-header i {
-        color: #155724;
-        font-size: 1.25rem;
-    }
-    
-    .calculation-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #155724;
-    }
-    
-    .calculation-details {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-    
-    .calculation-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #c3e6cb;
-    }
-    
-    .calculation-item:last-child {
-        border-bottom: none;
-        font-weight: 700;
-        border-top: 2px solid #155724;
-        padding-top: 1rem;
-    }
-    
-    .calculation-label {
-        font-size: 0.875rem;
-        color: #155724;
-    }
-    
-    .calculation-value {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #155724;
-    }
-    
-    .action-buttons {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-    
-    .btn-danger {
-        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        border: none;
-        padding: 0.75rem 2rem;
-        border-radius: 8px;
-        color: white;
-        font-size: 0.875rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        text-decoration: none;
-    }
-    
-    .btn-danger:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn-secondary {
-        background: transparent;
-        border: 1px solid #6c757d;
-        padding: 0.75rem 2rem;
-        border-radius: 8px;
-        color: #6c757d;
-        font-size: 0.875rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        text-decoration: none;
-    }
-    
-    .btn-secondary:hover {
-        background: #6c757d;
-        color: white;
-        text-decoration: none;
-    }
-    
-    .alert {
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
-        margin-bottom: 1.5rem;
-        border: 1px solid transparent;
-    }
-    
-    .alert-warning {
-        background: #fff3cd;
-        border-color: #ffeaa7;
-        color: #856404;
-    }
-    
-    .alert-info {
-        background: #d1ecf1;
-        border-color: #bee5eb;
-        color: #0c5460;
-    }
-    
-    @media (max-width: 768px) {
-        .summary-header {
-            flex-direction: column;
-            gap: 1rem;
-            text-align: center;
-        }
-        
-        .booking-header {
-            flex-direction: column;
-            gap: 1rem;
-            text-align: center;
-        }
-        
-        .booking-route {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .summary-details {
-            grid-template-columns: 1fr;
-        }
-        
-        .booking-details {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        
-        .calculation-details {
-            grid-template-columns: 1fr;
-        }
-        
-        .action-buttons {
-            flex-direction: column;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .booking-details {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block title %}Request Refund -
+TravelMate{% endblock %} {% block content %}
 <!-- Header -->
-<section class="refund-header">
-    <div class="container">
-        <div class="refund-container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="mb-2"><i class="fas fa-undo me-2"></i>Request Refund</h1>
-                    <p class="mb-0">Submit a refund request for your payment</p>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    <a href="{% url 'payments:payment_detail' payment.payment_id %}" class="btn btn-light">
-                        <i class="fas fa-arrow-left me-2"></i>Back to Payment
-                    </a>
-                </div>
-            </div>
-        </div>
+<section
+  class="bg-gradient-to-r from-red-600 to-pink-700 text-white py-12 -mt-6"
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div
+      class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4"
+    >
+      <i class="fas fa-undo text-2xl"></i>
     </div>
+    <h1 class="text-3xl md:text-4xl font-bold mb-2">Request Refund</h1>
+    <p class="text-xl opacity-90">Submit a refund request for your payment</p>
+  </div>
 </section>
 
-<!-- Content -->
-<section class="py-4">
-    <div class="container">
-        <div class="refund-container">
-            <!-- Payment Summary -->
-            <div class="payment-summary">
-                <div class="summary-header">
-                    <div class="payment-id">
-                        <i class="fas fa-hashtag me-2"></i>
-                        {{ payment.payment_id }}
-                    </div>
-                    <div class="payment-amount">रू {{ payment.amount|floatformat:2 }}</div>
-                </div>
-                
-                <div class="summary-details">
-                    <div class="summary-item">
-                        <div class="summary-label">Payment Method</div>
-                        <div class="summary-value">{{ payment.get_payment_method_display }}</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Payment Date</div>
-                        <div class="summary-value">{{ payment.payment_date|date:"M d, Y" }}</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Transaction ID</div>
-                        <div class="summary-value">{{ payment.transaction_id|default:"N/A" }}</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Status</div>
-                        <div class="summary-value">{{ payment.get_payment_status_display }}</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Booking Information -->
-            <div class="booking-info">
-                <div class="booking-header">
-                    <div class="booking-route">
-                        <span>{{ booking.bus_schedule.route.source.name }}</span>
-                        <i class="fas fa-arrow-right route-arrow"></i>
-                        <span>{{ booking.bus_schedule.route.destination.name }}</span>
-                    </div>
-                    <div class="booking-date">
-                        <i class="fas fa-calendar-alt me-1"></i>
-                        {{ booking.travel_date|date:"M d, Y" }}
-                    </div>
-                </div>
-                
-                <div class="booking-details">
-                    <div class="booking-detail">
-                        <div class="booking-detail-label">Booking ID</div>
-                        <div class="booking-detail-value">{{ booking.booking_id }}</div>
-                    </div>
-                    <div class="booking-detail">
-                        <div class="booking-detail-label">Bus Number</div>
-                        <div class="booking-detail-value">{{ booking.bus_schedule.bus.bus_number }}</div>
-                    </div>
-                    <div class="booking-detail">
-                        <div class="booking-detail-label">Departure</div>
-                        <div class="booking-detail-value">{{ booking.bus_schedule.departure_time|time:"H:i" }}</div>
-                    </div>
-                    <div class="booking-detail">
-                        <div class="booking-detail-label">Seats</div>
-                        <div class="booking-detail-value">
-                            {% for seat in booking.seats.all %}
-                                {{ seat.seat_number }}{% if not forloop.last %}, {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Refund Policy -->
-            <div class="refund-policy">
-                <div class="policy-header">
-                    <i class="fas fa-info-circle"></i>
-                    <span class="policy-title">Refund Policy</span>
-                </div>
-                <div class="policy-content">
-                    <p>Please review our refund policy before submitting your request:</p>
-                    <ul class="policy-list">
-                        <li><strong>Full Refund:</strong> Available if cancelled 24+ hours before departure</li>
-                        <li><strong>Partial Refund (75%):</strong> Available if cancelled 12-24 hours before departure</li>
-                        <li><strong>Partial Refund (50%):</strong> Available if cancelled 6-12 hours before departure</li>
-                        <li><strong>No Refund:</strong> If cancelled less than 6 hours before departure</li>
-                        <li><strong>Processing Time:</strong> Refunds are processed within 7-10 business days</li>
-                        <li><strong>Service Fee:</strong> Non-refundable service charges may apply</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <!-- Refund Calculation -->
-            <div class="refund-calculation">
-                <div class="calculation-header">
-                    <i class="fas fa-calculator"></i>
-                    <span class="calculation-title">Estimated Refund Amount</span>
-                </div>
-                <div class="calculation-details">
-                    <div>
-                        <div class="calculation-item">
-                            <span class="calculation-label">Original Amount</span>
-                            <span class="calculation-value">रू {{ payment.amount|floatformat:2 }}</span>
-                        </div>
-                        <div class="calculation-item">
-                            <span class="calculation-label">Service Fee (Non-refundable)</span>
-                            <span class="calculation-value">-रू{{ booking.service_fee|default:"50.00"|floatformat:2 }}</span>
-                        </div>
-                        <div class="calculation-item">
-                            <span class="calculation-label">Cancellation Charges</span>
-                            <span class="calculation-value">-रू{{ cancellation_charges|default:"100.00"|floatformat:2 }}</span>
-                        </div>
-                        <div class="calculation-item">
-                            <span class="calculation-label">Estimated Refund</span>
-                            <span class="calculation-value">रू {{ estimated_refund|default:payment.amount|floatformat:2 }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Refund Form -->
-            <div class="refund-form">
-                <div class="form-title">
-                    <i class="fas fa-edit"></i>
-                    Refund Request Details
-                </div>
-                
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-                
-                <form method="POST">
-                    {% csrf_token %}
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="{{ form.reason.id_for_label }}">Reason for Refund *</label>
-                        {{ form.reason }}
-                        {% if form.reason.help_text %}
-                            <div class="form-text">{{ form.reason.help_text }}</div>
-                        {% endif %}
-                        {% if form.reason.errors %}
-                            <div class="text-danger mt-1">
-                                {% for error in form.reason.errors %}
-                                    <small>{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="{{ form.description.id_for_label }}">Additional Details</label>
-                        {{ form.description }}
-                        {% if form.description.help_text %}
-                            <div class="form-text">{{ form.description.help_text }}</div>
-                        {% endif %}
-                        {% if form.description.errors %}
-                            <div class="text-danger mt-1">
-                                {% for error in form.description.errors %}
-                                    <small>{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <strong>Important:</strong> Once submitted, your refund request will be reviewed by our team. 
-                        You will receive an email confirmation and updates about the status of your refund.
-                    </div>
-                    
-                    <div class="action-buttons">
-                        <button type="submit" class="btn-danger">
-                            <i class="fas fa-paper-plane"></i>
-                            Submit Refund Request
-                        </button>
-                        
-                        <a href="{% url 'payments:payment_detail' payment.payment_id %}" class="btn-secondary">
-                            <i class="fas fa-times"></i>
-                            Cancel
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</section>
-{% endblock %}
+<!-- Refund Form -->
+<section class="py-12 bg-gray-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Payment Summary -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
+          <h2
+            class="text-xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-3"
+          >
+            <i class="fas fa-receipt mr-2 text-red-500"></i>Payment Summary
+          </h2>
 
-{% block extra_js %}
+          <!-- Payment Amount -->
+          <div
+            class="text-center mb-6 p-4 bg-red-50 rounded-lg border border-red-200"
+          >
+            <div class="text-sm text-red-600 mb-1">Refund Amount</div>
+            <div class="text-3xl font-bold text-red-600">
+              रू{{ payment.amount|floatformat:2 }}
+            </div>
+          </div>
+
+          <!-- Payment Details -->
+          <div class="space-y-4">
+            <div
+              class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+            >
+              <span class="text-gray-600 text-sm">Payment ID</span>
+              <span class="font-mono font-semibold text-gray-900 text-sm"
+                >{{ payment.payment_id }}</span
+              >
+            </div>
+
+            <div
+              class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+            >
+              <span class="text-gray-600 text-sm">Transaction ID</span>
+              <span class="font-mono font-semibold text-gray-900 text-sm"
+                >{{ payment.transaction_id }}</span
+              >
+            </div>
+
+            <div
+              class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+            >
+              <span class="text-gray-600 text-sm">Payment Method</span>
+              <span class="font-semibold text-gray-900 text-sm"
+                >{{ payment.get_payment_method_display }}</span
+              >
+            </div>
+
+            <div
+              class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+            >
+              <span class="text-gray-600 text-sm">Payment Date</span>
+              <span class="font-semibold text-gray-900 text-sm"
+                >{{ payment.payment_date|date:"M d, Y" }}</span
+              >
+            </div>
+
+            <div
+              class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+            >
+              <span class="text-gray-600 text-sm">Status</span>
+              <span
+                class="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-semibold"
+              >
+                {{ payment.get_payment_status_display }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Refund Form -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">
+            <i class="fas fa-file-alt mr-2 text-red-500"></i>Refund Request Form
+          </h2>
+
+          <!-- Booking Information -->
+          <div class="bg-blue-50 rounded-xl p-6 mb-8 border border-blue-200">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+              <i class="fas fa-bus mr-2 text-blue-500"></i>Booking Information
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <div class="text-sm text-gray-600 mb-1">Booking ID</div>
+                <div class="font-semibold text-gray-900">
+                  {{ payment.booking.booking_id }}
+                </div>
+              </div>
+
+              <div>
+                <div class="text-sm text-gray-600 mb-1">Travel Date</div>
+                <div class="font-semibold text-gray-900">
+                  {{ payment.booking.travel_date|date:"M d, Y" }}
+                </div>
+              </div>
+
+              <div>
+                <div class="text-sm text-gray-600 mb-1">Route</div>
+                <div class="font-semibold text-gray-900">
+                  {{ payment.booking.bus_schedule.route.source }} → {{
+                  payment.booking.bus_schedule.route.destination }}
+                </div>
+              </div>
+
+              <div>
+                <div class="text-sm text-gray-600 mb-1">Bus Number</div>
+                <div class="font-semibold text-gray-900">
+                  {{ payment.booking.bus_schedule.bus.bus_number }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Refund Form -->
+          <form method="POST" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Reason for Refund -->
+            <div>
+              <label
+                for="{{ form.reason.id_for_label }}"
+                class="block text-sm font-semibold text-gray-700 mb-2"
+              >
+                <i class="fas fa-exclamation-circle text-red-500 mr-1"></i
+                >Reason for Refund *
+              </label>
+              <select
+                name="reason"
+                id="{{ form.reason.id_for_label }}"
+                required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              >
+                <option value="">Select a reason</option>
+                <option value="trip_cancelled">
+                  Trip Cancelled by Operator
+                </option>
+                <option value="emergency">Personal Emergency</option>
+                <option value="schedule_change">Schedule Change</option>
+                <option value="medical_emergency">Medical Emergency</option>
+                <option value="weather_conditions">Weather Conditions</option>
+                <option value="other">Other</option>
+              </select>
+              {% if form.reason.help_text %}
+              <div class="text-sm text-gray-600 mt-1">
+                {{ form.reason.help_text }}
+              </div>
+              {% endif %} {% if form.reason.errors %}
+              <div class="text-red-600 text-sm mt-1">
+                {% for error in form.reason.errors %}
+                <div>{{ error }}</div>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Additional Details -->
+            <div>
+              <label
+                for="{{ form.description.id_for_label }}"
+                class="block text-sm font-semibold text-gray-700 mb-2"
+              >
+                <i class="fas fa-comment-alt text-blue-500 mr-1"></i>Additional
+                Details
+              </label>
+              <textarea
+                name="description"
+                id="{{ form.description.id_for_label }}"
+                rows="4"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 resize-vertical"
+                placeholder="Please provide additional details about your refund request. Include any relevant information that might help us process your request faster."
+              ></textarea>
+              {% if form.description.help_text %}
+              <div class="text-sm text-gray-600 mt-1">
+                {{ form.description.help_text }}
+              </div>
+              {% endif %} {% if form.description.errors %}
+              <div class="text-red-600 text-sm mt-1">
+                {% for error in form.description.errors %}
+                <div>{{ error }}</div>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Refund Policy Notice -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <h4 class="font-semibold text-yellow-800 mb-2">
+                <i class="fas fa-info-circle mr-2"></i>Refund Policy
+              </h4>
+              <ul class="text-sm text-yellow-700 space-y-1">
+                <li>
+                  • Refund requests are processed within 3-5 business days
+                </li>
+                <li>
+                  • Cancellation fees may apply based on timing and reason
+                </li>
+                <li>• Refunds are processed to the original payment method</li>
+                <li>• You will receive email updates on your refund status</li>
+              </ul>
+            </div>
+
+            <!-- Processing Time Notice -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 class="font-semibold text-blue-800 mb-2">
+                <i class="fas fa-clock mr-2"></i>Processing Timeline
+              </h4>
+              <div
+                class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-blue-700"
+              >
+                <div class="text-center">
+                  <div class="font-semibold">1-2 Days</div>
+                  <div>Request Review</div>
+                </div>
+                <div class="text-center">
+                  <div class="font-semibold">3-5 Days</div>
+                  <div>Processing</div>
+                </div>
+                <div class="text-center">
+                  <div class="font-semibold">5-7 Days</div>
+                  <div>Refund Credit</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Terms Agreement -->
+            <div class="border border-gray-200 rounded-lg p-4">
+              <label class="flex items-start">
+                <input
+                  type="checkbox"
+                  name="terms_agreed"
+                  required
+                  class="h-5 w-5 text-red-600 focus:ring-red-500 border-gray-300 rounded mt-1 mr-3"
+                />
+                <span class="text-sm text-gray-600 leading-relaxed">
+                  I understand and agree to the
+                  <a
+                    href="{% url 'home:terms' %}"
+                    class="text-red-600 hover:text-red-700 font-medium"
+                    target="_blank"
+                    >refund policy</a
+                  >
+                  and acknowledge that processing fees may apply. I confirm that
+                  the information provided is accurate and complete.
+                </span>
+              </label>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-6">
+              <button
+                type="submit"
+                class="flex-1 bg-red-500 text-white py-4 rounded-xl font-semibold text-lg hover:bg-red-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
+              >
+                <i class="fas fa-paper-plane mr-2"></i>Submit Refund Request
+              </button>
+
+              <a
+               <a href="{% url 'payments:payment_detail' payment.payment_id %}"
+                class="flex-1 bg-gray-500 text-white py-4 rounded-xl font-semibold text-lg hover:bg-gray-600 transition-colors text-center"
+              >
+                <i class="fas fa-times mr-2"></i>Cancel
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Help Section -->
+<section class="py-12 bg-white">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-gray-50 rounded-2xl p-8">
+      <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">
+        <i class="fas fa-question-circle text-blue-500 mr-2"></i>Need Help with
+        Your Refund?
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <h4 class="font-semibold text-gray-800 mb-4">Common Questions</h4>
+          <ul class="space-y-3 text-sm text-gray-600">
+            <li class="flex items-start">
+              <i class="fas fa-question text-blue-500 mr-2 mt-1"></i>
+              <div>
+                <strong>How long does a refund take?</strong><br />
+                Refunds are typically processed within 5-7 business days after
+                approval.
+              </div>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-question text-blue-500 mr-2 mt-1"></i>
+              <div>
+                <strong>Are there any cancellation fees?</strong><br />
+                Fees may apply based on the timing and reason for cancellation.
+              </div>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-question text-blue-500 mr-2 mt-1"></i>
+              <div>
+                <strong>Can I track my refund status?</strong><br />
+                Yes, you'll receive email updates and can check status in your
+                account.
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold text-gray-800 mb-4">Contact Support</h4>
+          <div class="space-y-3">
+            <a
+              href="tel:+9779847435111"
+              class="flex items-center p-3 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <i class="fas fa-phone text-green-500 mr-3"></i>
+              <div>
+                <div class="font-medium text-gray-900">Call Support</div>
+                <div class="text-sm text-gray-600">+977 9847435111</div>
+              </div>
+            </a>
+
+            <a
+              href="mailto:support@travelmate.com"
+              class="flex items-center p-3 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <i class="fas fa-envelope text-blue-500 mr-3"></i>
+              <div>
+                <div class="font-medium text-gray-900">Email Support</div>
+                <div class="text-sm text-gray-600">support@travelmate.com</div>
+              </div>
+            </a>
+
+            <a
+              href="{% url 'home:contact' %}"
+              class="flex items-center p-3 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <i class="fas fa-comments text-purple-500 mr-3"></i>
+              <div>
+                <div class="font-medium text-gray-900">Live Chat</div>
+                <div class="text-sm text-gray-600">Available 24/7</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Auto-resize textarea
-        const textarea = document.querySelector('textarea');
-        if (textarea) {
-            textarea.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = this.scrollHeight + 'px';
-            });
+  document.addEventListener("DOMContentLoaded", function () {
+    // Auto-resize textarea
+    const textarea = document.querySelector('textarea[name="description"]');
+    if (textarea) {
+      textarea.addEventListener("input", function () {
+        this.style.height = "auto";
+        this.style.height = this.scrollHeight + "px";
+      });
+    }
+
+    // Form validation
+    const form = document.querySelector("form");
+    if (form) {
+      form.addEventListener("submit", function (e) {
+        const reasonSelect = document.querySelector('select[name="reason"]');
+        const termsCheckbox = document.querySelector(
+          'input[name="terms_agreed"]'
+        );
+
+        // Check reason selection
+        if (!reasonSelect.value) {
+          e.preventDefault();
+          showToast("Please select a reason for the refund.", "error");
+          reasonSelect.focus();
+          return false;
         }
-        
-        // Form validation
-        const form = document.querySelector('form');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                const reasonSelect = document.querySelector('select[name="reason"]');
-                if (reasonSelect && !reasonSelect.value) {
-                    e.preventDefault();
-                    alert('Please select a reason for the refund.');
-                    reasonSelect.focus();
-                    return false;
-                }
-                
-                // Confirm submission
-                if (!confirm('Are you sure you want to submit this refund request? This action cannot be undone.')) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
+
+        // Check terms agreement
+        if (!termsCheckbox.checked) {
+          e.preventDefault();
+          showToast("Please agree to the refund policy terms.", "error");
+          termsCheckbox.focus();
+          return false;
         }
-    });
+
+        // Confirm submission
+        if (
+          !confirm(
+            "Are you sure you want to submit this refund request? This action cannot be undone."
+          )
+        ) {
+          e.preventDefault();
+          return false;
+        }
+
+        // Add loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.innerHTML =
+          '<i class="fas fa-spinner fa-spin mr-2"></i>Submitting Request...';
+        submitBtn.disabled = true;
+      });
+    }
+
+    // Show/hide additional details based on reason
+    const reasonSelect = document.querySelector('select[name="reason"]');
+    const descriptionTextarea = document.querySelector(
+      'textarea[name="description"]'
+    );
+
+    if (reasonSelect && descriptionTextarea) {
+      reasonSelect.addEventListener("change", function () {
+        if (this.value === "other") {
+          descriptionTextarea.required = true;
+          descriptionTextarea.placeholder =
+            "Please provide detailed information about your reason for refund request.";
+        } else {
+          descriptionTextarea.required = false;
+          descriptionTextarea.placeholder =
+            "Please provide additional details about your refund request. Include any relevant information that might help us process your request faster.";
+        }
+      });
+    }
+  });
+
+  // Show toast notification
+  function showToast(message, type) {
+    const toast = document.createElement("div");
+    toast.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+      type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+    } min-w-80 transform translate-x-full transition-transform duration-300`;
+
+    toast.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-${
+                      type === "success" ? "check" : "exclamation"
+                    }-circle mr-2"></i>
+                    ${message}
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+
+    document.body.appendChild(toast);
+
+    // Animate in
+    setTimeout(() => {
+      toast.classList.remove("translate-x-full");
+    }, 100);
+
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+      toast.classList.add("translate-x-full");
+      setTimeout(() => {
+        if (toast.parentElement) {
+          toast.remove();
+        }
+      }, 300);
+    }, 3000);
+  }
 </script>
 {% endblock %}

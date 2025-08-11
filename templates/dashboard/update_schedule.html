@@ -1,468 +1,335 @@
-{% extends 'base.html' %}
+{% extends "dashboard/base.html" %}
 {% load static %}
 
 {% block title %}Update Schedule - Dashboard{% endblock %}
 
-{% block extra_css %}
-<style>
-    .admin-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem 0;
-        margin-bottom: 2rem;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .admin-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-        opacity: 0.1;
-    }
-    
-    .admin-header .container {
-        position: relative;
-        z-index: 1;
-    }
-    
-    .bus-assignment-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-        padding: 2.5rem;
-        margin-bottom: 2.5rem;
-        border: 1px solid #e5e7eb;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .bus-assignment-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 5px;
-        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4, #10b981);
-    }
-    
-    .bus-assignment-card:hover {
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
-        transform: translateY(-5px);
-    }
-    
-    .bus-assignment-card h4 {
-        color: #1f2937;
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-        position: relative;
-        padding-bottom: 0.75rem;
-        font-size: 1.5rem;
-    }
-    
-    .bus-assignment-card h4::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 60px;
-        height: 3px;
-        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-        border-radius: 2px;
-    }
-    
-    .assign-form {
-        background: linear-gradient(135deg, #f8fafc 0%, white 100%);
-        border-radius: 16px;
-        padding: 2.5rem;
-        margin-top: 1.5rem;
-        border: 2px solid #e2e8f0;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .assign-form::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
-    }
-    
-    .form-row {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    @media (max-width: 1200px) {
-        .form-row {
-            grid-template-columns: repeat(3, 1fr);
-        }
-    }
-    
-    @media (max-width: 900px) {
-        .form-row {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-    
-    .form-group {
-        position: relative;
-        margin-bottom: 1.75rem;
-    }
-    
-    .form-group:hover .form-control,
-    .form-group:hover .form-select {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        transform: translateY(-1px);
-    }
-    
-    .form-group:focus-within .form-label {
-        color: #3b82f6;
-        transform: translateY(-2px);
-    }
-    
-    .form-label {
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: 0.75rem;
-        font-size: 0.95rem;
-        display: block;
-        position: relative;
-        padding-left: 1.5rem;
-    }
-    
-    .form-label::before {
-        content: '●';
-        position: absolute;
-        left: 0;
-        color: #3b82f6;
-        font-size: 0.8rem;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-    
-    .form-control, .form-select {
-        border: 2px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 1rem 1.25rem;
-        font-size: 0.95rem;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        background: white;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-        outline: none;
-        transform: translateY(-1px);
-    }
-    
-    .form-control::placeholder {
-        color: #9ca3af;
-        font-style: italic;
-    }
-    
-    .form-control:hover, .form-select:hover {
-        border-color: #d1d5db;
-    }
-    
-    .form-check {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 1rem;
-        background: #f8fafc;
-        border-radius: 12px;
-        border: 2px solid #e5e7eb;
-        transition: all 0.3s ease;
-    }
-    
-    .form-check:hover {
-        background: #f1f5f9;
-        border-color: #3b82f6;
-    }
-    
-    .form-check-input {
-        width: 1.25rem;
-        height: 1.25rem;
-        border: 2px solid #d1d5db;
-        border-radius: 6px;
-        background: white;
-        transition: all 0.3s ease;
-    }
-    
-    .form-check-input:checked {
-        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-        border-color: #3b82f6;
-    }
-    
-    .form-check-label {
-        font-weight: 500;
-        color: #374151;
-        cursor: pointer;
-    }
-    
-    .btn-assign {
-        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-        color: white;
-        border: none;
-        padding: 1.25rem 3rem;
-        border-radius: 16px;
-        font-weight: 700;
-        font-size: 1.1rem;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
-        position: relative;
-        overflow: hidden;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-    
-    .btn-assign::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s ease;
-    }
-    
-    .btn-assign:hover::before {
-        left: 100%;
-    }
-    
-    .btn-assign::after {
-        content: '→';
-        font-size: 1.2rem;
-        transition: transform 0.3s ease;
-    }
-    
-    .btn-assign:hover {
-        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-        transform: translateY(-3px);
-        box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
-    }
-    
-    .btn-assign:hover::after {
-        transform: translateX(5px);
-    }
-    
-    .btn-assign:active {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
-    }
-    
-    .btn-secondary {
-        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-        color: white;
-        border: none;
-        padding: 1rem 2rem;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .btn-secondary:hover {
-        background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(107, 114, 128, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-    
-    .alert {
-        border-radius: 12px;
-        padding: 1rem 1.5rem;
-        margin-bottom: 1.5rem;
-        border: none;
-        font-weight: 500;
-    }
-    
-    .alert-success {
-        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-        color: #065f46;
-        border-left: 4px solid #10b981;
-    }
-    
-    .alert-danger {
-        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-        color: #991b1b;
-        border-left: 4px solid #ef4444;
-    }
-</style>
-{% endblock %}
+{% block dashboard_content %}
+<div class="container mx-auto px-4 sm:px-8">
+    <div class="py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-semibold leading-tight text-gray-800">
+                        <i class="fas fa-clock mr-2"></i>Update Schedule
+                    </h2>
+                    <p class="text-gray-600">
+                        {{ route.source }} → {{ route.destination }} | Bus: {{ schedule.bus.bus_number }}
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+                    <a href="{% url 'dashboard:route_bus_management' route.id %}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Route
+                    </a>
+                </div>
+            </div>
 
-{% block content %}
-<div class="admin-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="mb-2">
-                    <i class="fas fa-edit me-3"></i>
-                    Update Schedule
-                </h1>
-                <p class="mb-0 opacity-75">
-                    Update schedule for bus {{ schedule.bus.bus_number }} on route {{ route.source }} → {{ route.destination }}
-                </p>
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-100 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800 border border-yellow-200{% else %}bg-blue-100 text-blue-800 border border-blue-200{% endif %}">
+                        <div class="flex justify-between items-center">
+                            <span>{{ message }}</span>
+                            <button onclick="this.parentElement.parentElement.remove()" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Schedule Information -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                    <i class="fas fa-info-circle mr-2 text-blue-500"></i>Current Schedule Information
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                        <div class="flex items-center">
+                            <i class="fas fa-bus text-blue-500 text-xl mr-3"></i>
+                            <div>
+                                <p class="text-sm text-gray-600">Bus</p>
+                                <p class="text-lg font-semibold text-gray-800">{{ schedule.bus.bus_number }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                        <div class="flex items-center">
+                            <i class="fas fa-route text-green-500 text-xl mr-3"></i>
+                            <div>
+                                <p class="text-sm text-gray-600">Route</p>
+                                <p class="text-lg font-semibold text-gray-800">{{ route.source }} → {{ route.destination }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar text-purple-500 text-xl mr-3"></i>
+                            <div>
+                                <p class="text-sm text-gray-600">Created</p>
+                                <p class="text-lg font-semibold text-gray-800">{{ schedule.created_at|date:"M d, Y" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
+                        <div class="flex items-center">
+                            <i class="fas fa-toggle-{% if schedule.is_active %}on text-green-500{% else %}off text-red-500{% endif %} text-xl mr-3"></i>
+                            <div>
+                                <p class="text-sm text-gray-600">Status</p>
+                                <p class="text-lg font-semibold text-gray-800">{% if schedule.is_active %}Active{% else %}Inactive{% endif %}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-4 text-end">
-                <a href="{% url 'dashboard:route_bus_management' route.id %}" class="btn-secondary">
-                    <i class="fas fa-arrow-left"></i>
-                    Back to Route Management
-                </a>
+
+            <!-- Update Form -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                    <i class="fas fa-edit mr-2 text-green-500"></i>Update Schedule Details
+                </h3>
+                
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Schedule Times -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="departure_time" class="block text-sm font-medium text-gray-700 mb-2">
+                                Departure Time <span class="text-red-500">*</span>
+                            </label>
+                            <input type="time" name="departure_time" id="departure_time" 
+                                   value="{{ schedule.departure_time|time:'H:i' }}" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                        
+                        <div>
+                            <label for="arrival_time" class="block text-sm font-medium text-gray-700 mb-2">
+                                Arrival Time <span class="text-red-500">*</span>
+                            </label>
+                            <input type="time" name="arrival_time" id="arrival_time" 
+                                   value="{{ schedule.arrival_time|time:'H:i' }}" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Fare and Schedule Type -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="base_fare" class="block text-sm font-medium text-gray-700 mb-2">
+                                Base Fare (रू) <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" name="base_fare" id="base_fare" 
+                                   value="{{ schedule.base_fare }}" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" 
+                                   min="1" step="0.01" required>
+                        </div>
+                        
+                        <div>
+                            <label for="schedule_type" class="block text-sm font-medium text-gray-700 mb-2">
+                                Schedule Type
+                            </label>
+                            <select name="schedule_type" id="schedule_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="regular" {% if schedule.schedule_type == 'regular' %}selected{% endif %}>Regular</option>
+                                <option value="express" {% if schedule.schedule_type == 'express' %}selected{% endif %}>Express</option>
+                                <option value="deluxe" {% if schedule.schedule_type == 'deluxe' %}selected{% endif %}>Deluxe</option>
+                                <option value="night" {% if schedule.schedule_type == 'night' %}selected{% endif %}>Night Service</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Effective Dates -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="effective_from" class="block text-sm font-medium text-gray-700 mb-2">
+                                Effective From
+                            </label>
+                            <input type="date" name="effective_from" id="effective_from" 
+                                   value="{{ schedule.effective_from|date:'Y-m-d' }}" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label for="effective_until" class="block text-sm font-medium text-gray-700 mb-2">
+                                Effective Until (Optional)
+                            </label>
+                            <input type="date" name="effective_until" id="effective_until" 
+                                   value="{{ schedule.effective_until|date:'Y-m-d' }}" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+                    
+                    <!-- Advanced Settings -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="days_of_week" class="block text-sm font-medium text-gray-700 mb-2">
+                                Days of Week
+                            </label>
+                            <input type="text" name="days_of_week" id="days_of_week" 
+                                   value="{{ schedule.days_of_week }}" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" 
+                                   placeholder="1234567">
+                            <p class="text-sm text-gray-500 mt-1">1=Monday, 2=Tuesday, ..., 7=Sunday (e.g., 1234567 for all days)</p>
+                        </div>
+                        
+                        <div>
+                            <label for="buffer_hours" class="block text-sm font-medium text-gray-700 mb-2">
+                                Buffer Hours
+                            </label>
+                            <input type="number" name="buffer_hours" id="buffer_hours" 
+                                   value="{{ schedule.buffer_hours }}" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" 
+                                   min="0" max="24" step="0.5">
+                            <p class="text-sm text-gray-500 mt-1">Buffer time between consecutive trips for the same bus</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Schedule Options -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="return_schedule_enabled" name="return_schedule_enabled" 
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" 
+                                   {% if schedule.return_schedule_enabled %}checked{% endif %}>
+                            <label for="return_schedule_enabled" class="ml-2 block text-sm text-gray-700">
+                                <span class="font-medium">Enable Return Schedule</span>
+                                <p class="text-gray-500 text-xs">Automatically create return trip schedule</p>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <input type="checkbox" id="is_active" name="is_active" 
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" 
+                                   {% if schedule.is_active %}checked{% endif %}>
+                            <label for="is_active" class="ml-2 block text-sm text-gray-700">
+                                <span class="font-medium">Active Schedule</span>
+                                <p class="text-gray-500 text-xs">Schedule is available for booking</p>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row justify-between gap-4 pt-4">
+                        <a href="{% url 'dashboard:route_bus_management' route.id %}" 
+                           class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors text-center">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </a>
+                        
+                        <button type="submit" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors">
+                            <i class="fas fa-save mr-2"></i>Update Schedule
+                        </button>
+                    </div>
+                </form>
             </div>
+            
+            <!-- Schedule Statistics (if available) -->
+            {% if schedule_stats %}
+            <div class="bg-white rounded-lg shadow p-6 mt-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                    <i class="fas fa-chart-bar mr-2 text-purple-500"></i>Schedule Performance
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                        <div class="text-2xl font-bold text-blue-600">{{ schedule_stats.total_bookings|default:0 }}</div>
+                        <div class="text-sm text-gray-600">Total Bookings</div>
+                    </div>
+                    
+                    <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                        <div class="text-2xl font-bold text-green-600">{{ schedule_stats.avg_occupancy|floatformat:1|default:0 }}%</div>
+                        <div class="text-sm text-gray-600">Average Occupancy</div>
+                    </div>
+                    
+                    <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+                        <div class="text-2xl font-bold text-purple-600">रू{{ schedule_stats.total_revenue|floatformat:0|default:0 }}</div>
+                        <div class="text-sm text-gray-600">Total Revenue</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
-
-<div class="container">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
-    
-    <div class="bus-assignment-card">
-        <h4 class="mb-3">
-            <i class="fas fa-edit me-2"></i>
-            Update Schedule
-        </h4>
-        
-        <form method="post" class="assign-form">
-            {% csrf_token %}
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="departure_time" class="form-label">Departure Time</label>
-                    <input type="time" name="departure_time" id="departure_time" class="form-control" value="{{ schedule.departure_time|time:'H:i' }}" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="arrival_time" class="form-label">Arrival Time</label>
-                    <input type="time" name="arrival_time" id="arrival_time" class="form-control" value="{{ schedule.arrival_time|time:'H:i' }}" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="base_fare" class="form-label">Base Fare (रू)</label>
-                    <input type="number" name="base_fare" id="base_fare" class="form-control" 
-                           value="{{ schedule.base_fare }}" min="0" step="0.01" placeholder="0.00" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="schedule_type" class="form-label">Schedule Type</label>
-                    <select name="schedule_type" id="schedule_type" class="form-select">
-                        <option value="morning" {% if schedule.schedule_type == 'morning' %}selected{% endif %}>Morning</option>
-                        <option value="afternoon" {% if schedule.schedule_type == 'afternoon' %}selected{% endif %}>Afternoon</option>
-                        <option value="evening" {% if schedule.schedule_type == 'evening' %}selected{% endif %}>Evening</option>
-                        <option value="night" {% if schedule.schedule_type == 'night' %}selected{% endif %}>Night</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="effective_from" class="form-label">Effective From</label>
-                    <input type="date" name="effective_from" id="effective_from" class="form-control" value="{{ schedule.effective_from|date:'Y-m-d' }}">
-                </div>
-                
-                <div class="form-group">
-                    <label for="effective_until" class="form-label">Effective Until (Optional)</label>
-                    <input type="date" name="effective_until" id="effective_until" class="form-control" value="{{ schedule.effective_until|date:'Y-m-d' }}">
-                </div>
-                
-                <div class="form-group">
-                    <label for="days_of_week" class="form-label">Days of Week</label>
-                    <input type="text" name="days_of_week" id="days_of_week" class="form-control" 
-                           value="{{ schedule.days_of_week }}" placeholder="1234567 (1=Mon, 7=Sun)">
-                </div>
-                
-                <div class="form-group">
-                    <label for="buffer_hours" class="form-label">Buffer Hours</label>
-                    <input type="number" name="buffer_hours" id="buffer_hours" class="form-control" 
-                           value="{{ schedule.buffer_hours }}" min="0" max="24">
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <div class="form-check mt-4">
-                        <input class="form-check-input" type="checkbox" id="return_schedule_enabled" name="return_schedule_enabled" {% if schedule.return_schedule_enabled %}checked{% endif %}>
-                        <label class="form-check-label" for="return_schedule_enabled">
-                            Enable Return Schedule
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <div class="form-check mt-4">
-                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {% if schedule.is_active %}checked{% endif %}>
-                        <label class="form-check-label" for="is_active">
-                            Active Schedule
-                        </label>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="text-center">
-                <a href="{% url 'dashboard:route_bus_management' route.id %}" class="btn-secondary me-3">
-                    <i class="fas fa-times me-1"></i>Cancel
-                </a>
-                <button type="submit" class="btn-assign">
-                    <i class="fas fa-save me-2"></i>Update Schedule
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
 {% endblock %}
 
-{% block extra_js %}
+{% block dashboard_extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('Update schedule page loaded');
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const departureTime = document.getElementById('departure_time').value;
+            const arrivalTime = document.getElementById('arrival_time').value;
+            const baseFare = document.getElementById('base_fare').value;
+            
+            // Validate required fields
+            if (!departureTime || !arrivalTime || !baseFare) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Validate time logic
+            if (departureTime >= arrivalTime) {
+                e.preventDefault();
+                alert('Arrival time must be after departure time.');
+                return;
+            }
+            
+            // Validate fare
+            if (parseFloat(baseFare) <= 0) {
+                e.preventDefault();
+                alert('Base fare must be greater than 0.');
+                return;
+            }
+        });
         
-        // Auto-dismiss alerts with fade effect
-        setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                alert.style.transition = 'opacity 0.5s ease';
-                alert.style.opacity = '0';
-                setTimeout(() => {
-                    if (alert.parentNode) {
-                        alert.parentNode.removeChild(alert);
-                    }
-                }, 500);
+        // Days of week helper
+        const daysInput = document.getElementById('days_of_week');
+        if (daysInput) {
+            daysInput.addEventListener('input', function() {
+                // Validate days format
+                const value = this.value.replace(/[^1-7]/g, '');
+                if (value !== this.value) {
+                    this.value = value;
+                }
             });
-        }, 5000);
+        }
+        
+        // Auto-dismiss messages after 5 seconds
+        setTimeout(function() {
+            const messages = document.querySelectorAll('[class*="bg-green-100"], [class*="bg-red-100"], [class*="bg-yellow-100"], [class*="bg-blue-100"]');
+            messages.forEach(message => {
+                if (message.querySelector('button')) {
+                    setTimeout(() => {
+                        message.style.opacity = '0';
+                        message.style.transition = 'opacity 0.5s';
+                        setTimeout(() => message.remove(), 500);
+                    }, 5000);
+                }
+            });
+        }, 100);
+        
+        // Real-time validation feedback
+        const timeInputs = document.querySelectorAll('input[type="time"]');
+        timeInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                const departure = document.getElementById('departure_time').value;
+                const arrival = document.getElementById('arrival_time').value;
+                
+                if (departure && arrival) {
+                    if (departure >= arrival) {
+                        this.classList.add('border-red-500');
+                        this.classList.remove('border-gray-300');
+                    } else {
+                        this.classList.remove('border-red-500');
+                        this.classList.add('border-gray-300');
+                    }
+                }
+            });
+        });
     });
 </script>
 {% endblock %}

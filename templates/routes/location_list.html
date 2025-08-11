@@ -1,666 +1,349 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}All Locations{% endblock %}
-
-{% block extra_css %}
-<style>
-    .locations-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 3rem 0;
-        margin-bottom: 2rem;
-    }
-    
-    .search-section {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .search-form {
-        display: flex;
-        gap: 1rem;
-        align-items: end;
-        flex-wrap: wrap;
-    }
-    
-    .form-group {
-        flex: 1;
-        min-width: 250px;
-    }
-    
-    .form-label {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: #495057;
-        margin-bottom: 0.5rem;
-    }
-    
-    .form-control {
-        border: 1px solid #ced4da;
-        border-radius: 6px;
-        padding: 0.5rem 0.75rem;
-        font-size: 0.875rem;
-        transition: border-color 0.3s ease;
-    }
-    
-    .form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    
-    .btn-search {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        padding: 0.5rem 1.5rem;
-        border-radius: 6px;
-        color: white;
-        font-size: 0.875rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        flex: 0 0 auto;
-    }
-    
-    .btn-search:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
-    }
-    
-    .btn-clear {
-        background: transparent;
-        border: 1px solid #6c757d;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        color: #6c757d;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        flex: 0 0 auto;
-    }
-    
-    .btn-clear:hover {
-        background: #6c757d;
-        color: white;
-    }
-    
-    .locations-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .location-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        padding: 1.5rem;
-        border: 1px solid #e9ecef;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .location-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
-    }
-    
-    .location-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .location-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1rem;
-    }
-    
-    .location-info {
-        flex: 1;
-    }
-    
-    .location-name {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #495057;
-        margin-bottom: 0.25rem;
-        display: flex;
-        align-items: center;
-    }
-    
-    .location-name i {
-        color: #667eea;
-        margin-right: 0.5rem;
-    }
-    
-    .location-region {
-        color: #6c757d;
-        font-size: 0.875rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .location-country {
-        color: #6c757d;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .popular-badge {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 15px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        flex: 0 0 auto;
-    }
-    
-    .location-details {
-        margin-bottom: 1.5rem;
-    }
-    
-    .detail-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #f8f9fa;
-    }
-    
-    .detail-row:last-child {
-        border-bottom: none;
-    }
-    
-    .detail-label {
-        font-size: 0.875rem;
-        color: #6c757d;
-        display: flex;
-        align-items: center;
-    }
-    
-    .detail-label i {
-        color: #667eea;
-        margin-right: 0.5rem;
-        width: 16px;
-    }
-    
-    .detail-value {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #495057;
-    }
-    
-    .location-stats {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-    }
-    
-    .stat-item {
-        text-align: center;
-        flex: 1;
-    }
-    
-    .stat-value {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #495057;
-        margin-bottom: 0.25rem;
-    }
-    
-    .stat-label {
-        font-size: 0.75rem;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .location-actions {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        color: white;
-        text-decoration: none;
-        font-size: 0.875rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        flex: 1;
-        justify-content: center;
-    }
-    
-    .btn-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn-outline {
-        background: transparent;
-        border: 1px solid #667eea;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        color: #667eea;
-        text-decoration: none;
-        font-size: 0.875rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        flex: 1;
-        justify-content: center;
-    }
-    
-    .btn-outline:hover {
-        background: #667eea;
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn i {
-        margin-right: 0.5rem;
-    }
-    
-    .no-locations {
-        text-align: center;
-        padding: 3rem 1rem;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        grid-column: 1 / -1;
-    }
-    
-    .no-locations i {
-        font-size: 3rem;
-        color: #6c757d;
-        margin-bottom: 1rem;
-    }
-    
-    .no-locations h3 {
-        color: #495057;
-        margin-bottom: 1rem;
-    }
-    
-    .no-locations p {
-        color: #6c757d;
-        margin-bottom: 2rem;
-    }
-    
-    .pagination-wrapper {
-        display: flex;
-        justify-content: center;
-        margin-top: 2rem;
-    }
-    
-    .pagination {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-    }
-    
-    .page-link {
-        padding: 0.5rem 0.75rem;
-        border: 1px solid #dee2e6;
-        color: #667eea;
-        text-decoration: none;
-        border-radius: 6px;
-        transition: all 0.3s ease;
-    }
-    
-    .page-link:hover {
-        background: #667eea;
-        color: white;
-        text-decoration: none;
-    }
-    
-    .page-link.active {
-        background: #667eea;
-        color: white;
-        border-color: #667eea;
-    }
-    
-    .page-link.disabled {
-        color: #6c757d;
-        pointer-events: none;
-        background: #f8f9fa;
-    }
-    
-    .summary-section {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .summary-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-    }
-    
-    .summary-item {
-        text-align: center;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-    }
-    
-    .summary-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1rem;
-        font-size: 1.25rem;
-    }
-    
-    .summary-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #495057;
-        margin-bottom: 0.25rem;
-    }
-    
-    .summary-label {
-        font-size: 0.875rem;
-        color: #6c757d;
-    }
-    
-    @media (max-width: 768px) {
-        .search-form {
-            flex-direction: column;
-        }
-        
-        .form-group {
-            min-width: auto;
-        }
-        
-        .locations-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .location-actions {
-            flex-direction: column;
-        }
-        
-        .summary-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .summary-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-{% endblock %}
+{% block title %}All Locations - TravelMate{% endblock %}
 
 {% block content %}
 <!-- Header -->
-<section class="locations-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>All Locations</h1>
-                <p class="mb-0">Discover all destinations we serve across the country</p>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <a href="{% url 'routes:route_search' %}" class="btn btn-light me-2">
-                    <i class="fas fa-search me-2"></i>Search Routes
-                </a>
-                <a href="{% url 'routes:route_list' %}" class="btn btn-success">
-                    <i class="fas fa-route me-2"></i>All Routes
-                </a>
-            </div>
+<section class="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-16 -mt-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-map-marker-alt text-2xl"></i>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">All Locations</h1>
+        <p class="text-xl opacity-90">Discover all destinations served by TravelMate across Nepal</p>
+    </div>
+</section>
+
+<!-- Search Section -->
+<section class="py-8 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                <i class="fas fa-search mr-2 text-blue-500"></i>Search Locations
+            </h2>
+            
+            <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search by name or region</label>
+                    <input type="text" name="search" value="{{ search_query }}" 
+                           placeholder="Enter city, district, or region name..." 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sort by</label>
+                    <select name="sort" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Default</option>
+                        <option value="name" {% if sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                        <option value="popularity" {% if sort == 'popularity' %}selected{% endif %}>Popularity</option>
+                        <option value="routes" {% if sort == 'routes' %}selected{% endif %}>Most Routes</option>
+                    </select>
+                </div>
+                
+                <div class="md:col-span-3 flex gap-2">
+                    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-search mr-2"></i>Search Locations
+                    </button>
+                    
+                    {% if search_query or sort %}
+                        <a href="{% url 'routes:location_list' %}" 
+                           class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                            <i class="fas fa-times mr-2"></i>Clear Filters
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
         </div>
     </div>
 </section>
 
-<!-- Content -->
-<section class="py-4">
-    <div class="container">
-        <!-- Summary Section -->
-        <div class="summary-section">
-            <div class="summary-grid">
-                <div class="summary-item">
-                    <div class="summary-icon">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </div>
-                    <div class="summary-value">{{ page_obj.paginator.count }}</div>
-                    <div class="summary-label">Total Locations</div>
+<!-- Locations Grid -->
+<section class="py-8 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% if locations %}
+            <!-- Results Summary -->
+            <div class="flex justify-between items-center mb-6">
+                <div class="text-gray-600">
+                    <span class="font-semibold">{{ locations|length }}</span> location{{ locations|length|pluralize }} found
+                    {% if search_query %}
+                        for "{{ search_query }}"
+                    {% endif %}
                 </div>
                 
-                <div class="summary-item">
-                    <div class="summary-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="summary-value">{{ popular_count|default:"0" }}</div>
-                    <div class="summary-label">Popular Destinations</div>
-                </div>
-                
-                <div class="summary-item">
-                    <div class="summary-icon">
-                        <i class="fas fa-globe"></i>
-                    </div>
-                    <div class="summary-value">{{ states_count|default:"0" }}</div>
-                    <div class="summary-label">States Covered</div>
-                </div>
-                
-                <div class="summary-item">
-                    <div class="summary-icon">
-                        <i class="fas fa-route"></i>
-                    </div>
-                    <div class="summary-value">{{ routes_count|default:"0" }}</div>
-                    <div class="summary-label">Active Routes</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Search and Filter -->
-        <div class="search-section">
-            <form method="GET" class="search-form">
-                <div class="form-group">
-                    <label class="form-label">Search Locations</label>
-                    <input type="text" name="search" class="form-control" placeholder="Search by city, state, or country..." value="{{ search_query }}">
-                </div>
-                
-                <div class="form-group" style="flex: 0 0 auto;">
-                    <button type="submit" class="btn-search">
-                        <i class="fas fa-search me-2"></i>Search
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-600">View:</span>
+                    <button onclick="toggleView('grid')" id="gridViewBtn" 
+                            class="p-2 rounded bg-blue-500 text-white">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                    <button onclick="toggleView('list')" id="listViewBtn" 
+                            class="p-2 rounded bg-gray-300 text-gray-600">
+                        <i class="fas fa-list"></i>
                     </button>
                 </div>
-                
-                <div class="form-group" style="flex: 0 0 auto;">
-                    <a href="{% url 'routes:location_list' %}" class="btn-clear">
-                        <i class="fas fa-times me-2"></i>Clear
-                    </a>
-                </div>
-            </form>
-        </div>
-        
-        <!-- Locations Grid -->
-        {% if page_obj %}
-            <div class="locations-grid">
-                {% for location in page_obj %}
-                <div class="location-card">
-                    <div class="location-header">
-                        <div class="location-info">
-                            <div class="location-name">
-                                <i class="fas fa-map-marker-alt"></i>
-                                {{ location.name }}
+            </div>
+            
+            <!-- Locations Grid -->
+            <div id="locationsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {% for location in locations %}
+                <div class="location-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+                    <!-- Location Image/Header -->
+                    <div class="relative h-48 bg-gradient-to-br from-blue-500 to-purple-600">
+                        {% if location.image %}
+                            <img src="{{ location.image.url }}" alt="{{ location.name }}" 
+                                 class="w-full h-full object-cover">
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt text-white text-4xl"></i>
                             </div>
-                            <div class="location-region">{{ location.state }}</div>
-                            <div class="location-country">{{ location.country }}</div>
+                        {% endif %}
+                        
+                        <!-- Overlay -->
+                        <div class="absolute inset-0 bg-black bg-opacity-30 group-hover:bg-opacity-20 transition-all duration-300"></div>
+                        
+                        <!-- Location Name -->
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <h3 class="text-xl font-bold text-white mb-1">{{ location.name }}</h3>
+                            <p class="text-blue-100 text-sm">{{ location.district|default:"Nepal" }}</p>
                         </div>
+                        
+                        <!-- Popular Badge -->
                         {% if location.is_popular %}
-                        <div class="popular-badge">
-                            Popular
+                        <div class="absolute top-4 right-4">
+                            <span class="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                                <i class="fas fa-star mr-1"></i>Popular
+                            </span>
                         </div>
                         {% endif %}
                     </div>
                     
-                    <div class="location-details">
-                        <div class="detail-row">
-                            <span class="detail-label">
-                                <i class="fas fa-clock"></i>
-                                Timezone
-                            </span>
-                            <span class="detail-value">{{ location.timezone|default:"UTC+5:30" }}</span>
+                    <!-- Location Details -->
+                    <div class="p-6">
+                        <!-- Stats -->
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="text-center p-3 bg-blue-50 rounded-lg">
+                                <i class="fas fa-route text-blue-500 text-lg mb-2"></i>
+                                <div class="text-lg font-semibold text-gray-800">{{ location.total_routes|default:"12" }}</div>
+                                <div class="text-xs text-gray-600">Routes</div>
+                            </div>
+                            
+                            <div class="text-center p-3 bg-green-50 rounded-lg">
+                                <i class="fas fa-bus text-green-500 text-lg mb-2"></i>
+                                <div class="text-lg font-semibold text-gray-800">{{ location.daily_buses|default:"45" }}</div>
+                                <div class="text-xs text-gray-600">Daily Buses</div>
+                            </div>
                         </div>
                         
-                        <div class="detail-row">
-                            <span class="detail-label">
-                                <i class="fas fa-map"></i>
-                                Coordinates
-                            </span>
-                            <span class="detail-value">
-                                {% if location.latitude and location.longitude %}
-                                    {{ location.latitude|floatformat:2 }}, {{ location.longitude|floatformat:2 }}
-                                {% else %}
-                                    Not available
+                        <!-- Popular Destinations -->
+                        {% if location.popular_destinations %}
+                        <div class="mb-6">
+                            <h4 class="text-sm font-semibold text-gray-700 mb-3">Popular Routes From Here</h4>
+                            <div class="space-y-2">
+                                {% for dest in location.popular_destinations|slice:":3" %}
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-gray-600">{{ location.name }} → {{ dest.name }}</span>
+                                    <span class="text-blue-600 font-medium">रू{{ dest.min_fare|default:"500" }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Location Features -->
+                        <div class="mb-6">
+                            <h4 class="text-sm font-semibold text-gray-700 mb-3">Features</h4>
+                            <div class="flex flex-wrap gap-2">
+                                {% if location.has_bus_station %}
+                                <span class="inline-flex items-center px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">
+                                    <i class="fas fa-building mr-1"></i>Bus Station
+                                </span>
                                 {% endif %}
-                            </span>
+                                
+                                {% if location.tourist_destination %}
+                                <span class="inline-flex items-center px-2 py-1 bg-green-50 text-green-700 rounded-full text-xs">
+                                    <i class="fas fa-camera mr-1"></i>Tourist Spot
+                                </span>
+                                {% endif %}
+                                
+                                {% if location.major_city %}
+                                <span class="inline-flex items-center px-2 py-1 bg-purple-50 text-purple-700 rounded-full text-xs">
+                                    <i class="fas fa-city mr-1"></i>Major City
+                                </span>
+                                {% endif %}
+                                
+                                <span class="inline-flex items-center px-2 py-1 bg-gray-50 text-gray-700 rounded-full text-xs">
+                                    <i class="fas fa-shield-alt mr-1"></i>Safe Route
+                                </span>
+                            </div>
                         </div>
                         
-                        <div class="detail-row">
-                            <span class="detail-label">
-                                <i class="fas fa-info-circle"></i>
-                                Status
-                            </span>
-                            <span class="detail-value">
-                                {% if location.is_active %}
-                                    <span style="color: #28a745;">Active</span>
-                                {% else %}
-                                    <span style="color: #dc3545;">Inactive</span>
-                                {% endif %}
-                            </span>
+                        <!-- Action Buttons -->
+                        <div class="space-y-2">
+                            <a href="{% url 'routes:route_search' %}?source={{ location.name }}" 
+                               class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors text-center font-medium block">
+                                <i class="fas fa-plane-departure mr-2"></i>From {{ location.name }}
+                            </a>
+                            
+                            <a href="{% url 'routes:route_search' %}?destination={{ location.name }}" 
+                               class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors text-center font-medium block">
+                                <i class="fas fa-plane-arrival mr-2"></i>To {{ location.name }}
+                            </a>
                         </div>
-                    </div>
-                    
-                    <div class="location-stats">
-                        <div class="stat-item">
-                            <div class="stat-value">{{ location.source_routes_count|default:"0" }}</div>
-                            <div class="stat-label">From Here</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">{{ location.destination_routes_count|default:"0" }}</div>
-                            <div class="stat-label">To Here</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">{{ location.total_bookings|default:"0" }}</div>
-                            <div class="stat-label">Bookings</div>
-                        </div>
-                    </div>
-                    
-                    <div class="location-actions">
-                        <a href="{% url 'routes:route_search' %}?source={{ location.id }}" class="btn-primary">
-                            <i class="fas fa-plane-departure"></i>From Here
-                        </a>
-                        <a href="{% url 'routes:route_search' %}?destination={{ location.id }}" class="btn-outline">
-                            <i class="fas fa-plane-arrival"></i>To Here
-                        </a>
                     </div>
                 </div>
                 {% endfor %}
             </div>
             
             <!-- Pagination -->
-            {% if page_obj.has_other_pages %}
-            <div class="pagination-wrapper">
-                <div class="pagination">
-                    {% if page_obj.has_previous %}
-                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}page=1" class="page-link">
-                            <i class="fas fa-angle-double-left"></i>
-                        </a>
-                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}page={{ page_obj.previous_page_number }}" class="page-link">
-                            <i class="fas fa-angle-left"></i>
-                        </a>
-                    {% else %}
-                        <span class="page-link disabled">
-                            <i class="fas fa-angle-double-left"></i>
+            {% if is_paginated %}
+                <div class="flex justify-center mt-8">
+                    <nav class="flex space-x-2">
+                        {% if page_obj.has_previous %}
+                            <a href="?{% if search_query %}search={{ search_query }}&{% endif %}page=1" 
+                               class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                            <a href="?{% if search_query %}search={{ search_query }}&{% endif %}page={{ page_obj.previous_page_number }}" 
+                               class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        {% endif %}
+                        
+                        <span class="bg-blue-500 text-white px-3 py-2 rounded">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
                         </span>
-                        <span class="page-link disabled">
-                            <i class="fas fa-angle-left"></i>
-                        </span>
-                    {% endif %}
-                    
-                    <span class="page-link active">
-                        {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-                    </span>
-                    
-                    {% if page_obj.has_next %}
-                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}page={{ page_obj.next_page_number }}" class="page-link">
-                            <i class="fas fa-angle-right"></i>
-                        </a>
-                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}page={{ page_obj.paginator.num_pages }}" class="page-link">
-                            <i class="fas fa-angle-double-right"></i>
-                        </a>
-                    {% else %}
-                        <span class="page-link disabled">
-                            <i class="fas fa-angle-right"></i>
-                        </span>
-                        <span class="page-link disabled">
-                            <i class="fas fa-angle-double-right"></i>
-                        </span>
-                    {% endif %}
+                        
+                        {% if page_obj.has_next %}
+                            <a href="?{% if search_query %}search={{ search_query }}&{% endif %}page={{ page_obj.next_page_number }}" 
+                               class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="?{% if search_query %}search={{ search_query }}&{% endif %}page={{ page_obj.paginator.num_pages }}" 
+                               class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        {% endif %}
+                    </nav>
                 </div>
-            </div>
             {% endif %}
         {% else %}
-            <div class="locations-grid">
-                <div class="no-locations">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <h3>No Locations Found</h3>
-                    <p>{% if search_query %}No locations match your search criteria. Try adjusting your search terms.{% else %}No locations are currently available.{% endif %}</p>
-                    <a href="{% url 'routes:route_search' %}" class="btn-primary">
-                        <i class="fas fa-search me-2"></i>Search Routes
-                    </a>
-                    <a href="{% url 'home:home' %}" class="btn-outline">
-                        <i class="fas fa-home me-2"></i>Back to Home
-                    </a>
+            <!-- Empty State -->
+            <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                <div class="max-w-md mx-auto">
+                    <i class="fas fa-map-marker-alt text-6xl text-gray-300 mb-6"></i>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">No Locations Found</h3>
+                    <p class="text-gray-600 mb-6">
+                        {% if search_query %}
+                            No locations match your search criteria "{{ search_query }}". Try adjusting your search terms.
+                        {% else %}
+                            No locations are currently available. Please check back later.
+                        {% endif %}
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                        <a href="{% url 'routes:route_search' %}" 
+                           class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                            <i class="fas fa-search mr-2"></i>Search Routes
+                        </a>
+                        {% if search_query %}
+                            <a href="{% url 'routes:location_list' %}" 
+                               class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
+                                <i class="fas fa-times mr-2"></i>Clear Search
+                            </a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         {% endif %}
+    </div>
+</section>
+
+<!-- Popular Destinations -->
+{% if not search_query %}
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Most Popular Destinations</h2>
+            <p class="text-xl text-gray-600">Top destinations chosen by travelers</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Popular Destination 1 -->
+            <div class="bg-gradient-to-br from-blue-500 to-purple-600 text-white p-6 rounded-xl hover:shadow-lg transition-shadow cursor-pointer" 
+                 onclick="searchFromLocation('Kathmandu')">
+                <div class="text-center">
+                    <i class="fas fa-city text-3xl mb-3"></i>
+                    <h3 class="text-lg font-semibold mb-2">Kathmandu</h3>
+                    <div class="text-sm opacity-90">Capital City • 50+ routes</div>
+                </div>
+            </div>
+            
+            <!-- Popular Destination 2 -->
+            <div class="bg-gradient-to-br from-green-500 to-teal-600 text-white p-6 rounded-xl hover:shadow-lg transition-shadow cursor-pointer" 
+                 onclick="searchFromLocation('Pokhara')">
+                <div class="text-center">
+                    <i class="fas fa-mountain text-3xl mb-3"></i>
+                    <h3 class="text-lg font-semibold mb-2">Pokhara</h3>
+                    <div class="text-sm opacity-90">Lake City • 25+ routes</div>
+                </div>
+            </div>
+            
+            <!-- Popular Destination 3 -->
+            <div class="bg-gradient-to-br from-orange-500 to-red-600 text-white p-6 rounded-xl hover:shadow-lg transition-shadow cursor-pointer" 
+                 onclick="searchFromLocation('Chitwan')">
+                <div class="text-center">
+                    <i class="fas fa-tree text-3xl mb-3"></i>
+                    <h3 class="text-lg font-semibold mb-2">Chitwan</h3>
+                    <div class="text-sm opacity-90">National Park • 20+ routes</div>
+                </div>
+            </div>
+            
+            <!-- Popular Destination 4 -->
+            <div class="bg-gradient-to-br from-purple-500 to-pink-600 text-white p-6 rounded-xl hover:shadow-lg transition-shadow cursor-pointer" 
+                 onclick="searchFromLocation('Butwal')">
+                <div class="text-center">
+                    <i class="fas fa-road text-3xl mb-3"></i>
+                    <h3 class="text-lg font-semibold mb-2">Butwal</h3>
+                    <div class="text-sm opacity-90">Gateway West • 18+ routes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Quick Stats -->
+<section class="py-12 bg-blue-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-8">
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">TravelMate Network</h3>
+            <p class="text-gray-600">Connecting Nepal from east to west</p>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="text-center">
+                <div class="text-3xl font-bold text-blue-600 mb-2">75+</div>
+                <div class="text-gray-600">Cities & Towns</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-green-600 mb-2">200+</div>
+                <div class="text-gray-600">Routes</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-purple-600 mb-2">500+</div>
+                <div class="text-gray-600">Daily Buses</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-orange-600 mb-2">7</div>
+                <div class="text-gray-600">Provinces</div>
+            </div>
+        </div>
     </div>
 </section>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Add any JavaScript functionality here if needed
     document.addEventListener('DOMContentLoaded', function() {
         // Auto-submit search form on Enter key
         const searchInput = document.querySelector('input[name="search"]');
@@ -671,6 +354,47 @@
                 }
             });
         }
+        
+        // Add smooth animations to location cards
+        const locationCards = document.querySelectorAll('.location-card');
+        locationCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
     });
+    
+    // View toggle functionality
+    function toggleView(viewType) {
+        const container = document.getElementById('locationsContainer');
+        const gridBtn = document.getElementById('gridViewBtn');
+        const listBtn = document.getElementById('listViewBtn');
+        
+        if (viewType === 'grid') {
+            container.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6';
+            gridBtn.className = 'p-2 rounded bg-blue-500 text-white';
+            listBtn.className = 'p-2 rounded bg-gray-300 text-gray-600';
+        } else {
+            container.className = 'space-y-4';
+            gridBtn.className = 'p-2 rounded bg-gray-300 text-gray-600';
+            listBtn.className = 'p-2 rounded bg-blue-500 text-white';
+            
+            // Adjust card layout for list view
+            const cards = container.querySelectorAll('.location-card');
+            cards.forEach(card => {
+                card.classList.add('flex', 'flex-col', 'md:flex-row');
+            });
+        }
+    }
+    
+    // Search from location function
+    function searchFromLocation(locationName) {
+        window.location.href = `/routes/search/?source=${encodeURIComponent(locationName)}`;
+    }
 </script>
 {% endblock %}

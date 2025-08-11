@@ -1,700 +1,614 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Process Refund - Admin Dashboard{% endblock %}
-
-{% block extra_css %}
-<style>
-    .admin-container {
-        background: #f8f9fa;
-        min-height: 100vh;
-        padding: 2rem 0;
-    }
-    
-    .refund-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        overflow: hidden;
-        margin-bottom: 2rem;
-    }
-    
-    .card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 1.5rem 2rem;
-        border-bottom: none;
-    }
-    
-    .card-header h3 {
-        margin: 0;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-    }
-    
-    .card-header h3 i {
-        margin-right: 0.75rem;
-        font-size: 1.2rem;
-    }
-    
-    .card-body {
-        padding: 2rem;
-    }
-    
-    .refund-status {
-        display: inline-block;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .refund-status.pending {
-        background: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeaa7;
-    }
-    
-    .refund-status.approved {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-    
-    .refund-status.rejected {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
-    
-    .refund-status.processed {
-        background: #d1ecf1;
-        color: #0c5460;
-        border: 1px solid #bee5eb;
-    }
-    
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
-        margin-bottom: 2rem;
-    }
-    
-    .info-section {
-        background: #f8f9fa;
-        border-radius: 12px;
-        padding: 1.5rem;
-        border-left: 4px solid #667eea;
-    }
-    
-    .info-section h5 {
-        color: #333;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-    }
-    
-    .info-section h5 i {
-        margin-right: 0.5rem;
-        color: #667eea;
-    }
-    
-    .info-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #e9ecef;
-    }
-    
-    .info-row:last-child {
-        border-bottom: none;
-    }
-    
-    .info-label {
-        font-weight: 600;
-        color: #6c757d;
-    }
-    
-    .info-value {
-        color: #333;
-        font-weight: 500;
-    }
-    
-    .info-value.amount {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #667eea;
-    }
-    
-    .timeline {
-        position: relative;
-        padding: 1rem 0;
-    }
-    
-    .timeline::before {
-        content: '';
-        position: absolute;
-        left: 20px;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background: #e9ecef;
-    }
-    
-    .timeline-item {
-        position: relative;
-        padding: 1rem 0 1rem 60px;
-        margin-bottom: 1rem;
-    }
-    
-    .timeline-item:last-child {
-        margin-bottom: 0;
-    }
-    
-    .timeline-dot {
-        position: absolute;
-        left: 12px;
-        top: 1.5rem;
-        width: 16px;
-        height: 16px;
-        background: #667eea;
-        border-radius: 50%;
-        border: 3px solid white;
-        box-shadow: 0 0 0 2px #667eea;
-    }
-    
-    .timeline-content {
-        background: white;
-        padding: 1rem;
-        border-radius: 10px;
-        border: 1px solid #e9ecef;
-    }
-    
-    .timeline-title {
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 0.25rem;
-    }
-    
-    .timeline-time {
-        color: #6c757d;
-        font-size: 0.9rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .timeline-description {
-        color: #6c757d;
-        font-size: 0.9rem;
-        margin: 0;
-    }
-    
-    .action-form {
-        background: #f8f9fa;
-        border-radius: 12px;
-        padding: 2rem;
-        margin-top: 2rem;
-    }
-    
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    
-    .form-label {
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 0.5rem;
-        display: block;
-    }
-    
-    .form-control {
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-    }
-    
-    .form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    
-    .btn-group {
-        display: flex;
-        gap: 1rem;
-        margin-top: 1.5rem;
-    }
-    
-    .btn {
-        border: none;
-        border-radius: 8px;
-        padding: 0.75rem 2rem;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        flex: 1;
-    }
-    
-    .btn i {
-        margin-right: 0.5rem;
-    }
-    
-    .btn-approve {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        color: white;
-    }
-    
-    .btn-approve:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn-reject {
-        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        color: white;
-    }
-    
-    .btn-reject:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn-process {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-    }
-    
-    .btn-process:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn-back {
-        background: #6c757d;
-        color: white;
-    }
-    
-    .btn-back:hover {
-        background: #5a6268;
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn:disabled {
-        opacity: 0.6;
-        transform: none;
-        box-shadow: none;
-        cursor: not-allowed;
-    }
-    
-    .alert {
-        border-radius: 10px;
-        border: none;
-        padding: 1rem 1.25rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .alert-success {
-        background: #d4edda;
-        color: #155724;
-    }
-    
-    .alert-danger {
-        background: #f8d7da;
-        color: #721c24;
-    }
-    
-    .alert-warning {
-        background: #fff3cd;
-        color: #856404;
-    }
-    
-    .refund-calculation {
-        background: white;
-        border: 2px solid #667eea;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin: 1.5rem 0;
-    }
-    
-    .calculation-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #e9ecef;
-    }
-    
-    .calculation-row:last-child {
-        border-bottom: none;
-        font-weight: 700;
-        font-size: 1.1rem;
-        color: #667eea;
-        border-top: 2px solid #e9ecef;
-        padding-top: 1rem;
-        margin-top: 0.5rem;
-    }
-    
-    .loading-spinner {
-        display: none;
-        margin-right: 0.5rem;
-    }
-    
-    @media (max-width: 768px) {
-        .admin-container {
-            padding: 1rem;
-        }
-        
-        .card-body {
-            padding: 1.5rem;
-        }
-        
-        .info-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .btn-group {
-            flex-direction: column;
-        }
-        
-        .timeline {
-            padding-left: 0;
-        }
-        
-        .timeline::before {
-            left: 15px;
-        }
-        
-        .timeline-item {
-            padding-left: 50px;
-        }
-        
-        .timeline-dot {
-            left: 7px;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="admin-container">
-    <div class="container">
-        <!-- Header -->
-        <div class="refund-card">
-            <div class="card-header">
-                <h3>
-                    <i class="fas fa-undo-alt"></i>
-                    Process Refund Request
-                </h3>
-            </div>
-        </div>
-        
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}" role="alert">
-                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} mr-2"></i>
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-        
-        <!-- Refund Information -->
-        <div class="refund-card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="mb-0">Refund Request #{{ refund.id }}</h4>
-                    <span class="refund-status {{ refund.status|lower }}">{{ refund.get_status_display }}</span>
-                </div>
-                
-                <div class="info-grid">
-                    <!-- Booking Information -->
-                    <div class="info-section">
-                        <h5><i class="fas fa-ticket-alt"></i>Booking Details</h5>
-                        <div class="info-row">
-                            <span class="info-label">Booking ID:</span>
-                            <span class="info-value">{{ refund.booking.booking_id }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Route:</span>
-                            <span class="info-value">{{ refund.booking.route.source }} → {{ refund.booking.route.destination }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Travel Date:</span>
-                            <span class="info-value">{{ refund.booking.travel_date|date:"M d, Y" }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Passenger:</span>
-                            <span class="info-value">{{ refund.booking.passenger_name }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Total Amount:</span>
-                            <span class="info-value amount">रू{{ refund.booking.total_amount }}</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Refund Information -->
-                    <div class="info-section">
-                        <h5><i class="fas fa-money-bill-wave"></i>Refund Details</h5>
-                        <div class="info-row">
-                            <span class="info-label">Request Date:</span>
-                            <span class="info-value">{{ refund.created_at|date:"M d, Y H:i" }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Reason:</span>
-                            <span class="info-value">{{ refund.get_reason_display }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Requested Amount:</span>
-                            <span class="info-value amount">रू{{ refund.refund_amount }}</span>
-                        </div>
-                        {% if refund.admin_notes %}
-                        <div class="info-row">
-                            <span class="info-label">Admin Notes:</span>
-                            <span class="info-value">{{ refund.admin_notes }}</span>
-                        </div>
-                        {% endif %}
-                        {% if refund.processed_at %}
-                        <div class="info-row">
-                            <span class="info-label">Processed Date:</span>
-                            <span class="info-value">{{ refund.processed_at|date:"M d, Y H:i" }}</span>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <!-- Customer Comments -->
-                {% if refund.comments %}
-                <div class="info-section">
-                    <h5><i class="fas fa-comment"></i>Customer Comments</h5>
-                    <p class="mb-0">{{ refund.comments }}</p>
-                </div>
-                {% endif %}
-                
-                <!-- Refund Calculation -->
-                <div class="refund-calculation">
-                    <h5 class="mb-3"><i class="fas fa-calculator mr-2"></i>Refund Calculation</h5>
-                    <div class="calculation-row">
-                        <span>Original Amount:</span>
-                        <span>रू{{ refund.booking.total_amount }}</span>
-                    </div>
-                    <div class="calculation-row">
-                        <span>Cancellation Fee:</span>
-                        <span>- रू{{ refund.cancellation_fee|default:0 }}</span>
-                    </div>
-                    <div class="calculation-row">
-                        <span>Processing Fee:</span>
-                        <span>- रू{{ refund.processing_fee|default:0 }}</span>
-                    </div>
-                    <div class="calculation-row">
-                        <span>Refund Amount:</span>
-                        <span>रू{{ refund.refund_amount }}</span>
-                    </div>
-                </div>
-                
-                <!-- Timeline -->
-                {% if refund.timeline.exists %}
-                <div class="mt-4">
-                    <h5 class="mb-3"><i class="fas fa-history mr-2"></i>Refund Timeline</h5>
-                    <div class="timeline">
-                        {% for event in refund.timeline.all %}
-                        <div class="timeline-item">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-content">
-                                <div class="timeline-title">{{ event.title }}</div>
-                                <div class="timeline-time">{{ event.created_at|date:"M d, Y H:i" }}</div>
-                                {% if event.description %}
-                                <p class="timeline-description">{{ event.description }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-                
-                <!-- Action Form -->
-                {% if refund.status == 'pending' %}
-                <div class="action-form">
-                    <h5 class="mb-3"><i class="fas fa-cogs mr-2"></i>Process Refund</h5>
-                    
-                    <form method="post" id="refundForm">
-                        {% csrf_token %}
-                        
-                        <div class="form-group">
-                            <label for="action" class="form-label">Action</label>
-                            <select class="form-control" name="action" id="action" required>
-                                <option value="">Select Action</option>
-                                <option value="approve">Approve Refund</option>
-                                <option value="reject">Reject Refund</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group" id="refundAmountGroup" style="display: none;">
-                            <label for="refund_amount" class="form-label">Final Refund Amount</label>
-                            <input type="number" class="form-control" name="refund_amount" 
-                                   id="refund_amount" step="0.01" min="0" 
-                                   value="{{ refund.refund_amount }}" 
-                                   placeholder="Enter final refund amount">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="admin_notes" class="form-label">Admin Notes</label>
-                            <textarea class="form-control" name="admin_notes" id="admin_notes" 
-                                      rows="3" placeholder="Add notes about this decision..."></textarea>
-                        </div>
-                        
-                        <div class="form-group" id="rejectionReasonGroup" style="display: none;">
-                            <label for="rejection_reason" class="form-label">Rejection Reason</label>
-                            <select class="form-control" name="rejection_reason" id="rejection_reason">
-                                <option value="">Select Reason</option>
-                                <option value="invalid_request">Invalid Request</option>
-                                <option value="policy_violation">Policy Violation</option>
-                                <option value="insufficient_documentation">Insufficient Documentation</option>
-                                <option value="duplicate_request">Duplicate Request</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        
-                        <div class="btn-group">
-                            <button type="submit" class="btn btn-process" id="submitBtn">
-                                <span class="loading-spinner">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                </span>
-                                <i class="fas fa-check mr-2"></i>Process Refund
-                            </button>
-                            <a href="{% url 'payments:admin_refund_list' %}" class="btn btn-back">
-                                <i class="fas fa-arrow-left mr-2"></i>Back to List
-                            </a>
-                        </div>
-                    </form>
-                </div>
-                {% else %}
-                <div class="text-center mt-4">
-                    <a href="{% url 'payments:admin_refund_list' %}" class="btn btn-back">
-                        <i class="fas fa-arrow-left mr-2"></i>Back to Refund List
-                    </a>
-                </div>
-                {% endif %}
-            </div>
-        </div>
+{% extends 'base.html' %} {% load static %} {% block title %}Process Refund -
+Admin Dashboard{% endblock %} {% block content %}
+<!-- Header -->
+<section
+  class="bg-gradient-to-r from-indigo-600 to-purple-700 text-white py-12 -mt-6"
+>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">
+          <i class="fas fa-undo mr-3"></i>Process Refund Request
+        </h1>
+        <p class="text-xl opacity-90">
+          Review and process customer refund request
+        </p>
+      </div>
+      <div>
+        <a
+          href="{% url 'payments:admin_refund_list' %}"
+          class="bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-colors"
+        >
+          <i class="fas fa-arrow-left mr-2"></i>Back to List
+        </a>
+      </div>
     </div>
-</div>
-{% endblock %}
+  </div>
+</section>
 
-{% block extra_js %}
+<!-- Refund Processing -->
+<section class="py-12 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Refund Details -->
+      <div class="lg:col-span-2">
+        <!-- Refund Information -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
+          <div
+            class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6"
+          >
+            <h2 class="text-xl font-bold flex items-center">
+              <i class="fas fa-info-circle mr-3"></i>Refund Request Details
+            </h2>
+          </div>
+
+          <div class="p-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Basic Info -->
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                  <i class="fas fa-receipt text-indigo-500 mr-2"></i>Request
+                  Information
+                </h3>
+
+                <div class="space-y-3">
+                  <div
+                    class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span class="text-gray-600 font-medium">Request ID</span>
+                    <span class="font-bold text-gray-900"
+                      >#{{ refund.id }}</span
+                    >
+                  </div>
+
+                  <div
+                    class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span class="text-gray-600 font-medium">Request Date</span>
+                    <span class="font-semibold text-gray-900"
+                      >{{ refund.created_at|date:"M d, Y H:i" }}</span
+                    >
+                  </div>
+
+                  <div
+                    class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span class="text-gray-600 font-medium"
+                      >Current Status</span
+                    >
+                    {% if refund.status == 'pending' %}
+                    <span
+                      class="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
+                    >
+                      <i class="fas fa-clock mr-1"></i>Pending Review
+                    </span>
+                    {% elif refund.status == 'approved' %}
+                    <span
+                      class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
+                    >
+                      <i class="fas fa-check mr-1"></i>Approved
+                    </span>
+                    {% elif refund.status == 'rejected' %}
+                    <span
+                      class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
+                    >
+                      <i class="fas fa-times mr-1"></i>Rejected
+                    </span>
+                    {% elif refund.status == 'processed' %}
+                    <span
+                      class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
+                    >
+                      <i class="fas fa-money-bill-wave mr-1"></i>Processed
+                    </span>
+                    {% endif %}
+                  </div>
+
+                  <div
+                    class="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-200"
+                  >
+                    <span class="text-gray-600 font-medium">Refund Amount</span>
+                    <span class="text-2xl font-bold text-green-600"
+                      >रू{{ refund.amount|floatformat:2 }}</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Customer Info -->
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                  <i class="fas fa-user text-blue-500 mr-2"></i>Customer
+                  Information
+                </h3>
+
+                <div class="space-y-3">
+                  <div
+                    class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span class="text-gray-600 font-medium">Customer Name</span>
+                    <span class="font-semibold text-gray-900"
+                      >{{ refund.payment.booking.passenger_name }}</span
+                    >
+                  </div>
+
+                  <div
+                    class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span class="text-gray-600 font-medium">Phone Number</span>
+                    <span class="font-semibold text-gray-900"
+                      >{{ refund.payment.booking.passenger_phone }}</span
+                    >
+                  </div>
+
+                  <div
+                    class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span class="text-gray-600 font-medium">Email</span>
+                    <span class="font-semibold text-gray-900"
+                      >{{ refund.payment.booking.passenger_email|default:"Not
+                      provided" }}</span
+                    >
+                  </div>
+
+                  <div
+                    class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span class="text-gray-600 font-medium">Booking ID</span>
+                    <span class="font-mono font-semibold text-gray-900"
+                      >{{ refund.payment.booking.booking_id }}</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Refund Reason -->
+            {% if refund.reason %}
+            <div
+              class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
+            >
+              <h4 class="font-semibold text-yellow-800 mb-2">
+                <i class="fas fa-comment-alt mr-2"></i>Refund Reason
+              </h4>
+              <p class="text-yellow-700">{{ refund.reason }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Admin Notes -->
+            {% if refund.admin_notes %}
+            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 class="font-semibold text-blue-800 mb-2">
+                <i class="fas fa-sticky-note mr-2"></i>Admin Notes
+              </h4>
+              <p class="text-blue-700">{{ refund.admin_notes }}</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Booking Details -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div
+            class="bg-gradient-to-r from-blue-500 to-cyan-600 text-white p-6"
+          >
+            <h2 class="text-xl font-bold flex items-center">
+              <i class="fas fa-bus mr-3"></i>Original Booking Details
+            </h2>
+          </div>
+
+          <div class="p-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Route Info -->
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                  Journey Details
+                </h3>
+
+                <div
+                  class="p-4 bg-blue-50 rounded-lg border border-blue-200 mb-4"
+                >
+                  <div class="text-center">
+                    <div class="flex items-center justify-center mb-2">
+                      <span class="text-lg font-bold text-gray-800"
+                        >{{ refund.payment.booking.bus_schedule.route.source
+                        }}</span
+                      >
+                      <i class="fas fa-arrow-right text-blue-500 mx-3"></i>
+                      <span class="text-lg font-bold text-gray-800"
+                        >{{
+                        refund.payment.booking.bus_schedule.route.destination
+                        }}</span
+                      >
+                    </div>
+                    <div class="text-sm text-gray-600">
+                      {{ refund.payment.booking.travel_date|date:"l, M d, Y" }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space-y-3">
+                  <div
+                    class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span class="text-gray-600 font-medium">Bus Number</span>
+                    <span class="font-semibold text-gray-900"
+                      >{{ refund.payment.booking.bus_schedule.bus.bus_number
+                      }}</span
+                    >
+                  </div>
+
+                  <div
+                    class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span class="text-gray-600 font-medium"
+                      >Departure Time</span
+                    >
+                    <span class="font-semibold text-gray-900"
+                      >{{ refund.payment.booking.departure_time|time:"g:i A"
+                      }}</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Payment Info -->
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                  Payment Details
+                </h3>
+
+                <div class="space-y-3">
+                  <div
+                    class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span class="text-gray-600 font-medium">Payment ID</span>
+                    <span class="font-mono font-semibold text-gray-900"
+                      >{{ refund.payment.payment_id }}</span
+                    >
+                  </div>
+
+                  <div
+                    class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span class="text-gray-600 font-medium"
+                      >Payment Method</span
+                    >
+                    <span class="font-semibold text-gray-900"
+                      >{{ refund.payment.get_payment_method_display }}</span
+                    >
+                  </div>
+
+                  <div
+                    class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span class="text-gray-600 font-medium"
+                      >Original Amount</span
+                    >
+                    <span class="font-semibold text-gray-900"
+                      >रू{{ refund.payment.amount|floatformat:2 }}</span
+                    >
+                  </div>
+
+                  <div
+                    class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span class="text-gray-600 font-medium">Payment Date</span>
+                    <span class="font-semibold text-gray-900"
+                      >{{ refund.payment.payment_date|date:"M d, Y H:i" }}</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seats -->
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-600 font-medium">Selected Seats</span>
+                <span class="text-sm text-gray-500"
+                  >{{ refund.payment.booking.seats.count }} seat{{
+                  refund.payment.booking.seats.count|pluralize }}</span
+                >
+              </div>
+              <div class="flex flex-wrap gap-2">
+                {% for seat in refund.payment.booking.seats.all %}
+                <span
+                  class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
+                >
+                  {{ seat.seat_number }}
+                </span>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Panel -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-2xl shadow-xl p-6 sticky top-8">
+          <h3 class="text-xl font-bold text-gray-900 mb-6">
+            <i class="fas fa-cogs text-indigo-500 mr-2"></i>Process Refund
+          </h3>
+
+          {% if refund.status == 'pending' %}
+          <form id="refundForm" method="POST">
+            {% csrf_token %}
+
+            <!-- Action Selection -->
+            <div class="mb-6">
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Action</label
+              >
+              <select
+                id="action"
+                name="action"
+                required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="">Select an action</option>
+                <option value="approve">Approve Refund</option>
+                <option value="reject">Reject Refund</option>
+              </select>
+            </div>
+
+            <!-- Refund Amount (for approval) -->
+            <div id="refundAmountGroup" class="mb-6 hidden">
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Refund Amount</label
+              >
+              <input
+                type="number"
+                id="refund_amount"
+                name="refund_amount"
+                value="{{ refund.amount }}"
+                step="0.01"
+                min="0"
+                max="{{ refund.payment.amount }}"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+              <div class="text-sm text-gray-600 mt-1">
+                Maximum: रू{{ refund.payment.amount|floatformat:2 }}
+              </div>
+            </div>
+
+            <!-- Rejection Reason (for rejection) -->
+            <div id="rejectionReasonGroup" class="mb-6 hidden">
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Rejection Reason</label
+              >
+              <select
+                id="rejection_reason"
+                name="rejection_reason"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="">Select a reason</option>
+                <option value="invalid_request">Invalid Request</option>
+                <option value="policy_violation">Policy Violation</option>
+                <option value="insufficient_documentation">
+                  Insufficient Documentation
+                </option>
+                <option value="time_limit_exceeded">Time Limit Exceeded</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <!-- Admin Notes -->
+            <div class="mb-6">
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Admin Notes</label
+              >
+              <textarea
+                name="admin_notes"
+                rows="3"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Add any notes about this refund decision..."
+              ></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              id="submitBtn"
+              disabled
+              class="w-full bg-gray-400 text-white py-4 rounded-xl font-semibold text-lg cursor-not-allowed"
+            >
+              <i class="fas fa-check mr-2"></i>Select Action
+            </button>
+          </form>
+          {% elif refund.status == 'approved' %}
+          <div class="text-center">
+            <div
+              class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <i class="fas fa-check text-green-600 text-2xl"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">
+              Refund Approved
+            </h4>
+            <p class="text-gray-600 mb-6">
+              This refund has been approved and is ready for processing.
+            </p>
+
+            <form method="POST">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="process" />
+              <button
+                type="submit"
+                class="w-full bg-blue-500 text-white py-4 rounded-xl font-semibold text-lg hover:bg-blue-600 transition-colors"
+              >
+                <i class="fas fa-money-bill-wave mr-2"></i>Process Payment
+              </button>
+            </form>
+          </div>
+          {% elif refund.status == 'rejected' %}
+          <div class="text-center">
+            <div
+              class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <i class="fas fa-times text-red-600 text-2xl"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">
+              Refund Rejected
+            </h4>
+            <p class="text-gray-600">This refund request has been rejected.</p>
+          </div>
+          {% elif refund.status == 'processed' %}
+          <div class="text-center">
+            <div
+              class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <i class="fas fa-check-circle text-blue-600 text-2xl"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">
+              Refund Processed
+            </h4>
+            <p class="text-gray-600">
+              This refund has been successfully processed and paid to the
+              customer.
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const actionSelect = document.getElementById('action');
-        const refundAmountGroup = document.getElementById('refundAmountGroup');
-        const rejectionReasonGroup = document.getElementById('rejectionReasonGroup');
-        const submitBtn = document.getElementById('submitBtn');
-        const refundForm = document.getElementById('refundForm');
-        
-        // Handle action selection
-        actionSelect.addEventListener('change', function() {
-            const action = this.value;
-            
-            if (action === 'approve') {
-                refundAmountGroup.style.display = 'block';
-                rejectionReasonGroup.style.display = 'none';
-                submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Approve Refund';
-                submitBtn.className = 'btn btn-approve';
-            } else if (action === 'reject') {
-                refundAmountGroup.style.display = 'none';
-                rejectionReasonGroup.style.display = 'block';
-                submitBtn.innerHTML = '<i class="fas fa-times mr-2"></i>Reject Refund';
-                submitBtn.className = 'btn btn-reject';
-            } else {
-                refundAmountGroup.style.display = 'none';
-                rejectionReasonGroup.style.display = 'none';
-                submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Process Refund';
-                submitBtn.className = 'btn btn-process';
-            }
-        });
-        
-        // Form submission
-        if (refundForm) {
-            refundForm.addEventListener('submit', function(e) {
-                const action = actionSelect.value;
-                
-                if (!action) {
-                    e.preventDefault();
-                    alert('Please select an action.');
-                    return;
-                }
-                
-                if (action === 'reject') {
-                    const rejectionReason = document.getElementById('rejection_reason').value;
-                    if (!rejectionReason) {
-                        e.preventDefault();
-                        alert('Please select a rejection reason.');
-                        return;
-                    }
-                }
-                
-                // Show loading state
-                const loadingSpinner = document.querySelector('.loading-spinner');
-                const buttonIcon = submitBtn.querySelector('i:not(.fa-spinner)');
-                
-                loadingSpinner.style.display = 'inline-block';
-                buttonIcon.style.display = 'none';
-                submitBtn.disabled = true;
-                
-                // Confirm action
-                const confirmMessage = action === 'approve' ? 
-                    'Are you sure you want to approve this refund?' : 
-                    'Are you sure you want to reject this refund?';
-                
-                if (!confirm(confirmMessage)) {
-                    e.preventDefault();
-                    loadingSpinner.style.display = 'none';
-                    buttonIcon.style.display = 'inline';
-                    submitBtn.disabled = false;
-                }
-            });
-        }
-        
-        // Auto-calculate refund amount
-        const originalAmount = {{ refund.booking.total_amount }};
-        const refundAmountInput = document.getElementById('refund_amount');
-        
-        if (refundAmountInput) {
-            refundAmountInput.addEventListener('input', function() {
-                const amount = parseFloat(this.value) || 0;
-                if (amount > originalAmount) {
-                    this.value = originalAmount;
-                    alert('Refund amount cannot exceed the original booking amount.');
-                }
-            });
-        }
-        
-        // Add confirmation for sensitive actions
-        document.querySelectorAll('.btn-approve, .btn-reject').forEach(button => {
-            button.addEventListener('click', function(e) {
-                const action = this.classList.contains('btn-approve') ? 'approve' : 'reject';
-                const message = `Are you sure you want to ${action} this refund request?`;
-                
-                if (!confirm(message)) {
-                    e.preventDefault();
-                }
-            });
-        });
-    });
+  document.addEventListener('DOMContentLoaded', function() {
+      const actionSelect = document.getElementById('action');
+      const refundAmountGroup = document.getElementById('refundAmountGroup');
+      const rejectionReasonGroup = document.getElementById('rejectionReasonGroup');
+      const submitBtn = document.getElementById('submitBtn');
+      const refundForm = document.getElementById('refundForm');
+
+      if (actionSelect) {
+          // Handle action selection
+          actionSelect.addEventListener('change', function() {
+              const action = this.value;
+
+              if (action === 'approve') {
+                  refundAmountGroup.classList.remove('hidden');
+                  rejectionReasonGroup.classList.add('hidden');
+                  submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Approve Refund';
+                  submitBtn.className = 'w-full bg-green-500 text-white py-4 rounded-xl font-semibold text-lg hover:bg-green-600 transition-colors';
+                  submitBtn.disabled = false;
+              } else if (action === 'reject') {
+                  refundAmountGroup.classList.add('hidden');
+                  rejectionReasonGroup.classList.remove('hidden');
+                  submitBtn.innerHTML = '<i class="fas fa-times mr-2"></i>Reject Refund';
+                  submitBtn.className = 'w-full bg-red-500 text-white py-4 rounded-xl font-semibold text-lg hover:bg-red-600 transition-colors';
+                  submitBtn.disabled = false;
+              } else {
+                  refundAmountGroup.classList.add('hidden');
+                  rejectionReasonGroup.classList.add('hidden');
+                  submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Select Action';
+                  submitBtn.className = 'w-full bg-gray-400 text-white py-4 rounded-xl font-semibold text-lg cursor-not-allowed';
+                  submitBtn.disabled = true;
+              }
+          });
+      }
+
+      // Form submission
+      if (refundForm) {
+          refundForm.addEventListener('submit', function(e) {
+              const action = actionSelect.value;
+
+              if (!action) {
+                  e.preventDefault();
+                  showToast('Please select an action.', 'error');
+                  return;
+              }
+
+              if (action === 'reject') {
+                  const rejectionReason = document.getElementById('rejection_reason').value;
+                  if (!rejectionReason) {
+                      e.preventDefault();
+                      showToast('Please select a rejection reason.', 'error');
+                      return;
+                  }
+              }
+
+              // Show loading state
+              submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+              submitBtn.disabled = true;
+
+              // Confirm action
+              const confirmMessage = action === 'approve' ?
+                  'Are you sure you want to approve this refund?' :
+                  'Are you sure you want to reject this refund?';
+
+              if (!confirm(confirmMessage)) {
+                  e.preventDefault();
+                  // Reset button
+                  actionSelect.dispatchEvent(new Event('change'));
+              }
+          });
+      }
+
+      // Auto-calculate refund amount
+      const originalAmount = {{ refund.payment.amount }};
+      const refundAmountInput = document.getElementById('refund_amount');
+
+      if (refundAmountInput) {
+          refundAmountInput.addEventListener('input', function() {
+              const amount = parseFloat(this.value) || 0;
+              if (amount > originalAmount) {
+                  this.value = originalAmount;
+                  showToast('Refund amount cannot exceed the original booking amount.', 'warning');
+              }
+          });
+      }
+  });
+
+  // Show toast notification
+  function showToast(message, type) {
+      const toast = document.createElement('div');
+      let bgColor = 'bg-blue-500';
+      let icon = 'info';
+
+      if (type === 'success') {
+          bgColor = 'bg-green-500';
+          icon = 'check';
+      } else if (type === 'error') {
+          bgColor = 'bg-red-500';
+          icon = 'exclamation';
+      } else if (type === 'warning') {
+          bgColor = 'bg-yellow-500';
+          icon = 'exclamation-triangle';
+      }
+
+      toast.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${bgColor} text-white min-w-80 transform translate-x-full transition-transform duration-300`;
+
+      toast.innerHTML = `
+          <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                  <i class="fas fa-${icon}-circle mr-2"></i>
+                  ${message}
+              </div>
+              <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                  <i class="fas fa-times"></i>
+              </button>
+          </div>
+      `;
+
+      document.body.appendChild(toast);
+
+      // Animate in
+      setTimeout(() => {
+          toast.classList.remove('translate-x-full');
+      }, 100);
+
+      // Auto remove after 3 seconds
+      setTimeout(() => {
+          toast.classList.add('translate-x-full');
+          setTimeout(() => {
+              if (toast.parentElement) {
+                  toast.remove();
+              }
+          }, 300);
+      }, 3000);
+  }
 </script>
 {% endblock %}

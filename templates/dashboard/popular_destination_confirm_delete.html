@@ -1,125 +1,362 @@
-{% extends 'dashboard/base.html' %}
-{% load static %}
+{% extends "dashboard/base.html" %} {% load static %} {% block title %}{{ title
+}} - Dashboard{% endblock %} {% block dashboard_content %}
+<div class="container mx-auto px-4 sm:px-8">
+  <div class="py-8">
+    <div class="max-w-4xl mx-auto">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-2xl font-semibold leading-tight text-gray-800">
+            <i class="fas fa-exclamation-triangle mr-2 text-red-500"></i>{{
+            title }}
+          </h2>
+          <p class="text-gray-600">
+            Confirm popular destination deletion - this action cannot be undone
+          </p>
+        </div>
+        <a
+          href="{% url 'dashboard:popular_destinations_management' %}"
+          class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+        >
+          <i class="fas fa-arrow-left mr-2"></i>Back to Destinations
+        </a>
+      </div>
 
-{% block title %}{{ title }}{% endblock %}
+      <!-- Warning Alert -->
+      <div class="bg-red-50 border-l-4 border-red-500 p-6 mb-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <i class="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-semibold text-red-800">
+              Danger Zone - Permanent Action
+            </h3>
+            <p class="text-red-700 mt-1">
+              Are you sure you want to delete the popular destination
+              <strong>{{ destination.title }}</strong>? This action cannot be
+              undone and will affect website display.
+            </p>
+          </div>
+        </div>
+      </div>
 
-{% block extra_css %}
-<style>
-    .delete-container {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-    .destination-preview {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 20px;
-        margin: 20px 0;
-    }
-    .destination-image {
-        max-width: 200px;
-        max-height: 150px;
-        object-fit: cover;
-        border-radius: 8px;
-    }
-    .warning-box {
-        background: #fff3cd;
-        border: 1px solid #ffeaa7;
-        border-radius: 8px;
-        padding: 15px;
-        margin: 20px 0;
-    }
-</style>
-{% endblock %}
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Destination Details Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>Destination
+            Details
+          </h3>
 
-{% block content %}
-<div class="container-fluid">
-    <div class="delete-container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="fas fa-trash text-danger me-2"></i>{{ title }}</h2>
-            <a href="{% url 'dashboard:popular_destinations_management' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Back to List
+          <!-- Destination Image -->
+          <div class="mb-4">
+            {% if destination.image %}
+            <img
+              src="{{ destination.image.url }}"
+              alt="{{ destination.title }}"
+              class="w-full h-48 object-cover rounded-lg border-2 border-gray-200"
+            />
+            {% else %}
+            <div
+              class="w-full h-48 bg-gray-100 rounded-lg border-2 border-gray-200 flex items-center justify-center"
+            >
+              <i class="fas fa-image text-4xl text-gray-400"></i>
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="space-y-4">
+            <div
+              class="flex justify-between items-center py-2 border-b border-gray-100"
+            >
+              <span class="text-sm font-medium text-gray-600">Title:</span>
+              <span class="text-sm font-semibold text-gray-900"
+                >{{ destination.title }}</span
+              >
+            </div>
+
+            <div
+              class="flex justify-between items-center py-2 border-b border-gray-100"
+            >
+              <span class="text-sm font-medium text-gray-600">Location:</span>
+              <span class="text-sm font-semibold text-gray-900"
+                >{{ destination.location.name }}</span
+              >
+            </div>
+
+            <div
+              class="flex justify-between items-center py-2 border-b border-gray-100"
+            >
+              <span class="text-sm font-medium text-gray-600"
+                >Display Order:</span
+              >
+              <span class="text-sm font-semibold text-gray-900"
+                >{{ destination.display_order }}</span
+              >
+            </div>
+
+            <div
+              class="flex justify-between items-center py-2 border-b border-gray-100"
+            >
+              <span class="text-sm font-medium text-gray-600"
+                >Routes Available:</span
+              >
+              <span class="text-sm font-semibold text-gray-900"
+                >{{ destination.route_count|default:0 }}</span
+              >
+            </div>
+
+            <div class="flex justify-between items-center py-2">
+              <span class="text-sm font-medium text-gray-600">Status:</span>
+              <span
+                class="px-2 py-1 rounded-full text-xs font-semibold {% if destination.is_active %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}"
+              >
+                {% if destination.is_active %}Active{% else %}Inactive{% endif
+                %}
+              </span>
+            </div>
+          </div>
+
+          {% if destination.description %}
+          <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-600 mb-2"
+              >Description:</label
+            >
+            <p class="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
+              {{ destination.description|truncatechars:200 }}
+            </p>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Impact Assessment Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-exclamation-circle mr-2 text-orange-500"></i
+            >Deletion Impact
+          </h3>
+
+          <div class="space-y-3">
+            <div class="flex items-start">
+              <i class="fas fa-globe text-red-500 mt-1 mr-3"></i>
+              <div>
+                <p class="text-sm font-medium text-gray-800">Website Display</p>
+                <p class="text-xs text-gray-600">
+                  Destination will be removed from popular destinations section
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <i class="fas fa-route text-orange-500 mt-1 mr-3"></i>
+              <div>
+                <p class="text-sm font-medium text-gray-800">
+                  Route Associations
+                </p>
+                <p class="text-xs text-gray-600">
+                  {{ destination.route_count|default:0 }} route(s) will lose
+                  popular destination status
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <i class="fas fa-users text-orange-500 mt-1 mr-3"></i>
+              <div>
+                <p class="text-sm font-medium text-gray-800">User Experience</p>
+                <p class="text-xs text-gray-600">
+                  Customers will no longer see this as a featured destination
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <i class="fas fa-image text-red-500 mt-1 mr-3"></i>
+              <div>
+                <p class="text-sm font-medium text-gray-800">Media Content</p>
+                <p class="text-xs text-gray-600">
+                  Associated images and content will be permanently deleted
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <i class="fas fa-ban text-red-500 mt-1 mr-3"></i>
+              <div>
+                <p class="text-sm font-medium text-gray-800">
+                  Irreversible Action
+                </p>
+                <p class="text-xs text-gray-600">
+                  This deletion cannot be undone or recovered
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Destination Statistics (if available) -->
+      {% if destination_stats %}
+      <div class="bg-white rounded-lg shadow p-6 mt-6">
+        <h3
+          class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+        >
+          <i class="fas fa-chart-bar mr-2 text-purple-500"></i>Destination
+          Statistics
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+            <div class="text-2xl font-bold text-blue-600">
+              {{ destination_stats.total_views|default:0 }}
+            </div>
+            <div class="text-sm text-gray-600">Total Views</div>
+          </div>
+
+          <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+            <div class="text-2xl font-bold text-green-600">
+              {{ destination_stats.total_bookings|default:0 }}
+            </div>
+            <div class="text-sm text-gray-600">Total Bookings</div>
+          </div>
+
+          <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+            <div class="text-2xl font-bold text-purple-600">
+              {{ destination.route_count|default:0 }}
+            </div>
+            <div class="text-sm text-gray-600">Available Routes</div>
+          </div>
+
+          <div class="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
+            <div class="text-2xl font-bold text-orange-600">
+              {{ destination_stats.popularity_rank|default:"N/A" }}
+            </div>
+            <div class="text-sm text-gray-600">Popularity Rank</div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Confirmation Form -->
+      <div class="bg-white rounded-lg shadow p-6 mt-6">
+        <h3
+          class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+        >
+          <i class="fas fa-check-circle mr-2 text-green-500"></i>Confirm
+          Deletion
+        </h3>
+
+        <form method="post" class="space-y-4">
+          {% csrf_token %}
+
+          <!-- Confirmation Checkbox -->
+          <div class="flex items-center">
+            <input
+              type="checkbox"
+              id="confirm_deletion"
+              name="confirm_deletion"
+              class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+              required
+            />
+            <label
+              for="confirm_deletion"
+              class="ml-2 block text-sm text-gray-700"
+            >
+              I understand that this action is permanent and cannot be undone
+            </label>
+          </div>
+
+          <div class="flex items-center">
+            <input
+              type="checkbox"
+              id="confirm_impact"
+              name="confirm_impact"
+              class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+              required
+            />
+            <label
+              for="confirm_impact"
+              class="ml-2 block text-sm text-gray-700"
+            >
+              I acknowledge that this will affect website display and user
+              experience
+            </label>
+          </div>
+
+          <!-- Reason for Deletion -->
+          <div>
+            <label
+              for="deletion_reason"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Reason for Deletion (Optional)
+            </label>
+            <textarea
+              id="deletion_reason"
+              name="deletion_reason"
+              rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
+              placeholder="Enter the reason for deleting this popular destination..."
+            ></textarea>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row justify-between gap-4 pt-4">
+            <a
+              href="{% url 'dashboard:popular_destinations_management' %}"
+              class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors text-center"
+            >
+              <i class="fas fa-times mr-2"></i>Cancel
             </a>
-        </div>
 
-        <div class="warning-box">
-            <h5 class="text-warning mb-2">
-                <i class="fas fa-exclamation-triangle me-2"></i>Warning
-            </h5>
-            <p class="mb-0">Are you sure you want to delete this popular destination? This action cannot be undone.</p>
-        </div>
-
-        <div class="destination-preview">
-            <h5 class="mb-3">Destination Details:</h5>
-            
-            <div class="row">
-                <div class="col-md-4">
-                    {% if destination.image %}
-                        <img src="{{ destination.image.url }}" alt="{{ destination.title }}" class="destination-image w-100">
-                    {% else %}
-                        <div class="destination-image w-100 d-flex align-items-center justify-content-center bg-light">
-                            <i class="fas fa-image fa-2x text-muted"></i>
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="col-md-8">
-                    <table class="table table-borderless">
-                        <tr>
-                            <td><strong>Title:</strong></td>
-                            <td>{{ destination.title }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Location:</strong></td>
-                            <td>{{ destination.location.name }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Display Order:</strong></td>
-                            <td>{{ destination.display_order }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Status:</strong></td>
-                            <td>
-                                <span class="badge {% if destination.is_active %}bg-success{% else %}bg-secondary{% endif %}">
-                                    {% if destination.is_active %}Active{% else %}Inactive{% endif %}
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>Routes Available:</strong></td>
-                            <td>{{ destination.route_count }}</td>
-                        </tr>
-                        {% if destination.description %}
-                        <tr>
-                            <td><strong>Description:</strong></td>
-                            <td>{{ destination.description|truncatechars:100 }}</td>
-                        </tr>
-                        {% endif %}
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <form method="post">
-            {% csrf_token %}
-            <div class="d-flex justify-content-end gap-2">
-                <a href="{% url 'dashboard:popular_destinations_management' %}" class="btn btn-secondary">
-                    <i class="fas fa-times me-2"></i>Cancel
-                </a>
-                <button type="submit" class="btn btn-danger">
-                    <i class="fas fa-trash me-2"></i>Yes, Delete Destination
-                </button>
-            </div>
+            <button
+              type="submit"
+              id="delete_button"
+              disabled
+              class="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            >
+              <i class="fas fa-trash mr-2"></i>Yes, Delete Destination
+              Permanently
+            </button>
+          </div>
         </form>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
+{% endblock %} {% block dashboard_extra_js %}
 <script>
-    // Add confirmation dialog
-    document.querySelector('form').addEventListener('submit', function(e) {
-        if (!confirm('Are you absolutely sure you want to delete this popular destination?')) {
-            e.preventDefault();
-        }
+  document.addEventListener("DOMContentLoaded", function () {
+    const confirmDeletion = document.getElementById("confirm_deletion");
+    const confirmImpact = document.getElementById("confirm_impact");
+    const deleteButton = document.getElementById("delete_button");
+
+    function updateDeleteButton() {
+      const isConfirmed = confirmDeletion.checked && confirmImpact.checked;
+      deleteButton.disabled = !isConfirmed;
+    }
+
+    confirmDeletion.addEventListener("change", updateDeleteButton);
+    confirmImpact.addEventListener("change", updateDeleteButton);
+
+    // Additional confirmation for destination deletion
+    document.querySelector("form").addEventListener("submit", function (e) {
+      if (
+        !confirm(
+          "FINAL WARNING: You are about to permanently delete this popular destination. This action cannot be undone. Continue?"
+        )
+      ) {
+        e.preventDefault();
+      }
     });
+
+    // Auto-focus on first checkbox
+    confirmDeletion.focus();
+  });
 </script>
 {% endblock %}

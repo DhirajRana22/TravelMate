@@ -3,86 +3,117 @@
 
 {% block title %}Contact Us - TravelMate{% endblock %}
 
-{% block extra_css %}
-<style>
-    .contact-hero {
-        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{% static "img/contact-hero.jpg" %}') no-repeat center center;
-        background-size: cover;
-        color: white;
-        padding: 80px 0;
-        margin-top: -1.5rem;
-    }
-    .contact-info-card {
-        transition: transform 0.3s;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    .contact-info-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-    .contact-icon {
-        font-size: 2rem;
-        color: #0d6efd;
-        margin-bottom: 1rem;
-    }
-    .map-container {
-        height: 400px;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
 <!-- Hero Section -->
-<section class="contact-hero">
-    <div class="container text-center">
-        <h1 class="display-4 fw-bold mb-4">Contact Us</h1>
-        <p class="lead mb-0">We're Here to Help You</p>
+<section class="relative bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white py-24 overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-full h-full" style="background-image: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.1"><circle cx="30" cy="30" r="4"/></g></g></svg>');"></div>
+    </div>
+    
+    <!-- Animated Elements -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-white opacity-5 rounded-full animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-white opacity-5 rounded-full animate-pulse delay-1000"></div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            Contact <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">Us</span>
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed mb-8">
+            We're Here to Help You Every Step of the Way
+        </p>
+        
+        <!-- Quick Contact Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+            <div class="text-center">
+                <div class="text-3xl font-bold text-green-400 mb-2">24/7</div>
+                <div class="text-gray-300">Support Available</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-blue-400 mb-2">&lt;2hrs</div>
+                <div class="text-gray-300">Response Time</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-purple-400 mb-2">99%</div>
+                <div class="text-gray-300">Customer Satisfaction</div>
+            </div>
+        </div>
     </div>
 </section>
 
 <!-- Contact Information -->
-<section class="py-5">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card contact-info-card h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="contact-icon">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <h4>Our Location</h4>
-                        <p class="mb-0">TravelMate Office<br>Patan, Lalitpur<br>Nepal</p>
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">Get in Touch</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Multiple ways to reach us - choose what works best for you
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Location -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-all duration-300 group border border-gray-100">
+                <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                    <i class="fas fa-map-marker-alt text-3xl text-white"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900 mb-4">Our Location</h4>
+                <div class="text-gray-600 space-y-2">
+                    <p class="font-medium">TravelMate Headquarters</p>
+                    <p>Patan, Lalitpur</p>
+                    <p>Bagmati Province, Nepal</p>
+                    <p class="text-sm text-blue-600 mt-4">
+                        <i class="fas fa-clock mr-1"></i>Mon-Fri: 9AM-6PM
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Phone -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-all duration-300 group border border-gray-100">
+                <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                    <i class="fas fa-phone-alt text-3xl text-white"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900 mb-4">Phone Support</h4>
+                <div class="text-gray-600 space-y-3">
+                    <div>
+                        <p class="text-sm text-gray-500">Customer Service:</p>
+                        <a href="tel:+9779847435111" class="text-lg font-semibold text-green-600 hover:text-green-700 transition-colors">
+                            +977 9847435111
+                        </a>
+                    </div>
+                    <div class="bg-green-50 rounded-lg p-3">
+                        <p class="text-sm font-medium text-green-800">24/7 Support Available</p>
+                        <p class="text-xs text-green-600">Emergency assistance anytime</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card contact-info-card h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="contact-icon">
-                            <i class="fas fa-phone-alt"></i>
-                        </div>
-                        <h4>Phone Numbers</h4>
-                        <p class="mb-2">Customer Service:<br>
-                        <strong>+977 9847435111</strong></p>
-                        <p class="mb-2">24/7 Support Available<br>
-                        <strong>Call us anytime</strong></p>
-                        <p class="mb-0">Emergency Support: <a href="tel:+9779847435111">+977 9847435111</a></p>
-                    </div>
+            
+            <!-- Email -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-all duration-300 group border border-gray-100">
+                <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                    <i class="fas fa-envelope text-3xl text-white"></i>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card contact-info-card h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="contact-icon">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <h4>Email Addresses</h4>
-                        <p class="mb-2">General Inquiries: <a href="mailto:info@travelmate.com">info@travelmate.com</a></p>
-                        <p class="mb-2">Customer Support: <a href="mailto:info@travelmate.com">info@travelmate.com</a></p>
-                        <p class="mb-0">Business Partnerships: <a href="mailto:info@travelmate.com">info@travelmate.com</a></p>
+                <h4 class="text-xl font-semibold text-gray-900 mb-4">Email Support</h4>
+                <div class="text-gray-600 space-y-3 text-sm">
+                    <div>
+                        <p class="text-gray-500">General Inquiries:</p>
+                        <a href="mailto:info@travelmate.com" class="text-purple-600 hover:text-purple-700 font-medium transition-colors">
+                            info@travelmate.com
+                        </a>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Customer Support:</p>
+                        <a href="mailto:support@travelmate.com" class="text-purple-600 hover:text-purple-700 font-medium transition-colors">
+                            support@travelmate.com
+                        </a>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Business Partnerships:</p>
+                        <a href="mailto:business@travelmate.com" class="text-purple-600 hover:text-purple-700 font-medium transition-colors">
+                            business@travelmate.com
+                        </a>
                     </div>
                 </div>
             </div>
@@ -90,80 +121,185 @@
     </div>
 </section>
 
-<!-- Contact Form -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-6 mb-4 mb-lg-0">
-                <h2 class="mb-4">Send Us a Message</h2>
-                <p class="mb-4">Have a question, feedback, or need assistance? Fill out the form below, and our team will get back to you as soon as possible.</p>
-                <form id="contactForm">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" id="name" placeholder="Your Name" required>
-                                <label for="name">Your Name</label>
-                            </div>
+<!-- Contact Form & Map -->
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            <!-- Contact Form -->
+            <div>
+                <div class="mb-8">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4">Send Us a Message</h2>
+                    <p class="text-xl text-gray-600 leading-relaxed">
+                        Have a question, feedback, or need assistance? Fill out the form below, and our team will get back to you within 2 hours.
+                    </p>
+                </div>
+                
+                <form id="contactForm" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Name & Email -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-user text-blue-500 mr-2"></i>Your Name
+                            </label>
+                            <input type="text" id="name" name="name" required 
+                                   class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                                   placeholder="Enter your full name">
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="email" class="form-control" id="email" placeholder="Your Email" required>
-                                <label for="email">Your Email</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input type="tel" class="form-control" id="phone" placeholder="Your Phone">
-                                <label for="phone">Your Phone (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <select class="form-select" id="subject" required>
-                                    <option value="" selected disabled>Select a subject</option>
-                                    <option value="General Inquiry">General Inquiry</option>
-                                    <option value="Booking Issue">Booking Issue</option>
-                                    <option value="Refund Request">Refund Request</option>
-                                    <option value="Technical Support">Technical Support</option>
-                                    <option value="Feedback">Feedback</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                                <label for="subject">Subject</label>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-floating mb-3">
-                                <textarea class="form-control" id="message" placeholder="Your Message" style="height: 150px" required></textarea>
-                                <label for="message">Your Message</label>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="privacyPolicy" required>
-                                <label class="form-check-label" for="privacyPolicy">
-                                    I agree to the <a href="{% url 'home:privacy' %}">Privacy Policy</a> and consent to the processing of my personal data.
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        <div>
+                            <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-envelope text-green-500 mr-2"></i>Your Email
+                            </label>
+                            <input type="email" id="email" name="email" required 
+                                   class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                                   placeholder="Enter your email address">
                         </div>
                     </div>
+                    
+                    <!-- Phone & Subject -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="phone" class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-phone text-purple-500 mr-2"></i>Your Phone (Optional)
+                            </label>
+                            <input type="tel" id="phone" name="phone" 
+                                   class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                                   placeholder="Enter your phone number">
+                        </div>
+                        <div>
+                            <label for="subject" class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-tag text-orange-500 mr-2"></i>Subject
+                            </label>
+                            <select id="subject" name="subject" required 
+                                    class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white">
+                                <option value="" disabled selected>Select a subject</option>
+                                <option value="General Inquiry">General Inquiry</option>
+                                <option value="Booking Issue">Booking Issue</option>
+                                <option value="Refund Request">Refund Request</option>
+                                <option value="Technical Support">Technical Support</option>
+                                <option value="Partnership">Partnership Inquiry</option>
+                                <option value="Feedback">Feedback & Suggestions</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Message -->
+                    <div>
+                        <label for="message" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-comment text-red-500 mr-2"></i>Your Message
+                        </label>
+                        <textarea id="message" name="message" rows="6" required 
+                                  class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none bg-gray-50 focus:bg-white"
+                                  placeholder="Please describe your inquiry in detail..."></textarea>
+                    </div>
+                    
+                    <!-- Privacy Policy -->
+                    <div class="flex items-start">
+                        <input type="checkbox" id="privacyPolicy" name="privacyPolicy" required 
+                               class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1 mr-3">
+                        <label for="privacyPolicy" class="text-sm text-gray-600 leading-relaxed">
+                            I agree to the <a href="{% url 'home:privacy' %}" class="text-blue-600 hover:text-blue-700 font-medium">Privacy Policy</a> 
+                            and consent to TravelMate processing my personal data for the purpose of responding to my inquiry.
+                        </label>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" id="submitBtn" 
+                            class="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-800 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <span id="submitText">
+                            <i class="fas fa-paper-plane mr-2"></i>Send Message
+                        </span>
+                        <span id="loadingText" class="hidden">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>Sending...
+                        </span>
+                    </button>
                 </form>
-            </div>
-            <div class="col-lg-6">
-                <h2 class="mb-4">Our Location</h2>
-                <div class="map-container">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14130.834905955953!2d85.31398!3d27.6766!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb19b5c5555555%3A0x5a5a5a5a5a5a5a5a!2sPatan%2C%20Lalitpur%2C%20Nepal!5e0!3m2!1sen!2snp!4v1635959999999!5m2!1sen!2snp" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                
+                <!-- Success Message -->
+                <div id="successMessage" class="hidden mt-6 p-6 bg-green-50 border border-green-200 rounded-xl">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 text-2xl mr-4"></i>
+                        <div>
+                            <h4 class="text-lg font-semibold text-green-800">Message Sent Successfully!</h4>
+                            <p class="text-green-700">Thank you for contacting us. We'll get back to you within 2 hours.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="mt-4">
-                    <h4>Office Hours</h4>
-                    <ul class="list-unstyled">
-                        <li><strong>Sunday - Friday:</strong> 9:00 AM - 6:00 PM</li>
-                        <li><strong>Saturday:</strong> 10:00 AM - 4:00 PM</li>
-                        <li><strong>Public Holidays:</strong> Closed</li>
-                    </ul>
-                    <p>Customer support is available 24/7 via phone (+977 9847435111) and email (info@travelmate.com).</p>
+            </div>
+            
+            <!-- Map & Additional Info -->
+            <div class="space-y-8">
+                <!-- Map Placeholder -->
+                <div class="bg-gray-100 rounded-2xl h-80 flex items-center justify-center border border-gray-200">
+                    <div class="text-center">
+                        <i class="fas fa-map-marked-alt text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-600 font-medium">Interactive Map</p>
+                        <p class="text-sm text-gray-500">TravelMate Office Location</p>
+                    </div>
+                </div>
+                
+                <!-- Quick Contact Options -->
+                <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-100">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-6">Need Immediate Help?</h3>
+                    
+                    <div class="space-y-4">
+                        <a href="tel:+9779847435111" 
+                           class="flex items-center p-4 bg-white rounded-xl hover:shadow-md transition-all duration-300 group">
+                            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-4 group-hover:bg-green-200 transition-colors">
+                                <i class="fas fa-phone text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">Call Us Now</p>
+                                <p class="text-sm text-gray-600">+977 9847435111</p>
+                            </div>
+                        </a>
+                        
+                        <a href="mailto:support@travelmate.com" 
+                           class="flex items-center p-4 bg-white rounded-xl hover:shadow-md transition-all duration-300 group">
+                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-4 group-hover:bg-blue-200 transition-colors">
+                                <i class="fas fa-envelope text-blue-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">Email Support</p>
+                                <p class="text-sm text-gray-600">support@travelmate.com</p>
+                            </div>
+                        </a>
+                        
+                        <a href="#" 
+                           class="flex items-center p-4 bg-white rounded-xl hover:shadow-md transition-all duration-300 group">
+                            <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mr-4 group-hover:bg-purple-200 transition-colors">
+                                <i class="fas fa-comments text-purple-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">Live Chat</p>
+                                <p class="text-sm text-gray-600">Available 24/7</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Business Hours -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-6">
+                        <i class="fas fa-clock text-blue-500 mr-2"></i>Business Hours
+                    </h3>
+                    
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-gray-600">Sunday - Friday</span>
+                            <span class="font-semibold text-gray-900">9:00 AM - 6:00 PM</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-gray-600">Saturday</span>
+                            <span class="font-semibold text-gray-900">Closed</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2">
+                            <span class="text-gray-600">Emergency Support</span>
+                            <span class="font-semibold text-green-600">24/7 Available</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -171,92 +307,94 @@
 </section>
 
 <!-- FAQ Section -->
-<section class="py-5">
-    <div class="container">
-        <h2 class="text-center mb-5">Frequently Asked Questions</h2>
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="accordion" id="contactFAQ">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingOne">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                How can I track my booking status?
-                            </button>
-                        </h2>
-                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#contactFAQ">
-                            <div class="accordion-body">
-                                You can track your booking status by logging into your TravelMate account and navigating to the "My Bookings" section. Alternatively, you can use the booking reference number sent to your email to check the status on our website or mobile app, or call our customer service at +977 9847435111.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingTwo">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                How do I request a refund for my booking?
-                            </button>
-                        </h2>
-                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#contactFAQ">
-                            <div class="accordion-body">
-                                To request a refund, log into your TravelMate account, go to "My Bookings," select the booking you wish to cancel, and click on the "Request Refund" button. Follow the instructions to complete the refund request. Please note that refund policies vary depending on the bus operator and how close to the departure date the cancellation is made. For specific refund information, please contact our support team at +977 9847435111 or email info@travelmate.com.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingThree">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                Can I change my travel date after booking?
-                            </button>
-                        </h2>
-                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#contactFAQ">
-                            <div class="accordion-body">
-                                Yes, you can change your travel date for most bookings. Log into your account, go to "My Bookings," select the booking you wish to modify, and click on the "Change Date" option. Please note that date changes are subject to availability and may incur additional charges depending on the bus operator's policy.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingFour">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                                How do I become a bus partner with TravelMate?
-                            </button>
-                        </h2>
-                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#contactFAQ">
-                            <div class="accordion-body">
-                                If you're a bus operator interested in partnering with TravelMate, please send an email to partners@travelmate.com with details about your company, fleet size, routes operated, and contact information. Our partnership team will get in touch with you to discuss the collaboration opportunities.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingFive">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-                                Is customer support available 24/7?
-                            </button>
-                        </h2>
-                        <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#contactFAQ">
-                            <div class="accordion-body">
-                                Yes, our customer support team is available 24/7 to assist you with any queries or issues. You can reach us by calling +977 9847435111, emailing info@travelmate.com, or through live chat on our website at any time, day or night.
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+            <p class="text-xl text-gray-600">Quick answers to common questions</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                <h4 class="text-lg font-semibold text-gray-900 mb-3">
+                    <i class="fas fa-question-circle text-blue-500 mr-2"></i>How can I cancel my booking?
+                </h4>
+                <p class="text-gray-600">You can cancel your booking through your account dashboard or by contacting our support team. Cancellation policies vary by operator.</p>
+            </div>
+            
+            <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                <h4 class="text-lg font-semibold text-gray-900 mb-3">
+                    <i class="fas fa-question-circle text-green-500 mr-2"></i>What payment methods do you accept?
+                </h4>
+                <p class="text-gray-600">We accept all major credit cards, debit cards, mobile banking, and digital wallets including eSewa and Khalti.</p>
+            </div>
+            
+            <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                <h4 class="text-lg font-semibold text-gray-900 mb-3">
+                    <i class="fas fa-question-circle text-purple-500 mr-2"></i>How do I get my ticket?
+                </h4>
+                <p class="text-gray-600">After successful booking, you'll receive your e-ticket via email and SMS. You can also download it from your account dashboard.</p>
+            </div>
+            
+            <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+                <h4 class="text-lg font-semibold text-gray-900 mb-3">
+                    <i class="fas fa-question-circle text-orange-500 mr-2"></i>Is customer support available 24/7?
+                </h4>
+                <p class="text-gray-600">Yes! Our customer support team is available 24/7 to assist you with any queries or emergencies during your travel.</p>
             </div>
         </div>
-        <div class="text-center mt-4">
-            <p>Can't find what you're looking for? <a href="{% url 'home:faq' %}">Visit our comprehensive FAQ page</a> or contact us directly.</p>
+        
+        <div class="text-center mt-12">
+            <p class="text-gray-600 mb-4">Can't find what you're looking for?</p>
+            <a href="{% url 'home:faq' %}" 
+               class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium">
+                <i class="fas fa-book mr-2"></i>Visit our comprehensive FAQ page
+            </a>
         </div>
     </div>
 </section>
 
-<!-- Connect With Us -->
-<section class="py-5 bg-primary text-white">
-    <div class="container text-center">
-        <h2 class="mb-4">Connect With Us</h2>
-        <p class="lead mb-4">Follow us on social media for the latest updates, travel tips, and exclusive offers.</p>
-        <div class="social-icons d-flex justify-content-center gap-3">
-            <a href="#" class="btn btn-light btn-lg"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" class="btn btn-light btn-lg"><i class="fab fa-twitter"></i></a>
-            <a href="#" class="btn btn-light btn-lg"><i class="fab fa-instagram"></i></a>
-            <a href="#" class="btn btn-light btn-lg"><i class="fab fa-linkedin-in"></i></a>
-            <a href="#" class="btn btn-light btn-lg"><i class="fab fa-youtube"></i></a>
+<!-- Social Media -->
+<section class="py-20 bg-gradient-to-r from-blue-600 via-purple-700 to-blue-800 text-white relative overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-full h-full" style="background-image: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.1"><circle cx="30" cy="30" r="4"/></g></g></svg>');"></div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-4xl font-bold mb-6">Connect With Us</h2>
+        <p class="text-xl text-blue-100 mb-10 max-w-3xl mx-auto">
+            Follow us on social media for the latest updates, travel tips, and exclusive offers
+        </p>
+        
+        <div class="flex justify-center space-x-6">
+            <a href="#" class="w-16 h-16 bg-white/20 backdrop-blur-sm text-white rounded-2xl flex items-center justify-center hover:bg-white/30 transition-all duration-300 transform hover:scale-110 group">
+                <i class="fab fa-facebook-f text-2xl group-hover:scale-110 transition-transform"></i>
+            </a>
+            <a href="#" class="w-16 h-16 bg-white/20 backdrop-blur-sm text-white rounded-2xl flex items-center justify-center hover:bg-white/30 transition-all duration-300 transform hover:scale-110 group">
+                <i class="fab fa-twitter text-2xl group-hover:scale-110 transition-transform"></i>
+            </a>
+            <a href="#" class="w-16 h-16 bg-white/20 backdrop-blur-sm text-white rounded-2xl flex items-center justify-center hover:bg-white/30 transition-all duration-300 transform hover:scale-110 group">
+                <i class="fab fa-instagram text-2xl group-hover:scale-110 transition-transform"></i>
+            </a>
+            <a href="#" class="w-16 h-16 bg-white/20 backdrop-blur-sm text-white rounded-2xl flex items-center justify-center hover:bg-white/30 transition-all duration-300 transform hover:scale-110 group">
+                <i class="fab fa-linkedin-in text-2xl group-hover:scale-110 transition-transform"></i>
+            </a>
+            <a href="#" class="w-16 h-16 bg-white/20 backdrop-blur-sm text-white rounded-2xl flex items-center justify-center hover:bg-white/30 transition-all duration-300 transform hover:scale-110 group">
+                <i class="fab fa-youtube text-2xl group-hover:scale-110 transition-transform"></i>
+            </a>
+        </div>
+        
+        <!-- Newsletter Signup -->
+        <div class="mt-16 max-w-md mx-auto">
+            <h3 class="text-xl font-semibold mb-4">Stay Updated</h3>
+            <div class="flex">
+                <input type="email" placeholder="Enter your email" 
+                       class="flex-1 px-4 py-3 rounded-l-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-white">
+                <button class="bg-white text-blue-600 px-6 py-3 rounded-r-xl font-semibold hover:bg-gray-100 transition-colors">
+                    Subscribe
+                </button>
+            </div>
         </div>
     </div>
 </section>
@@ -264,15 +402,73 @@
 
 {% block extra_js %}
 <script>
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        const contactForm = document.getElementById('contactForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const submitText = document.getElementById('submitText');
+        const loadingText = document.getElementById('loadingText');
+        const successMessage = document.getElementById('successMessage');
+        
         // Form submission handling
-        $('#contactForm').submit(function(e) {
+        contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            // Here you would normally send the form data to the server
-            // For demo purposes, we'll just show a success message
-            alert('Thank you for your message! We will get back to you soon.');
-            this.reset();
+            
+            // Show loading state
+            submitText.classList.add('hidden');
+            loadingText.classList.remove('hidden');
+            submitBtn.disabled = true;
+            
+            // Simulate form submission (replace with actual AJAX call)
+            setTimeout(() => {
+                // Hide loading state
+                submitText.classList.remove('hidden');
+                loadingText.classList.add('hidden');
+                submitBtn.disabled = false;
+                
+                // Show success message
+                successMessage.classList.remove('hidden');
+                contactForm.classList.add('hidden');
+                
+                // Scroll to success message
+                successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 2000);
+        });
+        
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in-up');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe elements for animation
+        document.querySelectorAll('.group, .bg-white').forEach(el => {
+            observer.observe(el);
         });
     });
 </script>
+
+<style>
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+}
+</style>
 {% endblock %}

@@ -1,1183 +1,454 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Admin - Analytics & Reports{% endblock %}
-
-{% block extra_css %}
-<style>
-    .admin-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem 0;
-        margin-bottom: 2rem;
-    }
-    
-    .analytics-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        border: 1px solid #e9ecef;
-    }
-    
-    .card-header {
-        display: flex;
-        align-items: center;
-        justify-content: between;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #e9ecef;
-    }
-    
-    .card-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #495057;
-        margin: 0;
-        display: flex;
-        align-items: center;
-    }
-    
-    .card-title i {
-        margin-right: 0.5rem;
-        color: #667eea;
-    }
-    
-    .card-actions {
-        display: flex;
-        gap: 0.5rem;
-    }
-    
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .stat-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        border: 1px solid #e9ecef;
-        transition: transform 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-2px);
-    }
-    
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-    }
-    
-    .stat-card.revenue::before {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .stat-card.bookings::before {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-    
-    .stat-card.users::before {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    }
-    
-    .stat-card.buses::before {
-        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    }
-    
-    .stat-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1rem;
-    }
-    
-    .stat-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.25rem;
-        margin-right: 1rem;
-    }
-    
-    .stat-icon.revenue {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .stat-icon.bookings {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-    
-    .stat-icon.users {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    }
-    
-    .stat-icon.buses {
-        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    }
-    
-    .stat-content {
-        flex: 1;
-    }
-    
-    .stat-label {
-        font-size: 0.875rem;
-        color: #6c757d;
-        margin-bottom: 0.25rem;
-        font-weight: 500;
-    }
-    
-    .stat-value {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: #495057;
-        margin-bottom: 0.25rem;
-    }
-    
-    .stat-change {
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-    }
-    
-    .stat-change.positive {
-        color: #28a745;
-    }
-    
-    .stat-change.negative {
-        color: #dc3545;
-    }
-    
-    .chart-container {
-        position: relative;
-        height: 400px;
-        margin-bottom: 1rem;
-    }
-    
-    .revenue-summary {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .revenue-metrics {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-    
-    .metric {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-    
-    .metric-label {
-        font-size: 0.875rem;
-        color: #6c757d;
-        margin-bottom: 0.25rem;
-    }
-    
-    .metric-value {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #495057;
-    }
-    
-    .metric-value.growth {
-        color: #28a745;
-    }
-    
-    .metric-value.growth.negative {
-        color: #dc3545;
-    }
-    
-    .revenue-info {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        margin-right: 1rem;
-    }
-    
-    .total-revenue, .last-updated {
-        font-size: 0.875rem;
-        color: #6c757d;
-    }
-    
-    .btn-refresh {
-        background: #28a745;
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 0.875rem;
-        margin-left: 0.5rem;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-refresh:hover {
-        background: #218838;
-        transform: rotate(180deg);
-    }
-    
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 40px;
-        height: 20px;
-    }
-    
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-    
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: .4s;
-        border-radius: 20px;
-    }
-    
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 16px;
-        width: 16px;
-        left: 2px;
-        bottom: 2px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
-    }
-    
-    input:checked + .slider {
-        background-color: #667eea;
-    }
-    
-    input:checked + .slider:before {
-        transform: translateX(20px);
-    }
-    
-    @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-    
-    .chart-controls {
-        display: flex;
-        gap: 0.5rem;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-    }
-    
-    .btn-chart {
-        padding: 0.375rem 0.75rem;
-        border: 1px solid #667eea;
-        background: transparent;
-        color: #667eea;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-chart.active,
-    .btn-chart:hover {
-        background: #667eea;
-        color: white;
-    }
-    
-    .table-responsive {
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .table {
-        margin: 0;
-        background: white;
-    }
-    
-    .table th {
-        background: #f8f9fa;
-        border: none;
-        font-weight: 600;
-        color: #495057;
-        padding: 1rem 0.75rem;
-    }
-    
-    .table td {
-        border: none;
-        padding: 0.75rem;
-        border-bottom: 1px solid #e9ecef;
-    }
-    
-    .table tbody tr:hover {
-        background: #f8f9fa;
-    }
-    
-    .progress {
-        height: 8px;
-        border-radius: 4px;
-        background: #e9ecef;
-        overflow: hidden;
-    }
-    
-    .progress-bar {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        height: 100%;
-        border-radius: 4px;
-        transition: width 0.3s ease;
-    }
-    
-    .filter-section {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .filter-row {
-        display: flex;
-        gap: 1rem;
-        align-items: end;
-        flex-wrap: wrap;
-    }
-    
-    .filter-group {
-        flex: 1;
-        min-width: 150px;
-    }
-    
-    .filter-label {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: #495057;
-        margin-bottom: 0.5rem;
-    }
-    
-    .filter-control {
-        border: 1px solid #ced4da;
-        border-radius: 6px;
-        padding: 0.5rem 0.75rem;
-        font-size: 0.875rem;
-        transition: border-color 0.3s ease;
-    }
-    
-    .filter-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    
-    .btn-filter {
-        padding: 0.5rem 1rem;
-        background: #667eea;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: background 0.3s ease;
-    }
-    
-    .btn-filter:hover {
-        background: #5a6fd8;
-    }
-    
-    .metric-card {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 1rem;
-        text-align: center;
-        border: 1px solid #e9ecef;
-    }
-    
-    .metric-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #495057;
-        margin-bottom: 0.25rem;
-    }
-    
-    .metric-label {
-        font-size: 0.75rem;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .export-section {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    
-    .btn-export {
-        padding: 0.5rem 1rem;
-        border: 1px solid #28a745;
-        background: transparent;
-        color: #28a745;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-    }
-    
-    .btn-export:hover {
-        background: #28a745;
-        color: white;
-    }
-    
-    .btn-export i {
-        margin-right: 0.5rem;
-    }
-    
-    @media (max-width: 768px) {
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        
-        .chart-container {
-            height: 300px;
-        }
-        
-        .filter-row {
-            flex-direction: column;
-        }
-        
-        .filter-group {
-            min-width: auto;
-        }
-        
-        .card-header {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        
-        .card-actions {
-            margin-top: 1rem;
-        }
-        
-        .export-section {
-            flex-direction: column;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .stats-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<!-- Admin Header -->
-<section class="admin-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="mb-2"><i class="fas fa-chart-line me-2"></i>Analytics & Reports</h1>
-                <p class="mb-0">Comprehensive business insights and performance metrics</p>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <a href="{% url 'dashboard:dashboard_home' %}" class="btn btn-light me-2">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-                </a>
-                <button class="btn btn-success" onclick="refreshData()">
-                    <i class="fas fa-sync me-2"></i>Refresh
-                </button>
-            </div>
-        </div>
+{% extends "dashboard/base.html" %} {% load static %} {% block title %}Analytics
+& Reports - Admin Dashboard{% endblock %} {% block dashboard_content %}
+<div class="container mx-auto px-4 sm:px-8">
+  <div class="py-8">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h2 class="text-2xl font-semibold leading-tight text-gray-800">
+          <i class="fas fa-chart-line mr-2"></i>Analytics & Reports
+        </h2>
+        <p class="text-gray-600">
+          Comprehensive business insights and performance metrics
+        </p>
+      </div>
+      <div class="flex space-x-2">
+        <a
+          href="{% url 'dashboard:dashboard_home' %}"
+          class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+        >
+          <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+        </a>
+        <button
+          onclick="refreshData()"
+          class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+        >
+          <i class="fas fa-sync mr-2"></i>Refresh
+        </button>
+      </div>
     </div>
-</section>
 
-<!-- Analytics Content -->
-<section class="py-4">
-    <div class="container">
-        <!-- Date Filter -->
-        <div class="analytics-card">
-            <div class="filter-section">
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label class="filter-label">Date Range</label>
-                        <select class="filter-control" id="dateRange">
-                            <option value="7">Last 7 Days</option>
-                            <option value="30" selected>Last 30 Days</option>
-                            <option value="90">Last 3 Months</option>
-                            <option value="365">Last Year</option>
-                            <option value="custom">Custom Range</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group" id="customDateStart" style="display: none;">
-                        <label class="filter-label">Start Date</label>
-                        <input type="date" class="filter-control" id="startDate">
-                    </div>
-                    
-                    <div class="filter-group" id="customDateEnd" style="display: none;">
-                        <label class="filter-label">End Date</label>
-                        <input type="date" class="filter-control" id="endDate">
-                    </div>
-                    
-                    <div class="filter-group" style="flex: 0 0 auto;">
-                        <button class="btn-filter" onclick="updateAnalytics()">
-                            <i class="fas fa-filter me-2"></i>Apply Filter
-                        </button>
-                    </div>
-                </div>
-            </div>
+    <!-- Date Filter -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Date Range</label
+          >
+          <select
+            id="dateRange"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="7">Last 7 Days</option>
+            <option value="30" selected>Last 30 Days</option>
+            <option value="90">Last 3 Months</option>
+            <option value="365">Last Year</option>
+            <option value="custom">Custom Range</option>
+          </select>
         </div>
-        
-        <!-- Key Metrics -->
-        <div class="stats-grid">
-            <div class="stat-card revenue">
-                <div class="stat-header">
-                    <div class="stat-icon revenue">
-                        <i class="fas fa-rupee-sign"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-label">Total Revenue</div>
-                        <div class="stat-value" id="totalRevenue">रू {{ total_revenue|floatformat:0 }}</div>
-                        <div class="stat-change positive" id="revenueChange">
-                            <i class="fas fa-arrow-up me-1"></i>+12.5% from last period
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="stat-card bookings">
-                <div class="stat-header">
-                    <div class="stat-icon bookings">
-                        <i class="fas fa-ticket-alt"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-label">Total Bookings</div>
-                        <div class="stat-value" id="totalBookings">{{ total_bookings }}</div>
-                        <div class="stat-change positive" id="bookingsChange">
-                            <i class="fas fa-arrow-up me-1"></i>+8.3% from last period
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="stat-card users">
-                <div class="stat-header">
-                    <div class="stat-icon users">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-label">Active Users</div>
-                        <div class="stat-value" id="activeUsers">{{ active_users }}</div>
-                        <div class="stat-change positive" id="usersChange">
-                            <i class="fas fa-arrow-up me-1"></i>+15.2% from last period
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="stat-card buses">
-                <div class="stat-header">
-                    <div class="stat-icon buses">
-                        <i class="fas fa-bus"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-label">Active Buses</div>
-                        <div class="stat-value" id="activeBuses">{{ active_buses }}</div>
-                        <div class="stat-change positive" id="busesChange">
-                            <i class="fas fa-arrow-up me-1"></i>+5.1% from last period
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div id="customDateStart" class="hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Start Date</label
+          >
+          <input
+            type="date"
+            id="startDate"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+          />
         </div>
-        
-        <!-- Revenue Trend Chart -->
-        <div class="analytics-card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-chart-line"></i>
-                    Revenue Trend (Confirmed Bookings Only)
-                </h3>
-                <div class="card-actions">
-                    <div class="revenue-info">
-                        <span class="total-revenue">Total Revenue: <strong id="totalRevenueDisplay">रू {{ total_revenue|floatformat:0 }}</strong></span>
-                        <span class="last-updated">Last Updated: <span id="lastUpdated">{{ last_updated|date:"M d, Y H:i" }}</span></span>
-                    </div>
-                    <div class="export-section">
-                        <button class="btn-export" onclick="exportChart('revenue')">
-                            <i class="fas fa-download"></i>Export
-                        </button>
-                        <button class="btn-refresh" onclick="refreshRevenueData()" title="Refresh Data">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="revenue-summary">
-                <div class="revenue-metrics">
-                    <div class="metric">
-                        <span class="metric-label">Period Revenue:</span>
-                        <span class="metric-value" id="periodRevenue">रू {{ recent_revenue|floatformat:0 }}</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Growth:</span>
-                        <span class="metric-value growth" id="growthPercentage">+0.0%</span>
-                    </div>
-                    <div class="metric">
-                        <span class="metric-label">Auto-refresh:</span>
-                        <label class="switch">
-                            <input type="checkbox" id="autoRefresh" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="chart-controls">
-                <button class="btn-chart active" onclick="setChartPeriod(30)">Last 30 Days</button>
-                <button class="btn-chart" onclick="setChartPeriod(90)">Last 3 Months</button>
-                <button class="btn-chart" onclick="setChartPeriod(365)">Last Year</button>
-            </div>
-            
-            <div class="chart-container">
-                <canvas id="revenueChart"></canvas>
-            </div>
+        <div id="customDateEnd" class="hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >End Date</label
+          >
+          <input
+            type="date"
+            id="endDate"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+          />
         </div>
-        
-        <!-- Booking Analytics -->
-        <div class="analytics-card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-chart-bar"></i>
-                    Booking Analytics
-                </h3>
-                <div class="card-actions">
-                    <div class="export-section">
-                        <button class="btn-export" onclick="exportChart('bookings')">
-                            <i class="fas fa-download"></i>Export
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="chart-container">
-                        <canvas id="bookingsChart"></canvas>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="row">
-                        <div class="col-6 col-md-12 mb-3">
-                            <div class="metric-card">
-                                <div class="metric-value">{{ booking_conversion_rate|floatformat:1 }}%</div>
-                                <div class="metric-label">Conversion Rate</div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-12 mb-3">
-                            <div class="metric-card">
-                                <div class="metric-value">रू {{ average_booking_value|floatformat:0 }}</div>
-                                <div class="metric-label">Avg Booking Value</div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-12 mb-3">
-                            <div class="metric-card">
-                                <div class="metric-value">{{ cancellation_rate|floatformat:1 }}%</div>
-                                <div class="metric-label">Cancellation Rate</div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-12 mb-3">
-                            <div class="metric-card">
-                                <div class="metric-value">{{ repeat_customer_rate|floatformat:1 }}%</div>
-                                <div class="metric-label">Repeat Customers</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="flex items-end">
+          <button
+            onclick="updateAnalytics()"
+            class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+          >
+            <i class="fas fa-filter mr-2"></i>Apply Filter
+          </button>
         </div>
-        
-        <!-- Route Performance -->
-        <div class="analytics-card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-route"></i>
-                    Top Performing Routes
-                </h3>
-                <div class="card-actions">
-                    <div class="export-section">
-                        <button class="btn-export" onclick="exportTable('routes')">
-                            <i class="fas fa-download"></i>Export
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Route</th>
-                            <th>Bookings</th>
-                            <th>Revenue</th>
-                            <th>Occupancy Rate</th>
-                            <th>Performance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for route in top_routes %}
-                        <tr>
-                            <td>
-                                <strong>{{ route.source }} → {{ route.destination }}</strong><br>
-                                <small class="text-muted">{{ route.departure_time }} - {{ route.arrival_time }}</small>
-                            </td>
-                            <td>{{ route.total_bookings }}</td>
-                            <td>रू {{ route.total_revenue|floatformat:0 }}</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <span class="me-2">{{ route.occupancy_rate|floatformat:1 }}%</span>
-                                    <div class="progress" style="width: 60px;">
-                                        <div class="progress-bar" style="width: {{ route.occupancy_rate }}%"></div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                {% if route.performance_score >= 80 %}
-                                    <span class="badge bg-success">Excellent</span>
-                                {% elif route.performance_score >= 60 %}
-                                    <span class="badge bg-warning">Good</span>
-                                {% else %}
-                                    <span class="badge bg-danger">Needs Improvement</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <!-- Bus Utilization -->
-        <div class="analytics-card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-bus"></i>
-                    Bus Utilization
-                </h3>
-                <div class="card-actions">
-                    <div class="export-section">
-                        <button class="btn-export" onclick="exportTable('buses')">
-                            <i class="fas fa-download"></i>Export
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Bus Number</th>
-                            <th>Type</th>
-                            <th>Total Trips</th>
-                            <th>Revenue</th>
-                            <th>Utilization Rate</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for bus in bus_utilization %}
-                        <tr>
-                            <td><strong>{{ bus.bus_number }}</strong></td>
-                            <td>{{ bus.bus_type }}</td>
-                            <td>{{ bus.total_trips }}</td>
-                            <td>रू {{ bus.total_revenue|floatformat:0 }}</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <span class="me-2">{{ bus.utilization_rate|floatformat:1 }}%</span>
-                                    <div class="progress" style="width: 60px;">
-                                        <div class="progress-bar" style="width: {{ bus.utilization_rate }}%"></div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                {% if bus.status == 'active' %}
-                                    <span class="badge bg-success">Active</span>
-                                {% elif bus.status == 'maintenance' %}
-                                    <span class="badge bg-warning">Maintenance</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">Inactive</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <!-- Customer Analytics -->
-        <div class="analytics-card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-users"></i>
-                    Customer Insights
-                </h3>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="chart-container" style="height: 300px;">
-                        <canvas id="customerSegmentChart"></canvas>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="chart-container" style="height: 300px;">
-                        <canvas id="customerAcquisitionChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-</section>
-{% endblock %}
 
-{% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Key Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div
+        class="bg-gradient-to-br from-purple-500 to-indigo-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow relative overflow-hidden"
+      >
+        <div class="flex items-center">
+          <div class="mr-4">
+            <i class="fas fa-rupee-sign text-3xl"></i>
+          </div>
+          <div>
+            <p class="text-sm opacity-90">Total Revenue</p>
+            <h4 class="text-2xl font-bold mb-1" id="totalRevenue">
+              रू{{ total_revenue|floatformat:0 }}
+            </h4>
+            <div class="text-green-200 text-sm" id="revenueChange">
+              <i class="fas fa-arrow-up mr-1"></i>+12.5% from last period
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-gradient-to-br from-pink-500 to-red-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow relative overflow-hidden"
+      >
+        <div class="flex items-center">
+          <div class="mr-4">
+            <i class="fas fa-ticket-alt text-3xl"></i>
+          </div>
+          <div>
+            <p class="text-sm opacity-90">Total Bookings</p>
+            <h4 class="text-2xl font-bold mb-1" id="totalBookings">
+              {{ total_bookings }}
+            </h4>
+            <div class="text-green-200 text-sm" id="bookingsChange">
+              <i class="fas fa-arrow-up mr-1"></i>+8.3% from last period
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-gradient-to-br from-blue-500 to-cyan-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow relative overflow-hidden"
+      >
+        <div class="flex items-center">
+          <div class="mr-4">
+            <i class="fas fa-users text-3xl"></i>
+          </div>
+          <div>
+            <p class="text-sm opacity-90">Active Users</p>
+            <h4 class="text-2xl font-bold mb-1" id="activeUsers">
+              {{ active_users }}
+            </h4>
+            <div class="text-green-200 text-sm" id="usersChange">
+              <i class="fas fa-arrow-up mr-1"></i>+15.2% from last period
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-gradient-to-br from-green-500 to-teal-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow relative overflow-hidden"
+      >
+        <div class="flex items-center">
+          <div class="mr-4">
+            <i class="fas fa-bus text-3xl"></i>
+          </div>
+          <div>
+            <p class="text-sm opacity-90">Active Buses</p>
+            <h4 class="text-2xl font-bold mb-1" id="activeBuses">
+              {{ active_buses }}
+            </h4>
+            <div class="text-green-200 text-sm" id="busesChange">
+              <i class="fas fa-arrow-up mr-1"></i>+5.1% from last period
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Revenue Trend Chart -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-lg font-semibold text-gray-800">
+          <i class="fas fa-chart-line mr-2 text-blue-500"></i>Revenue Trend
+        </h3>
+        <div class="flex items-center space-x-4">
+          <span class="text-sm text-gray-600"
+            >Total Revenue:
+            <strong id="totalRevenueDisplay"
+              >रू{{ total_revenue|floatformat:0 }}</strong
+            ></span
+          >
+          <button
+            onclick="exportChart('revenue')"
+            class="text-blue-600 hover:text-blue-800"
+          >
+            <i class="fas fa-download"></i>
+          </button>
+          <button
+            onclick="refreshRevenueData()"
+            class="text-green-600 hover:text-green-800"
+          >
+            <i class="fas fa-sync-alt"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <span class="text-sm text-gray-600">Period Revenue:</span>
+          <div class="text-xl font-bold text-gray-800" id="periodRevenue">
+            रू{{ recent_revenue|floatformat:0 }}
+          </div>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <span class="text-sm text-gray-600">Growth:</span>
+          <div class="text-xl font-bold text-green-600" id="growthPercentage">
+            +0.0%
+          </div>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <span class="text-sm text-gray-600">Auto-refresh:</span>
+          <div class="mt-2">
+            <label class="inline-flex items-center">
+              <input
+                type="checkbox"
+                id="autoRefresh"
+                checked
+                class="form-checkbox h-5 w-5 text-blue-600"
+              />
+              <span class="ml-2 text-sm text-gray-700">Enabled</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex space-x-2 mb-4">
+        <button
+          onclick="setChartPeriod(30)"
+          class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600"
+        >
+          Last 30 Days
+        </button>
+        <button
+          onclick="setChartPeriod(90)"
+          class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-400"
+        >
+          Last 3 Months
+        </button>
+        <button
+          onclick="setChartPeriod(365)"
+          class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-400"
+        >
+          Last Year
+        </button>
+      </div>
+
+      <div class="h-80 bg-gray-50 rounded-lg flex items-center justify-center">
+        <div class="text-center">
+          <i class="fas fa-chart-line text-6xl text-gray-300 mb-4"></i>
+          <p class="text-gray-500 mb-2">Revenue chart visualization</p>
+          <small class="text-gray-400">Chart.js integration recommended</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Analytics -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-lg font-semibold text-gray-800">
+            <i class="fas fa-chart-bar mr-2 text-blue-500"></i>Booking Analytics
+          </h3>
+          <button
+            onclick="exportChart('bookings')"
+            class="text-blue-600 hover:text-blue-800"
+          >
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+
+        <div
+          class="h-64 bg-gray-50 rounded-lg flex items-center justify-center"
+        >
+          <div class="text-center">
+            <i class="fas fa-chart-bar text-4xl text-gray-300 mb-2"></i>
+            <p class="text-gray-500">Booking analytics chart</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-6">
+          <i class="fas fa-chart-pie mr-2 text-blue-500"></i>Booking Status
+          Distribution
+        </h3>
+
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-700">Confirmed</span>
+            <div class="flex items-center space-x-2">
+              <div class="w-24 bg-gray-200 rounded-full h-2">
+                <div
+                  class="bg-green-500 h-2 rounded-full"
+                  style="width: 65%"
+                ></div>
+              </div>
+              <span class="text-sm font-semibold text-gray-600">65%</span>
+            </div>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-700">Pending</span>
+            <div class="flex items-center space-x-2">
+              <div class="w-24 bg-gray-200 rounded-full h-2">
+                <div
+                  class="bg-yellow-500 h-2 rounded-full"
+                  style="width: 25%"
+                ></div>
+              </div>
+              <span class="text-sm font-semibold text-gray-600">25%</span>
+            </div>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-700">Cancelled</span>
+            <div class="flex items-center space-x-2">
+              <div class="w-24 bg-gray-200 rounded-full h-2">
+                <div
+                  class="bg-red-500 h-2 rounded-full"
+                  style="width: 10%"
+                ></div>
+              </div>
+              <span class="text-sm font-semibold text-gray-600">10%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Routes and Performance -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-6">
+          <i class="fas fa-route mr-2 text-blue-500"></i>Top Routes
+        </h3>
+
+        <div class="space-y-4">
+          {% for route in top_routes|slice:":5" %}
+          <div
+            class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+          >
+            <div>
+              <div class="font-medium text-gray-900">
+                {{ route.source }} → {{ route.destination }}
+              </div>
+              <div class="text-sm text-gray-500">
+                {{ route.booking_count }} bookings
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="font-semibold text-gray-900">
+                रू{{ route.total_revenue|floatformat:0 }}
+              </div>
+              <div class="text-sm text-gray-500">Revenue</div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center py-8">
+            <i class="fas fa-route text-4xl text-gray-300 mb-2"></i>
+            <p class="text-gray-500">No route data available</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-6">
+          <i class="fas fa-bus mr-2 text-blue-500"></i>Top Performing Buses
+        </h3>
+
+        <div class="space-y-4">
+          {% for bus in top_buses|slice:":5" %}
+          <div
+            class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+          >
+            <div>
+              <div class="font-medium text-gray-900">{{ bus.bus_number }}</div>
+              <div class="text-sm text-gray-500">
+                {{ bus.trip_count }} trips
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="font-semibold text-gray-900">
+                रू{{ bus.total_revenue|floatformat:0 }}
+              </div>
+              <div class="text-sm text-gray-500">Revenue</div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center py-8">
+            <i class="fas fa-bus text-4xl text-gray-300 mb-2"></i>
+            <p class="text-gray-500">No bus data available</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block dashboard_extra_js %}
 <script>
-    let revenueChart, bookingsChart, customerSegmentChart, customerAcquisitionChart;
-    let currentChartPeriod = 'daily';
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeCharts();
-        setupEventListeners();
-        setupAutoRefresh();
-        
-        // Initial revenue data update
-        setTimeout(() => {
-            updateRevenueData();
-        }, 1000);
+  // Date range functionality
+  document.getElementById("dateRange").addEventListener("change", function () {
+    const customStart = document.getElementById("customDateStart");
+    const customEnd = document.getElementById("customDateEnd");
+
+    if (this.value === "custom") {
+      customStart.classList.remove("hidden");
+      customEnd.classList.remove("hidden");
+    } else {
+      customStart.classList.add("hidden");
+      customEnd.classList.add("hidden");
+    }
+  });
+
+  function updateAnalytics() {
+    // Implementation for updating analytics based on filters
+    console.log("Updating analytics...");
+  }
+
+  function refreshData() {
+    // Implementation for refreshing all data
+    console.log("Refreshing data...");
+    location.reload();
+  }
+
+  function exportChart(type) {
+    // Implementation for exporting charts
+    console.log("Exporting chart:", type);
+  }
+
+  function refreshRevenueData() {
+    // Implementation for refreshing revenue data
+    console.log("Refreshing revenue data...");
+  }
+
+  function setChartPeriod(days) {
+    // Update chart period buttons
+    document.querySelectorAll('[onclick^="setChartPeriod"]').forEach((btn) => {
+      btn.className =
+        "bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-400";
     });
-    
-    function setupEventListeners() {
-        const dateRangeSelect = document.getElementById('dateRange');
-        dateRangeSelect.addEventListener('change', function() {
-            const customDateStart = document.getElementById('customDateStart');
-            const customDateEnd = document.getElementById('customDateEnd');
-            
-            if (this.value === 'custom') {
-                customDateStart.style.display = 'block';
-                customDateEnd.style.display = 'block';
-            } else {
-                customDateStart.style.display = 'none';
-                customDateEnd.style.display = 'none';
-            }
-        });
-    }
-    
-    function initializeCharts() {
-        // Revenue Chart
-        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-        revenueChart = new Chart(revenueCtx, {
-            type: 'line',
-            data: {
-                labels: {{ revenue_chart_labels|safe }},
-                datasets: [{
-                    label: 'Revenue (रू)',
-                    data: {{ revenue_chart_data|safe }},
-                    borderColor: '#667eea',
-                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return 'रू ' + value.toLocaleString();
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        
-        // Bookings Chart
-        const bookingsCtx = document.getElementById('bookingsChart').getContext('2d');
-        bookingsChart = new Chart(bookingsCtx, {
-            type: 'bar',
-            data: {
-                labels: {{ booking_chart_labels|safe }},
-                datasets: [{
-                    label: 'Confirmed',
-                    data: {{ confirmed_bookings_data|safe }},
-                    backgroundColor: '#28a745'
-                }, {
-                    label: 'Cancelled',
-                    data: {{ cancelled_bookings_data|safe }},
-                    backgroundColor: '#dc3545'
-                }, {
-                    label: 'Pending',
-                    data: {{ pending_bookings_data|safe }},
-                    backgroundColor: '#ffc107'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top'
-                    }
-                },
-                scales: {
-                    x: {
-                        stacked: true
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-        
-        // Customer Segment Chart
-        const customerSegmentCtx = document.getElementById('customerSegmentChart').getContext('2d');
-        customerSegmentChart = new Chart(customerSegmentCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['New Customers', 'Returning Customers', 'VIP Customers'],
-                datasets: [{
-                    data: [{{ new_customers }}, {{ returning_customers }}, {{ vip_customers }}],
-                    backgroundColor: ['#667eea', '#f093fb', '#43e97b']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    },
-                    title: {
-                        display: true,
-                        text: 'Customer Segments'
-                    }
-                }
-            }
-        });
-        
-        // Customer Acquisition Chart
-        const customerAcquisitionCtx = document.getElementById('customerAcquisitionChart').getContext('2d');
-        customerAcquisitionChart = new Chart(customerAcquisitionCtx, {
-            type: 'line',
-            data: {
-                labels: {{ acquisition_chart_labels|safe }},
-                datasets: [{
-                    label: 'New Customers',
-                    data: {{ acquisition_chart_data|safe }},
-                    borderColor: '#4facfe',
-                    backgroundColor: 'rgba(79, 172, 254, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    title: {
-                        display: true,
-                        text: 'Customer Acquisition'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }
-    
-    let currentChartPeriod = 30;
-    let autoRefreshInterval;
-    
-    function setChartPeriod(days) {
-        currentChartPeriod = days;
-        
-        // Update button states
-        document.querySelectorAll('.btn-chart').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        event.target.classList.add('active');
-        
-        // Update chart data based on period
-        updateRevenueData(days);
-    }
-    
-    function updateRevenueData(days = currentChartPeriod) {
-        fetch(`{% url 'dashboard:get_real_time_revenue_data' %}?days=${days}`)
-            .then(response => response.json())
-            .then(data => {
-                // Update total revenue display
-                document.getElementById('totalRevenueDisplay').textContent = `रू ${data.total_revenue.toLocaleString()}`;
-                
-                // Update period revenue
-                document.getElementById('periodRevenue').textContent = `रू ${data.recent_revenue.toLocaleString()}`;
-                
-                // Update growth percentage
-                const growthElement = document.getElementById('growthPercentage');
-                const growthValue = data.growth_percentage;
-                growthElement.textContent = `${growthValue >= 0 ? '+' : ''}${growthValue}%`;
-                growthElement.className = `metric-value growth ${growthValue < 0 ? 'negative' : ''}`;
-                
-                // Update last updated time
-                const lastUpdated = new Date(data.last_updated);
-                document.getElementById('lastUpdated').textContent = lastUpdated.toLocaleString();
-                
-                // Update chart
-                if (revenueChart) {
-                    revenueChart.data.labels = data.chart_data.labels;
-                    revenueChart.data.datasets[0].data = data.chart_data.data;
-                    revenueChart.update('none');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching revenue data:', error);
-            });
-    }
-    
-    function refreshRevenueData() {
-        const refreshBtn = document.querySelector('.btn-refresh i');
-        refreshBtn.style.animation = 'spin 1s linear';
-        
-        updateRevenueData().finally(() => {
-            setTimeout(() => {
-                refreshBtn.style.animation = '';
-            }, 1000);
-        });
-    }
-    
-    function setupAutoRefresh() {
-        const autoRefreshCheckbox = document.getElementById('autoRefresh');
-        
-        function toggleAutoRefresh() {
-            if (autoRefreshCheckbox.checked) {
-                // Start auto-refresh every 30 seconds
-                autoRefreshInterval = setInterval(updateRevenueData, 30000);
-            } else {
-                // Stop auto-refresh
-                if (autoRefreshInterval) {
-                    clearInterval(autoRefreshInterval);
-                }
-            }
-        }
-        
-        autoRefreshCheckbox.addEventListener('change', toggleAutoRefresh);
-        
-        // Start auto-refresh if checkbox is checked
-        if (autoRefreshCheckbox.checked) {
-            toggleAutoRefresh();
-        }
-    }
-    
-    function updateAnalytics() {
-        const dateRange = document.getElementById('dateRange').value;
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-        
-        let params = new URLSearchParams();
-        params.append('date_range', dateRange);
-        
-        if (dateRange === 'custom' && startDate && endDate) {
-            params.append('start_date', startDate);
-            params.append('end_date', endDate);
-        }
-        
-        // Reload page with new parameters
-        window.location.href = `${window.location.pathname}?${params.toString()}`;
-    }
-    
-    function refreshData() {
-        location.reload();
-    }
-    
-    function exportChart(chartType) {
-        let chart;
-        switch(chartType) {
-            case 'revenue':
-                chart = revenueChart;
-                break;
-            case 'bookings':
-                chart = bookingsChart;
-                break;
-            default:
-                return;
-        }
-        
-        const url = chart.toBase64Image();
-        const link = document.createElement('a');
-        link.download = `${chartType}_chart.png`;
-        link.href = url;
-        link.click();
-    }
-    
-    function exportTable(tableType) {
-        const params = new URLSearchParams(window.location.search);
-        params.append('export', tableType);
-        params.append('format', 'csv');
-        
-        window.location.href = `${window.location.pathname}?${params.toString()}`;
-    }
+    event.target.className =
+      "bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600";
+
+    console.log("Setting chart period to:", days, "days");
+  }
+
+  // Auto-refresh functionality
+  let autoRefreshInterval;
+  document
+    .getElementById("autoRefresh")
+    .addEventListener("change", function () {
+      if (this.checked) {
+        autoRefreshInterval = setInterval(refreshRevenueData, 300000); // 5 minutes
+      } else {
+        clearInterval(autoRefreshInterval);
+      }
+    });
+
+  // Initialize auto-refresh if enabled
+  if (document.getElementById("autoRefresh").checked) {
+    autoRefreshInterval = setInterval(refreshRevenueData, 300000);
+  }
 </script>
 {% endblock %}

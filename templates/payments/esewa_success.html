@@ -1,78 +1,184 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Payment Successful{% endblock %}
-
-{% block extra_css %}
-<style>
-    .success-container {
-        max-width: 600px;
-        margin: 2rem auto;
-        text-align: center;
-    }
-    
-    .success-icon {
-        width: 80px;
-        height: 80px;
-        background: #28a745;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1.5rem;
-        color: white;
-        font-size: 2rem;
-    }
-    
-    .success-title {
-        color: #28a745;
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-    }
-    
-    .success-message {
-        color: #6c757d;
-        margin-bottom: 2rem;
-    }
-    
-    .btn-primary {
-        background: #28a745;
-        border: none;
-        padding: 0.75rem 2rem;
-        border-radius: 8px;
-        color: white;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-primary:hover {
-        background: #1e7e34;
-        color: white;
-        text-decoration: none;
-    }
-</style>
-{% endblock %}
+{% block title %}eSewa Payment Successful - TravelMate{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="success-container">
-        <div class="success-icon">
-            <i class="fas fa-check"></i>
+<!-- Success Header -->
+<section class="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-16 -mt-6">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+            <i class="fas fa-check-circle text-4xl text-white"></i>
         </div>
-        
-        <h1 class="success-title">Payment Successful!</h1>
-        
-        <p class="success-message">
-            Your payment has been processed successfully via eSewa. 
-            Your booking is now confirmed and you will receive a confirmation email shortly.
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Payment Successful!</h1>
+        <p class="text-xl opacity-90 max-w-2xl mx-auto">
+            Your payment has been processed successfully via eSewa. Your booking is now confirmed!
         </p>
-        
-        <a href="{% url 'accounts:booking_history' %}" class="btn btn-primary">
-            <i class="fas fa-list me-2"></i>
-            View My Bookings
-        </a>
     </div>
-</div>
+</section>
+
+<!-- Success Details -->
+<section class="py-12 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+            <!-- eSewa Logo/Icon -->
+            <div class="w-20 h-20 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-mobile-alt text-white text-3xl"></i>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                <span class="text-green-600">eSewa</span> Payment Confirmed
+            </h2>
+            
+            <p class="text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+                Thank you for using eSewa! Your payment has been processed securely and your booking is now confirmed. 
+                You will receive a confirmation email and SMS with your ticket details shortly.
+            </p>
+            
+            <!-- Success Features -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-shield-alt text-green-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Secure Payment</h3>
+                    <p class="text-sm text-gray-600">Your payment was processed securely through eSewa's encrypted gateway</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-ticket-alt text-blue-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Booking Confirmed</h3>
+                    <p class="text-sm text-gray-600">Your seats are reserved and your booking is confirmed</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-envelope text-purple-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Confirmation Sent</h3>
+                    <p class="text-sm text-gray-600">Email and SMS confirmations are on their way</p>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'accounts:booking_history' %}" 
+                   class="bg-green-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-list mr-2"></i>View My Bookings
+                </a>
+                
+                <a href="{% url 'routes:route_search' %}" 
+                   class="bg-blue-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-600 transition-colors">
+                    <i class="fas fa-search mr-2"></i>Book Another Trip
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- eSewa Information -->
+<section class="py-12 bg-green-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+            <div class="text-center mb-8">
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-mobile-alt text-green-500 mr-2"></i>About eSewa Payment
+                </h3>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    eSewa is Nepal's first and most trusted digital wallet. Your payment was processed through their secure platform.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="font-semibold text-gray-800 mb-4">Payment Benefits</h4>
+                    <ul class="space-y-3 text-sm text-gray-600">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                            <span>Instant payment confirmation</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                            <span>Bank-grade security and encryption</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                            <span>24/7 transaction monitoring</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                            <span>Digital receipt and transaction history</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-800 mb-4">Next Steps</h4>
+                    <ul class="space-y-3 text-sm text-gray-600">
+                        <li class="flex items-start">
+                            <i class="fas fa-envelope text-blue-500 mr-2 mt-1"></i>
+                            <span>Check your email for booking confirmation</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-mobile-alt text-purple-500 mr-2 mt-1"></i>
+                            <span>SMS with ticket details will arrive shortly</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-download text-green-500 mr-2 mt-1"></i>
+                            <span>Download your ticket from booking history</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-bus text-orange-500 mr-2 mt-1"></i>
+                            <span>Arrive 15 minutes early at departure point</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Support Section -->
+<section class="py-12 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h3 class="text-2xl font-bold text-gray-900 mb-4">Need Help?</h3>
+        <p class="text-gray-600 mb-6">
+            If you have any questions about your payment or booking, our support team is here to help.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="tel:+9779847435111" 
+               class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors">
+                <i class="fas fa-phone mr-2"></i>Call Support
+            </a>
+            <a href="{% url 'home:contact' %}" 
+               class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                <i class="fas fa-envelope mr-2"></i>Contact Us
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show success animation
+        setTimeout(() => {
+            const successIcon = document.querySelector('.animate-bounce');
+            if (successIcon) {
+                successIcon.classList.remove('animate-bounce');
+                successIcon.classList.add('animate-pulse');
+            }
+        }, 2000);
+        
+        // Auto-redirect after 30 seconds (optional)
+        setTimeout(function() {
+            if (confirm('Would you like to view your booking details?')) {
+                window.location.href = '{% url "accounts:booking_history" %}';
+            }
+        }, 30000);
+    });
+</script>
 {% endblock %}

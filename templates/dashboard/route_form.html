@@ -1,166 +1,485 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}{{ title }} - Dashboard{% endblock %}
-
-{% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">{{ title }}</h4>
-                    <div class="card-tools">
-                        <a href="{% url 'dashboard:route_management' %}" class="btn btn-secondary btn-sm">
-                            <i class="fas fa-arrow-left"></i> Back to Route Management
-                        </a>
-                    </div>
-                </div>
-                <div class="card-body">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-
-                    <form method="post" class="row g-3">
-                        {% csrf_token %}
-                        
-                        <div class="col-md-6">
-                            <label for="{{ form.source_name.id_for_label }}" class="form-label">Source Location *</label>
-                            {{ form.source_name }}
-                            {% if form.source_name.help_text %}
-                                <small class="form-text text-muted">{{ form.source_name.help_text }}</small>
-                            {% endif %}
-                            {% if form.source_name.errors %}
-                                <div class="text-danger small">{{ form.source_name.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label for="{{ form.destination_name.id_for_label }}" class="form-label">Destination Location *</label>
-                            {{ form.destination_name }}
-                            {% if form.destination_name.help_text %}
-                                <small class="form-text text-muted">{{ form.destination_name.help_text }}</small>
-                            {% endif %}
-                            {% if form.destination_name.errors %}
-                                <div class="text-danger small">{{ form.destination_name.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <label for="{{ form.distance.id_for_label }}" class="form-label">Distance (km) *</label>
-                            {{ form.distance }}
-                            <small class="form-text text-muted">Enter the distance between source and destination in kilometers</small>
-                            {% if form.distance.errors %}
-                                <div class="text-danger small">{{ form.distance.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <label class="form-label">Travel Time *</label>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    {{ form.travel_time_hours }}
-                                    {% if form.travel_time_hours.help_text %}
-                                        <small class="form-text text-muted">{{ form.travel_time_hours.help_text }}</small>
-                                    {% endif %}
-                                    {% if form.travel_time_hours.errors %}
-                                        <div class="text-danger small">{{ form.travel_time_hours.errors.0 }}</div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-6">
-                                    {{ form.travel_time_minutes }}
-                                    {% if form.travel_time_minutes.help_text %}
-                                        <small class="form-text text-muted">{{ form.travel_time_minutes.help_text }}</small>
-                                    {% endif %}
-                                    {% if form.travel_time_minutes.errors %}
-                                        <div class="text-danger small">{{ form.travel_time_minutes.errors.0 }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <small class="form-text text-muted">Enter estimated travel time (Hours : Minutes)</small>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <div class="form-check" style="margin-top: 2rem;">
-                                {{ form.is_active }}
-                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
-                                    Active
-                                </label>
-                            </div>
-                            {% if form.is_active.errors %}
-                                <div class="text-danger small">{{ form.is_active.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-
-                        
-                        {% if form.non_field_errors %}
-                            <div class="col-12">
-                                <div class="alert alert-danger">
-                                    {{ form.non_field_errors }}
-                                </div>
-                            </div>
-                        {% endif %}
-                        
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> {{ action }}
-                            </button>
-                            <a href="{% url 'dashboard:route_management' %}" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Cancel
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+{% extends "dashboard/base.html" %} {% load static %} {% block title %}{{ title
+}} - Dashboard{% endblock %} {% block dashboard_content %}
+<div class="container mx-auto px-4 sm:px-8">
+  <div class="py-8">
+    <div class="max-w-4xl mx-auto">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-2xl font-semibold leading-tight text-gray-800">
+            <i class="fas fa-route mr-2"></i>{{ title }}
+          </h2>
+          <p class="text-gray-600">
+            {% if action == 'Add' %}Create a new route for bus services{% else
+            %}Update route information{% endif %}
+          </p>
         </div>
-    </div>
-</div>
+        <a
+          href="{% url 'dashboard:route_management' %}"
+          class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+        >
+          <i class="fas fa-arrow-left mr-2"></i>Back to Route Management
+        </a>
+      </div>
 
+      <!-- Messages -->
+      {% if messages %} {% for message in messages %}
+      <div
+        class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-100 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800 border border-yellow-200{% else %}bg-blue-100 text-blue-800 border border-blue-200{% endif %}"
+      >
+        <div class="flex justify-between items-center">
+          <span>{{ message }}</span>
+          <button
+            onclick="this.parentElement.parentElement.remove()"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      {% endfor %} {% endif %}
+
+      <form method="post" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Route Information Section -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>Route
+            Information
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label
+                for="{{ form.source_name.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Source Location <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <i class="fas fa-map-marker-alt text-gray-400"></i>
+                </div>
+                <input
+                  type="text"
+                  name="{{ form.source_name.name }}"
+                  id="{{ form.source_name.id_for_label }}"
+                  value="{{ form.source_name.value|default:'' }}"
+                  class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 {% if form.source_name.errors %}border-red-500{% endif %}"
+                  placeholder="e.g., Kathmandu"
+                  required
+                />
+              </div>
+              {% if form.source_name.help_text %}
+              <p class="text-gray-500 text-sm mt-1">
+                {{ form.source_name.help_text }}
+              </p>
+              {% endif %} {% if form.source_name.errors %}
+              <p class="text-red-500 text-sm mt-1">
+                {{ form.source_name.errors.0 }}
+              </p>
+              {% endif %}
+            </div>
+
+            <div>
+              <label
+                for="{{ form.destination_name.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Destination Location <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <i class="fas fa-flag-checkered text-gray-400"></i>
+                </div>
+                <input
+                  type="text"
+                  name="{{ form.destination_name.name }}"
+                  id="{{ form.destination_name.id_for_label }}"
+                  value="{{ form.destination_name.value|default:'' }}"
+                  class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 {% if form.destination_name.errors %}border-red-500{% endif %}"
+                  placeholder="e.g., Pokhara"
+                  required
+                />
+              </div>
+              {% if form.destination_name.help_text %}
+              <p class="text-gray-500 text-sm mt-1">
+                {{ form.destination_name.help_text }}
+              </p>
+              {% endif %} {% if form.destination_name.errors %}
+              <p class="text-red-500 text-sm mt-1">
+                {{ form.destination_name.errors.0 }}
+              </p>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Route Preview -->
+          <div id="routePreview" class="mt-4 p-4 bg-blue-50 rounded-lg hidden">
+            <div class="flex items-center justify-center space-x-4">
+              <span id="sourcePreview" class="font-medium text-blue-800"></span>
+              <i class="fas fa-arrow-right text-blue-600"></i>
+              <span
+                id="destinationPreview"
+                class="font-medium text-blue-800"
+              ></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Route Details Section -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-info-circle mr-2 text-blue-500"></i>Route Details
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label
+                for="{{ form.distance.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Distance (km) <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <i class="fas fa-road text-gray-400"></i>
+                </div>
+                <input
+                  type="number"
+                  name="{{ form.distance.name }}"
+                  id="{{ form.distance.id_for_label }}"
+                  value="{{ form.distance.value|default:'' }}"
+                  class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 {% if form.distance.errors %}border-red-500{% endif %}"
+                  placeholder="200"
+                  min="1"
+                  step="0.1"
+                  required
+                />
+              </div>
+              <p class="text-gray-500 text-sm mt-1">
+                Enter the distance between source and destination in kilometers
+              </p>
+              {% if form.distance.errors %}
+              <p class="text-red-500 text-sm mt-1">
+                {{ form.distance.errors.0 }}
+              </p>
+              {% endif %}
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Travel Time <span class="text-red-500">*</span>
+              </label>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label
+                    for="{{ form.travel_time_hours.id_for_label }}"
+                    class="block text-xs text-gray-500 mb-1"
+                    >Hours</label
+                  >
+                  <div class="relative">
+                    <div
+                      class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                    >
+                      <i class="fas fa-clock text-gray-400"></i>
+                    </div>
+                    <input
+                      type="number"
+                      name="{{ form.travel_time_hours.name }}"
+                      id="{{ form.travel_time_hours.id_for_label }}"
+                      value="{{ form.travel_time_hours.value|default:'' }}"
+                      class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 {% if form.travel_time_hours.errors %}border-red-500{% endif %}"
+                      placeholder="6"
+                      min="0"
+                      max="23"
+                      required
+                    />
+                  </div>
+                  {% if form.travel_time_hours.errors %}
+                  <p class="text-red-500 text-xs mt-1">
+                    {{ form.travel_time_hours.errors.0 }}
+                  </p>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label
+                    for="{{ form.travel_time_minutes.id_for_label }}"
+                    class="block text-xs text-gray-500 mb-1"
+                    >Minutes</label
+                  >
+                  <div class="relative">
+                    <div
+                      class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                    >
+                      <i class="fas fa-clock text-gray-400"></i>
+                    </div>
+                    <input
+                      type="number"
+                      name="{{ form.travel_time_minutes.name }}"
+                      id="{{ form.travel_time_minutes.id_for_label }}"
+                      value="{{ form.travel_time_minutes.value|default:'' }}"
+                      class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 {% if form.travel_time_minutes.errors %}border-red-500{% endif %}"
+                      placeholder="30"
+                      min="0"
+                      max="59"
+                      required
+                    />
+                  </div>
+                  {% if form.travel_time_minutes.errors %}
+                  <p class="text-red-500 text-xs mt-1">
+                    {{ form.travel_time_minutes.errors.0 }}
+                  </p>
+                  {% endif %}
+                </div>
+              </div>
+              <p class="text-gray-500 text-sm mt-1">
+                Enter estimated travel time (Hours : Minutes)
+              </p>
+
+              <!-- Travel Time Preview -->
+              <div
+                id="travelTimePreview"
+                class="mt-2 p-2 bg-gray-50 rounded text-sm text-gray-600 hidden"
+              >
+                <i class="fas fa-info-circle mr-1"></i>
+                <span id="travelTimeText"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Route Settings Section -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-cogs mr-2 text-blue-500"></i>Route Settings
+          </h3>
+
+          <div>
+            <div class="flex items-center">
+              <input
+                type="checkbox"
+                name="{{ form.is_active.name }}"
+                id="{{ form.is_active.id_for_label }}"
+                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                {%
+                if
+                form.is_active.value
+                %}checked{%
+                endif
+                %}
+              />
+              <label
+                for="{{ form.is_active.id_for_label }}"
+                class="ml-2 block text-sm text-gray-700"
+              >
+                <span class="font-medium">Active Route</span>
+                <p class="text-gray-500 text-xs">
+                  Route is available for booking and scheduling
+                </p>
+              </label>
+            </div>
+            {% if form.is_active.errors %}
+            <p class="text-red-500 text-sm mt-1">
+              {{ form.is_active.errors.0 }}
+            </p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Form Errors -->
+        {% if form.non_field_errors %}
+        <div
+          class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+        >
+          {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end space-x-4">
+          <a
+            href="{% url 'dashboard:route_management' %}"
+            class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors"
+          >
+            <i class="fas fa-times mr-2"></i>Cancel
+          </a>
+          <button
+            type="submit"
+            class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            <i class="fas fa-save mr-2"></i>{{ action }} Route
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block dashboard_extra_js %}
 <script>
-// Form validation and enhancement
-document.addEventListener('DOMContentLoaded', function() {
-    const sourceInput = document.getElementById('{{ form.source_name.id_for_label }}');
-    const destinationInput = document.getElementById('{{ form.destination_name.id_for_label }}');
-    
+  // Form validation and enhancement
+  document.addEventListener("DOMContentLoaded", function () {
+    const sourceInput = document.getElementById(
+      "{{ form.source_name.id_for_label }}"
+    );
+    const destinationInput = document.getElementById(
+      "{{ form.destination_name.id_for_label }}"
+    );
+    const hoursInput = document.getElementById(
+      "{{ form.travel_time_hours.id_for_label }}"
+    );
+    const minutesInput = document.getElementById(
+      "{{ form.travel_time_minutes.id_for_label }}"
+    );
+    const routePreview = document.getElementById("routePreview");
+    const sourcePreview = document.getElementById("sourcePreview");
+    const destinationPreview = document.getElementById("destinationPreview");
+    const travelTimePreview = document.getElementById("travelTimePreview");
+    const travelTimeText = document.getElementById("travelTimeText");
+
+    // Route preview functionality
+    function updateRoutePreview() {
+      const source = sourceInput.value.trim();
+      const destination = destinationInput.value.trim();
+
+      if (source && destination) {
+        sourcePreview.textContent = source;
+        destinationPreview.textContent = destination;
+        routePreview.classList.remove("hidden");
+      } else {
+        routePreview.classList.add("hidden");
+      }
+    }
+
+    // Travel time preview functionality
+    function updateTravelTimePreview() {
+      const hours = parseInt(hoursInput.value) || 0;
+      const minutes = parseInt(minutesInput.value) || 0;
+
+      if (hours > 0 || minutes > 0) {
+        let timeText = "Total travel time: ";
+        if (hours > 0) {
+          timeText += `${hours} hour${hours > 1 ? "s" : ""}`;
+          if (minutes > 0) timeText += " and ";
+        }
+        if (minutes > 0) {
+          timeText += `${minutes} minute${minutes > 1 ? "s" : ""}`;
+        }
+
+        travelTimeText.textContent = timeText;
+        travelTimePreview.classList.remove("hidden");
+      } else {
+        travelTimePreview.classList.add("hidden");
+      }
+    }
+
     // Add input validation
     function validateInputs() {
-        const sourceValue = sourceInput.value.trim().toLowerCase();
-        const destinationValue = destinationInput.value.trim().toLowerCase();
-        
-        // Check if source and destination are the same
-        if (sourceValue && destinationValue && sourceValue === destinationValue) {
-            destinationInput.setCustomValidity('Destination cannot be the same as source location.');
-        } else {
-            destinationInput.setCustomValidity('');
-        }
+      const sourceValue = sourceInput.value.trim().toLowerCase();
+      const destinationValue = destinationInput.value.trim().toLowerCase();
+
+      // Check if source and destination are the same
+      if (sourceValue && destinationValue && sourceValue === destinationValue) {
+        destinationInput.setCustomValidity(
+          "Destination cannot be the same as source location."
+        );
+        destinationInput.classList.add("border-red-500");
+        destinationInput.classList.remove("border-gray-300");
+      } else {
+        destinationInput.setCustomValidity("");
+        destinationInput.classList.remove("border-red-500");
+        destinationInput.classList.add("border-gray-300");
+      }
     }
-    
-    // Add event listeners for real-time validation
-    sourceInput.addEventListener('input', validateInputs);
-    destinationInput.addEventListener('input', validateInputs);
-    
-    // Add autocomplete functionality (optional enhancement)
+
+    // Add autocomplete functionality
     function addAutocomplete(input) {
-        input.addEventListener('input', function() {
-            const value = this.value.trim();
-            if (value.length > 0) {
-                // Capitalize first letter of each word
-                this.value = value.split(' ').map(word => 
-                    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                ).join(' ');
-            }
-        });
+      input.addEventListener("input", function () {
+        const value = this.value.trim();
+        if (value.length > 0) {
+          // Capitalize first letter of each word
+          this.value = value
+            .split(" ")
+            .map(
+              (word) =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            )
+            .join(" ");
+        }
+      });
     }
-    
+
+    // Event listeners
+    sourceInput.addEventListener("input", function () {
+      validateInputs();
+      updateRoutePreview();
+    });
+
+    destinationInput.addEventListener("input", function () {
+      validateInputs();
+      updateRoutePreview();
+    });
+
+    hoursInput.addEventListener("input", updateTravelTimePreview);
+    minutesInput.addEventListener("input", updateTravelTimePreview);
+
     // Apply autocomplete to both inputs
     addAutocomplete(sourceInput);
     addAutocomplete(destinationInput);
-});
+
+    // Initialize previews
+    updateRoutePreview();
+    updateTravelTimePreview();
+  });
+
+  // Auto-dismiss messages after 5 seconds
+  setTimeout(function () {
+    const messages = document.querySelectorAll(
+      '[class*="bg-green-100"], [class*="bg-red-100"], [class*="bg-yellow-100"], [class*="bg-blue-100"]'
+    );
+    messages.forEach((message) => {
+      if (message.querySelector("button")) {
+        setTimeout(() => {
+          message.style.opacity = "0";
+          message.style.transition = "opacity 0.5s";
+          setTimeout(() => message.remove(), 500);
+        }, 5000);
+      }
+    });
+  }, 100);
+
+  // Form validation enhancement
+  document.querySelector("form").addEventListener("submit", function (e) {
+    const requiredFields = this.querySelectorAll("[required]");
+    let isValid = true;
+
+    requiredFields.forEach((field) => {
+      if (!field.value.trim()) {
+        field.classList.add("border-red-500");
+        isValid = false;
+      } else {
+        field.classList.remove("border-red-500");
+      }
+    });
+
+    if (!isValid) {
+      e.preventDefault();
+      alert("Please fill in all required fields.");
+    }
+  });
 </script>
 {% endblock %}

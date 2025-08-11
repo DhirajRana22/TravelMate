@@ -1,826 +1,349 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Ticket - {{ booking.booking_id }}{% endblock %}
-
-{% block extra_css %}
-<style>
-    .ticket-header {
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-        color: white;
-        padding: 2rem 0;
-        margin-bottom: 2rem;
-    }
-    
-    .ticket-container {
-        max-width: 900px;
-        margin: 0 auto;
-    }
-    
-    .ticket-card {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-        border: 1px solid #e9ecef;
-        overflow: hidden;
-        position: relative;
-    }
-    
-    .ticket-card::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: -10px;
-        width: 20px;
-        height: 20px;
-        background: #f8f9fa;
-        border-radius: 50%;
-        transform: translateY(-50%);
-        z-index: 2;
-    }
-    
-    .ticket-card::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        right: -10px;
-        width: 20px;
-        height: 20px;
-        background: #f8f9fa;
-        border-radius: 50%;
-        transform: translateY(-50%);
-        z-index: 2;
-    }
-    
-    .ticket-header-section {
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-        color: white;
-        padding: 1.5rem 2rem;
-        position: relative;
-    }
-    
-    .ticket-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-    
-    .ticket-subtitle {
-        font-size: 0.875rem;
-        opacity: 0.9;
-        margin: 0;
-    }
-    
-    .booking-id {
-        position: absolute;
-        top: 1.5rem;
-        right: 2rem;
-        text-align: right;
-    }
-    
-    .booking-id-label {
-        font-size: 0.75rem;
-        opacity: 0.8;
-        margin-bottom: 0.25rem;
-    }
-    
-    .booking-id-value {
-        font-size: 1rem;
-        font-weight: 600;
-        font-family: 'Courier New', monospace;
-    }
-    
-    .ticket-content {
-        padding: 2rem;
-    }
-    
-    .route-section {
-        margin-bottom: 2rem;
-        position: relative;
-    }
-    
-    .route-info {
-        display: flex;
-        align-items: center;
-        gap: 2rem;
-        padding: 1.5rem;
-        background: #f8f9fa;
-        border-radius: 12px;
-        border: 1px solid #e9ecef;
-        position: relative;
-    }
-    
-    .route-location {
-        text-align: center;
-        flex: 1;
-    }
-    
-    .location-code {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #007bff;
-        margin-bottom: 0.25rem;
-        font-family: 'Courier New', monospace;
-    }
-    
-    .location-name {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.25rem;
-    }
-    
-    .location-time {
-        font-size: 0.875rem;
-        color: #6c757d;
-    }
-    
-    .route-connector {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-        color: #007bff;
-    }
-    
-    .route-line {
-        width: 100px;
-        height: 2px;
-        background: #007bff;
-        position: relative;
-    }
-    
-    .route-line::before {
-        content: '';
-        position: absolute;
-        right: -6px;
-        top: -4px;
-        width: 0;
-        height: 0;
-        border-left: 8px solid #007bff;
-        border-top: 5px solid transparent;
-        border-bottom: 5px solid transparent;
-    }
-    
-    .route-duration {
-        font-size: 0.75rem;
-        font-weight: 600;
-        background: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        border: 1px solid #007bff;
-        color: #007bff;
-    }
-    
-    .ticket-details {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .detail-card {
-        background: #f8f9fa;
-        border-radius: 12px;
-        padding: 1.5rem;
-        border: 1px solid #e9ecef;
-        text-align: center;
-    }
-    
-    .detail-icon {
-        font-size: 2rem;
-        color: #007bff;
-        margin-bottom: 0.75rem;
-    }
-    
-    .detail-label {
-        font-size: 0.75rem;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.5rem;
-    }
-    
-    .detail-value {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #495057;
-    }
-    
-    .passengers-section {
-        margin-bottom: 2rem;
-    }
-    
-    .section-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-    
-    .passengers-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1rem;
-    }
-    
-    .passenger-card {
-        background: #f8f9fa;
-        border-radius: 12px;
-        padding: 1.5rem;
-        border: 1px solid #e9ecef;
-        position: relative;
-    }
-    
-    .passenger-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-    }
-    
-    .passenger-name {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #495057;
-    }
-    
-    .seat-badge {
-        background: #007bff;
-        color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
-    
-    .passenger-details {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
-    }
-    
-    .passenger-detail {
-        text-align: center;
-    }
-    
-    .passenger-detail-label {
-        font-size: 0.75rem;
-        color: #6c757d;
-        margin-bottom: 0.25rem;
-    }
-    
-    .passenger-detail-value {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #495057;
-    }
-    
-    .fare-section {
-        background: #f8f9fa;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        border: 1px solid #e9ecef;
-    }
-    
-    .fare-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-    
-    .fare-breakdown {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-    
-    .fare-item {
-        text-align: center;
-        padding: 1rem;
-        background: white;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
-    }
-    
-    .fare-item-label {
-        font-size: 0.75rem;
-        color: #6c757d;
-        margin-bottom: 0.5rem;
-    }
-    
-    .fare-item-value {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #495057;
-    }
-    
-    .total-fare {
-        text-align: center;
-        padding: 1rem;
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-        color: white;
-        border-radius: 8px;
-        margin-top: 1rem;
-    }
-    
-    .total-label {
-        font-size: 0.875rem;
-        margin-bottom: 0.25rem;
-        opacity: 0.9;
-    }
-    
-    .total-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-    
-    .qr-section {
-        text-align: center;
-        margin-bottom: 2rem;
-        padding: 1.5rem;
-        background: #f8f9fa;
-        border-radius: 12px;
-        border: 1px solid #e9ecef;
-    }
-    
-    .qr-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 1rem;
-    }
-    
-    .qr-code {
-        width: 150px;
-        height: 150px;
-        background: white;
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        margin: 0 auto 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 3rem;
-        color: #6c757d;
-    }
-    
-    .qr-image {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        border-radius: 6px;
-    }
-    
-    .qr-text {
-        font-size: 0.875rem;
-        color: #6c757d;
-        margin: 0;
-    }
-    
-    .important-info {
-        background: rgba(255, 193, 7, 0.1);
-        border: 1px solid rgba(255, 193, 7, 0.3);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .info-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #856404;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .info-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    
-    .info-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.5rem;
-        margin-bottom: 0.75rem;
-        font-size: 0.875rem;
-        color: #856404;
-    }
-    
-    .info-item:last-child {
-        margin-bottom: 0;
-    }
-    
-    .info-icon {
-        color: #ffc107;
-        margin-top: 0.125rem;
-        flex-shrink: 0;
-    }
-    
-    .ticket-actions {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    
-    .btn-action {
-        background: #007bff;
-        border: none;
-        padding: 0.875rem 1.5rem;
-        border-radius: 8px;
-        color: white;
-        font-size: 0.875rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        text-decoration: none;
-    }
-    
-    .btn-action:hover {
-        background: #0056b3;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn-secondary {
-        background: #6c757d;
-    }
-    
-    .btn-secondary:hover {
-        background: #545b62;
-        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
-    }
-    
-    .btn-danger {
-        background: #dc3545;
-    }
-    
-    .btn-danger:hover {
-        background: #c82333;
-        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-    }
-    
-    .status-badge {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .status-confirmed {
-        background: rgba(40, 167, 69, 0.1);
-        color: #155724;
-        border: 1px solid rgba(40, 167, 69, 0.3);
-    }
-    
-    .status-cancelled {
-        background: rgba(220, 53, 69, 0.1);
-        color: #721c24;
-        border: 1px solid rgba(220, 53, 69, 0.3);
-    }
-    
-    .status-pending {
-        background: rgba(255, 193, 7, 0.1);
-        color: #856404;
-        border: 1px solid rgba(255, 193, 7, 0.3);
-    }
-    
-    @media print {
-        .ticket-header,
-        .ticket-actions {
-            display: none;
-        }
-        
-        .ticket-card {
-            box-shadow: none;
-            border: 1px solid #000;
-        }
-        
-        .ticket-card::before,
-        .ticket-card::after {
-            background: white;
-            border: 1px solid #000;
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .route-info {
-            flex-direction: column;
-            gap: 1rem;
-        }
-        
-        .route-connector {
-            transform: rotate(90deg);
-        }
-        
-        .route-line {
-            width: 50px;
-        }
-        
-        .ticket-details {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        
-        .passengers-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .fare-breakdown {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        
-        .booking-id {
-            position: static;
-            text-align: left;
-            margin-top: 1rem;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .ticket-content {
-            padding: 1rem;
-        }
-        
-        .ticket-details {
-            grid-template-columns: 1fr;
-        }
-        
-        .fare-breakdown {
-            grid-template-columns: 1fr;
-        }
-        
-        .ticket-actions {
-            flex-direction: column;
-        }
-        
-        .btn-action {
-            width: 100%;
-            justify-content: center;
-        }
-    }
-</style>
-{% endblock %}
+{% block title %}Ticket - {{ booking.booking_id }} - TravelMate{% endblock %}
 
 {% block content %}
 <!-- Header -->
-<section class="ticket-header">
-    <div class="container">
+<section class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16 -mt-6 print:hidden">
+    <div class="container mx-auto px-4">
         <div class="text-center">
-            <h1 class="mb-2"><i class="fas fa-ticket-alt me-2"></i>E-Ticket</h1>
-            <p class="mb-0">Your digital travel ticket</p>
+            <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-ticket-alt text-2xl"></i>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold mb-2">Bus Ticket</h1>
+            <p class="text-xl opacity-90">Your digital travel ticket</p>
         </div>
     </div>
 </section>
 
-<!-- Content -->
-<section class="py-4">
-    <div class="container">
-        <div class="ticket-container">
-            <div class="ticket-card">
-                <!-- Status Badge -->
-                <div class="status-badge status-{{ booking.booking_status|lower }}">
-                    {{ booking.get_status_display }}
-                </div>
+<!-- Ticket -->
+<section class="py-12 bg-gray-50 print:py-0 print:bg-white">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <!-- Ticket Card -->
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-gray-200 relative print:shadow-none print:border print:border-black">
+                <!-- Ticket Perforations -->
+                <div class="absolute top-1/2 -left-3 w-6 h-6 bg-gray-50 rounded-full transform -translate-y-1/2 print:bg-white"></div>
+                <div class="absolute top-1/2 -right-3 w-6 h-6 bg-gray-50 rounded-full transform -translate-y-1/2 print:bg-white"></div>
                 
                 <!-- Ticket Header -->
-                <div class="ticket-header-section">
-                    <div class="ticket-title">
-                        <i class="fas fa-bus"></i>
-                        TravelMate E-Ticket
-                    </div>
-                    <p class="ticket-subtitle">Please present this ticket during your journey</p>
-                    
-                    <div class="booking-id">
-                        <div class="booking-id-label">Booking ID</div>
-                        <div class="booking-id-value">{{ booking.booking_id }}</div>
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-8 relative print:bg-blue-600">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                        <div>
+                            <h2 class="text-2xl font-bold mb-2 flex items-center">
+                                <i class="fas fa-bus mr-3"></i>TravelMate Bus Ticket
+                            </h2>
+                            <p class="text-blue-100">Your journey starts here</p>
+                        </div>
+                        <div class="text-right mt-4 md:mt-0">
+                            <div class="text-sm opacity-90 mb-1">Booking ID</div>
+                            <div class="text-xl font-bold font-mono cursor-pointer hover:bg-white hover:bg-opacity-10 px-2 py-1 rounded transition-colors" 
+                                 id="bookingId" title="Click to copy">{{ booking.booking_id }}</div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="ticket-content">
-                    <!-- Route Section -->
-                    <div class="route-section">
-                        <div class="route-info">
-                            <div class="route-location">
-                                <div class="location-code">{{ booking.bus_schedule.route.source.code|default:booking.bus_schedule.route.source.name|slice:":3"|upper }}</div>
-                                <div class="location-name">{{ booking.bus_schedule.route.source.name }}</div>
-                                <div class="location-time">{{ booking.bus_schedule.departure_time|time:"H:i" }}</div>
+                <!-- Ticket Content -->
+                <div class="p-8">
+                    <!-- Journey Information -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-6 border-b border-gray-200 pb-2">
+                            <i class="fas fa-route mr-2 text-blue-500"></i>Journey Details
+                        </h3>
+                        
+                        <!-- Route Display -->
+                        <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                            <div class="flex items-center justify-center">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-gray-800">{{ booking.route.source }}</div>
+                                    <div class="text-sm text-gray-500 mt-1">{{ booking.departure_time|time:"g:i A" }}</div>
+                                    <div class="text-xs text-gray-400">Departure</div>
+                                </div>
+                                <div class="mx-8 flex flex-col items-center">
+                                    <i class="fas fa-arrow-right text-blue-500 text-2xl mb-2"></i>
+                                    <div class="text-xs text-gray-500">{{ booking.journey_duration|default:"N/A" }}</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-gray-800">{{ booking.route.destination }}</div>
+                                    <div class="text-sm text-gray-500 mt-1">{{ booking.arrival_time|time:"g:i A" }}</div>
+                                    <div class="text-xs text-gray-400">Arrival</div>
+                                </div>
                             </div>
-                            
-                            <div class="route-connector">
-                                <div class="route-duration">{{ booking.bus_schedule.journey_duration }}</div>
-                                <div class="route-line"></div>
+                        </div>
+                        
+                        <!-- Journey Details Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                                <div class="text-xs text-gray-500 mb-1">Travel Date</div>
+                                <div class="font-semibold text-gray-800">{{ booking.travel_date|date:"l" }}</div>
+                                <div class="text-sm text-gray-600">{{ booking.travel_date|date:"M d, Y" }}</div>
                             </div>
-                            
-                            <div class="route-location">
-                                <div class="location-code">{{ booking.bus_schedule.route.destination.code|default:booking.bus_schedule.route.destination.name|slice:":3"|upper }}</div>
-                                <div class="location-name">{{ booking.bus_schedule.route.destination.name }}</div>
-                                <div class="location-time">{{ booking.bus_schedule.arrival_time|time:"H:i" }}</div>
+                            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                                <div class="text-xs text-gray-500 mb-1">Bus Number</div>
+                                <div class="font-semibold text-gray-800">{{ booking.bus.bus_number }}</div>
+                                <div class="text-sm text-gray-600">{{ booking.bus.bus_type }}</div>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                                <div class="text-xs text-gray-500 mb-1">Seat Numbers</div>
+                                <div class="font-semibold text-gray-800">{{ booking.seat_numbers }}</div>
+                                <div class="text-sm text-gray-600">{{ booking.passenger_count }} passenger{{ booking.passenger_count|pluralize }}</div>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                                <div class="text-xs text-gray-500 mb-1">Total Fare</div>
+                                <div class="font-semibold text-green-600 text-lg">रू{{ booking.total_fare }}</div>
+                                <div class="text-sm text-gray-600">{{ booking.get_status_display }}</div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Ticket Details -->
-                    <div class="ticket-details">
-                        <div class="detail-card">
-                            <div class="detail-icon">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                            <div class="detail-label">Travel Date</div>
-                            <div class="detail-value">{{ booking.booking_date|date:"M d, Y" }}</div>
-                        </div>
+                    <!-- Passenger Information -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                            <i class="fas fa-users mr-2 text-green-500"></i>Passenger Information
+                        </h3>
                         
-                        <div class="detail-card">
-                            <div class="detail-icon">
-                                <i class="fas fa-bus"></i>
-                            </div>
-                            <div class="detail-label">Bus Number</div>
-                            <div class="detail-value">{{ booking.bus_schedule.bus.bus_number }}</div>
-                        </div>
-                        
-                        <div class="detail-card">
-                            <div class="detail-icon">
-                                <i class="fas fa-cogs"></i>
-                            </div>
-                            <div class="detail-label">Bus Type</div>
-                            <div class="detail-value">{{ booking.bus_schedule.bus.bus_type.name }}</div>
-                        </div>
-                        
-                        <div class="detail-card">
-                            <div class="detail-icon">
-                                <i class="fas fa-chair"></i>
-                            </div>
-                            <div class="detail-label">Total Seats</div>
-                            <div class="detail-value">{{ booking.seats.count }}</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Passengers Section -->
-                    <div class="passengers-section">
-                        <div class="section-title">
-                            <i class="fas fa-users"></i>
-                            Passenger Details
-                        </div>
-                        
-                        <div class="passengers-grid">
-                            <div class="passenger-card">
-                                <div class="passenger-header">
-                                    <div class="passenger-name">{{ booking.passenger_name }}</div>
-                                    <div class="seat-badge">
-                                        {% for seat in booking.seats.all %}
-                                            Seat {{ seat.seat_number }}{% if not forloop.last %}, {% endif %}
-                                        {% endfor %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {% for passenger in booking.passengers.all %}
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center mr-3 text-sm font-semibold">
+                                        {{ forloop.counter }}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">{{ passenger.name }}</h4>
+                                        <p class="text-sm text-gray-600">Seat {{ passenger.seat_number }}</p>
                                     </div>
                                 </div>
-                                
-                                <div class="passenger-details">
-                                    <div class="passenger-detail">
-                                        <div class="passenger-detail-label">Phone</div>
-                                        <div class="passenger-detail-value">{{ booking.passenger_phone }}</div>
+                                <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div>
+                                        <span class="text-gray-500">Age:</span>
+                                        <span class="font-medium">{{ passenger.age }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500">Gender:</span>
+                                        <span class="font-medium">{{ passenger.gender|title }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Contact & QR Code Section -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                        <!-- Contact Information -->
+                        <div class="lg:col-span-2">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                                <i class="fas fa-phone mr-2 text-purple-500"></i>Contact Information
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-phone text-green-500 mr-3 text-lg"></i>
+                                        <div>
+                                            <div class="text-xs text-gray-500">Contact Phone</div>
+                                            <div class="font-semibold text-gray-800">{{ booking.contact_phone }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-envelope text-blue-500 mr-3 text-lg"></i>
+                                        <div>
+                                            <div class="text-xs text-gray-500">Contact Email</div>
+                                            <div class="font-semibold text-gray-800">{{ booking.contact_email }}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Fare Section -->
-                    <div class="fare-section">
-                        <div class="fare-title">
-                            <i class="fas fa-receipt"></i>
-                            Fare Breakdown
-                        </div>
                         
-                        <div class="fare-breakdown">
-                            <div class="fare-item">
-                                <div class="fare-item-label">Base Fare ({{ booking.seats.count }} seats)</div>
-                                <div class="fare-item-value">रू{{ booking.bus_schedule.base_fare|floatformat:2 }} × {{ booking.seats.count }}</div>
+                        <!-- QR Code -->
+                        <div class="text-center">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i class="fas fa-qrcode mr-2 text-indigo-500"></i>Digital Verification
+                            </h3>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <div id="qrcode" class="flex justify-center mb-3"></div>
+                                <p class="text-xs text-gray-600">Scan for quick verification</p>
                             </div>
-                            
-                            {% if booking.discount_amount %}
-                                <div class="fare-item">
-                                    <div class="fare-item-label">Discount</div>
-                                    <div class="fare-item-value">-रू{{ booking.discount_amount|floatformat:2 }}</div>
-                                </div>
-                            {% endif %}
                         </div>
-                        
-                        <div class="total-fare">
-                            <div class="total-label">Total Amount Paid</div>
-                            <div class="total-value">रू{{ booking.total_fare|floatformat:2 }}</div>
-                        </div>
-                    </div>
-                    
-                    <!-- QR Code Section -->
-                    <div class="qr-section">
-                        <div class="qr-title">Scan for Quick Verification</div>
-                        <div class="qr-code">
-                            {% if qr_code_url %}
-                                <img src="{{ qr_code_url }}" alt="QR Code for {{ booking.booking_id }}" class="qr-image" style="display: block; max-width: 100%; height: auto;">
-                            {% else %}
-                                <i class="fas fa-qrcode"></i>
-                            {% endif %}
-                        </div>
-                        <p class="qr-text">Show this QR code to the conductor for quick ticket verification</p>
                     </div>
                     
                     <!-- Important Information -->
-                    <div class="important-info">
-                        <div class="info-title">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            Important Information
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+                        <h4 class="text-lg font-semibold text-blue-800 mb-4">
+                            <i class="fas fa-info-circle mr-2"></i>Important Travel Information
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-700">
+                            <div>
+                                <h5 class="font-semibold mb-2">Before Travel:</h5>
+                                <ul class="space-y-1">
+                                    <li>• Arrive 15 minutes before departure</li>
+                                    <li>• Carry valid government ID</li>
+                                    <li>• Keep this ticket handy</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 class="font-semibold mb-2">During Travel:</h5>
+                                <ul class="space-y-1">
+                                    <li>• Follow safety instructions</li>
+                                    <li>• Keep belongings secure</li>
+                                    <li>• Report any issues to driver</li>
+                                </ul>
+                            </div>
                         </div>
-                        
-                        <ul class="info-list">
-                            <li class="info-item">
-                                <i class="fas fa-check info-icon"></i>
-                                Please arrive at the boarding point at least 15 minutes before departure time.
-                            </li>
-                            <li class="info-item">
-                                <i class="fas fa-check info-icon"></i>
-                                Carry a valid government-issued photo ID along with this ticket.
-                            </li>
-                            <li class="info-item">
-                                <i class="fas fa-check info-icon"></i>
-                                Smoking and consumption of alcohol are strictly prohibited.
-                            </li>
-                            <li class="info-item">
-                                <i class="fas fa-check info-icon"></i>
-                                The operator reserves the right to cancel or reschedule the service.
-                            </li>
-                            <li class="info-item">
-                                <i class="fas fa-check info-icon"></i>
-                                For any assistance, contact our customer support at +977 9847435111.
-                            </li>
-                        </ul>
                     </div>
                     
-                    <!-- Ticket Actions -->
-                    <div class="ticket-actions">
-                        <button onclick="window.print()" class="btn-action">
-                            <i class="fas fa-print"></i>
-                            Print Ticket
-                        </button>
+                    <!-- Booking Timeline -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                            <i class="fas fa-history mr-2 text-orange-500"></i>Booking Timeline
+                        </h3>
                         
-                        <a href="{% url 'bookings:download_ticket' booking.booking_id %}" class="btn-action">
-                            <i class="fas fa-download"></i>
-                            Download PDF
-                        </a>
-                        
-                        <a href="{% url 'bookings:booking_detail' booking.booking_id %}" class="btn-action btn-secondary">
-                            <i class="fas fa-eye"></i>
-                            View Booking
-                        </a>
-                        
-                        {% if booking.booking_status == 'confirmed' and booking.can_cancel %}
-                            <a href="{% url 'bookings:cancel_booking' booking.booking_id %}" class="btn-action btn-danger">
-                                <i class="fas fa-times-circle"></i>
-                                Cancel Booking
-                            </a>
-                        {% endif %}
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-check text-sm"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Booking Confirmed</div>
+                                    <div class="text-sm text-gray-600">{{ booking.created_at|date:"M d, Y g:i A" }}</div>
+                                </div>
+                            </div>
+                            {% if booking.payment %}
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-credit-card text-sm"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Payment Completed</div>
+                                    <div class="text-sm text-gray-600">{{ booking.payment.created_at|date:"M d, Y g:i A" }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-bus text-sm"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Travel Date</div>
+                                    <div class="text-sm text-gray-600">{{ booking.travel_date|date:"M d, Y" }} at {{ booking.departure_time|time:"g:i A" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div class="border-t border-gray-200 pt-6">
+                        <div class="flex flex-col md:flex-row justify-between items-center">
+                            <div class="text-sm text-gray-600 mb-4 md:mb-0">
+                                <p>Thank you for choosing TravelMate!</p>
+                                <p>For support: +977-1-4567890 | support@travelmate.com</p>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                <p>Ticket generated on {{ booking.created_at|date:"M d, Y g:i A" }}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8 print:hidden">
+                <button onclick="window.print()" 
+                        class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium">
+                    <i class="fas fa-print mr-2"></i>Print Ticket
+                </button>
+                
+                <button onclick="downloadTicket()" 
+                        class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors font-medium">
+                    <i class="fas fa-download mr-2"></i>Download PDF
+                </button>
+                
+                <a href="{% url 'bookings:booking_detail' booking.booking_id %}" 
+                   class="bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600 transition-colors font-medium text-center">
+                    <i class="fas fa-eye mr-2"></i>View Details
+                </a>
+                
+                {% if booking.status == 'confirmed' and booking.can_cancel %}
+                    <a href="{% url 'bookings:cancel_booking' booking.booking_id %}" 
+                       class="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors font-medium text-center">
+                        <i class="fas fa-times mr-2"></i>Cancel Booking
+                    </a>
+                {% endif %}
             </div>
         </div>
     </div>
 </section>
+
+<style>
+@media print {
+    body {
+        background: white !important;
+    }
+    
+    .print\:hidden {
+        display: none !important;
+    }
+    
+    .print\:py-0 {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    
+    .print\:bg-white {
+        background: white !important;
+    }
+    
+    .print\:shadow-none {
+        box-shadow: none !important;
+    }
+    
+    .print\:border {
+        border: 1px solid black !important;
+    }
+    
+    .print\:border-black {
+        border-color: black !important;
+    }
+    
+    .print\:bg-blue-600 {
+        background: #2563eb !important;
+        -webkit-print-color-adjust: exact;
+    }
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Only show QR icon if no actual QR code image exists
-        const qrCode = document.querySelector('.qr-code');
-        const qrImage = document.querySelector('.qr-image');
-        if (qrCode && !qrImage) {
-            // Show QR icon only when no actual QR code image is present
-            qrCode.innerHTML = '<i class="fas fa-qrcode"></i>';
-        }
+        // Generate QR Code
+        const qrData = JSON.stringify({
+            bookingId: '{{ booking.booking_id }}',
+            passengerName: '{{ booking.passengers.first.name }}',
+            route: '{{ booking.route.source }} to {{ booking.route.destination }}',
+            date: '{{ booking.travel_date|date:"Y-m-d" }}',
+            seats: '{{ booking.seat_numbers }}',
+            status: '{{ booking.status }}'
+        });
+        
+        QRCode.toCanvas(document.getElementById('qrcode'), qrData, {
+            width: 150,
+            height: 150,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+        }, function (error) {
+            if (error) {
+                console.error('QR Code generation error:', error);
+                document.getElementById('qrcode').innerHTML = '<i class="fas fa-qrcode text-4xl text-gray-400"></i>';
+            }
+        });
         
         // Auto-print functionality (optional)
         const urlParams = new URLSearchParams(window.location.search);
@@ -831,39 +354,95 @@
         }
         
         // Copy booking ID functionality
-        const bookingIdValue = document.querySelector('.booking-id-value');
-        if (bookingIdValue) {
-            bookingIdValue.style.cursor = 'pointer';
-            bookingIdValue.title = 'Click to copy booking ID';
-            
-            bookingIdValue.addEventListener('click', function() {
-                navigator.clipboard.writeText(this.textContent).then(() => {
+        const bookingIdElement = document.getElementById('bookingId');
+        if (bookingIdElement) {
+            bookingIdElement.addEventListener('click', function() {
+                const bookingId = '{{ booking.booking_id }}';
+                navigator.clipboard.writeText(bookingId).then(() => {
                     // Show temporary feedback
                     const originalText = this.textContent;
                     this.textContent = 'Copied!';
+                    this.classList.add('bg-green-500');
                     setTimeout(() => {
                         this.textContent = originalText;
+                        this.classList.remove('bg-green-500');
                     }, 1000);
-                }).catch(err => {
-                    console.error('Failed to copy: ', err);
+                }).catch(() => {
+                    // Fallback for browsers that don't support clipboard API
+                    const textArea = document.createElement('textarea');
+                    textArea.value = bookingId;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    const originalText = this.textContent;
+                    this.textContent = 'Copied!';
+                    this.classList.add('bg-green-500');
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                        this.classList.remove('bg-green-500');
+                    }, 1000);
                 });
             });
         }
         
         // Responsive QR code size
         function adjustQRSize() {
-            const qrCodeElement = document.querySelector('.qr-code');
+            const qrCodeElement = document.getElementById('qrcode');
             if (qrCodeElement && window.innerWidth < 480) {
-                qrCodeElement.style.width = '120px';
-                qrCodeElement.style.height = '120px';
-            } else if (qrCodeElement) {
-                qrCodeElement.style.width = '150px';
-                qrCodeElement.style.height = '150px';
+                // Regenerate QR code with smaller size for mobile
+                QRCode.toCanvas(qrCodeElement, qrData, {
+                    width: 120,
+                    height: 120,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
             }
         }
         
         adjustQRSize();
         window.addEventListener('resize', adjustQRSize);
     });
+    
+    function downloadTicket() {
+        // Create a new window with the ticket content
+        const printWindow = window.open('', '_blank');
+        const ticketContent = document.querySelector('.max-w-4xl').outerHTML;
+        
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>TravelMate - Bus Ticket</title>
+                <script src="https://cdn.tailwindcss.com"></script>
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; background: white; }
+                    .print\\:hidden { display: none; }
+                    @media print {
+                        body { margin: 0; }
+                        .max-w-4xl { max-width: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container mx-auto">
+                    <h2 class="text-center mb-4 text-2xl font-bold">TravelMate - Bus Ticket</h2>
+                    ${ticketContent}
+                </div>
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+        
+        // Wait for content to load then trigger download
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 500);
+    }
 </script>
 {% endblock %}

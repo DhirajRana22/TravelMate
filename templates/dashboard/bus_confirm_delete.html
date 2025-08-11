@@ -1,69 +1,363 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}{{ title }} - Dashboard{% endblock %}
-
-{% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-header bg-danger text-white">
-                    <h4 class="card-title mb-0">
-                        <i class="fas fa-exclamation-triangle"></i> {{ title }}
-                    </h4>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-warning">
-                        <h5><i class="fas fa-warning"></i> Warning!</h5>
-                        Are you sure you want to delete the bus <strong>{{ bus.bus_name }} ({{ bus.bus_number }})</strong>?
-                        This action cannot be undone.
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Bus Details:</h6>
-                            <ul class="list-unstyled">
-                                <li><strong>Bus Number:</strong> {{ bus.bus_number }}</li>
-                                <li><strong>Bus Name:</strong> {{ bus.bus_name }}</li>
-                                <li><strong>Bus Type:</strong> {{ bus.bus_type.name }}</li>
-                                <li><strong>Total Seats:</strong> {{ bus.total_seats }}</li>
-                                <li><strong>Status:</strong> 
-                                    {% if bus.is_active %}
-                                        <span class="badge bg-success">Active</span>
-                                    {% else %}
-                                        <span class="badge bg-secondary">Inactive</span>
-                                    {% endif %}
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Impact:</h6>
-                            <ul class="list-unstyled text-muted">
-                                <li><i class="fas fa-info-circle"></i> All associated schedules will be affected</li>
-                                <li><i class="fas fa-info-circle"></i> Historical booking data will remain</li>
-                                <li><i class="fas fa-info-circle"></i> This action is permanent</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <form method="post" class="mt-4">
-                        {% csrf_token %}
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-danger">
-                                <i class="fas fa-trash"></i> Yes, Delete Bus
-                            </button>
-                            <a href="{% url 'dashboard:bus_detail' bus.id %}" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Cancel
-                            </a>
-                            <a href="{% url 'dashboard:bus_management' %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left"></i> Back to Bus Management
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+{% extends "dashboard/base.html" %} {% load static %} {% block title %}{{ title
+}} - Dashboard{% endblock %} {% block dashboard_content %}
+<div class="container mx-auto px-4 sm:px-8">
+  <div class="py-8">
+    <div class="max-w-4xl mx-auto">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-2xl font-semibold leading-tight text-gray-800">
+            <i class="fas fa-exclamation-triangle mr-2 text-red-500"></i>{{
+            title }}
+          </h2>
+          <p class="text-gray-600">
+            Confirm bus deletion - this action cannot be undone
+          </p>
         </div>
+        <a
+          href="{% url 'dashboard:bus_management' %}"
+          class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+        >
+          <i class="fas fa-arrow-left mr-2"></i>Back to Buses
+        </a>
+      </div>
+
+      <!-- Warning Alert -->
+      <div class="bg-red-50 border-l-4 border-red-500 p-6 mb-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <i class="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-semibold text-red-800">
+              Danger Zone - Permanent Action
+            </h3>
+            <p class="text-red-700 mt-1">
+              Are you sure you want to delete the bus
+              <strong>{{ bus.bus_name }} ({{ bus.bus_number }})</strong>? This
+              action cannot be undone and will affect all associated schedules
+              and bookings.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Bus Details Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-bus mr-2 text-blue-500"></i>Bus Details
+          </h3>
+
+          <!-- Bus Image/Icon -->
+          <div class="flex justify-center mb-4">
+            {% if bus.image %}
+            <img
+              src="{{ bus.image.url }}"
+              alt="{{ bus.bus_name }}"
+              class="w-24 h-24 rounded-lg object-cover border-2 border-gray-300"
+            />
+            {% else %}
+            <div
+              class="w-24 h-24 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl"
+            >
+              <i class="fas fa-bus"></i>
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="space-y-4">
+            <div
+              class="flex justify-between items-center py-2 border-b border-gray-100"
+            >
+              <span class="text-sm font-medium text-gray-600">Bus Number:</span>
+              <span class="text-sm font-semibold text-gray-900"
+                >{{ bus.bus_number }}</span
+              >
+            </div>
+
+            <div
+              class="flex justify-between items-center py-2 border-b border-gray-100"
+            >
+              <span class="text-sm font-medium text-gray-600">Bus Name:</span>
+              <span class="text-sm font-semibold text-gray-900"
+                >{{ bus.bus_name }}</span
+              >
+            </div>
+
+            <div
+              class="flex justify-between items-center py-2 border-b border-gray-100"
+            >
+              <span class="text-sm font-medium text-gray-600">Bus Type:</span>
+              <span class="text-sm font-semibold text-gray-900"
+                >{{ bus.bus_type_name|default:"Standard" }}</span
+              >
+            </div>
+
+            <div
+              class="flex justify-between items-center py-2 border-b border-gray-100"
+            >
+              <span class="text-sm font-medium text-gray-600"
+                >Total Seats:</span
+              >
+              <span class="text-sm font-semibold text-gray-900"
+                >{{ bus.total_seats }}</span
+              >
+            </div>
+
+            <div
+              class="flex justify-between items-center py-2 border-b border-gray-100"
+            >
+              <span class="text-sm font-medium text-gray-600">Driver:</span>
+              <span class="text-sm font-semibold text-gray-900"
+                >{{ bus.driver_name|default:"Not Assigned" }}</span
+              >
+            </div>
+
+            <div class="flex justify-between items-center py-2">
+              <span class="text-sm font-medium text-gray-600">Status:</span>
+              <span
+                class="px-2 py-1 rounded-full text-xs font-semibold {% if bus.is_active %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}"
+              >
+                {% if bus.is_active %}Active{% else %}Inactive{% endif %}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Impact Assessment Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-exclamation-circle mr-2 text-orange-500"></i
+            >Deletion Impact
+          </h3>
+
+          <div class="space-y-3">
+            <div class="flex items-start">
+              <i class="fas fa-route text-red-500 mt-1 mr-3"></i>
+              <div>
+                <p class="text-sm font-medium text-gray-800">
+                  Route Assignments
+                </p>
+                <p class="text-xs text-gray-600">
+                  All route assignments and schedules will be removed
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <i class="fas fa-ticket-alt text-red-500 mt-1 mr-3"></i>
+              <div>
+                <p class="text-sm font-medium text-gray-800">Active Bookings</p>
+                <p class="text-xs text-gray-600">
+                  Current and future bookings will be affected
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <i class="fas fa-user-tie text-orange-500 mt-1 mr-3"></i>
+              <div>
+                <p class="text-sm font-medium text-gray-800">
+                  Driver Assignment
+                </p>
+                <p class="text-xs text-gray-600">
+                  Driver will be unassigned and available for other buses
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <i class="fas fa-database text-orange-500 mt-1 mr-3"></i>
+              <div>
+                <p class="text-sm font-medium text-gray-800">Historical Data</p>
+                <p class="text-xs text-gray-600">
+                  Past booking records will remain but lose bus association
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <i class="fas fa-ban text-red-500 mt-1 mr-3"></i>
+              <div>
+                <p class="text-sm font-medium text-gray-800">
+                  Irreversible Action
+                </p>
+                <p class="text-xs text-gray-600">
+                  This deletion cannot be undone or recovered
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics Card (if available) -->
+      {% if bus_stats %}
+      <div class="bg-white rounded-lg shadow p-6 mt-6">
+        <h3
+          class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+        >
+          <i class="fas fa-chart-bar mr-2 text-purple-500"></i>Bus Statistics
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+            <div class="text-2xl font-bold text-blue-600">
+              {{ bus_stats.total_bookings|default:0 }}
+            </div>
+            <div class="text-sm text-gray-600">Total Bookings</div>
+          </div>
+
+          <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+            <div class="text-2xl font-bold text-green-600">
+              रू{{ bus_stats.total_revenue|floatformat:0|default:0 }}
+            </div>
+            <div class="text-sm text-gray-600">Total Revenue</div>
+          </div>
+
+          <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+            <div class="text-2xl font-bold text-purple-600">
+              {{ bus_stats.assigned_routes|default:0 }}
+            </div>
+            <div class="text-sm text-gray-600">Assigned Routes</div>
+          </div>
+
+          <div class="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
+            <div class="text-2xl font-bold text-orange-600">
+              {{ bus_stats.active_schedules|default:0 }}
+            </div>
+            <div class="text-sm text-gray-600">Active Schedules</div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Confirmation Form -->
+      <div class="bg-white rounded-lg shadow p-6 mt-6">
+        <h3
+          class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+        >
+          <i class="fas fa-check-circle mr-2 text-green-500"></i>Confirm
+          Deletion
+        </h3>
+
+        <form method="post" class="space-y-4">
+          {% csrf_token %}
+
+          <!-- Confirmation Checkbox -->
+          <div class="flex items-center">
+            <input
+              type="checkbox"
+              id="confirm_deletion"
+              name="confirm_deletion"
+              class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+              required
+            />
+            <label
+              for="confirm_deletion"
+              class="ml-2 block text-sm text-gray-700"
+            >
+              I understand that this action is permanent and cannot be undone
+            </label>
+          </div>
+
+          <div class="flex items-center">
+            <input
+              type="checkbox"
+              id="confirm_impact"
+              name="confirm_impact"
+              class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+              required
+            />
+            <label
+              for="confirm_impact"
+              class="ml-2 block text-sm text-gray-700"
+            >
+              I acknowledge that this will affect all associated routes,
+              schedules, and bookings
+            </label>
+          </div>
+
+          <!-- Reason for Deletion -->
+          <div>
+            <label
+              for="deletion_reason"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Reason for Deletion (Optional)
+            </label>
+            <textarea
+              id="deletion_reason"
+              name="deletion_reason"
+              rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
+              placeholder="Enter the reason for deleting this bus..."
+            ></textarea>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-3 pt-4">
+            <button
+              type="submit"
+              id="delete_button"
+              disabled
+              class="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+            >
+              <i class="fas fa-trash mr-2"></i>Yes, Delete Bus Permanently
+            </button>
+
+            <a
+              href="{% url 'dashboard:bus_detail' bus.id %}"
+              class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors text-center"
+            >
+              <i class="fas fa-times mr-2"></i>Cancel
+            </a>
+
+            <a
+              href="{% url 'dashboard:bus_management' %}"
+              class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors text-center"
+            >
+              <i class="fas fa-arrow-left mr-2"></i>Back to Bus Management
+            </a>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
+{% endblock %} {% block dashboard_extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const confirmDeletion = document.getElementById("confirm_deletion");
+    const confirmImpact = document.getElementById("confirm_impact");
+    const deleteButton = document.getElementById("delete_button");
+
+    function updateDeleteButton() {
+      const isConfirmed = confirmDeletion.checked && confirmImpact.checked;
+      deleteButton.disabled = !isConfirmed;
+    }
+
+    confirmDeletion.addEventListener("change", updateDeleteButton);
+    confirmImpact.addEventListener("change", updateDeleteButton);
+
+    // Additional confirmation for bus deletion
+    document.querySelector("form").addEventListener("submit", function (e) {
+      if (
+        !confirm(
+          "FINAL WARNING: You are about to permanently delete this bus and all its associated data. This action cannot be undone. Continue?"
+        )
+      ) {
+        e.preventDefault();
+      }
+    });
+
+    // Auto-focus on first checkbox
+    confirmDeletion.focus();
+  });
+</script>
 {% endblock %}

@@ -1,1289 +1,531 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Manage Buses - {{ route.source.name }} to {{ route.destination.name }}{% endblock %}
-
-{% block extra_css %}
-<style>
-    :root {
-        --primary-color: #4f46e5;
-        --primary-dark: #3730a3;
-        --success-color: #10b981;
-        --danger-color: #ef4444;
-        --warning-color: #f59e0b;
-        --gray-50: #f9fafb;
-        --gray-100: #f3f4f6;
-        --gray-200: #e5e7eb;
-        --gray-300: #d1d5db;
-        --gray-500: #6b7280;
-        --gray-600: #4b5563;
-        --gray-700: #374151;
-        --gray-800: #1f2937;
-        --gray-900: #111827;
-        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    }
-
-    .admin-header {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-        color: white;
-        padding: 2.5rem 0;
-        margin-bottom: 2rem;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .admin-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
-        opacity: 0.1;
-    }
-    
-    .admin-header .container {
-        position: relative;
-        z-index: 1;
-    }
-    
-    .bus-assignment-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-        padding: 2.5rem;
-        margin-bottom: 2.5rem;
-        border: 1px solid #e5e7eb;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .bus-assignment-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 5px;
-        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4, #10b981);
-    }
-    
-    .bus-assignment-card:hover {
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
-        transform: translateY(-5px);
-    }
-    
-    .bus-assignment-card h4 {
-        color: #1f2937;
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-        position: relative;
-        padding-bottom: 0.75rem;
-        font-size: 1.5rem;
-    }
-    
-    .bus-assignment-card h4::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 60px;
-        height: 3px;
-        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-        border-radius: 2px;
-    }
-    
-    .route-info {
-        background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        border: 1px solid var(--gray-200);
-        box-shadow: var(--shadow-sm);
-    }
-    
-    .bus-schedule-card {
-        background: white;
-        border: 2px solid var(--gray-200);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .bus-schedule-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
-        background: var(--primary-color);
-        transform: scaleY(0);
-        transition: transform 0.3s ease;
-    }
-    
-    .bus-schedule-card:hover {
-        box-shadow: var(--shadow-lg);
-        transform: translateY(-4px);
-        border-color: var(--primary-color);
-    }
-    
-    .bus-schedule-card:hover::before {
-        transform: scaleY(1);
-    }
-    
-    .bus-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-    
-    .bus-icon {
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.5rem;
-        box-shadow: var(--shadow-md);
-    }
-    
-    .schedule-details {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 1.5rem;
-        margin-top: 1.5rem;
-        padding-top: 1.5rem;
-        border-top: 2px solid var(--gray-100);
-    }
-    
-    .detail-item {
-        text-align: center;
-        padding: 1rem;
-        background: var(--gray-50);
-        border-radius: 8px;
-        transition: all 0.3s ease;
-    }
-    
-    .detail-item:hover {
-        background: var(--gray-100);
-        transform: translateY(-2px);
-    }
-    
-    .detail-label {
-        font-size: 0.75rem;
-        color: var(--gray-500);
-        margin-bottom: 0.5rem;
-        text-transform: uppercase;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-    }
-    
-    .detail-value {
-        font-weight: 700;
-        color: var(--gray-800);
-        font-size: 1.1rem;
-    }
-    
-    .assign-form {
-        background: linear-gradient(135deg, #f8fafc 0%, white 100%);
-        border-radius: 16px;
-        padding: 2.5rem;
-        margin-top: 1.5rem;
-        border: 2px solid #e2e8f0;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .assign-form::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
-    }
-    
-    .form-row {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    @media (max-width: 1200px) {
-        .form-row {
-            grid-template-columns: repeat(3, 1fr);
-        }
-    }
-    
-    @media (max-width: 900px) {
-        .form-row {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-    
-    .form-group {
-        position: relative;
-        margin-bottom: 1.75rem;
-    }
-    
-    .form-group:hover .form-control,
-    .form-group:hover .form-select {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        transform: translateY(-1px);
-    }
-    
-    .form-group:focus-within .form-label {
-        color: #3b82f6;
-        transform: translateY(-2px);
-    }
-    
-    .form-label {
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: 0.75rem;
-        font-size: 0.95rem;
-        display: block;
-        position: relative;
-        padding-left: 1.5rem;
-    }
-    
-    .form-label::before {
-        content: '●';
-        position: absolute;
-        left: 0;
-        color: #3b82f6;
-        font-size: 0.8rem;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-    
-    .form-control, .form-select {
-        border: 2px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 1rem 1.25rem;
-        font-size: 0.95rem;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        background: white;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        background: white;
-    }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-        outline: none;
-        transform: translateY(-1px);
-    }
-    
-    .form-control::placeholder {
-        color: #9ca3af;
-        font-style: italic;
-    }
-    
-    .form-control:hover, .form-select:hover {
-        border-color: var(--gray-300);
-    }
-    
-    .btn-remove {
-        background: linear-gradient(135deg, var(--danger-color) 0%, #dc2626 100%);
-        color: white;
-        border: none;
-        padding: 0.6rem 1.2rem;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: var(--shadow-sm);
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .btn-remove:hover {
-        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-    }
-    
-    .btn-assign {
-        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-        color: white;
-        border: none;
-        padding: 1.25rem 3rem;
-        border-radius: 16px;
-        font-weight: 700;
-        font-size: 1.1rem;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
-        display: inline-flex;
-        align-items: center;
-        gap: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        position: relative;
-        overflow: hidden;
-        min-width: 200px;
-        justify-content: center;
-    }
-    
-    .btn-assign::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-        transition: left 0.6s ease;
-    }
-    
-    .btn-assign::after {
-        content: '→';
-        font-size: 1.2rem;
-        margin-left: 0.5rem;
-        transition: transform 0.3s ease;
-    }
-    
-    .btn-assign:hover::before {
-        left: 100%;
-    }
-    
-    .btn-assign:hover {
-        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-        transform: translateY(-4px);
-        box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
-    }
-    
-    .btn-assign:hover::after {
-        transform: translateX(4px);
-    }
-    
-    .btn-assign:active {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: var(--shadow-sm);
-    }
-    
-    .btn-primary:hover {
-        background: linear-gradient(135deg, var(--primary-dark) 0%, #312e81 100%);
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-    }
-    
-    .btn-secondary {
-        background: var(--gray-200);
-        color: var(--gray-700);
-        border: 2px solid var(--gray-300);
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-secondary:hover {
-        background: var(--gray-300);
-        color: var(--gray-800);
-        transform: translateY(-2px);
-    }
-    
-    .btn-outline-primary {
-        background: transparent;
-        color: var(--primary-color);
-        border: 2px solid var(--primary-color);
-        padding: 0.6rem 1.2rem;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .btn-outline-primary:hover {
-        background: var(--primary-color);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-    }
-    
-    .btn-outline-danger {
-        background: transparent;
-        color: var(--danger-color);
-        border: 2px solid var(--danger-color);
-        padding: 0.6rem 1.2rem;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .btn-outline-danger:hover {
-        background: var(--danger-color);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 3rem 2rem;
-        color: var(--gray-500);
-        background: var(--gray-50);
-        border-radius: 12px;
-        border: 2px dashed var(--gray-300);
-    }
-    
-    .empty-icon {
-        font-size: 4rem;
-        margin-bottom: 1.5rem;
-        opacity: 0.6;
-        color: var(--gray-400);
-    }
-    
-    .empty-state h5 {
-        color: var(--gray-700);
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-    
-    .empty-state p {
-        color: var(--gray-500);
-        margin-bottom: 1.5rem;
-    }
-    
-    .alert {
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-        border: none;
-        box-shadow: var(--shadow-sm);
-        padding: 1rem 1.5rem;
-    }
-    
-    .alert-success {
-        background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
-        color: #065f46;
-        border-left: 4px solid var(--success-color);
-    }
-    
-    .alert-danger {
-        background: linear-gradient(135deg, #fef2f2 0%, #fef7f7 100%);
-        color: #991b1b;
-        border-left: 4px solid var(--danger-color);
-    }
-    
-    .alert-warning {
-        background: linear-gradient(135deg, #fffbeb 0%, #fefce8 100%);
-        color: #92400e;
-        border-left: 4px solid var(--warning-color);
-    }
-    
-    .update-schedule-form {
-        background: linear-gradient(135deg, #fafafa 0%, white 100%);
-        border: 2px solid var(--gray-200);
-        border-radius: 12px;
-        padding: 2rem;
-        margin-top: 1.5rem;
-        box-shadow: var(--shadow-sm);
-        animation: slideDown 0.3s ease;
-    }
-    
-    .update-schedule-form .form-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .update-schedule-form .form-group {
-        position: relative;
-    }
-    
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .action-buttons {
-        display: flex;
-        gap: 0.75rem;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    
-    .update-schedule-form .form-label {
-        font-weight: 700;
-        color: var(--gray-700);
-        margin-bottom: 0.75rem;
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .update-schedule-form .form-control,
-    .update-schedule-form .form-select {
-        border: 2px solid var(--gray-200);
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        transition: all 0.3s ease;
-    }
-    
-    .update-schedule-form .form-control:focus,
-    .update-schedule-form .form-select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        outline: none;
-    }
-    
-    .form-check {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 1.25rem;
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        border-radius: 12px;
-        border: 2px solid #e5e7eb;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .form-check::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
-        background: linear-gradient(180deg, #3b82f6, #8b5cf6);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    .form-check:hover {
-        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-        border-color: #3b82f6;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-    }
-    
-    .form-check:hover::before {
-        opacity: 1;
-    }
-    
-    .form-check-input {
-        width: 1.5rem;
-        height: 1.5rem;
-        border: 2px solid #d1d5db;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    
-    .form-check-input:checked {
-        background-color: #3b82f6;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        transform: scale(1.05);
-    }
-    
-    .form-check-label {
-        font-weight: 600;
-        color: #374151;
-        cursor: pointer;
-        user-select: none;
-        transition: color 0.3s ease;
-    }
-    
-    .form-check:hover .form-check-label {
-        color: #1f2937;
-    }
-    
-    .badge {
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .bg-success {
-        background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%) !important;
-        color: white;
-    }
-    
-    .bg-warning {
-        background: linear-gradient(135deg, var(--warning-color) 0%, #d97706 100%) !important;
-        color: white;
-    }
-    
-    .bg-danger {
-        background: linear-gradient(135deg, var(--danger-color) 0%, #dc2626 100%) !important;
-        color: white;
-    }
-    
-    /* Loading states */
-    .loading {
-        position: relative;
-        pointer-events: none;
-        opacity: 0.7;
-    }
-    
-    .loading::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 20px;
-        height: 20px;
-        margin: -10px 0 0 -10px;
-        border: 2px solid var(--gray-300);
-        border-top: 2px solid var(--primary-color);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    /* Responsive improvements */
-    @media (max-width: 768px) {
-        .admin-header {
-            padding: 1.5rem 0;
-        }
-        
-        .bus-assignment-card {
-            padding: 1.5rem;
-        }
-        
-        .form-row {
-            grid-template-columns: 1fr;
-        }
-        
-        .action-buttons {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        
-        .schedule-details {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .schedule-details {
-            grid-template-columns: 1fr;
-        }
-        
-        .bus-info {
-            flex-direction: column;
-            text-align: center;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<!-- Admin Header -->
-<section class="admin-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="mb-2">
-                    <i class="fas fa-bus me-2"></i>
-                    Manage Buses for Route
-                </h1>
-                <p class="mb-0">{{ route.source.name }} → {{ route.destination.name }}</p>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <a href="{% url 'dashboard:route_detail' route.id %}" class="btn btn-light me-2">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Route
-                </a>
-                <a href="{% url 'dashboard:route_management' %}" class="btn btn-outline-light">
-                    <i class="fas fa-list me-2"></i>All Routes
-                </a>
-            </div>
-        </div>
+{% extends "dashboard/base.html" %} {% load static %} {% block title %}Manage
+Buses - {{ route.source.name }} to {{ route.destination.name }}{% endblock %} {%
+block dashboard_content %}
+<div class="container mx-auto px-4 sm:px-8">
+  <div class="py-8">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h2 class="text-2xl font-semibold leading-tight text-gray-800">
+          <i class="fas fa-bus mr-2"></i>Manage Buses for Route
+        </h2>
+        <p class="text-gray-600">
+          {{ route.source.name }} → {{ route.destination.name }}
+        </p>
+      </div>
+      <div class="flex space-x-2">
+        <a
+          href="{% url 'dashboard:route_detail' route.id %}"
+          class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+        >
+          <i class="fas fa-arrow-left mr-2"></i>Back to Route
+        </a>
+        <a
+          href="{% url 'dashboard:route_management' %}"
+          class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+        >
+          <i class="fas fa-list mr-2"></i>All Routes
+        </a>
+      </div>
     </div>
-</section>
 
-<!-- Bus Assignment Content -->
-<section class="py-4">
-    <div class="container">
-        <!-- Messages -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-        
-        <!-- Route Information -->
-        <div class="route-info">
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="detail-item">
-                        <div class="detail-label">Distance</div>
-                        <div class="detail-value">{{ route.distance }} km</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="detail-item">
-                        <div class="detail-label">Travel Time</div>
-                        <div class="detail-value">{{ route.travel_time }}</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="detail-item">
-                        <div class="detail-label">Status</div>
-                        <div class="detail-value">
-                            {% if route.is_active %}
-                                <span class="badge bg-success">Active</span>
-                            {% else %}
-                                <span class="badge bg-danger">Inactive</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="detail-item">
-                        <div class="detail-label">Assigned Buses</div>
-                        <div class="detail-value">{{ current_schedules.count }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Currently Assigned Buses -->
-        <div class="bus-assignment-card">
-            <h4 class="mb-3">
-                <i class="fas fa-bus me-2"></i>
-                Currently Assigned Buses ({{ current_schedules.count }})
-            </h4>
-            
-            {% if current_schedules %}
-                {% for schedule in current_schedules %}
-                    <div class="bus-schedule-card">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="bus-info">
-                                <div class="bus-icon">
-                                    <i class="fas fa-bus"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-1">{{ schedule.bus.bus_number }}</h6>
-                                    <p class="mb-0 text-muted">{{ schedule.bus.bus_type }} • {{ schedule.bus.total_seats }} seats</p>
-                                </div>
-                            </div>
-                            <div class="action-buttons">
-                                <a href="{% url 'dashboard:update_schedule' schedule.id %}" class="btn btn-sm btn-outline-primary me-2">
-                                    <i class="fas fa-edit me-1"></i>Update Schedule
-                                </a>
-                                <form method="post" style="display: inline;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="action" value="remove_bus">
-                                    <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                            onclick="return confirm('Are you sure you want to remove this bus from the route?')">
-                                        <i class="fas fa-times me-1"></i>Remove
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                        
-                        <div class="schedule-details">
-                            <div class="detail-item">
-                                <div class="detail-label">Departure Time</div>
-                                <div class="detail-value">{{ schedule.departure_time }}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Arrival Time</div>
-                                <div class="detail-value">{{ schedule.arrival_time }}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Journey Duration</div>
-                                <div class="detail-value">{{ schedule.journey_duration|default:"Calculating..." }}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Base Fare</div>
-                                <div class="detail-value">रू {{ schedule.base_fare }}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Status</div>
-                                <div class="detail-value">
-                                    {% if schedule.is_active %}
-                                        <span class="badge bg-success">Active</span>
-                                    {% else %}
-                                        <span class="badge bg-warning">Inactive</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="fas fa-bus"></i>
-                    </div>
-                    <h5>No Buses Assigned</h5>
-                    <p>No buses are currently assigned to this route. Use the form below to assign buses.</p>
-                </div>
-            {% endif %}
-        </div>
-        
-        <!-- Assign New Bus -->
-        <div class="bus-assignment-card">
-            <h4 class="mb-3">
-                <i class="fas fa-plus me-2"></i>
-                Assign New Bus
-            </h4>
-            
-            {% if available_buses %}
-                <form method="post" class="assign-form">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="assign_bus">
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="bus_id" class="form-label">Select Bus</label>
-                            <select name="bus_id" id="bus_id" class="form-select" required>
-                                <option value="">Choose a bus...</option>
-                                {% for bus in available_buses %}
-                                    <option value="{{ bus.id }}">
-                                        {{ bus.bus_number }} - {{ bus.bus_type }} ({{ bus.total_seats }} seats)
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="departure_time" class="form-label">Departure Time</label>
-                            <input type="time" name="departure_time" id="departure_time" class="form-control" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="arrival_time" class="form-label">Arrival Time</label>
-                            <input type="time" name="arrival_time" id="arrival_time" class="form-control" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="base_fare" class="form-label">Base Fare (रू)</label>
-                            <input type="number" name="base_fare" id="base_fare" class="form-control" 
-                                   min="0" step="0.01" placeholder="0.00" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="effective_from" class="form-label">Effective From</label>
-                            <input type="date" name="effective_from" id="effective_from" class="form-control">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="effective_until" class="form-label">Effective Until (Optional)</label>
-                            <input type="date" name="effective_until" id="effective_until" class="form-control">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="schedule_type" class="form-label">Schedule Type</label>
-                            <select name="schedule_type" id="schedule_type" class="form-select">
-                                <option value="morning">Morning</option>
-                                <option value="afternoon">Afternoon</option>
-                                <option value="evening">Evening</option>
-                                <option value="night">Night</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="days_of_week" class="form-label">Days of Week</label>
-                            <input type="text" name="days_of_week" id="days_of_week" class="form-control" 
-                                   value="1234567" placeholder="1234567 (1=Mon, 7=Sun)">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="buffer_hours" class="form-label">Buffer Hours</label>
-                            <input type="number" name="buffer_hours" id="buffer_hours" class="form-control" 
-                                   value="2" min="0" max="24">
-                        </div>
-                        
-                        <div class="form-group">
-                            <div class="form-check mt-4">
-                                <input class="form-check-input" type="checkbox" id="return_schedule_enabled" name="return_schedule_enabled">
-                                <label class="form-check-label" for="return_schedule_enabled">
-                                    Enable Return Schedule
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="text-center">
-                        <button type="submit" class="btn-assign">
-                            <i class="fas fa-plus me-2"></i>Assign Bus to Route
-                        </button>
-                    </div>
-                </form>
-            {% else %}
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="fas fa-exclamation-circle"></i>
-                    </div>
-                    <h5>No Available Buses</h5>
-                    <p>All active buses are already assigned to this route, or there are no active buses in the system.</p>
-                    <a href="{% url 'dashboard:bus_management' %}" class="btn btn-primary">
-                        <i class="fas fa-bus me-2"></i>Manage Buses
-                    </a>
-                </div>
-            {% endif %}
-        </div>
+    <!-- Messages -->
+    {% if messages %} {% for message in messages %}
+    <div
+      class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-100 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800 border border-yellow-200{% else %}bg-blue-100 text-blue-800 border border-blue-200{% endif %}"
+    >
+      <div class="flex justify-between items-center">
+        <span>{{ message }}</span>
+        <button
+          onclick="this.parentElement.parentElement.remove()"
+          class="text-gray-500 hover:text-gray-700"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
     </div>
-</section>
-{% endblock %}
+    {% endfor %} {% endif %}
 
-{% block extra_js %}
+    <!-- Route Information -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <h3
+        class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+      >
+        <i class="fas fa-info-circle mr-2 text-blue-500"></i>Route Information
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+          <div class="flex items-center">
+            <i class="fas fa-road text-blue-500 text-xl mr-3"></i>
+            <div>
+              <p class="text-sm text-gray-600">Distance</p>
+              <p class="text-lg font-semibold text-gray-800">
+                {{ route.distance }} km
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+          <div class="flex items-center">
+            <i class="fas fa-clock text-green-500 text-xl mr-3"></i>
+            <div>
+              <p class="text-sm text-gray-600">Travel Time</p>
+              <p class="text-lg font-semibold text-gray-800">
+                {{ route.travel_time }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+          <div class="flex items-center">
+            <i
+              class="fas fa-toggle-{% if route.is_active %}on text-green-500{% else %}off text-red-500{% endif %} text-xl mr-3"
+            ></i>
+            <div>
+              <p class="text-sm text-gray-600">Status</p>
+              <span
+                class="px-2 py-1 rounded-full text-sm font-semibold {% if route.is_active %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}"
+              >
+                {% if route.is_active %}Active{% else %}Inactive{% endif %}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
+          <div class="flex items-center">
+            <i class="fas fa-bus text-orange-500 text-xl mr-3"></i>
+            <div>
+              <p class="text-sm text-gray-600">Assigned Buses</p>
+              <p class="text-lg font-semibold text-gray-800">
+                {{ current_schedules.count }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Currently Assigned Buses -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <div
+        class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2"
+      >
+        <h3 class="text-lg font-semibold text-gray-800">
+          <i class="fas fa-bus mr-2 text-blue-500"></i>Currently Assigned Buses
+          ({{ current_schedules.count }})
+        </h3>
+      </div>
+
+      {% if current_schedules %}
+      <div class="space-y-4">
+        {% for schedule in current_schedules %}
+        <div
+          class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+        >
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <div class="flex items-center mb-2">
+                <div
+                  class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-sm font-bold mr-3"
+                >
+                  {{ schedule.bus.bus_number|slice:":2" }}
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-800">
+                    {{ schedule.bus.bus_number }}
+                  </h4>
+                  <p class="text-sm text-gray-600">
+                    {{ schedule.bus.bus_name }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                  <span class="text-gray-500">Departure:</span>
+                  <span class="font-medium">{{ schedule.departure_time }}</span>
+                </div>
+                <div>
+                  <span class="text-gray-500">Arrival:</span>
+                  <span class="font-medium">{{ schedule.arrival_time }}</span>
+                </div>
+                <div>
+                  <span class="text-gray-500">Fare:</span>
+                  <span class="font-medium">रू{{ schedule.base_fare }}</span>
+                </div>
+                <div>
+                  <span class="text-gray-500">Type:</span>
+                  <span class="font-medium"
+                    >{{ schedule.schedule_type|title }}</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="flex space-x-2 ml-4">
+              <a
+                href="{% url 'dashboard:update_schedule' schedule.id %}"
+                class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
+              >
+                <i class="fas fa-edit mr-1"></i>Edit
+              </a>
+
+              <form
+                method="post"
+                class="inline"
+                onsubmit="return confirm('Are you sure you want to remove this bus assignment?')"
+              >
+                {% csrf_token %}
+                <input type="hidden" name="action" value="remove_schedule" />
+                <input
+                  type="hidden"
+                  name="schedule_id"
+                  value="{{ schedule.id }}"
+                />
+                <button
+                  type="submit"
+                  class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+                >
+                  <i class="fas fa-trash mr-1"></i>Remove
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-center py-8">
+        <i class="fas fa-bus text-6xl text-gray-300 mb-4"></i>
+        <h4 class="text-lg font-semibold text-gray-600 mb-2">
+          No Buses Assigned
+        </h4>
+        <p class="text-gray-500">
+          Assign buses to this route to start scheduling trips.
+        </p>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Assign New Bus -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h3
+        class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+      >
+        <i class="fas fa-plus mr-2 text-green-500"></i>Assign New Bus
+      </h3>
+
+      <form method="post" class="space-y-6">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="assign_bus" />
+
+        <!-- Bus Selection -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label
+              for="bus_id"
+              class="block text-sm font-medium text-gray-700 mb-2"
+              >Select Bus <span class="text-red-500">*</span></label
+            >
+            <select
+              name="bus_id"
+              id="bus_id"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              required
+            >
+              <option value="">Choose a bus...</option>
+              {% for bus in available_buses %}
+              <option value="{{ bus.id }}">
+                {{ bus.bus_number }} - {{ bus.bus_name }} ({{ bus.total_seats }}
+                seats)
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div>
+            <label
+              for="base_fare"
+              class="block text-sm font-medium text-gray-700 mb-2"
+              >Base Fare (रू) <span class="text-red-500">*</span></label
+            >
+            <input
+              type="number"
+              name="base_fare"
+              id="base_fare"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              placeholder="1500"
+              min="1"
+              step="0.01"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Schedule Times -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label
+              for="departure_time"
+              class="block text-sm font-medium text-gray-700 mb-2"
+              >Departure Time <span class="text-red-500">*</span></label
+            >
+            <input
+              type="time"
+              name="departure_time"
+              id="departure_time"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+
+          <div>
+            <label
+              for="arrival_time"
+              class="block text-sm font-medium text-gray-700 mb-2"
+              >Arrival Time <span class="text-red-500">*</span></label
+            >
+            <input
+              type="time"
+              name="arrival_time"
+              id="arrival_time"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Schedule Details -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div>
+            <label
+              for="effective_from"
+              class="block text-sm font-medium text-gray-700 mb-2"
+              >Effective From</label
+            >
+            <input
+              type="date"
+              name="effective_from"
+              id="effective_from"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label
+              for="effective_until"
+              class="block text-sm font-medium text-gray-700 mb-2"
+              >Effective Until (Optional)</label
+            >
+            <input
+              type="date"
+              name="effective_until"
+              id="effective_until"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label
+              for="schedule_type"
+              class="block text-sm font-medium text-gray-700 mb-2"
+              >Schedule Type</label
+            >
+            <select
+              name="schedule_type"
+              id="schedule_type"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="regular">Regular</option>
+              <option value="express">Express</option>
+              <option value="deluxe">Deluxe</option>
+              <option value="night">Night Service</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Advanced Settings -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label
+              for="days_of_week"
+              class="block text-sm font-medium text-gray-700 mb-2"
+              >Days of Week</label
+            >
+            <input
+              type="text"
+              name="days_of_week"
+              id="days_of_week"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              placeholder="1234567"
+              value="1234567"
+            />
+            <p class="text-sm text-gray-500 mt-1">
+              1=Monday, 2=Tuesday, ..., 7=Sunday (e.g., 1234567 for all days)
+            </p>
+          </div>
+
+          <div>
+            <label
+              for="buffer_hours"
+              class="block text-sm font-medium text-gray-700 mb-2"
+              >Buffer Hours</label
+            >
+            <input
+              type="number"
+              name="buffer_hours"
+              id="buffer_hours"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              placeholder="2"
+              min="0"
+              step="0.5"
+              value="2"
+            />
+            <p class="text-sm text-gray-500 mt-1">
+              Buffer time between consecutive trips for the same bus
+            </p>
+          </div>
+        </div>
+
+        <!-- Return Schedule Option -->
+        <div class="flex items-center">
+          <input
+            type="checkbox"
+            id="return_schedule_enabled"
+            name="return_schedule_enabled"
+            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+          <label
+            for="return_schedule_enabled"
+            class="ml-2 block text-sm text-gray-700"
+          >
+            <span class="font-medium">Enable Return Schedule</span>
+            <p class="text-gray-500 text-xs">
+              Automatically create a return trip schedule
+            </p>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-end">
+          <button
+            type="submit"
+            class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors"
+          >
+            <i class="fas fa-plus mr-2"></i>Assign Bus to Route
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mt-6 flex justify-center space-x-4">
+      <a
+        href="{% url 'dashboard:bus_management' %}"
+        class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+      >
+        <i class="fas fa-bus mr-2"></i>Manage Buses
+      </a>
+      <a
+        href="{% url 'dashboard:route_detail' route.id %}"
+        class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600"
+      >
+        <i class="fas fa-info-circle mr-2"></i>Route Details
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block dashboard_extra_js %}
 <script>
-    // Enhanced form management with better UX
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Enhanced route bus management loaded');
-        
-        // Set default effective_from to today
-        const today = new Date().toISOString().split('T')[0];
-        const effectiveFromInputs = document.querySelectorAll('input[name="effective_from"]');
-        effectiveFromInputs.forEach(input => {
-            if (!input.value) {
-                input.value = today;
-            }
-        });
-        
-        // Initialize form enhancements
-        initializeFormValidation();
-        initializeDurationCalculator();
-        initializeLoadingStates();
-        initializeTooltips();
-        
-        // Auto-dismiss alerts with fade effect
-        setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                alert.style.transition = 'opacity 0.5s ease';
-                alert.style.opacity = '0';
-                setTimeout(() => {
-                    if (alert.parentNode) {
-                        alert.parentNode.removeChild(alert);
-                    }
-                }, 500);
-            });
-        }, 5000);
-    });
-    
+  document.addEventListener("DOMContentLoaded", function () {
+    // Form validation
+    const form = document.querySelector('form[method="post"]');
+    if (form) {
+      form.addEventListener("submit", function (e) {
+        const busSelect = document.getElementById("bus_id");
+        const departureTime = document.getElementById("departure_time");
+        const arrivalTime = document.getElementById("arrival_time");
+        const baseFare = document.getElementById("base_fare");
 
-    
-    // Enhanced form validation with real-time feedback
-    function initializeFormValidation() {
-        const forms = document.querySelectorAll('form');
-        
-        forms.forEach(form => {
-            const inputs = form.querySelectorAll('input[required], select[required]');
-            
-            inputs.forEach(input => {
-                input.addEventListener('blur', validateField);
-                input.addEventListener('input', clearFieldError);
-            });
-            
-            form.addEventListener('submit', function(e) {
-                if (!validateForm(form)) {
-                    e.preventDefault();
-                    return false;
-                }
-                
-                // Add loading state
-                const submitBtn = form.querySelector('button[type="submit"]');
-                if (submitBtn) {
-                    submitBtn.classList.add('loading');
-                    submitBtn.disabled = true;
-                }
-            });
-        });
+        // Validate required fields
+        if (
+          !busSelect.value ||
+          !departureTime.value ||
+          !arrivalTime.value ||
+          !baseFare.value
+        ) {
+          e.preventDefault();
+          alert("Please fill in all required fields.");
+          return;
+        }
+
+        // Validate time logic
+        if (departureTime.value >= arrivalTime.value) {
+          e.preventDefault();
+          alert("Arrival time must be after departure time.");
+          return;
+        }
+
+        // Validate fare
+        if (parseFloat(baseFare.value) <= 0) {
+          e.preventDefault();
+          alert("Base fare must be greater than 0.");
+          return;
+        }
+      });
     }
-    
-    function validateField(e) {
-        const field = e.target;
-        const value = field.value.trim();
-        
-        // Remove existing error styling
-        field.classList.remove('is-invalid');
-        const existingError = field.parentNode.querySelector('.invalid-feedback');
-        if (existingError) {
-            existingError.remove();
+
+    // Auto-calculate arrival time based on route travel time
+    const departureInput = document.getElementById("departure_time");
+    const arrivalInput = document.getElementById("arrival_time");
+
+    if (departureInput && arrivalInput) {
+      departureInput.addEventListener("change", function () {
+        if (this.value && !arrivalInput.value) {
+          // Add route travel time to departure time
+          const departure = new Date("2000-01-01 " + this.value);
+          // Assuming route travel time is available, add it
+          // For now, add 6 hours as default
+          departure.setHours(departure.getHours() + 6);
+
+          const hours = departure.getHours().toString().padStart(2, "0");
+          const minutes = departure.getMinutes().toString().padStart(2, "0");
+          arrivalInput.value = `${hours}:${minutes}`;
         }
-        
-        let isValid = true;
-        let errorMessage = '';
-        
-        // Required field validation
-        if (field.hasAttribute('required') && !value) {
-            isValid = false;
-            errorMessage = 'This field is required.';
-        }
-        
-        // Specific field validations
-        if (field.name === 'base_fare' && value && parseFloat(value) <= 0) {
-            isValid = false;
-            errorMessage = 'Base fare must be greater than 0.';
-        }
-        
-        if (field.name === 'departure_time' || field.name === 'arrival_time') {
-            validateTimeFields();
-        }
-        
-        if (field.name === 'days_of_week' && value && !/^[1-7]+$/.test(value)) {
-            isValid = false;
-            errorMessage = 'Days of week must contain only numbers 1-7.';
-        }
-        
-        if (!isValid) {
-            showFieldError(field, errorMessage);
-        }
-        
-        return isValid;
+      });
     }
-    
-    function showFieldError(field, message) {
-        field.classList.add('is-invalid');
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'invalid-feedback';
-        errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
-        errorDiv.style.color = 'var(--danger-color)';
-        errorDiv.style.fontSize = '0.875rem';
-        errorDiv.style.marginTop = '0.25rem';
-        field.parentNode.appendChild(errorDiv);
-    }
-    
-    function clearFieldError(e) {
-        const field = e.target;
-        field.classList.remove('is-invalid');
-        const existingError = field.parentNode.querySelector('.invalid-feedback');
-        if (existingError) {
-            existingError.remove();
+
+    // Days of week helper
+    const daysInput = document.getElementById("days_of_week");
+    if (daysInput) {
+      daysInput.addEventListener("input", function () {
+        // Validate days format
+        const value = this.value.replace(/[^1-7]/g, "");
+        if (value !== this.value) {
+          this.value = value;
         }
+      });
     }
-    
-    function validateForm(form) {
-        const inputs = form.querySelectorAll('input[required], select[required]');
-        let isValid = true;
-        
-        inputs.forEach(input => {
-            if (!validateField({ target: input })) {
-                isValid = false;
-            }
-        });
-        
-        if (!isValid) {
-            showNotification('Please fix the errors before submitting.', 'error');
+
+    // Auto-dismiss messages after 5 seconds
+    setTimeout(function () {
+      const messages = document.querySelectorAll(
+        '[class*="bg-green-100"], [class*="bg-red-100"], [class*="bg-yellow-100"], [class*="bg-blue-100"]'
+      );
+      messages.forEach((message) => {
+        if (message.querySelector("button")) {
+          setTimeout(() => {
+            message.style.opacity = "0";
+            message.style.transition = "opacity 0.5s";
+            setTimeout(() => message.remove(), 500);
+          }, 5000);
         }
-        
-        return isValid;
-    }
-    
-    function validateTimeFields() {
-        const departureInput = document.getElementById('departure_time');
-        const arrivalInput = document.getElementById('arrival_time');
-        
-        if (departureInput && arrivalInput && departureInput.value && arrivalInput.value) {
-            const departure = new Date('2000-01-01 ' + departureInput.value);
-            const arrival = new Date('2000-01-01 ' + arrivalInput.value);
-            
-            // For same-day journeys, arrival should be after departure
-            if (arrival <= departure) {
-                // This might be an overnight journey, which is valid
-                console.log('Overnight journey detected');
-            }
-        }
-    }
-    
-    // Enhanced duration calculator with display
-    function initializeDurationCalculator() {
-        const departureInputs = document.querySelectorAll('input[name="departure_time"]');
-        const arrivalInputs = document.querySelectorAll('input[name="arrival_time"]');
-        
-        [...departureInputs, ...arrivalInputs].forEach(input => {
-            input.addEventListener('change', calculateAndDisplayDuration);
-        });
-    }
-    
-    function calculateAndDisplayDuration(e) {
-        const form = e.target.closest('form');
-        const departureInput = form.querySelector('input[name="departure_time"]');
-        const arrivalInput = form.querySelector('input[name="arrival_time"]');
-        
-        if (departureInput && arrivalInput && departureInput.value && arrivalInput.value) {
-            const departure = new Date('2000-01-01 ' + departureInput.value);
-            let arrival = new Date('2000-01-01 ' + arrivalInput.value);
-            
-            // Handle overnight journeys
-            if (arrival <= departure) {
-                arrival.setDate(arrival.getDate() + 1);
-            }
-            
-            const duration = arrival - departure;
-            const hours = Math.floor(duration / (1000 * 60 * 60));
-            const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
-            
-            // Display duration if there's a container for it
-            let durationDisplay = form.querySelector('.duration-display');
-            if (!durationDisplay) {
-                durationDisplay = document.createElement('div');
-                durationDisplay.className = 'duration-display';
-                durationDisplay.style.cssText = `
-                    margin-top: 0.5rem;
-                    padding: 0.5rem;
-                    background: var(--gray-100);
-                    border-radius: 6px;
-                    font-size: 0.875rem;
-                    color: var(--gray-700);
-                    font-weight: 600;
-                `;
-                arrivalInput.parentNode.appendChild(durationDisplay);
-            }
-            
-            durationDisplay.innerHTML = `<i class="fas fa-clock me-1"></i>Journey Duration: ${hours}h ${minutes}m`;
-        }
-    }
-    
-    // Loading states for better UX
-    function initializeLoadingStates() {
-        const removeButtons = document.querySelectorAll('button[type="submit"]');
-        
-        removeButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                if (this.closest('form')) {
-                    setTimeout(() => {
-                        this.classList.add('loading');
-                        this.disabled = true;
-                    }, 100);
-                }
-            });
-        });
-    }
-    
-    // Initialize tooltips for better guidance
-    function initializeTooltips() {
-        // Add helpful tooltips
-        const daysOfWeekInputs = document.querySelectorAll('input[name="days_of_week"]');
-        daysOfWeekInputs.forEach(input => {
-            input.title = 'Enter days as numbers: 1=Monday, 2=Tuesday, ..., 7=Sunday. Example: 1234567 for all days';
-        });
-        
-        const bufferHoursInputs = document.querySelectorAll('input[name="buffer_hours"]');
-        bufferHoursInputs.forEach(input => {
-            input.title = 'Buffer time in hours between consecutive trips for the same bus';
-        });
-    }
-    
-    // Notification system
-    function showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.className = `alert alert-${type} notification`;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            min-width: 300px;
-            animation: slideInRight 0.3s ease;
-        `;
-        notification.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
-        `;
-        
-        document.body.appendChild(notification);
-        
-        // Auto remove after 5 seconds
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.style.animation = 'slideOutRight 0.3s ease';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }
-        }, 5000);
-    }
-    
-    // Add CSS for notifications
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
-        @keyframes slideOutRight {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
-        
-        .is-invalid {
-            border-color: var(--danger-color) !important;
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
-        }
-    `;
-    document.head.appendChild(style);
+      });
+    }, 100);
+  });
 </script>
 {% endblock %}

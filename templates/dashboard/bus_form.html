@@ -1,162 +1,450 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}{{ title }} - Dashboard{% endblock %}
-
-{% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">{{ title }}</h4>
-                    <div class="card-tools">
-                        <a href="{% url 'dashboard:bus_management' %}" class="btn btn-secondary btn-sm">
-                            <i class="fas fa-arrow-left"></i> Back to Bus Management
-                        </a>
-                    </div>
-                </div>
-                <div class="card-body">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-
-                    <form method="post" enctype="multipart/form-data" class="row g-3">
-                        {% csrf_token %}
-                        
-                        <div class="col-md-6">
-                            <label for="{{ form.bus_number.id_for_label }}" class="form-label">Bus Number *</label>
-                            {{ form.bus_number }}
-                            {% if form.bus_number.errors %}
-                                <div class="text-danger small">{{ form.bus_number.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label for="{{ form.bus_name.id_for_label }}" class="form-label">Bus Name *</label>
-                            {{ form.bus_name }}
-                            {% if form.bus_name.errors %}
-                                <div class="text-danger small">{{ form.bus_name.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label for="{{ form.bus_type_name.id_for_label }}" class="form-label">Bus Type *</label>
-                            {{ form.bus_type_name }}
-                            {% if form.bus_type_name.help_text %}
-                                <small class="form-text text-muted">{{ form.bus_type_name.help_text }}</small>
-                            {% endif %}
-                            {% if form.bus_type_name.errors %}
-                                <div class="text-danger small">{{ form.bus_type_name.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label for="{{ form.total_seats.id_for_label }}" class="form-label">Total Seats *</label>
-                            {{ form.total_seats }}
-                            {% if form.total_seats.errors %}
-                                <div class="text-danger small">{{ form.total_seats.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label for="{{ form.image.id_for_label }}" class="form-label">Bus Image</label>
-                            {{ form.image }}
-                            {% if form.image.help_text %}
-                                <small class="form-text text-muted">{{ form.image.help_text }}</small>
-                            {% endif %}
-                            {% if form.image.errors %}
-                                <div class="text-danger small">{{ form.image.errors.0 }}</div>
-                            {% endif %}
-                            {% if form.instance.image %}
-                                <div class="mt-2">
-                                    <small class="text-muted">Current image:</small><br>
-                                    <img src="{{ form.instance.image.url }}" alt="Bus Image" class="img-thumbnail" style="max-width: 150px; max-height: 100px;">
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <label for="{{ form.driver_name.id_for_label }}" class="form-label">Driver Name</label>
-                            {{ form.driver_name }}
-                            {% if form.driver_name.help_text %}
-                                <small class="form-text text-muted">{{ form.driver_name.help_text }}</small>
-                            {% endif %}
-                            {% if form.driver_name.errors %}
-                                <div class="text-danger small">{{ form.driver_name.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <label for="{{ form.driver_license.id_for_label }}" class="form-label">Driver License</label>
-                            {{ form.driver_license }}
-                            {% if form.driver_license.help_text %}
-                                <small class="form-text text-muted">{{ form.driver_license.help_text }}</small>
-                            {% endif %}
-                            {% if form.driver_license.errors %}
-                                <div class="text-danger small">{{ form.driver_license.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <label for="{{ form.driver_contact.id_for_label }}" class="form-label">Driver Contact</label>
-                            {{ form.driver_contact }}
-                            {% if form.driver_contact.help_text %}
-                                <small class="form-text text-muted">{{ form.driver_contact.help_text }}</small>
-                            {% endif %}
-                            {% if form.driver_contact.errors %}
-                                <div class="text-danger small">{{ form.driver_contact.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-12">
-                            <label for="{{ form.amenities_list.id_for_label }}" class="form-label">Amenities</label>
-                            {{ form.amenities_list }}
-                            {% if form.amenities_list.help_text %}
-                                <small class="form-text text-muted">{{ form.amenities_list.help_text }}</small>
-                            {% endif %}
-                            {% if form.amenities_list.errors %}
-                                <div class="text-danger small">{{ form.amenities_list.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-12">
-                            <div class="form-check">
-                                {{ form.is_active }}
-                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
-                                    Active
-                                </label>
-                            </div>
-                            {% if form.is_active.errors %}
-                                <div class="text-danger small">{{ form.is_active.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        {% if form.non_field_errors %}
-                            <div class="col-12">
-                                <div class="alert alert-danger">
-                                    {{ form.non_field_errors }}
-                                </div>
-                            </div>
-                        {% endif %}
-                        
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> {{ action }}
-                            </button>
-                            <a href="{% url 'dashboard:bus_management' %}" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Cancel
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+{% extends "dashboard/base.html" %} {% load static %} {% block title %}{{ title
+}} - Dashboard{% endblock %} {% block dashboard_content %}
+<div class="container mx-auto px-4 sm:px-8">
+  <div class="py-8">
+    <div class="max-w-4xl mx-auto">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-2xl font-semibold leading-tight text-gray-800">
+            <i class="fas fa-bus mr-2"></i>{{ title }}
+          </h2>
+          <p class="text-gray-600">
+            {% if action == 'Add' %}Add a new bus to the fleet{% else %}Update
+            bus information{% endif %}
+          </p>
         </div>
+        <a
+          href="{% url 'dashboard:bus_management' %}"
+          class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+        >
+          <i class="fas fa-arrow-left mr-2"></i>Back to Bus Management
+        </a>
+      </div>
+
+      <!-- Messages -->
+      {% if messages %} {% for message in messages %}
+      <div
+        class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-100 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800 border border-yellow-200{% else %}bg-blue-100 text-blue-800 border border-blue-200{% endif %}"
+      >
+        <div class="flex justify-between items-center">
+          <span>{{ message }}</span>
+          <button
+            onclick="this.parentElement.parentElement.remove()"
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      {% endfor %} {% endif %}
+
+      <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Basic Information Section -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-info-circle mr-2 text-blue-500"></i>Basic
+            Information
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label
+                for="{{ form.bus_number.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Bus Number <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="{{ form.bus_number.name }}"
+                id="{{ form.bus_number.id_for_label }}"
+                value="{{ form.bus_number.value|default:'' }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 {% if form.bus_number.errors %}border-red-500{% endif %}"
+                placeholder="e.g., BA 1 KHA 5678"
+                required
+              />
+              {% if form.bus_number.errors %}
+              <p class="text-red-500 text-sm mt-1">
+                {{ form.bus_number.errors.0 }}
+              </p>
+              {% endif %}
+            </div>
+
+            <div>
+              <label
+                for="{{ form.bus_name.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Bus Name <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="{{ form.bus_name.name }}"
+                id="{{ form.bus_name.id_for_label }}"
+                value="{{ form.bus_name.value|default:'' }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 {% if form.bus_name.errors %}border-red-500{% endif %}"
+                placeholder="e.g., Mountain Express"
+                required
+              />
+              {% if form.bus_name.errors %}
+              <p class="text-red-500 text-sm mt-1">
+                {{ form.bus_name.errors.0 }}
+              </p>
+              {% endif %}
+            </div>
+
+            <div>
+              <label
+                for="{{ form.bus_type_name.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Bus Type <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="{{ form.bus_type_name.name }}"
+                id="{{ form.bus_type_name.id_for_label }}"
+                value="{{ form.bus_type_name.value|default:'' }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 {% if form.bus_type_name.errors %}border-red-500{% endif %}"
+                placeholder="e.g., AC Deluxe"
+                required
+              />
+              {% if form.bus_type_name.help_text %}
+              <p class="text-gray-500 text-sm mt-1">
+                {{ form.bus_type_name.help_text }}
+              </p>
+              {% endif %} {% if form.bus_type_name.errors %}
+              <p class="text-red-500 text-sm mt-1">
+                {{ form.bus_type_name.errors.0 }}
+              </p>
+              {% endif %}
+            </div>
+
+            <div>
+              <label
+                for="{{ form.total_seats.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Total Seats <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                name="{{ form.total_seats.name }}"
+                id="{{ form.total_seats.id_for_label }}"
+                value="{{ form.total_seats.value|default:'' }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 {% if form.total_seats.errors %}border-red-500{% endif %}"
+                placeholder="e.g., 37"
+                min="1"
+                required
+              />
+              {% if form.total_seats.errors %}
+              <p class="text-red-500 text-sm mt-1">
+                {{ form.total_seats.errors.0 }}
+              </p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Bus Image Section -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-image mr-2 text-blue-500"></i>Bus Image
+          </h3>
+
+          {% if form.instance.image %}
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Current Image:</label
+            >
+            <img
+              src="{{ form.instance.image.url }}"
+              alt="Bus Image"
+              class="max-w-xs h-32 object-cover rounded-lg border-2 border-gray-200"
+            />
+          </div>
+          {% endif %}
+
+          <div>
+            <label
+              for="{{ form.image.id_for_label }}"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              {% if form.instance.image %}New Image (leave empty to keep
+              current){% else %}Bus Image{% endif %}
+            </label>
+            <input
+              type="file"
+              name="{{ form.image.name }}"
+              id="{{ form.image.id_for_label }}"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 {% if form.image.errors %}border-red-500{% endif %}"
+              accept="image/*"
+            />
+            {% if form.image.help_text %}
+            <p class="text-gray-500 text-sm mt-1">{{ form.image.help_text }}</p>
+            {% endif %} {% if form.image.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ form.image.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Image Preview -->
+          <div id="imagePreview" class="mt-4 hidden">
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >New Image Preview:</label
+            >
+            <img
+              id="previewImg"
+              class="max-w-xs h-32 object-cover rounded-lg border-2 border-gray-200"
+            />
+          </div>
+        </div>
+
+        <!-- Driver Information Section -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-user-tie mr-2 text-blue-500"></i>Driver Information
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label
+                for="{{ form.driver_name.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Driver Name
+              </label>
+              <input
+                type="text"
+                name="{{ form.driver_name.name }}"
+                id="{{ form.driver_name.id_for_label }}"
+                value="{{ form.driver_name.value|default:'' }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 {% if form.driver_name.errors %}border-red-500{% endif %}"
+                placeholder="e.g., Hari Thapa"
+              />
+              {% if form.driver_name.help_text %}
+              <p class="text-gray-500 text-sm mt-1">
+                {{ form.driver_name.help_text }}
+              </p>
+              {% endif %} {% if form.driver_name.errors %}
+              <p class="text-red-500 text-sm mt-1">
+                {{ form.driver_name.errors.0 }}
+              </p>
+              {% endif %}
+            </div>
+
+            <div>
+              <label
+                for="{{ form.driver_license.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Driver License
+              </label>
+              <input
+                type="text"
+                name="{{ form.driver_license.name }}"
+                id="{{ form.driver_license.id_for_label }}"
+                value="{{ form.driver_license.value|default:'' }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 {% if form.driver_license.errors %}border-red-500{% endif %}"
+                placeholder="e.g., 1230001020"
+              />
+              {% if form.driver_license.help_text %}
+              <p class="text-gray-500 text-sm mt-1">
+                {{ form.driver_license.help_text }}
+              </p>
+              {% endif %} {% if form.driver_license.errors %}
+              <p class="text-red-500 text-sm mt-1">
+                {{ form.driver_license.errors.0 }}
+              </p>
+              {% endif %}
+            </div>
+
+            <div>
+              <label
+                for="{{ form.driver_contact.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Driver Contact
+              </label>
+              <input
+                type="text"
+                name="{{ form.driver_contact.name }}"
+                id="{{ form.driver_contact.id_for_label }}"
+                value="{{ form.driver_contact.value|default:'' }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 {% if form.driver_contact.errors %}border-red-500{% endif %}"
+                placeholder="e.g., 9840090180"
+              />
+              {% if form.driver_contact.help_text %}
+              <p class="text-gray-500 text-sm mt-1">
+                {{ form.driver_contact.help_text }}
+              </p>
+              {% endif %} {% if form.driver_contact.errors %}
+              <p class="text-red-500 text-sm mt-1">
+                {{ form.driver_contact.errors.0 }}
+              </p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Amenities and Settings Section -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+          >
+            <i class="fas fa-cogs mr-2 text-blue-500"></i>Amenities & Settings
+          </h3>
+
+          <div class="space-y-6">
+            <div>
+              <label
+                for="{{ form.amenities_list.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Amenities
+              </label>
+              <textarea
+                name="{{ form.amenities_list.name }}"
+                id="{{ form.amenities_list.id_for_label }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 {% if form.amenities_list.errors %}border-red-500{% endif %}"
+                rows="3"
+                placeholder="Enter amenities separated by commas (e.g., AC, WiFi, Charging Port, Entertainment)"
+              >
+{{ form.amenities_list.value|default:'' }}</textarea
+              >
+              {% if form.amenities_list.help_text %}
+              <p class="text-gray-500 text-sm mt-1">
+                {{ form.amenities_list.help_text }}
+              </p>
+              {% endif %} {% if form.amenities_list.errors %}
+              <p class="text-red-500 text-sm mt-1">
+                {{ form.amenities_list.errors.0 }}
+              </p>
+              {% endif %}
+            </div>
+
+            <div>
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  name="{{ form.is_active.name }}"
+                  id="{{ form.is_active.id_for_label }}"
+                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  {%
+                  if
+                  form.is_active.value
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <label
+                  for="{{ form.is_active.id_for_label }}"
+                  class="ml-2 block text-sm text-gray-700"
+                >
+                  Active (Bus is available for booking)
+                </label>
+              </div>
+              {% if form.is_active.errors %}
+              <p class="text-red-500 text-sm mt-1">
+                {{ form.is_active.errors.0 }}
+              </p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Errors -->
+        {% if form.non_field_errors %}
+        <div
+          class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+        >
+          {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end space-x-4">
+          <a
+            href="{% url 'dashboard:bus_management' %}"
+            class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors"
+          >
+            <i class="fas fa-times mr-2"></i>Cancel
+          </a>
+          <button
+            type="submit"
+            class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            <i class="fas fa-save mr-2"></i>{{ action }} Bus
+          </button>
+        </div>
+      </form>
     </div>
+  </div>
 </div>
+{% endblock %} {% block dashboard_extra_js %}
+<script>
+  // Image preview functionality
+  document
+    .getElementById("{{ form.image.id_for_label }}")
+    .addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      const previewContainer = document.getElementById("imagePreview");
+      const previewImg = document.getElementById("previewImg");
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          previewImg.src = e.target.result;
+          previewContainer.classList.remove("hidden");
+        };
+        reader.readAsDataURL(file);
+      } else {
+        previewContainer.classList.add("hidden");
+      }
+    });
+
+  // Auto-dismiss messages after 5 seconds
+  setTimeout(function () {
+    const messages = document.querySelectorAll(
+      '[class*="bg-green-100"], [class*="bg-red-100"], [class*="bg-yellow-100"], [class*="bg-blue-100"]'
+    );
+    messages.forEach((message) => {
+      if (message.querySelector("button")) {
+        setTimeout(() => {
+          message.style.opacity = "0";
+          message.style.transition = "opacity 0.5s";
+          setTimeout(() => message.remove(), 500);
+        }, 5000);
+      }
+    });
+  }, 100);
+
+  // Form validation enhancement
+  document.querySelector("form").addEventListener("submit", function (e) {
+    const requiredFields = this.querySelectorAll("[required]");
+    let isValid = true;
+
+    requiredFields.forEach((field) => {
+      if (!field.value.trim()) {
+        field.classList.add("border-red-500");
+        isValid = false;
+      } else {
+        field.classList.remove("border-red-500");
+      }
+    });
+
+    if (!isValid) {
+      e.preventDefault();
+      alert("Please fill in all required fields.");
+    }
+  });
+</script>
 {% endblock %}

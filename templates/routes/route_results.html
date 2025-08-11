@@ -3,556 +3,352 @@
 
 {% block title %}Search Results - TravelMate{% endblock %}
 
-{% block extra_css %}
-<style>
-    .results-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem 0;
-        margin-top: -1.5rem;
-    }
-    .search-summary {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    .modify-search {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 1rem;
-        margin-bottom: 2rem;
-    }
-    .schedule-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        margin-bottom: 1.5rem;
-        transition: all 0.3s ease;
-        overflow: hidden;
-    }
-    .schedule-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    }
-    .schedule-header {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        padding: 1.5rem;
-        border-bottom: 1px solid #dee2e6;
-    }
-    .schedule-body {
-        padding: 1.5rem;
-    }
-    .bus-info {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1rem;
-    }
-    .bus-number {
-        font-size: 1.25rem;
-        font-weight: bold;
-        color: #495057;
-        margin-right: 1rem;
-    }
-    .bus-type {
-        background: #667eea;
-        color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.875rem;
-    }
-    .time-info {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        gap: 1rem;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-    .time-block {
-        text-align: center;
-    }
-    .time-large {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #495057;
-    }
-    .time-label {
-        color: #6c757d;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-    }
-    .duration-block {
-        text-align: center;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 10px;
-    }
-    .duration-time {
-        font-weight: bold;
-        color: #667eea;
-    }
-    .duration-line {
-        height: 2px;
-        background: #667eea;
-        margin: 0.5rem 0;
-        position: relative;
-    }
-    .duration-line::before {
-        content: '';
-        position: absolute;
-        right: 0;
-        top: -3px;
-        width: 0;
-        height: 0;
-        border-left: 8px solid #667eea;
-        border-top: 4px solid transparent;
-        border-bottom: 4px solid transparent;
-    }
-    .amenities-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-    }
-    .amenity-badge {
-        background: #e3f2fd;
-        color: #1976d2;
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        display: flex;
-        align-items: center;
-    }
-    .amenity-badge i {
-        margin-right: 0.25rem;
-    }
-    .price-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 1rem;
-        border-top: 1px solid #dee2e6;
-    }
-    .price-info {
-        text-align: right;
-    }
-    .price-amount {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #28a745;
-    }
-    .price-label {
-        color: #6c757d;
-        font-size: 0.875rem;
-    }
-    .btn-book {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        border: none;
-        border-radius: 8px;
-        padding: 12px 25px;
-        color: white;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-    .btn-book:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
-        color: white;
-        text-decoration: none;
-    }
-    .btn-view-seats {
-        background: #667eea;
-        border: none;
-        border-radius: 8px;
-        padding: 8px 16px;
-        color: white;
-        font-size: 0.875rem;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        margin-right: 0.5rem;
-    }
-    .btn-view-seats:hover {
-        background: #5a67d8;
-        color: white;
-        text-decoration: none;
-    }
-    .filter-sidebar {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        position: sticky;
-        top: 2rem;
-    }
-    .filter-section {
-        margin-bottom: 2rem;
-    }
-    .filter-title {
-        font-weight: bold;
-        margin-bottom: 1rem;
-        color: #495057;
-        display: flex;
-        align-items: center;
-    }
-    .filter-title i {
-        margin-right: 0.5rem;
-        color: #667eea;
-    }
-    .filter-option {
-        display: flex;
-        align-items: center;
-        margin-bottom: 0.5rem;
-    }
-    .filter-option input {
-        margin-right: 0.5rem;
-    }
-    .no-results {
-        text-align: center;
-        padding: 4rem 2rem;
-        color: #6c757d;
-    }
-    .no-results i {
-        font-size: 4rem;
-        margin-bottom: 1.5rem;
-        opacity: 0.5;
-    }
-    .sort-options {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-    }
-    .sort-btn {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        padding: 0.5rem 1rem;
-        color: #495057;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        font-size: 0.875rem;
-    }
-    .sort-btn:hover, .sort-btn.active {
-        background: #667eea;
-        color: white;
-        text-decoration: none;
-    }
-    .results-count {
-        color: #6c757d;
-        margin-bottom: 1rem;
-    }
-    .seats-available {
-        color: #28a745;
-        font-size: 0.875rem;
-        font-weight: 600;
-    }
-    .seats-limited {
-        color: #ffc107;
-        font-size: 0.875rem;
-        font-weight: 600;
-    }
-    .seats-full {
-        color: #dc3545;
-        font-size: 0.875rem;
-        font-weight: 600;
-    }
-    .recommended-card {
-        border: 2px solid #ffd700;
-        position: relative;
-    }
-    .recommended-card::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
-        border-radius: 17px;
-        z-index: -1;
-        animation: recommendedGlow 2s ease-in-out infinite alternate;
-    }
-    @keyframes recommendedGlow {
-        0% { opacity: 0.7; }
-        100% { opacity: 1; }
-    }
-    .recommendation-badge {
-        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-        color: #333;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        margin-left: 1rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-        box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
-    }
-    .recommendation-badge i {
-        font-size: 0.7rem;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<!-- Results Header -->
-<section class="results-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="mb-2"><i class="fas fa-search me-2"></i>Search Results</h1>
-                <p class="mb-0">{{ source }} → {{ destination }} on {{ travel_date|date:"F d, Y" }}</p>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <a href="{% url 'routes:route_search' %}" class="btn btn-light">
-                    <i class="fas fa-search me-2"></i>New Search
-                </a>
-            </div>
+<!-- Header -->
+<section class="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-12 -mt-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-2">Search Results</h1>
+            <p class="text-xl opacity-90">{{ source }} to {{ destination }} • {{ travel_date|date:"M d, Y" }}</p>
         </div>
     </div>
 </section>
 
-<!-- Search Results -->
-<section class="py-5">
-    <div class="container">
+<!-- Search Summary & Modify -->
+<section class="py-8 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Search Summary -->
-        <div class="search-summary">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h5 class="mb-1">{{ source }} to {{ destination }}</h5>
-                    <p class="text-muted mb-0">
-                        <i class="fas fa-calendar me-1"></i>{{ travel_date|date:"l, F d, Y" }}
-                        <span class="ms-3"><i class="fas fa-bus me-1"></i>{{ schedules|length }} bus{{ schedules|length|pluralize:"es" }} found</span>
-                    </p>
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div class="mb-4 md:mb-0">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">
+                        <i class="fas fa-route mr-2 text-blue-500"></i>{{ source }} → {{ destination }}
+                    </h2>
+                    <div class="flex flex-wrap gap-4 text-sm text-gray-600">
+                        <span><i class="fas fa-calendar mr-1 text-green-500"></i>{{ travel_date|date:"l, M d, Y" }}</span>
+                        <span><i class="fas fa-users mr-1 text-purple-500"></i>{{ passengers }} passenger{{ passengers|pluralize }}</span>
+                        <span class="results-count"><i class="fas fa-info-circle mr-1 text-blue-500"></i>{{ schedules|length }} result{{ schedules|length|pluralize }} found</span>
+                    </div>
                 </div>
-                <div class="col-md-4 text-md-end">
-                    <button class="btn btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#modifySearch">
-                        <i class="fas fa-edit me-2"></i>Modify Search
-                    </button>
-                </div>
+                
+                <button onclick="toggleModifySearch()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                    <i class="fas fa-edit mr-2"></i>Modify Search
+                </button>
             </div>
         </div>
         
-        <!-- Modify Search Form -->
-        <div class="collapse modify-search" id="modifySearch">
-            <form method="get" class="row g-3">
-                <div class="col-md-3">
-                    <label class="form-label">From</label>
-                    <input type="text" name="source" class="form-control" value="{{ source }}" required>
+        <!-- Modify Search Form (Hidden by default) -->
+        <div id="modifySearchForm" class="bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Modify Your Search</h3>
+            <form method="GET" action="{% url 'routes:route_results' %}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">From</label>
+                    <input type="text" name="source" value="{{ source }}" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">To</label>
-                    <input type="text" name="destination" class="form-control" value="{{ destination }}" required>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">To</label>
+                    <input type="text" name="destination" value="{{ destination }}" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">Travel Date</label>
-                    <input type="date" name="travel_date" class="form-control" value="{{ travel_date|date:'Y-m-d' }}" required>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <input type="date" name="travel_date" value="{{ travel_date|date:'Y-m-d' }}" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">&nbsp;</label>
-                    <button type="submit" class="btn btn-primary d-block w-100">
-                        <i class="fas fa-search me-2"></i>Search
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Passengers</label>
+                    <select name="passengers" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="1" {% if passengers == '1' %}selected{% endif %}>1 Passenger</option>
+                        <option value="2" {% if passengers == '2' %}selected{% endif %}>2 Passengers</option>
+                        <option value="3" {% if passengers == '3' %}selected{% endif %}>3 Passengers</option>
+                        <option value="4" {% if passengers == '4' %}selected{% endif %}>4 Passengers</option>
+                        <option value="5" {% if passengers == '5' %}selected{% endif %}>5+ Passengers</option>
+                    </select>
+                </div>
+                <div class="md:col-span-4 flex gap-2">
+                    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-search mr-2"></i>Search Again
+                    </button>
+                    <button type="button" onclick="toggleModifySearch()" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                        Cancel
                     </button>
                 </div>
             </form>
         </div>
-        
-        <div class="row">
+    </div>
+</section>
+
+<!-- Results Section -->
+<section class="py-8 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <!-- Filters Sidebar -->
-            <div class="col-lg-3">
-                <div class="filter-sidebar">
-                    <h5 class="mb-3"><i class="fas fa-filter me-2"></i>Filters</h5>
-                    
-                    <!-- Bus Type Filter -->
-                    <div class="filter-section">
-                        <div class="filter-title">
-                            <i class="fas fa-bus"></i>Bus Type
-                        </div>
-                        {% for bus_type in bus_types %}
-                        <div class="filter-option">
-                            <input type="checkbox" id="type_{{ bus_type.id }}" class="filter-checkbox" data-filter="bus_type" value="{{ bus_type.id }}">
-                            <label for="type_{{ bus_type.id }}">{{ bus_type.name }}</label>
-                        </div>
-                        {% endfor %}
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-lg p-6 sticky top-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800">Filters</h3>
+                        <button id="clearFilters" class="text-sm text-blue-500 hover:text-blue-600">Clear All</button>
                     </div>
                     
-                    <!-- Price Range Filter -->
-                    <div class="filter-section">
-                        <div class="filter-title">
-                            <i class="fas fa-money-bill"></i>Price Range
+                    <!-- Bus Type Filter -->
+                    <div class="mb-6">
+                        <h4 class="font-semibold text-gray-700 mb-3">Bus Type</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" data-filter="bus-type" value="ac">
+                                <span class="ml-2 text-sm text-gray-700">AC</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" data-filter="bus-type" value="non_ac">
+                                <span class="ml-2 text-sm text-gray-700">Non-AC</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" data-filter="bus-type" value="sleeper">
+                                <span class="ml-2 text-sm text-gray-700">Sleeper</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" data-filter="bus-type" value="semi_sleeper">
+                                <span class="ml-2 text-sm text-gray-700">Semi-Sleeper</span>
+                            </label>
                         </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="price_low" class="filter-checkbox" data-filter="price" value="low">
-                            <label for="price_low">रू 0 - रू 500</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="price_mid" class="filter-checkbox" data-filter="price" value="mid">
-                            <label for="price_mid">रू 500 - रू 1000</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="price_high" class="filter-checkbox" data-filter="price" value="high">
-                            <label for="price_high">रू 1000+</label>
+                    </div>
+                    
+                    <!-- Price Filter -->
+                    <div class="mb-6">
+                        <h4 class="font-semibold text-gray-700 mb-3">Price Range</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" data-filter="price" value="low">
+                                <span class="ml-2 text-sm text-gray-700">Under रू500</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" data-filter="price" value="mid">
+                                <span class="ml-2 text-sm text-gray-700">रू500 - रू1000</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" data-filter="price" value="high">
+                                <span class="ml-2 text-sm text-gray-700">Above रू1000</span>
+                            </label>
                         </div>
                     </div>
                     
                     <!-- Departure Time Filter -->
-                    <div class="filter-section">
-                        <div class="filter-title">
-                            <i class="fas fa-clock"></i>Departure Time
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="time_morning" class="filter-checkbox" data-filter="time" value="morning">
-                            <label for="time_morning">Morning (6 AM - 12 PM)</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="time_afternoon" class="filter-checkbox" data-filter="time" value="afternoon">
-                            <label for="time_afternoon">Afternoon (12 PM - 6 PM)</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="time_evening" class="filter-checkbox" data-filter="time" value="evening">
-                            <label for="time_evening">Evening (6 PM - 12 AM)</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="time_night" class="filter-checkbox" data-filter="time" value="night">
-                            <label for="time_night">Night (12 AM - 6 AM)</label>
+                    <div class="mb-6">
+                        <h4 class="font-semibold text-gray-700 mb-3">Departure Time</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" data-filter="time" value="morning">
+                                <span class="ml-2 text-sm text-gray-700">Morning (6AM - 12PM)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" data-filter="time" value="afternoon">
+                                <span class="ml-2 text-sm text-gray-700">Afternoon (12PM - 6PM)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" data-filter="time" value="evening">
+                                <span class="ml-2 text-sm text-gray-700">Evening (6PM - 12AM)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" data-filter="time" value="night">
+                                <span class="ml-2 text-sm text-gray-700">Night (12AM - 6AM)</span>
+                            </label>
                         </div>
                     </div>
                     
-                    <button class="btn btn-outline-secondary w-100" id="clearFilters">
-                        <i class="fas fa-times me-2"></i>Clear Filters
-                    </button>
+                    <!-- Sort Options -->
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-3">Sort By</h4>
+                        <select id="sortBy" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="departure">Departure Time</option>
+                            <option value="price">Price (Low to High)</option>
+                            <option value="duration">Duration</option>
+                            <option value="rating">Rating</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             
             <!-- Results List -->
-            <div class="col-lg-9">
-                <!-- Sort Options -->
-                <div class="sort-options">
-                    <span class="fw-bold">Sort by:</span>
-                    <a href="?{{ request.GET.urlencode }}&sort=departure" class="sort-btn {% if request.GET.sort == 'departure' or not request.GET.sort %}active{% endif %}">
-                        <i class="fas fa-clock me-1"></i>Departure Time
-                    </a>
-                    <a href="?{{ request.GET.urlencode }}&sort=price" class="sort-btn {% if request.GET.sort == 'price' %}active{% endif %}">
-                        <i class="fas fa-money-bill me-1"></i>Price
-                    </a>
-                    <a href="?{{ request.GET.urlencode }}&sort=duration" class="sort-btn {% if request.GET.sort == 'duration' %}active{% endif %}">
-                        <i class="fas fa-hourglass me-1"></i>Duration
-                    </a>
-                </div>
-                
-                <!-- Results Count -->
-                <div class="results-count">
-                    <i class="fas fa-info-circle me-1"></i>
-                    Showing {{ schedules|length }} result{{ schedules|length|pluralize }} for your search
-                </div>
-                
-                <!-- Schedule Cards -->
+            <div class="lg:col-span-3">
                 {% if schedules %}
-                    {% for schedule in schedules %}
-                    <div class="schedule-card{% if schedule.is_recommended %} recommended-card{% endif %}" data-bus-type="{{ schedule.bus.bus_type.id }}" data-price="{{ schedule.base_fare }}" data-departure="{{ schedule.departure_time|time:'H' }}">
-                        <div class="schedule-header">
-                            <div class="bus-info">
-                                <span class="bus-number">{{ schedule.bus.bus_number }}</span>
-                                <span class="bus-type">{{ schedule.bus.bus_type.name }}</span>
-                                {% if schedule.is_recommended %}
-                                <span class="recommendation-badge">
-                                    <i class="fas fa-star"></i> Recommended for You
-                                </span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="schedule-body">
-                            <!-- Time Information -->
-                            <div class="time-info">
-                                <div class="time-block">
-                                    <div class="time-large">{{ schedule.departure_time|time:"g:i A" }}</div>
-                                    <div class="time-label">{{ schedule.route.source }}</div>
-                                </div>
-                                <div class="duration-block">
-                                    <div class="duration-time">{{ schedule.journey_duration }}</div>
-                                    <div class="duration-line"></div>
-                                    <small class="text-muted">{{ schedule.route.distance }} km</small>
-                                </div>
-                                <div class="time-block">
-                                    <div class="time-large">{{ schedule.arrival_time|time:"g:i A" }}</div>
-                                    <div class="time-label">{{ schedule.route.destination }}</div>
+                    <div class="space-y-6">
+                        {% for schedule in schedules %}
+                        <div class="schedule-card bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100" 
+                             data-bus-type="{{ schedule.bus.bus_type }}" 
+                             data-price="{{ schedule.base_fare }}" 
+                             data-departure="{{ schedule.departure_time.hour }}">
+                            
+                            <!-- Schedule Header -->
+                            <div class="bg-gradient-to-r from-gray-50 to-gray-100 p-6 border-b border-gray-200">
+                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                                    <div class="mb-4 md:mb-0">
+                                        <div class="flex items-center mb-2">
+                                            <h3 class="text-xl font-bold text-gray-800 mr-3">{{ schedule.bus.bus_number }}</h3>
+                                            <span class="px-3 py-1 bg-blue-500 text-white rounded-full text-sm font-medium">
+                                                {{ schedule.bus.bus_type|title }}
+                                            </span>
+                                        </div>
+                                        <p class="text-gray-600">{{ schedule.bus.operator|default:"TravelMate" }}</p>
+                                    </div>
+                                    
+                                    <div class="text-right">
+                                        <div class="text-2xl font-bold text-green-600 mb-1">रू{{ schedule.base_fare }}</div>
+                                        <div class="text-sm text-gray-600">per person</div>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <!-- Amenities -->
-                            {% if schedule.bus.amenities.all %}
-                            <div class="amenities-row">
-                                {% for amenity in schedule.bus.amenities.all %}
-                                <span class="amenity-badge">
-                                    <i class="fas fa-check"></i>
-                                    {{ amenity.name }}
-                                </span>
-                                {% endfor %}
+                            <!-- Schedule Body -->
+                            <div class="p-6">
+                                <!-- Time Information -->
+                                <div class="grid grid-cols-3 gap-4 mb-6">
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-gray-800">{{ schedule.departure_time|time:"g:i A" }}</div>
+                                        <div class="text-sm text-gray-600 mt-1">{{ source }}</div>
+                                        <div class="text-xs text-gray-500">Departure</div>
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <div class="bg-blue-50 rounded-lg p-3">
+                                            <div class="text-sm font-semibold text-blue-600 mb-1">{{ schedule.duration|default:"6h 30m" }}</div>
+                                            <div class="h-1 bg-blue-500 rounded-full relative">
+                                                <div class="absolute -right-1 -top-1 w-3 h-3 bg-blue-500 rounded-full"></div>
+                                            </div>
+                                            <div class="text-xs text-gray-600 mt-1">Direct</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-gray-800">{{ schedule.arrival_time|time:"g:i A" }}</div>
+                                        <div class="text-sm text-gray-600 mt-1">{{ destination }}</div>
+                                        <div class="text-xs text-gray-500">Arrival</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Bus Details -->
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                    <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                        <i class="fas fa-users text-blue-500 text-lg mb-2"></i>
+                                        <div class="text-sm font-semibold text-gray-800">{{ schedule.bus.total_seats }}</div>
+                                        <div class="text-xs text-gray-600">Total Seats</div>
+                                    </div>
+                                    
+                                    <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                        <i class="fas fa-chair text-green-500 text-lg mb-2"></i>
+                                        <div class="text-sm font-semibold text-green-600">{{ schedule.available_seats|default:schedule.bus.total_seats }}</div>
+                                        <div class="text-xs text-gray-600">Available</div>
+                                    </div>
+                                    
+                                    <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                        <i class="fas fa-star text-yellow-500 text-lg mb-2"></i>
+                                        <div class="text-sm font-semibold text-gray-800">{{ schedule.bus.rating|default:"4.2" }}</div>
+                                        <div class="text-xs text-gray-600">Rating</div>
+                                    </div>
+                                    
+                                    <div class="text-center p-3 bg-gray-50 rounded-lg">
+                                        <i class="fas fa-route text-purple-500 text-lg mb-2"></i>
+                                        <div class="text-sm font-semibold text-gray-800">{{ schedule.distance|default:"200" }}km</div>
+                                        <div class="text-xs text-gray-600">Distance</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Amenities -->
+                                <div class="mb-6">
+                                    <h4 class="text-sm font-semibold text-gray-700 mb-3">Amenities</h4>
+                                    <div class="flex flex-wrap gap-2">
+                                        {% if schedule.bus.is_ac %}
+                                        <span class="inline-flex items-center px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">
+                                            <i class="fas fa-snowflake mr-1"></i>AC
+                                        </span>
+                                        {% endif %}
+                                        {% if schedule.bus.has_wifi %}
+                                        <span class="inline-flex items-center px-2 py-1 bg-purple-50 text-purple-700 rounded-full text-xs">
+                                            <i class="fas fa-wifi mr-1"></i>WiFi
+                                        </span>
+                                        {% endif %}
+                                        {% if schedule.bus.has_charging %}
+                                        <span class="inline-flex items-center px-2 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs">
+                                            <i class="fas fa-charging-station mr-1"></i>Charging
+                                        </span>
+                                        {% endif %}
+                                        {% if schedule.bus.has_entertainment %}
+                                        <span class="inline-flex items-center px-2 py-1 bg-red-50 text-red-700 rounded-full text-xs">
+                                            <i class="fas fa-tv mr-1"></i>Entertainment
+                                        </span>
+                                        {% endif %}
+                                        <span class="inline-flex items-center px-2 py-1 bg-green-50 text-green-700 rounded-full text-xs">
+                                            <i class="fas fa-shield-alt mr-1"></i>Insured
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="flex flex-col sm:flex-row gap-3">
+                                    <a href="{% url 'bookings:seat_selection' schedule.id %}" 
+                                       class="flex-1 bg-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-600 transition-colors font-semibold text-center btn-book">
+                                        <i class="fas fa-ticket-alt mr-2"></i>Book Now
+                                    </a>
+                                    
+                                    <a href="{% url 'routes:schedule_detail' schedule.id %}" 
+                                       class="flex-1 bg-blue-500 text-white py-3 px-6 rounded-lg hover:bg-blue-600 transition-colors font-semibold text-center btn-view-seats">
+                                        <i class="fas fa-eye mr-2"></i>View Details
+                                    </a>
+                                    
+                                    <button onclick="shareSchedule('{{ schedule.id }}')" 
+                                            class="bg-gray-500 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition-colors font-semibold">
+                                        <i class="fas fa-share mr-2"></i>Share
+                                    </button>
+                                </div>
                             </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if is_paginated %}
+                    <div class="flex justify-center mt-8">
+                        <nav class="flex space-x-2">
+                            {% if page_obj.has_previous %}
+                                <a href="?page={{ page_obj.previous_page_number }}" 
+                                   class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
                             {% endif %}
                             
-                            <!-- Seat Availability -->
-                            <div class="mb-2">
-                                {% with available_seats=schedule.available_seats %}
-                                    {% if available_seats > 10 %}
-                                        <span class="seats-available">
-                                            <i class="fas fa-check-circle me-1"></i>{{ available_seats }} seats available
-                                        </span>
-                                    {% elif available_seats > 0 %}
-                                        <span class="seats-limited">
-                                            <i class="fas fa-exclamation-triangle me-1"></i>Only {{ available_seats }} seats left
-                                        </span>
-                                    {% else %}
-                                        <span class="seats-full">
-                                            <i class="fas fa-times-circle me-1"></i>Fully booked
-                                        </span>
-                                    {% endif %}
-                                {% endwith %}
-                            </div>
+                            <span class="bg-blue-500 text-white px-3 py-2 rounded">
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                            </span>
                             
-                            <!-- Price and Booking -->
-                            <div class="price-section">
-                                <div>
-                                    <a href="{% url 'bookings:seat_selection' schedule.id %}?date={{ travel_date|date:'Y-m-d' }}" class="btn-view-seats">
-                                    <i class="fas fa-eye me-1"></i>View Seats
+                            {% if page_obj.has_next %}
+                                <a href="?page={{ page_obj.next_page_number }}" 
+                                   class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                    <i class="fas fa-chevron-right"></i>
                                 </a>
-                                </div>
-                                <div class="price-info">
-                                    <div class="price-amount">रू {{ schedule.base_fare }}</div>
-                                    <div class="price-label">per person</div>
-                                </div>
-                                <div>
-                                    {% if schedule.available_seats > 0 %}
-                                        <a href="{% url 'bookings:quick_booking' schedule.id %}?date={{ travel_date|date:'Y-m-d' }}" class="btn-book">
-                                        <i class="fas fa-ticket-alt me-1"></i>Book Now
-                                    </a>
-                                    {% else %}
-                                        <button class="btn btn-secondary" disabled>
-                                            <i class="fas fa-times me-2"></i>Fully Booked
-                                        </button>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+                            {% endif %}
+                        </nav>
                     </div>
-                    {% endfor %}
+                    {% endif %}
                 {% else %}
-                    <div class="no-results">
-                        <i class="fas fa-search"></i>
-                        <h4>No buses found</h4>
-                        <p>Sorry, we couldn't find any buses for your selected route and date.</p>
-                        <div class="mt-3">
-                            <a href="{% url 'routes:route_search' %}" class="btn btn-primary me-2">
-                                <i class="fas fa-search me-2"></i>Try Different Search
-                            </a>
-                            <button class="btn btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#modifySearch">
-                                <i class="fas fa-edit me-2"></i>Modify Search
-                            </button>
+                    <!-- No Results -->
+                    <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                        <div class="max-w-md mx-auto">
+                            <i class="fas fa-search text-6xl text-gray-300 mb-6"></i>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">No Routes Found</h3>
+                            <p class="text-gray-600 mb-6">
+                                We couldn't find any bus routes for your search criteria. 
+                                Try adjusting your search parameters or check back later.
+                            </p>
+                            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                                <button onclick="toggleModifySearch()" 
+                                        class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                                    <i class="fas fa-edit mr-2"></i>Modify Search
+                                </button>
+                                <a href="{% url 'routes:route_search' %}" 
+                                   class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
+                                    <i class="fas fa-search mr-2"></i>New Search
+                                </a>
+                            </div>
                         </div>
                     </div>
                 {% endif %}
@@ -564,31 +360,25 @@
 
 {% block extra_js %}
 <script>
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
         // Filter functionality
-        $('.filter-checkbox').change(function() {
-            applyFilters();
+        const filterCheckboxes = document.querySelectorAll('.filter-checkbox');
+        const scheduleCards = document.querySelectorAll('.schedule-card');
+        
+        filterCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', applyFilters);
         });
         
         function applyFilters() {
-            const busTypeFilters = $('.filter-checkbox[data-filter="bus_type"]:checked').map(function() {
-                return $(this).val();
-            }).get();
+            const busTypeFilters = Array.from(document.querySelectorAll('.filter-checkbox[data-filter="bus-type"]:checked')).map(cb => cb.value);
+            const priceFilters = Array.from(document.querySelectorAll('.filter-checkbox[data-filter="price"]:checked')).map(cb => cb.value);
+            const timeFilters = Array.from(document.querySelectorAll('.filter-checkbox[data-filter="time"]:checked')).map(cb => cb.value);
             
-            const priceFilters = $('.filter-checkbox[data-filter="price"]:checked').map(function() {
-                return $(this).val();
-            }).get();
-            
-            const timeFilters = $('.filter-checkbox[data-filter="time"]:checked').map(function() {
-                return $(this).val();
-            }).get();
-            
-            $('.schedule-card').each(function() {
+            scheduleCards.forEach(card => {
                 let show = true;
-                const card = $(this);
-                const busType = card.data('bus-type').toString();
-                const price = parseFloat(card.data('price'));
-                const departure = parseInt(card.data('departure'));
+                const busType = card.dataset.busType;
+                const price = parseFloat(card.dataset.price);
+                const departure = parseInt(card.dataset.departure);
                 
                 // Bus type filter
                 if (busTypeFilters.length > 0 && !busTypeFilters.includes(busType)) {
@@ -598,7 +388,7 @@
                 // Price filter
                 if (priceFilters.length > 0) {
                     let priceMatch = false;
-                    priceFilters.forEach(function(filter) {
+                    priceFilters.forEach(filter => {
                         if (filter === 'low' && price <= 500) priceMatch = true;
                         if (filter === 'mid' && price > 500 && price <= 1000) priceMatch = true;
                         if (filter === 'high' && price > 1000) priceMatch = true;
@@ -609,7 +399,7 @@
                 // Time filter
                 if (timeFilters.length > 0) {
                     let timeMatch = false;
-                    timeFilters.forEach(function(filter) {
+                    timeFilters.forEach(filter => {
                         if (filter === 'morning' && departure >= 6 && departure < 12) timeMatch = true;
                         if (filter === 'afternoon' && departure >= 12 && departure < 18) timeMatch = true;
                         if (filter === 'evening' && departure >= 18 && departure < 24) timeMatch = true;
@@ -618,43 +408,91 @@
                     if (!timeMatch) show = false;
                 }
                 
-                if (show) {
-                    card.show();
-                } else {
-                    card.hide();
-                }
+                card.style.display = show ? 'block' : 'none';
             });
             
             updateResultsCount();
         }
         
         function updateResultsCount() {
-            const visibleCards = $('.schedule-card:visible').length;
-            $('.results-count').html(`<i class="fas fa-info-circle me-1"></i>Showing ${visibleCards} result${visibleCards !== 1 ? 's' : ''} for your search`);
+            const visibleCards = document.querySelectorAll('.schedule-card[style*="block"], .schedule-card:not([style*="none"])');
+            const count = visibleCards.length;
+            document.querySelector('.results-count').innerHTML = `<i class="fas fa-info-circle mr-1 text-blue-500"></i>${count} result${count !== 1 ? 's' : ''} found`;
         }
         
         // Clear filters
-        $('#clearFilters').click(function() {
-            $('.filter-checkbox').prop('checked', false);
-            $('.schedule-card').show();
+        document.getElementById('clearFilters').addEventListener('click', function() {
+            filterCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            scheduleCards.forEach(card => {
+                card.style.display = 'block';
+            });
             updateResultsCount();
         });
         
-        // Add loading state to book buttons
-        $('.btn-book, .btn-view-seats').click(function() {
-            const btn = $(this);
-            const originalText = btn.html();
-            btn.html('<i class="fas fa-spinner fa-spin me-2"></i>Loading...');
+        // Sort functionality
+        document.getElementById('sortBy').addEventListener('change', function() {
+            const sortBy = this.value;
+            const container = document.querySelector('.space-y-6');
+            const cards = Array.from(scheduleCards);
             
-            // Restore original text after a delay (in case of navigation issues)
-            setTimeout(function() {
-                btn.html(originalText);
-            }, 3000);
+            cards.sort((a, b) => {
+                switch(sortBy) {
+                    case 'price':
+                        return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+                    case 'departure':
+                        return parseInt(a.dataset.departure) - parseInt(b.dataset.departure);
+                    default:
+                        return 0;
+                }
+            });
+            
+            cards.forEach(card => container.appendChild(card));
+        });
+        
+        // Add loading state to book buttons
+        document.querySelectorAll('.btn-book, .btn-view-seats').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Loading...';
+                
+                // Restore original text after a delay (in case of navigation issues)
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 3000);
+            });
         });
         
         // Set minimum date for modify search
         const today = new Date().toISOString().split('T')[0];
-        $('input[name="travel_date"]').attr('min', today);
+        document.querySelector('input[name="travel_date"]').setAttribute('min', today);
     });
+    
+    // Toggle modify search form
+    function toggleModifySearch() {
+        const form = document.getElementById('modifySearchForm');
+        form.classList.toggle('hidden');
+    }
+    
+    // Share schedule function
+    function shareSchedule(scheduleId) {
+        const url = window.location.origin + '/routes/schedule/' + scheduleId + '/';
+        
+        if (navigator.share) {
+            navigator.share({
+                title: 'Bus Schedule - TravelMate',
+                text: 'Check out this bus schedule',
+                url: url
+            });
+        } else {
+            // Fallback: copy to clipboard
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Schedule link copied to clipboard!');
+            }).catch(() => {
+                prompt('Copy this link:', url);
+            });
+        }
+    }
 </script>
 {% endblock %}

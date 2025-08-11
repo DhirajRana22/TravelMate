@@ -1,753 +1,552 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} {% load static %} {% block title %}Select Seats -
+TravelMate{% endblock %} {% block content %}
+<!-- Header -->
+<section
+  class="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-16 -mt-6"
+>
+  <div class="container mx-auto px-4">
+    <div class="text-center">
+      <h1 class="text-3xl md:text-4xl font-bold mb-2">Select Your Seats</h1>
+      <p class="text-xl opacity-90">
+        Choose your preferred seats for a comfortable journey
+      </p>
+    </div>
+  </div>
+</section>
 
-{% block title %}Select Seats - TravelMate{% endblock %}
+<!-- Seat Selection -->
+<section class="py-8 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <div class="max-w-6xl mx-auto">
+      <!-- Journey Information -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h3
+          class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
+        >
+          <i class="fas fa-route mr-2 text-blue-500"></i>Journey Details
+        </h3>
 
-{% block extra_css %}
-<style>
-    .seat-selection-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem 0;
-        margin-top: -1.5rem;
-    }
-    .journey-info {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    .bus-layout {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        border-radius: 20px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        padding: 25px 20px;
-        margin-bottom: 2rem;
-        border: 2px solid #dee2e6;
-        position: relative;
-        overflow: hidden;
-        max-width: 400px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .seat-map {
-        max-width: 350px;
-        margin: 0 auto;
-        background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
-        border-radius: 15px;
-        padding: 2rem 1.2rem;
-        position: relative;
-        box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);
-        border: 2px solid #dee2e6;
-    }
-    .driver-section {
-        background: #f8f9fa;
-        color: #495057;
-        padding: 0.75rem;
-        border-radius: 6px;
-        text-align: center;
-        margin-bottom: 0.75rem;
-        border: 1px solid #dee2e6;
-    }
-    .seat-row {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 8px;
-        align-items: center;
-        padding: 0 15px;
-        gap: 15px;
-    }
-    .seat-row.last-row {
-        justify-content: center;
-        gap: 8px;
-        margin-bottom: 8px;
-        margin-top: 8px;
-        padding: 0 15px;
-    }
-    .seat-group {
-        display: flex;
-        gap: 8px;
-    }
-    .seat {
-        width: 40px;
-        height: 40px;
-        border: 2px solid #dee2e6;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 11px;
-        font-weight: 600;
-        position: relative;
-        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
-        transform: translateY(0);
-    }
-    .seat::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 26px;
-        height: 3px;
-        background: #dee2e6;
-        border-radius: 2px;
-        transition: all 0.3s ease;
-    }
-    .seat.available {
-                background: linear-gradient(145deg, #4ade80,rgb(153, 217, 226));
-                border-color: #16a34a;
-                color: white;
-            }
-
-    .seat.available:hover {
-                background: linear-gradient(145deg, #22c55e, #06b6d4);
-                color: white;
-                transform: translateY(-2px);
-                box-shadow: 0 5px 10px rgba(0,0,0,0.15);
-            }
-
-    .seat.selected {
-                background: linear-gradient(145deg, #fbbf24, #f59e0b);
-                border-color: #d97706;
-                color: #92400e;
-                animation: pulse 2s infinite;
-            }
-
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
-    }
-    .seat.booked {
-                background: linear-gradient(145deg, #f87171, #ef4444);
-                border-color: #dc2626;
-                color: white;
-                cursor: not-allowed;
-                opacity: 0.8;
-            }
-
-    .seat.reserved {
-                background: linear-gradient(145deg, #fef3c7, #fde68a);
-                border-color: #f59e0b;
-                color: #92400e;
-                cursor: not-allowed;
-                opacity: 0.8;
-            }
-    .aisle {
-        width: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #999;
-        font-size: 10px;
-        opacity: 0.6;
-    }
-
-    
-
-    .seat-legend {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        margin-top: 1.5rem;
-        flex-wrap: wrap;
-        background: #f8f9fa;
-        padding: 1rem;
-        border-radius: 8px;
-        border: 1px solid #dee2e6;
-    }
-    .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-        font-size: 0.8rem;
-        font-weight: 500;
-        color: #666;
-    }
-    .legend-seat {
-        width: 16px;
-        height: 16px;
-        border-radius: 3px;
-        border: 1px solid;
-        position: relative;
-    }
-    .legend-seat::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 12px;
-        height: 2px;
-        border-radius: 1px;
-     }
-
-     .booking-summary {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        padding: 1.5rem;
-        position: sticky;
-        top: 2rem;
-    }
-    .summary-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.75rem 0;
-        border-bottom: 1px solid #f8f9fa;
-    }
-    .summary-item:last-child {
-        border-bottom: none;
-        font-weight: bold;
-        font-size: 1.1rem;
-        color: #495057;
-    }
-    .selected-seats {
-        background: #e3f2fd;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-    .seat-tag {
-        background: #667eea;
-        color: white;
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        margin: 0.25rem;
-        display: inline-block;
-    }
-    .btn-proceed {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        border: none;
-        border-radius: 10px;
-        padding: 1rem 2rem;
-        color: white;
-        font-weight: 600;
-        font-size: 1.1rem;
-        width: 100%;
-        transition: all 0.3s ease;
-    }
-    .btn-proceed:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
-        color: white;
-    }
-    .btn-proceed:disabled {
-        background: #6c757d;
-        cursor: not-allowed;
-    }
-    .journey-route {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1rem;
-    }
-    .route-city {
-        font-size: 1.25rem;
-        font-weight: bold;
-        color: #495057;
-    }
-    .route-arrow {
-        margin: 0 1rem;
-        color: #667eea;
-        font-size: 1.5rem;
-    }
-    .journey-details {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
-    }
-    .detail-item {
-        text-align: center;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-    }
-    .detail-label {
-        color: #6c757d;
-        font-size: 0.875rem;
-        margin-bottom: 0.25rem;
-    }
-    .detail-value {
-        font-weight: bold;
-        color: #495057;
-    }
-    .seat-selection-tips {
-        background: #e3f2fd;
-        border-radius: 10px;
-        padding: 1rem;
-        margin-bottom: 2rem;
-    }
-    .tips-title {
-        font-weight: bold;
-        color: #1976d2;
-        margin-bottom: 0.5rem;
-    }
-    .tips-list {
-        font-size: 0.875rem;
-        color: #1976d2;
-        margin: 0;
-        padding-left: 1rem;
-    }
-    .seat-number {
-        position: absolute;
-        top: -6px;
-        right: -6px;
-        background: #495057;
-        color: white;
-        border-radius: 50%;
-        width: 14px;
-        height: 14px;
-        font-size: 0.55rem;
-        font-weight: 800;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        z-index: 2;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<!-- Seat Selection Header -->
-<section class="seat-selection-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="mb-2"><i class="fas fa-chair me-2"></i>Select Your Seats</h1>
-                <p class="mb-0">Choose your preferred seats for a comfortable journey</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="flex items-center">
+            <div
+              class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-map-marker-alt text-blue-600"></i>
             </div>
-            <div class="col-md-4 text-md-end">
-                <a href="{% url 'routes:route_search' %}?source={{ schedule.route.source }}&destination={{ schedule.route.destination }}&travel_date={{ travel_date }}" class="btn btn-light">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Results
+            <div>
+              <p class="text-xs text-gray-500">From</p>
+              <p class="font-semibold text-gray-800">
+                {{ schedule.route.source }}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center">
+            <div
+              class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-map-marker-alt text-green-600"></i>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">To</p>
+              <p class="font-semibold text-gray-800">
+                {{ schedule.route.destination }}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center">
+            <div
+              class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-calendar text-purple-600"></i>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Date</p>
+              <p class="font-semibold text-gray-800">
+                {{ travel_date|date:"M d, Y" }}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center">
+            <div
+              class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-3"
+            >
+              <i class="fas fa-clock text-orange-600"></i>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Departure</p>
+              <p class="font-semibold text-gray-800">
+                {{ schedule.departure_time|time:"g:i A" }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm text-gray-600">
+                Bus:
+                <span class="font-semibold">{{ schedule.bus.bus_number }}</span>
+              </p>
+              <p class="text-sm text-gray-600">
+                Type:
+                <span class="font-semibold">{{ schedule.bus.bus_type }}</span>
+              </p>
+            </div>
+            <div class="text-right">
+              <p class="text-sm text-gray-600">
+                Base Fare:
+                <span class="font-semibold">रू{{ schedule.base_fare }}</span>
+              </p>
+              <p class="text-sm text-gray-600">
+                Available Seats:
+                <span class="font-semibold">{{ available_seats_count }}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Seat Map -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+              <h3 class="text-xl font-semibold text-gray-800">
+                <i class="fas fa-chair mr-2 text-purple-500"></i>Select Your
+                Seats
+              </h3>
+              <p class="text-sm text-gray-600 mt-1">
+                Click on available seats to select them
+              </p>
+            </div>
+
+            <div class="p-6">
+              <!-- Seat Legend -->
+              <div
+                class="flex flex-wrap justify-center gap-4 mb-6 p-4 bg-gray-50 rounded-lg"
+              >
+                <div class="flex items-center">
+                  <div
+                    class="w-6 h-6 bg-green-500 rounded border-2 border-green-600 mr-2"
+                  ></div>
+                  <span class="text-sm text-gray-700">Available</span>
+                </div>
+                <div class="flex items-center">
+                  <div
+                    class="w-6 h-6 bg-blue-500 rounded border-2 border-blue-600 mr-2"
+                  ></div>
+                  <span class="text-sm text-gray-700">Selected</span>
+                </div>
+                <div class="flex items-center">
+                  <div
+                    class="w-6 h-6 bg-red-500 rounded border-2 border-red-600 mr-2"
+                  ></div>
+                  <span class="text-sm text-gray-700">Booked</span>
+                </div>
+                <div class="flex items-center">
+                  <div
+                    class="w-6 h-6 bg-yellow-500 rounded border-2 border-yellow-600 mr-2"
+                  ></div>
+                  <span class="text-sm text-gray-700">Reserved</span>
+                </div>
+              </div>
+
+              <!-- Bus Layout -->
+              <div
+                class="bg-gradient-to-b from-gray-100 to-gray-200 rounded-2xl p-6 max-w-md mx-auto border-2 border-gray-300"
+              >
+                <!-- Driver Section -->
+                <div
+                  class="bg-gray-300 text-gray-700 p-3 rounded-lg text-center mb-4 border border-gray-400"
+                >
+                  <i class="fas fa-steering-wheel mr-2"></i>Driver
+                </div>
+
+                <!-- Seat Map -->
+                <div class="space-y-2">
+                  {% for row in seat_layout %}
+                  <div class="flex justify-center items-center gap-3">
+                    {% for seat_group in row %}
+                    <div class="flex gap-2">
+                      {% for seat in seat_group %}
+                      <div
+                        class="seat w-10 h-10 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all duration-200 text-xs font-semibold hover:scale-105 transform {% if seat.is_booked %}bg-red-500 border-red-600 text-white cursor-not-allowed {% elif seat.is_reserved %}bg-yellow-500 border-yellow-600 text-white cursor-not-allowed {% else %}bg-green-500 border-green-600 text-white hover:bg-green-600{% endif %}"
+                        data-seat-id="{{ seat.id }}"
+                        data-seat-number="{{ seat.number }}"
+                        data-seat-type="{{ seat.seat_type }}"
+                        {%
+                        if
+                        not
+                        seat.is_booked
+                        and
+                        not
+                        seat.is_reserved
+                        %}onclick="toggleSeat(this)"
+                        {%
+                        endif
+                        %}
+                      >
+                        {{ seat.number }}
+                      </div>
+                      {% endfor %}
+                    </div>
+                    {% if not forloop.last and row|length > 1 %}
+                    <div class="w-8"></div>
+                    <!-- Aisle space -->
+                    {% endif %} {% endfor %}
+                  </div>
+                  {% endfor %}
+                </div>
+
+                <!-- Back Section -->
+                {% if back_row_seats %}
+                <div class="mt-4 pt-4 border-t border-gray-300">
+                  <div class="flex justify-center gap-2">
+                    {% for seat in back_row_seats %}
+                    <div
+                      class="seat w-10 h-10 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all duration-200 text-xs font-semibold hover:scale-105 transform {% if seat.is_booked %}bg-red-500 border-red-600 text-white cursor-not-allowed {% elif seat.is_reserved %}bg-yellow-500 border-yellow-600 text-white cursor-not-allowed {% else %}bg-green-500 border-green-600 text-white hover:bg-green-600{% endif %}"
+                      data-seat-id="{{ seat.id }}"
+                      data-seat-number="{{ seat.number }}"
+                      data-seat-type="{{ seat.seat_type }}"
+                      {%
+                      if
+                      not
+                      seat.is_booked
+                      and
+                      not
+                      seat.is_reserved
+                      %}onclick="toggleSeat(this)"
+                      {%
+                      endif
+                      %}
+                    >
+                      {{ seat.number }}
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Booking Summary -->
+        <div class="lg:col-span-1">
+          <div
+            class="bg-white rounded-xl shadow-lg overflow-hidden sticky top-4"
+          >
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+              <h3 class="text-xl font-semibold text-gray-800">
+                <i class="fas fa-receipt mr-2 text-green-500"></i>Booking
+                Summary
+              </h3>
+            </div>
+
+            <div class="p-6">
+              <div id="selectedSeatsDisplay" class="mb-6">
+                <h4 class="text-sm font-medium text-gray-700 mb-2">
+                  Selected Seats:
+                </h4>
+                <div id="seatsList" class="text-gray-500 text-sm">
+                  No seats selected
+                </div>
+              </div>
+
+              <div class="space-y-3 mb-6">
+                <div class="flex justify-between">
+                  <span class="text-sm text-gray-600">Base Fare per seat:</span>
+                  <span class="text-sm font-semibold"
+                    >रू{{ schedule.base_fare }}</span
+                  >
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm text-gray-600">Number of seats:</span>
+                  <span class="text-sm font-semibold" id="seatCount">0</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm text-gray-600">Subtotal:</span>
+                  <span class="text-sm font-semibold" id="subtotal">रू0</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm text-gray-600">Service charge:</span>
+                  <span class="text-sm font-semibold"
+                    >रू{{ service_charge|default:0 }}</span
+                  >
+                </div>
+                <hr class="border-gray-200" />
+                <div class="flex justify-between">
+                  <span class="text-lg font-semibold text-gray-800"
+                    >Total:</span
+                  >
+                  <span class="text-lg font-bold text-green-600" id="totalFare"
+                    >रू0</span
+                  >
+                </div>
+              </div>
+
+              <form
+                method="post"
+                action="{% url 'bookings:create_booking' %}"
+                id="seatSelectionForm"
+              >
+                {% csrf_token %}
+                <input
+                  type="hidden"
+                  name="schedule_id"
+                  value="{{ schedule.id }}"
+                />
+                <input
+                  type="hidden"
+                  name="travel_date"
+                  value="{{ travel_date }}"
+                />
+                <input
+                  type="hidden"
+                  name="selected_seats"
+                  id="selectedSeatsInput"
+                  value=""
+                />
+
+                <button
+                  type="submit"
+                  id="proceedBtn"
+                  disabled
+                  class="w-full bg-gradient-to-r from-green-600 to-emerald-700 text-white py-3 rounded-lg hover:from-green-700 hover:to-emerald-800 transition-all duration-200 transform hover:scale-105 font-medium disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  <i class="fas fa-arrow-right mr-2"></i>Proceed to Booking
+                </button>
+              </form>
+
+              <div class="mt-4 text-center">
+                <a
+                  href="{% url 'routes:route_search' %}"
+                  class="text-sm text-gray-500 hover:text-gray-700"
+                >
+                  <i class="fas fa-arrow-left mr-1"></i>Back to Search
                 </a>
+              </div>
             </div>
-        </div>
-    </div>
-</section>
+          </div>
 
-<!-- Seat Selection Content -->
-<section class="py-5">
-    <div class="container">
-        <!-- Journey Information -->
-        <div class="journey-info">
-            <div class="journey-route">
-                <span class="route-city">{{ schedule.route.source }}</span>
-                <i class="fas fa-arrow-right route-arrow"></i>
-                <span class="route-city">{{ schedule.route.destination }}</span>
-            </div>
-            
-            <div class="journey-details">
-                <div class="detail-item">
-                    <div class="detail-label">Bus Number</div>
-                    <div class="detail-value">{{ schedule.bus.bus_number }}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Bus Type</div>
-                    <div class="detail-value">{{ schedule.bus.bus_type.name }}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Departure</div>
-                    <div class="detail-value">{{ schedule.departure_time|time:"g:i A" }}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Arrival</div>
-                    <div class="detail-value">{{ schedule.arrival_time|time:"g:i A" }}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Duration</div>
-                    <div class="detail-value">{{ schedule.journey_duration }}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Travel Date</div>
-                    <div class="detail-value">{{ travel_date|date:"l, M d, Y" }}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Fare per Seat</div>
-                    <div class="detail-value">रू {{ schedule.base_fare }}</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Seat Selection Tips -->
-        <div class="seat-selection-tips">
-            <div class="tips-title"><i class="fas fa-lightbulb me-1"></i>Seat Selection Tips</div>
-            <ul class="tips-list">
-                <li>Front seats offer better views and less motion</li>
-                <li>Window seats are great for scenic routes</li>
-                <li>Aisle seats provide easier access to facilities</li>
-                <li>Seats near the middle have the smoothest ride</li>
+          <!-- Seat Selection Tips -->
+          <div class="bg-blue-50 rounded-xl p-6 mt-6 border border-blue-200">
+            <h4 class="text-sm font-semibold text-blue-800 mb-3">
+              <i class="fas fa-lightbulb mr-2"></i>Seat Selection Tips
+            </h4>
+            <ul class="text-xs text-blue-700 space-y-2">
+              <li class="flex items-start">
+                <i class="fas fa-check-circle mr-2 mt-0.5 text-blue-600"></i>
+                <span>Window seats offer scenic views</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fas fa-check-circle mr-2 mt-0.5 text-blue-600"></i>
+                <span>Aisle seats provide easy access</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fas fa-check-circle mr-2 mt-0.5 text-blue-600"></i>
+                <span>Front seats have less vibration</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fas fa-check-circle mr-2 mt-0.5 text-blue-600"></i>
+                <span>Select seats together for groups</span>
+              </li>
             </ul>
+          </div>
         </div>
-        
-        <div class="row">
-            <!-- Seat Map -->
-            <div class="col-lg-8">
-                <div class="bus-layout">
-                    <h4 class="text-center mb-4"><i class="fas fa-bus me-2"></i>{{ schedule.bus.bus_number }} - Seat Layout</h4>
-                    
-                    <form method="post" id="seatSelectionForm">
-                        {% csrf_token %}
-                        <input type="hidden" name="selected_seats" id="selectedSeatsInput">
-                        
-                        <div class="seat-map">
-                            <!-- Driver Section -->
-                            <div class="driver-section">
-                                <div style="font-size: 0.8rem; opacity: 0.9; margin-bottom: 0.3rem;">
-                                    <i class="fas fa-route me-1"></i>{{ schedule.route.origin.name }} → {{ schedule.route.destination.name }}
-                                </div>
-                                <div class="driver-content d-flex align-items-center justify-content-end">
-                    <strong class="driver-label me-2">Driver</strong>
-                    <i class="fas fa-steering-wheel driver-icon"></i>
-                </div>
-                            </div>
-                            
-                            <!-- Seat Rows -->
-                            {% for row in seat_layout %}
-                                {% if row.last_row_seats %}
-                                    <!-- Last row with 5 seats -->
-                                    <div class="seat-row last-row">
-                                        {% for seat in row.last_row_seats %}
-                                        <div class="seat {{ seat.status }}" 
-                                             data-seat-id="{{ seat.id }}" 
-                                             data-seat-number="{{ seat.seat_number }}"
-                                             {% if seat.status == 'available' %}onclick="toggleSeat(this)"{% endif %}
-                                             title="{{ seat.seat_number }}">
-                                            <span class="seat-number">{{ seat.seat_number }}</span>
-                                        </div>
-                                        {% endfor %}
-                                    </div>
-                                {% else %}
-                                    <!-- Regular 2x2 row -->
-                                    <div class="seat-row">
-                                        <div class="seat-group">
-                                            {% for seat in row.left_seats %}
-                                            <div class="seat {{ seat.status }}" 
-                                                 data-seat-id="{{ seat.id }}" 
-                                                 data-seat-number="{{ seat.seat_number }}"
-                                                 {% if seat.status == 'available' %}onclick="toggleSeat(this)"{% endif %}
-                                                 title="{{ seat.seat_number }}">
-                                                <span class="seat-number">{{ seat.seat_number }}</span>
-                                            </div>
-                                            {% endfor %}
-                                        </div>
-                                        
-                                        <div class="aisle">
-                                            <i class="fas fa-arrows-alt-h"></i>
-                                        </div>
-                                        
-                                        <div class="seat-group">
-                                            {% for seat in row.right_seats %}
-                                            <div class="seat {{ seat.status }}" 
-                                                 data-seat-id="{{ seat.id }}" 
-                                                 data-seat-number="{{ seat.seat_number }}"
-                                                 {% if seat.status == 'available' %}onclick="toggleSeat(this)"{% endif %}
-                                                 title="{{ seat.seat_number }}">
-                                                <span class="seat-number">{{ seat.seat_number }}</span>
-                                            </div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                        
-                        <!-- Seat Legend -->
-                        <div class="seat-legend">
-                            <div class="legend-item">
-                                <div class="legend-seat" style="background: linear-gradient(145deg, #d4edda 0%, #c3e6cb 100%); border-color: #28a745;">
-                                    <div style="position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 16px; height: 3px; background: #28a745; border-radius: 1px;"></div>
-                                </div>
-                                <span>Available</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-seat" style="background: linear-gradient(145deg, #ffc107 0%, #e0a800 100%); border-color: #ffc107;">
-                                    <div style="position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 16px; height: 3px; background: #ffffff; border-radius: 1px; box-shadow: 0 0 6px rgba(255,255,255,0.8);"></div>
-                                </div>
-                                <span>Selected</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-seat" style="background: linear-gradient(145deg, #dc3545 0%, #c82333 100%); border-color: #dc3545;">
-                                    <div style="position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 16px; height: 3px; background: #c82333; border-radius: 1px;"></div>
-                                </div>
-                                <span>Booked</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-seat" style="background: linear-gradient(145deg, #fff3cd 0%, #ffeaa7 100%); border-color: #ffc107; opacity: 0.8;">
-                                    <div style="position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 16px; height: 3px; background: #ffc107; border-radius: 1px;"></div>
-                                </div>
-                                <span>Reserved</span>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            
-            <!-- Booking Summary -->
-            <div class="col-lg-4">
-                <div class="booking-summary">
-                    <h5 class="mb-3"><i class="fas fa-receipt me-2"></i>Booking Summary</h5>
-                    
-                    <!-- Selected Seats -->
-                    <div class="selected-seats">
-                        <h6 class="mb-2">Selected Seats:</h6>
-                        <div id="selectedSeatsDisplay">
-                            <span class="text-muted">No seats selected</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Summary Items -->
-                    <div class="summary-item">
-                        <span>Base Fare (per seat):</span>
-                        <span>रू {{ schedule.base_fare }}</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Number of Seats:</span>
-                        <span id="seatCount">0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Subtotal:</span>
-                        <span id="subtotal">रू 0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Service Fee:</span>
-                        <span id="serviceFee">रू 0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Total Amount:</span>
-                        <span id="totalAmount">रू 0</span>
-                    </div>
-                    
-                    <!-- Proceed Button -->
-                    <button type="submit" form="seatSelectionForm" class="btn-proceed" id="proceedBtn" disabled>
-                        <i class="fas fa-arrow-right me-2"></i>Proceed to Payment
-                    </button>
-                    
-                    <!-- Additional Info -->
-                    <div class="mt-3">
-                        <small class="text-muted">
-                            <i class="fas fa-info-circle me-1"></i>
-                            Seats will be held for 10 minutes during payment process
-                        </small>
-                    </div>
-                    
-                    <!-- Bus Amenities -->
-                    {% if schedule.bus.amenities.all %}
-                    <div class="mt-3">
-                        <h6>Bus Amenities:</h6>
-                        <div class="d-flex flex-wrap gap-1">
-                            {% for amenity in schedule.bus.amenities.all %}
-                            <span class="badge bg-secondary">{{ amenity.name }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
 </section>
-{% endblock %}
-
-{% block extra_js %}
+{% endblock %} {% block extra_js %}
 <script>
-    let selectedSeats = [];
-    const baseFare = {{ schedule.base_fare }};
-    const serviceFeeRate = 0.02; // 2% service fee
-    
-    function toggleSeat(seatElement) {
-        const seatId = seatElement.getAttribute('data-seat-id');
-        const seatNumber = seatElement.getAttribute('data-seat-number');
-        
-        // Check if seat is booked or reserved
-        if (seatElement.classList.contains('booked') || seatElement.classList.contains('reserved')) {
-            return;
-        }
-        
-        if (seatElement.classList.contains('selected')) {
-            // Deselect seat
-            seatElement.classList.remove('selected');
-            seatElement.classList.add('available');
-            selectedSeats = selectedSeats.filter(seat => seat.id !== seatId);
-        } else {
-            // Check if seat is already selected (prevent duplicates)
-            const alreadySelected = selectedSeats.find(seat => seat.id === seatId);
-            if (alreadySelected) {
-                return;
-            }
-            
-            // Select seat (limit to 6 seats)
-            if (selectedSeats.length >= 6) {
-                alert('You can select maximum 6 seats at a time.');
-                return;
-            }
-            
-            seatElement.classList.remove('available');
-            seatElement.classList.add('selected');
-            selectedSeats.push({
-                id: seatId,
-                number: seatNumber
-            });
-        }
-        
-        updateBookingSummary();
-    }
-    
-    function updateBookingSummary() {
-        const seatCount = selectedSeats.length;
-        const subtotal = seatCount * baseFare;
-        const serviceFee = Math.round(subtotal * serviceFeeRate);
-        const total = subtotal + serviceFee;
-        
-        // Update seat count
-        document.getElementById('seatCount').textContent = seatCount;
-        
-        // Update amounts
-        document.getElementById('subtotal').textContent = `रू ${subtotal}`;
-        document.getElementById('serviceFee').textContent = `रू ${serviceFee}`;
-        document.getElementById('totalAmount').textContent = `रू ${total}`;
-        
-        // Update selected seats display
-        const selectedSeatsDisplay = document.getElementById('selectedSeatsDisplay');
-        if (seatCount > 0) {
-            const seatTags = selectedSeats.map(seat => 
-                `<span class="seat-tag">${seat.number}</span>`
-            ).join('');
-            selectedSeatsDisplay.innerHTML = seatTags;
-        } else {
-            selectedSeatsDisplay.innerHTML = '<span class="text-muted">No seats selected</span>';
-        }
-        
-        // Update hidden input
-        document.getElementById('selectedSeatsInput').value = selectedSeats.map(seat => seat.id).join(',');
-        
-        // Enable/disable proceed button
-        const proceedBtn = document.getElementById('proceedBtn');
-        if (seatCount > 0) {
-            proceedBtn.disabled = false;
-            proceedBtn.innerHTML = '<i class="fas fa-arrow-right me-2"></i>Proceed to Payment';
-        } else {
-            proceedBtn.disabled = true;
-            proceedBtn.innerHTML = '<i class="fas fa-chair me-2"></i>Select Seats to Continue';
-        }
-    }
-    
-    // Form submission
-    document.getElementById('seatSelectionForm').addEventListener('submit', function(e) {
-        if (selectedSeats.length === 0) {
-            e.preventDefault();
-            alert('Please select at least one seat.');
-            return;
-        }
-        
-        // Ensure the hidden input is updated with latest selection
-        document.getElementById('selectedSeatsInput').value = selectedSeats.map(seat => seat.id).join(',');
-        
-        // Add loading state
-        const proceedBtn = document.getElementById('proceedBtn');
-        proceedBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
-        proceedBtn.disabled = true;
-        
-        // Save current selection to localStorage
-        saveToLocalStorage();
-    });
-    
-    // Auto-save selected seats to localStorage
-    function saveToLocalStorage() {
-        localStorage.setItem('selectedSeats_{{ schedule.id }}', JSON.stringify(selectedSeats));
-    }
-    
-    function loadFromLocalStorage() {
-        const saved = localStorage.getItem('selectedSeats_{{ schedule.id }}');
-        if (saved) {
-            const savedSeats = JSON.parse(saved);
-            savedSeats.forEach(seat => {
-                const seatElement = document.querySelector(`[data-seat-id="${seat.id}"]`);
-                if (seatElement && !seatElement.classList.contains('booked') && !seatElement.classList.contains('reserved')) {
-                    seatElement.classList.add('selected');
-                    seatElement.classList.remove('available');
-                    selectedSeats.push(seat);
-                }
-            });
-            updateBookingSummary();
-        }
-    }
-    
-    // Load saved seats on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        // First, handle preselected seats from backend (form validation errors)
-        const preselectedSeatIds = {{ preselected_seat_ids|default:'[]' }};
-        if (preselectedSeatIds.length > 0) {
-            preselectedSeatIds.forEach(seatId => {
-                const seatElement = document.querySelector(`[data-seat-id="${seatId}"]`);
-                if (seatElement && !seatElement.classList.contains('booked') && !seatElement.classList.contains('reserved')) {
-                    const seatNumber = seatElement.getAttribute('data-seat-number');
-                    seatElement.classList.remove('available');
-                    seatElement.classList.add('selected');
-                    selectedSeats.push({
-                        id: seatId.toString(),
-                        number: seatNumber
-                    });
-                }
-            });
-            updateBookingSummary();
-            saveToLocalStorage();
-        } else {
-            // If no preselected seats, load from localStorage
-            loadFromLocalStorage();
-        }
-        
-        // Save seats whenever selection changes
-        const originalToggleSeat = toggleSeat;
-        toggleSeat = function(seatElement) {
-            originalToggleSeat(seatElement);
-            saveToLocalStorage();
-        };
-    });
-    
-    // Clear localStorage on successful booking or when no seats selected
-    window.addEventListener('beforeunload', function() {
-        if (selectedSeats.length === 0) {
-            localStorage.removeItem('selectedSeats_{{ schedule.id }}');
-        }
-    });
-    
-    // Function to clear localStorage (can be called from other pages)
-    window.clearSeatSelection = function() {
-        localStorage.removeItem('selectedSeats_{{ schedule.id }}');
-    };
-    
-    // Clear localStorage if coming from a successful booking
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('booking_success') === 'true') {
-        localStorage.removeItem('selectedSeats_{{ schedule.id }}');
-    }
-    
-    // Add keyboard navigation
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            // Clear all selections
-            selectedSeats.forEach(seat => {
-                const seatElement = document.querySelector(`[data-seat-id="${seat.id}"]`);
-                if (seatElement) {
-                    seatElement.classList.remove('selected');
-                }
-            });
-            selectedSeats = [];
-            updateBookingSummary();
-            saveToLocalStorage();
-        }
-    });
+  let selectedSeats = [];
+  const baseFare = {{ schedule.base_fare }};
+  const serviceCharge = {{ service_charge|default:0 }};
+
+  function toggleSeat(seatElement) {
+      const seatId = seatElement.getAttribute('data-seat-id');
+      const seatNumber = seatElement.getAttribute('data-seat-number');
+      const seatType = seatElement.getAttribute('data-seat-type');
+
+      if (seatElement.classList.contains('bg-red-500') || seatElement.classList.contains('bg-yellow-500')) {
+          return; // Can't select booked or reserved seats
+      }
+
+      if (seatElement.classList.contains('bg-blue-500')) {
+          // Deselect seat
+          seatElement.classList.remove('bg-blue-500', 'border-blue-600');
+          seatElement.classList.add('bg-green-500', 'border-green-600');
+
+          selectedSeats = selectedSeats.filter(seat => seat.id !== seatId);
+      } else {
+          // Select seat
+          seatElement.classList.remove('bg-green-500', 'border-green-600');
+          seatElement.classList.add('bg-blue-500', 'border-blue-600');
+
+          selectedSeats.push({
+              id: seatId,
+              number: seatNumber,
+              type: seatType
+          });
+      }
+
+      updateBookingSummary();
+  }
+
+  function updateBookingSummary() {
+      const seatsList = document.getElementById('seatsList');
+      const seatCount = document.getElementById('seatCount');
+      const subtotal = document.getElementById('subtotal');
+      const totalFare = document.getElementById('totalFare');
+      const proceedBtn = document.getElementById('proceedBtn');
+      const selectedSeatsInput = document.getElementById('selectedSeatsInput');
+
+      if (selectedSeats.length === 0) {
+          seatsList.textContent = 'No seats selected';
+          seatsList.className = 'text-gray-500 text-sm';
+          seatCount.textContent = '0';
+          subtotal.textContent = 'रू0';
+          totalFare.textContent = 'रू0';
+          proceedBtn.disabled = true;
+          selectedSeatsInput.value = '';
+      } else {
+          const seatNumbers = selectedSeats.map(seat => seat.number).sort((a, b) => a - b);
+          seatsList.innerHTML = seatNumbers.map(num =>
+              `<span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium mr-1 mb-1">${num}</span>`
+          ).join('');
+          seatsList.className = 'text-gray-800 text-sm';
+
+          const count = selectedSeats.length;
+          const subtotalAmount = count * baseFare;
+          const totalAmount = subtotalAmount + serviceCharge;
+
+          seatCount.textContent = count;
+          subtotal.textContent = `रू${subtotalAmount}`;
+          totalFare.textContent = `रू${totalAmount}`;
+          proceedBtn.disabled = false;
+          selectedSeatsInput.value = selectedSeats.map(seat => seat.id).join(',');
+      }
+  }
+
+  // Form submission
+  document.getElementById('seatSelectionForm').addEventListener('submit', function(e) {
+      if (selectedSeats.length === 0) {
+          e.preventDefault();
+          alert('Please select at least one seat.');
+          return;
+      }
+
+      // Ensure the hidden input is updated with latest selection
+      document.getElementById('selectedSeatsInput').value = selectedSeats.map(seat => seat.id).join(',');
+
+      // Add loading state
+      const proceedBtn = document.getElementById('proceedBtn');
+      proceedBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+      proceedBtn.disabled = true;
+
+      // Save current selection to localStorage
+      saveToLocalStorage();
+  });
+
+  // Auto-save selected seats to localStorage
+  function saveToLocalStorage() {
+      localStorage.setItem('selectedSeats_{{ schedule.id }}', JSON.stringify(selectedSeats));
+  }
+
+  function loadFromLocalStorage() {
+      const saved = localStorage.getItem('selectedSeats_{{ schedule.id }}');
+      if (saved) {
+          const savedSeats = JSON.parse(saved);
+          savedSeats.forEach(seat => {
+              const seatElement = document.querySelector(`[data-seat-id="${seat.id}"]`);
+              if (seatElement && !seatElement.classList.contains('bg-red-500') && !seatElement.classList.contains('bg-yellow-500')) {
+                  seatElement.classList.remove('bg-green-500', 'border-green-600');
+                  seatElement.classList.add('bg-blue-500', 'border-blue-600');
+                  selectedSeats.push(seat);
+              }
+          });
+          updateBookingSummary();
+      }
+  }
+
+  // Load saved seats on page load
+  document.addEventListener('DOMContentLoaded', function() {
+      // First, handle preselected seats from backend (form validation errors)
+      const preselectedSeatIds = {{ preselected_seat_ids|default:'[]' }};
+      if (preselectedSeatIds.length > 0) {
+          preselectedSeatIds.forEach(seatId => {
+              const seatElement = document.querySelector(`[data-seat-id="${seatId}"]`);
+              if (seatElement && !seatElement.classList.contains('bg-red-500') && !seatElement.classList.contains('bg-yellow-500')) {
+                  const seatNumber = seatElement.getAttribute('data-seat-number');
+                  const seatType = seatElement.getAttribute('data-seat-type');
+                  seatElement.classList.remove('bg-green-500', 'border-green-600');
+                  seatElement.classList.add('bg-blue-500', 'border-blue-600');
+                  selectedSeats.push({
+                      id: seatId.toString(),
+                      number: seatNumber,
+                      type: seatType
+                  });
+              }
+          });
+          updateBookingSummary();
+          saveToLocalStorage();
+      } else {
+          // If no preselected seats, load from localStorage
+          loadFromLocalStorage();
+      }
+
+      // Add smooth animations to seats
+      const seats = document.querySelectorAll('.seat');
+      seats.forEach((seat, index) => {
+          seat.style.opacity = '0';
+          seat.style.transform = 'scale(0.8)';
+
+          setTimeout(() => {
+              seat.style.transition = 'all 0.3s ease';
+              seat.style.opacity = '1';
+              seat.style.transform = 'scale(1)';
+          }, index * 50);
+      });
+  });
+
+  // Clear localStorage on successful booking or when no seats selected
+  window.addEventListener('beforeunload', function() {
+      if (selectedSeats.length === 0) {
+          localStorage.removeItem('selectedSeats_{{ schedule.id }}');
+      }
+  });
+
+  // Function to clear localStorage (can be called from other pages)
+  window.clearSeatSelection = function() {
+      localStorage.removeItem('selectedSeats_{{ schedule.id }}');
+  };
+
+  // Clear localStorage if coming from a successful booking
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('booking_success') === 'true') {
+      localStorage.removeItem('selectedSeats_{{ schedule.id }}');
+  }
+
+  // Add keyboard navigation
+  document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+          // Clear all selections
+          selectedSeats.forEach(seat => {
+              const seatElement = document.querySelector(`[data-seat-id="${seat.id}"]`);
+              if (seatElement) {
+                  seatElement.classList.remove('bg-blue-500', 'border-blue-600');
+                  seatElement.classList.add('bg-green-500', 'border-green-600');
+              }
+          });
+          selectedSeats = [];
+          updateBookingSummary();
+          saveToLocalStorage();
+      }
+  });
 </script>
 {% endblock %}

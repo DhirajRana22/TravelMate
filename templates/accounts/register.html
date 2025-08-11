@@ -1,887 +1,638 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} {% load static %} {% block title %}Register -
+TravelMate{% endblock %} {% block content %}
+<div
+  class="min-h-screen bg-gradient-to-br from-blue-600 via-purple-700 to-indigo-800 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 -mt-6"
+>
+  <!-- Background Pattern -->
+  <div class="absolute inset-0 bg-black bg-opacity-20">
+    <div
+      class="absolute inset-0 animate-pulse"
+      style="
+        background-image: radial-gradient(
+          circle at 1px 1px,
+          rgba(255, 255, 255, 0.1) 1px,
+          transparent 0
+        );
+        background-size: 20px 20px;
+      "
+    ></div>
+    <div
+      class="absolute top-1/4 left-1/4 w-64 h-64 bg-white bg-opacity-5 rounded-full blur-3xl animate-float"
+    ></div>
+    <div
+      class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-300 bg-opacity-10 rounded-full blur-3xl animate-float-delayed"
+    ></div>
+  </div>
 
-{% block title %}Register - TravelMate{% endblock %}
-
-{% block extra_css %}
-<style>
-    .register-container {
-        min-height: 100vh;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem 1rem;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .register-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: 
-            radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%),
-            url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
-        animation: float 6s ease-in-out infinite;
-        pointer-events: none;
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
-    }
-    
-    .register-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: 28px;
-        box-shadow: 
-            0 32px 64px rgba(0, 0, 0, 0.15),
-            0 16px 32px rgba(0, 0, 0, 0.1),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9),
-            0 0 0 1px rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        position: relative;
-        z-index: 1;
-        max-width: 520px;
-        width: 100%;
-        overflow: hidden;
-    }
-    
-    .register-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%, #f093fb 100%, #f5576c 100%);
-        color: white;
-        padding: 3rem 2rem 2.5rem;
-        text-align: center;
-        position: relative;
-        margin: -1px -1px 0 -1px;
-        border-radius: 28px 28px 0 0;
-    }
-    
-    .register-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 6px;
-        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
-        border-radius: 28px 28px 0 0;
-    }
-    
-    .register-header::after {
-        content: '';
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        right: 0;
-        height: 40px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        clip-path: polygon(0 0, 100% 0, 100% 60%, 0 100%);
-    }
-    
-    .register-header h2 {
-        font-size: 2.25rem;
-        font-weight: 800;
-        margin-bottom: 0.75rem;
-        letter-spacing: -0.025em;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    
-    .register-header p {
-        opacity: 0.95;
-        font-size: 1.1rem;
-        margin: 0;
-        font-weight: 500;
-    }
-    
-    .register-body {
-        padding: 3rem 2.5rem 2.5rem;
-        background: rgba(255, 255, 255, 0.02);
-    }
-    
-    .form-group {
-        margin-bottom: 1.5rem;
-        position: relative;
-    }
-    
-    .form-control {
-        height: 60px;
-        padding: 1.25rem 1.25rem;
-        border: 2px solid #e2e8f0;
-        border-radius: 18px;
-        background: linear-gradient(145deg, #f8fafc 0%, #ffffff 100%);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        font-size: 1rem;
-        font-weight: 500;
-        color: #2d3748;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
-    }
-    
-    .form-control:focus {
-        border-color: #667eea;
-        background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-        box-shadow: 
-            0 0 0 4px rgba(102, 126, 234, 0.12),
-            0 8px 24px rgba(102, 126, 234, 0.08),
-            inset 0 2px 4px rgba(0, 0, 0, 0.02);
-        outline: none;
-        transform: translateY(-2px);
-    }
-    
-    .form-control::placeholder {
-        color: #a0aec0;
-        font-weight: 400;
-    }
-    
-    .form-label {
-        font-weight: 700;
-        color: #2d3748;
-        margin-bottom: 0.75rem;
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 0.75px;
-        display: flex;
-        align-items: center;
-    }
-    
-    .form-label i {
-        color: #667eea;
-        margin-right: 0.75rem;
-        font-size: 1.1rem;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    
-    .input-group {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-    
-    .input-group .form-control {
-        padding-right: 4rem;
-    }
-    
-    .password-toggle {
-        position: absolute;
-        right: 1.25rem;
-        top: 50%;
-        transform: translateY(-50%);
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-        border: 2px solid #e2e8f0;
-        color: #667eea;
-        cursor: pointer;
-        padding: 0.75rem;
-        border-radius: 12px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 10;
-        width: 44px;
-        height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-    
-    .password-toggle:hover {
-        color: white;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-color: #667eea;
-        transform: translateY(-50%) scale(1.05);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
-    }
-    
-    .password-toggle:focus {
-        outline: none;
-        color: white;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-color: #667eea;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
-    }
-    
-    .password-toggle:active {
-        transform: translateY(-50%) scale(0.95);
-    }
-    
-    .btn-register {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        border: none;
-        border-radius: 18px;
-        padding: 1.25rem 2.5rem;
-        font-weight: 800;
-        font-size: 1.1rem;
-        color: white;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-        text-transform: none;
-        letter-spacing: 0.025em;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    }
-    
-    .btn-register::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, transparent 100%);
-        opacity: 0;
-        transition: opacity 0.4s ease;
-    }
-    
-    .btn-register:hover::before {
-        opacity: 1;
-    }
-    
-    .btn-register:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 16px 32px rgba(102, 126, 234, 0.35);
-        background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 50%, #ec4899 100%);
-    }
-    
-    .btn-register:active {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
-    }
-    
-    .login-link {
-        text-align: center;
-        margin-top: 2.5rem;
-        padding-top: 2rem;
-        border-top: 2px solid #e2e8f0;
-        position: relative;
-    }
-    
-    .login-link::before {
-        content: '';
-        position: absolute;
-        top: -1px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60px;
-        height: 2px;
-        background: linear-gradient(90deg, #667eea, #764ba2);
-        border-radius: 1px;
-    }
-    
-    .login-link p {
-        color: #718096;
-        margin: 0;
-        font-size: 1rem;
-        font-weight: 500;
-    }
-    
-    .login-link a {
-        color: #667eea;
-        text-decoration: none;
-        font-weight: 700;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        position: relative;
-    }
-    
-    .login-link a::after {
-        content: '';
-        position: absolute;
-        bottom: -2px;
-        left: 0;
-        width: 0;
-        height: 2px;
-        background: linear-gradient(90deg, #667eea, #764ba2);
-        transition: width 0.3s ease;
-    }
-    
-    .login-link a:hover {
-        transform: translateY(-1px);
-    }
-    
-    .login-link a:hover::after {
-        width: 100%;
-    }
-    
-    .error-message {
-        background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
-        color: #c53030;
-        padding: 1rem 1.25rem;
-        border-radius: 16px;
-        margin-top: 0.75rem;
-        font-size: 0.9rem;
-        font-weight: 600;
-        border: 2px solid #fc8181;
-        display: flex;
-        align-items: center;
-        box-shadow: 0 4px 12px rgba(197, 48, 48, 0.15);
-        backdrop-filter: blur(10px);
-        animation: slideIn 0.3s ease-out;
-    }
-    
-    .error-message::before {
-        content: '⚠️';
-        margin-right: 0.75rem;
-        font-size: 1.1rem;
-        background: linear-gradient(135deg, #e53e3e, #c53030);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .success-message {
-        background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
-        color: #2f855a;
-        padding: 1rem 1.25rem;
-        border-radius: 16px;
-        margin-top: 0.75rem;
-        font-size: 0.9rem;
-        font-weight: 600;
-        border: 2px solid #68d391;
-        display: flex;
-        align-items: center;
-        box-shadow: 0 4px 12px rgba(47, 133, 90, 0.15);
-        backdrop-filter: blur(10px);
-        animation: slideIn 0.3s ease-out;
-    }
-    
-    .success-message::before {
-        content: '✅';
-        margin-right: 0.75rem;
-        font-size: 1.1rem;
-        background: linear-gradient(135deg, #38a169, #2f855a);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    
-    /* Success feedback styling */
-    .form-control.is-valid {
-        border-color: #38a169;
-        background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
-        box-shadow: 
-            0 0 0 4px rgba(56, 161, 105, 0.15),
-            0 4px 12px rgba(56, 161, 105, 0.1),
-            inset 0 2px 4px rgba(56, 161, 105, 0.05);
-        transform: translateY(-1px);
-    }
-    
-    .form-control.is-invalid {
-        border-color: #e53e3e;
-        background: linear-gradient(135deg, #fffaf0 0%, #fed7d7 100%);
-        box-shadow: 
-            0 0 0 4px rgba(229, 62, 62, 0.15),
-            0 4px 12px rgba(229, 62, 62, 0.1),
-            inset 0 2px 4px rgba(229, 62, 62, 0.05);
-        animation: shake 0.5s ease-in-out;
-    }
-    
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-4px); }
-        75% { transform: translateX(4px); }
-    }
-    
-    .form-text {
-        font-size: 0.9rem;
-        color: #718096;
-        margin-top: 0.75rem;
-        font-weight: 500;
-        padding: 0.5rem 0.75rem;
-        background: rgba(113, 128, 150, 0.05);
-        border-radius: 12px;
-        border-left: 3px solid #cbd5e0;
-    }
-    
-    /* Loading state for submit button */
-    .btn-register:disabled {
-        background: #6c757d;
-        cursor: not-allowed;
-        transform: none;
-    }
-    
-    .btn-register:disabled:hover {
-        background: #6c757d;
-        transform: none;
-        box-shadow: none;
-    }
-    
-    .loading-spinner {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top-color: #fff;
-        animation: spin 1s ease-in-out infinite;
-        margin-right: 0.5rem;
-    }
-    
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-    
-    /* Enhanced focus states */
-    .form-floating.focused > .form-control {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.12), 0 4px 16px rgba(102, 126, 234, 0.08);
-    }
-    
-    /* Smooth transitions for all interactive elements */
-    * {
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
-    
-    .form-floating > .form-control,
-    .form-floating > label,
-    .btn-register {
-        will-change: transform, box-shadow, border-color;
-    }
-    
-    .form-text {
-        font-size: 0.875rem;
-        color: #6c757d;
-        margin-top: 0.5rem;
-    }
-    
-    /* Loading state styling */
-    .btn-register.loading {
-        pointer-events: none;
-        opacity: 0.8;
-    }
-    
-    .btn-register.loading::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 20px;
-        height: 20px;
-        border: 2px solid transparent;
-        border-top: 2px solid white;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-        0% { transform: translate(-50%, -50%) rotate(0deg); }
-        100% { transform: translate(-50%, -50%) rotate(360deg); }
-    }
-    
-    /* Enhanced focus states */
-    .form-control:focus + .form-label,
-    .form-control:not(:placeholder-shown) + .form-label {
-        transform: translateY(-8px) scale(0.85);
-        color: #667eea;
-    }
-    
-    @media (max-width: 768px) {
-        .register-container {
-            padding: 1rem;
-            min-height: 100vh;
-        }
-        
-        .register-card {
-            margin: 0;
-            border-radius: 20px;
-        }
-        
-        .register-body {
-            padding: 2.5rem 1.5rem;
-        }
-        
-        .register-header {
-            padding: 2.5rem 1.5rem;
-        }
-        
-        .register-header h2 {
-            font-size: 1.875rem;
-        }
-        
-        .form-control {
-            height: 56px;
-            font-size: 16px; /* Prevents zoom on iOS */
-            padding: 1rem 1rem;
-        }
-        
-        .btn-register {
-            height: 56px;
-            font-size: 1rem;
-            padding: 1rem 2rem;
-        }
-        
-        .password-toggle {
-            width: 40px;
-            height: 40px;
-            right: 1rem;
-        }
-        
-        .row {
-            margin: 0;
-        }
-        
-        .col-md-6 {
-            padding: 0;
-        }
-        
-        .col-md-6:first-child {
-            margin-bottom: 1rem;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .register-container {
-            padding: 0.5rem;
-        }
-        
-        .register-body {
-            padding: 2rem 1.25rem;
-        }
-        
-        .register-header {
-            padding: 2rem 1.25rem;
-        }
-        
-        .register-header h2 {
-            font-size: 1.75rem;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="register-container">
-    <div class="register-card">
-        <div class="register-header">
-            <h2><i class="fas fa-user-plus me-2"></i>Create Account</h2>
-            <p>Join TravelMate for seamless bus booking</p>
+  <div class="max-w-lg w-full space-y-8 relative z-10">
+    <!-- Register Card -->
+    <div
+      class="bg-white bg-opacity-95 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-white border-opacity-20"
+    >
+      <!-- Header -->
+      <div
+        class="bg-gradient-to-r from-blue-600 via-purple-700 to-pink-600 px-8 py-12 text-center text-white relative"
+      >
+        <div class="absolute inset-0 bg-black bg-opacity-10"></div>
+        <div
+          class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+        ></div>
+        <div class="relative z-10">
+          <div
+            class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <i class="fas fa-user-plus text-3xl"></i>
+          </div>
+          <h2 class="text-3xl font-bold mb-2">Join TravelMate</h2>
+          <p class="text-blue-100">
+            Create your account and start your journey
+          </p>
         </div>
-        <div class="register-body">
-            <form method="post">
-                {% csrf_token %}
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="{{ form.first_name.id_for_label }}" class="form-label">
-                                <i class="fas fa-user"></i>First Name
-                            </label>
-                            {{ form.first_name }}
-                            {% if form.first_name.errors %}
-                                <div class="error-message">
-                                    {{ form.first_name.errors.0 }}
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="{{ form.last_name.id_for_label }}" class="form-label">
-                                <i class="fas fa-user"></i>Last Name
-                            </label>
-                            {{ form.last_name }}
-                            {% if form.last_name.errors %}
-                                <div class="error-message">
-                                    {{ form.last_name.errors.0 }}
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                            
-                <div class="form-group">
-                    <label for="{{ form.phone_number.id_for_label }}" class="form-label">
-                        <i class="fas fa-phone"></i>Phone Number
-                    </label>
-                    {{ form.phone_number }}
-                    {% if form.phone_number.errors %}
-                        <div class="error-message">
-                            {{ form.phone_number.errors.0 }}
-                        </div>
-                    {% endif %}
-                </div>
-                
-                <div class="form-group">
-                    <label for="{{ form.email.id_for_label }}" class="form-label">
-                        <i class="fas fa-envelope"></i>Email Address
-                    </label>
-                    {{ form.email }}
-                    {% if form.email.errors %}
-                        <div class="error-message">
-                            {{ form.email.errors.0 }}
-                        </div>
-                    {% endif %}
-                </div>
-                
-                <div class="form-group">
-                    <label for="{{ form.password1.id_for_label }}" class="form-label">
-                        <i class="fas fa-lock"></i>Password
-                    </label>
-                    <div class="input-group">
-                        {{ form.password1 }}
-                        <button type="button" class="password-toggle" data-target="#{{ form.password1.id_for_label }}">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    {% if form.password1.errors %}
-                        <div class="error-message">
-                            {{ form.password1.errors.0 }}
-                        </div>
-                    {% endif %}
-                </div>
-                
-                <div class="form-group">
-                    <label for="{{ form.password2.id_for_label }}" class="form-label">
-                        <i class="fas fa-lock"></i>Confirm Password
-                    </label>
-                    {{ form.password2 }}
-                    {% if form.password2.errors %}
-                        <div class="error-message">
-                            {{ form.password2.errors.0 }}
-                        </div>
-                    {% endif %}
-                </div>
-                            
-                {% if form.non_field_errors %}
-                    <div class="error-message">
-                        {{ form.non_field_errors.0 }}
-                    </div>
-                {% endif %}
-                
-                <button type="submit" class="btn btn-primary btn-register w-100">
-                    <i class="fas fa-user-plus me-2"></i>Create Account
-                </button>
-            </form>
-            
-            <div class="login-link">
-                <p>Already have an account? <a href="{% url 'accounts:login' %}">Sign In</a></p>
+        <!-- Decorative bottom curve -->
+        <div
+          class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-r from-blue-600 via-purple-700 to-pink-600"
+          style="clip-path: polygon(0 0, 100% 0, 100% 60%, 0 100%)"
+        ></div>
+      </div>
+
+      <!-- Form Body -->
+      <div class="px-8 py-8">
+        <form method="post" class="space-y-6" id="registerForm">
+          {% csrf_token %}
+
+          <!-- Name Fields -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label
+                for="{{ form.first_name.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                <i class="fas fa-user mr-2 text-blue-500"></i>First Name
+              </label>
+              {{ form.first_name }} {% if form.first_name.errors %}
+              <div
+                class="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+              >
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                {{ form.first_name.errors.0 }}
+              </div>
+              {% endif %}
             </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
 
-{% block extra_js %}
+            <div>
+              <label
+                for="{{ form.last_name.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                <i class="fas fa-user mr-2 text-blue-500"></i>Last Name
+              </label>
+              {{ form.last_name }} {% if form.last_name.errors %}
+              <div
+                class="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+              >
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                {{ form.last_name.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Email Field -->
+          <div>
+            <label
+              for="{{ form.email.id_for_label }}"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              <i class="fas fa-envelope mr-2 text-blue-500"></i>Email Address
+            </label>
+            <div class="relative">
+              {{ form.email }}
+              <div
+                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+              >
+                <i class="fas fa-envelope text-gray-400"></i>
+              </div>
+            </div>
+            {% if form.email.errors %}
+            <div
+              class="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+            >
+              <i class="fas fa-exclamation-circle mr-1"></i>
+              {{ form.email.errors.0 }}
+            </div>
+            {% endif %}
+            <p class="mt-1 text-xs text-gray-500">
+              We'll use this for account verification and updates
+            </p>
+          </div>
+
+          <!-- Phone Number Field -->
+          <div>
+            <label
+              for="{{ form.phone_number.id_for_label }}"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              <i class="fas fa-phone mr-2 text-blue-500"></i>Phone Number
+            </label>
+            <div class="relative">
+              {{ form.phone_number }}
+              <div
+                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+              >
+                <i class="fas fa-phone text-gray-400"></i>
+              </div>
+            </div>
+            {% if form.phone_number.errors %}
+            <div
+              class="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+            >
+              <i class="fas fa-exclamation-circle mr-1"></i>
+              {{ form.phone_number.errors.0 }}
+            </div>
+            {% endif %}
+            <p class="mt-1 text-xs text-gray-500">
+              10-digit phone number for booking confirmations
+            </p>
+          </div>
+
+          <!-- Password Fields -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label
+                for="{{ form.password1.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                <i class="fas fa-lock mr-2 text-blue-500"></i>Password
+              </label>
+              <div class="relative">
+                {{ form.password1 }}
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <i class="fas fa-lock text-gray-400"></i>
+                </div>
+                <button
+                  type="button"
+                  class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onclick="togglePassword('{{ form.password1.id_for_label }}', this)"
+                >
+                  <i class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                </button>
+              </div>
+              <div id="password-strength" class="mt-2 hidden">
+                <div class="flex items-center space-x-2">
+                  <div class="flex-1 bg-gray-200 rounded-full h-2">
+                    <div
+                      id="strength-bar"
+                      class="h-2 rounded-full transition-all duration-300"
+                    ></div>
+                  </div>
+                  <span id="strength-text" class="text-xs font-medium"></span>
+                </div>
+              </div>
+              {% if form.password1.errors %}
+              <div
+                class="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+              >
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                {{ form.password1.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <div>
+              <label
+                for="{{ form.password2.id_for_label }}"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                <i class="fas fa-lock mr-2 text-blue-500"></i>Confirm Password
+              </label>
+              <div class="relative">
+                {{ form.password2 }}
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <i class="fas fa-lock text-gray-400"></i>
+                </div>
+                <button
+                  type="button"
+                  class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onclick="togglePassword('{{ form.password2.id_for_label }}', this)"
+                >
+                  <i class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                </button>
+              </div>
+              <div id="password-match" class="mt-2 hidden text-xs">
+                <span id="match-text"></span>
+              </div>
+              {% if form.password2.errors %}
+              <div
+                class="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+              >
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                {{ form.password2.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Password Requirements -->
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 class="text-sm font-medium text-blue-800 mb-2">
+              Password Requirements:
+            </h4>
+            <ul class="text-xs text-blue-700 space-y-1">
+              <li class="flex items-center">
+                <i class="fas fa-check-circle mr-2 text-green-500"></i>At least
+                8 characters long
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check-circle mr-2 text-green-500"></i>Contains
+                uppercase and lowercase letters
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check-circle mr-2 text-green-500"></i>Contains
+                at least one number
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check-circle mr-2 text-green-500"></i>Contains
+                at least one special character
+              </li>
+            </ul>
+          </div>
+
+          <!-- Terms and Conditions -->
+          <div class="flex items-start">
+            <input
+              type="checkbox"
+              id="terms"
+              name="terms"
+              required
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+            />
+            <label for="terms" class="ml-2 block text-sm text-gray-700">
+              I agree to the
+              <a href="#" class="text-blue-600 hover:text-blue-500 font-medium"
+                >Terms of Service</a
+              >
+              and
+              <a href="#" class="text-blue-600 hover:text-blue-500 font-medium"
+                >Privacy Policy</a
+              >
+            </label>
+          </div>
+
+          <!-- Marketing Consent -->
+          <div class="flex items-start">
+            <input
+              type="checkbox"
+              id="marketing"
+              name="marketing"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+            />
+            <label for="marketing" class="ml-2 block text-sm text-gray-700">
+              I would like to receive promotional emails and travel updates
+            </label>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            id="submitBtn"
+            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-purple-700 hover:from-blue-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform transition-all duration-200 hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+              <i
+                class="fas fa-user-plus group-hover:text-blue-200 transition-colors"
+              ></i>
+            </span>
+            <span class="ml-3">Create Account</span>
+            <!-- Loading spinner (hidden by default) -->
+            <div
+              class="hidden absolute inset-0 flex items-center justify-center"
+              id="loadingSpinner"
+            >
+              <i class="fas fa-spinner fa-spin"></i>
+            </div>
+          </button>
+        </form>
+
+        <!-- Login Link -->
+        <div class="mt-8 pt-6 border-t border-gray-200 text-center">
+          <p class="text-sm text-gray-600">
+            Already have an account?
+            <a
+              href="{% url 'accounts:login' %}"
+              class="font-medium text-blue-600 hover:text-blue-500 transition-colors ml-1"
+            >
+              Sign In
+            </a>
+          </p>
+        </div>
+
+        <!-- Social Registration -->
+        <div class="mt-6">
+          <div class="relative">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-gray-300"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+              <span class="px-2 bg-white text-gray-500">Or register with</span>
+            </div>
+          </div>
+
+          <div class="mt-6 grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+            >
+              <i class="fab fa-google text-red-500 mr-2"></i>
+              Google
+            </button>
+            <button
+              type="button"
+              class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+            >
+              <i class="fab fa-facebook text-blue-600 mr-2"></i>
+              Facebook
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Notice -->
+    <div class="text-center">
+      <p class="text-xs text-white text-opacity-80">
+        <i class="fas fa-shield-alt mr-1"></i>
+        Your information is protected with 256-bit SSL encryption
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes float-delayed {
+    0%,
+    100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-15px) rotate(5deg);
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-float-delayed {
+    animation: float-delayed 8s ease-in-out infinite;
+    animation-delay: 2s;
+  }
+</style>
+{% endblock %} {% block extra_js %}
 <script>
-    $(document).ready(function() {
-        // Add Bootstrap classes to form fields
-        $('.form-control').addClass('form-control');
-        
-        // Add enhanced placeholder text for form fields
-        $('#id_first_name').attr('placeholder', 'Enter your first name').addClass('form-control');
-        $('#id_last_name').attr('placeholder', 'Enter your last name').addClass('form-control');
-        $('#id_phone_number').attr('placeholder', 'Enter your 10-digit phone number').addClass('form-control');
-        $('#id_email').attr('placeholder', 'Enter your email address').addClass('form-control');
-        $('#id_password1').attr('placeholder', 'Create a strong password (min 8 characters)').addClass('form-control');
-        $('#id_password2').attr('placeholder', 'Confirm your password').addClass('form-control');
-        
-        // Enhanced form interactions with better animations
-        $('.form-control').on('focus', function() {
-            $(this).parent().addClass('focused');
-            $(this).removeClass('is-invalid');
-        }).on('blur', function() {
-            $(this).parent().removeClass('focused');
-            validateField($(this));
-        });
-        
-        // Real-time validation with visual feedback
-        function validateField($field) {
-            const fieldType = $field.attr('type') || $field.attr('name');
-            const value = $field.val().trim();
-            let isValid = true;
-            
-            // Basic validation rules
-            if ($field.prop('required') && !value) {
-                isValid = false;
-            } else if (fieldType === 'email' && value) {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                isValid = emailRegex.test(value);
-            } else if ($field.attr('name') === 'phone_number' && value) {
-                const cleanPhone = value.replace(/[\s\-\(\)]/g, '');
-                isValid = cleanPhone.length === 10 && /^[0-9]{10}$/.test(cleanPhone);
-            } else if ($field.attr('name') === 'password1' && value) {
-                isValid = value.length >= 8;
-            } else if ($field.attr('name') === 'password2' && value) {
-                const password1 = $('#id_password1').val();
-                isValid = value === password1;
-            }
-            
-            // Apply validation classes with animation
-            if (value && isValid) {
-                $field.removeClass('is-invalid').addClass('is-valid');
-            } else if (value && !isValid) {
-                $field.removeClass('is-valid').addClass('is-invalid');
-            } else {
-                $field.removeClass('is-valid is-invalid');
-            }
-            
-            return isValid;
+  document.addEventListener("DOMContentLoaded", function () {
+    // Style form inputs with Tailwind classes
+    const inputs = [
+      "{{ form.first_name.id_for_label }}",
+      "{{ form.last_name.id_for_label }}",
+      "{{ form.email.id_for_label }}",
+      "{{ form.phone_number.id_for_label }}",
+      "{{ form.password1.id_for_label }}",
+      "{{ form.password2.id_for_label }}",
+    ];
+
+    inputs.forEach((inputId) => {
+      const input = document.getElementById(inputId);
+      if (input) {
+        if (
+          inputId.includes("email") ||
+          inputId.includes("phone") ||
+          inputId.includes("password")
+        ) {
+          input.className =
+            "w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white";
+        } else {
+          input.className =
+            "w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white";
         }
-        
-        // Enhanced form submission with better validation
-        $('form').on('submit', function(e) {
-            let isValid = true;
-            const $submitBtn = $('.btn-register');
-            
-            // Validate all fields
-            $('.form-control').each(function() {
-                if (!validateField($(this))) {
-                    isValid = false;
-                }
-            });
-            
-            if (!isValid) {
-                e.preventDefault();
-                // Focus on first invalid field with smooth scroll
-                const $firstInvalid = $('.form-control.is-invalid').first();
-                if ($firstInvalid.length) {
-                    $('html, body').animate({
-                        scrollTop: $firstInvalid.offset().top - 100
-                    }, 300);
-                    setTimeout(() => $firstInvalid.focus(), 300);
-                }
-            } else {
-                // Show loading state
-                $submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...');
-                $submitBtn.prop('disabled', true);
-            }
-        });
-        
-        // Real-time validation on input
-        $('.form-control').on('input', function() {
-            const $this = $(this);
-            clearTimeout($this.data('timeout'));
-            $this.data('timeout', setTimeout(() => {
-                validateField($this);
-            }, 300));
-        });
-        
-        // Password strength indicator
-        $('#id_password1').on('input', function() {
-            const password = $(this).val();
-            const $field = $(this);
-            
-            // Remove existing strength indicator
-            $field.parent().find('.password-strength').remove();
-            
-            if (password.length > 0) {
-                let strength = 0;
-                let strengthText = '';
-                let strengthClass = '';
-                
-                if (password.length >= 8) strength++;
-                if (/[a-z]/.test(password)) strength++;
-                if (/[A-Z]/.test(password)) strength++;
-                if (/[0-9]/.test(password)) strength++;
-                if (/[^A-Za-z0-9]/.test(password)) strength++;
-                
-                switch(strength) {
-                    case 0:
-                    case 1:
-                        strengthText = 'Very Weak';
-                        strengthClass = 'text-danger';
-                        break;
-                    case 2:
-                        strengthText = 'Weak';
-                        strengthClass = 'text-warning';
-                        break;
-                    case 3:
-                        strengthText = 'Fair';
-                        strengthClass = 'text-info';
-                        break;
-                    case 4:
-                        strengthText = 'Good';
-                        strengthClass = 'text-success';
-                        break;
-                    case 5:
-                        strengthText = 'Strong';
-                        strengthClass = 'text-success fw-bold';
-                        break;
-                }
-                
-                $field.parent().append(`
-                    <div class="password-strength ${strengthClass}" style="font-size: 0.75rem; margin-top: 0.25rem;">
-                        Password Strength: ${strengthText}
-                    </div>
-                `);
-            }
-        });
-        
-        // Auto-format phone number with 10-digit limit
-        $('#id_phone_number').on('input', function() {
-            let value = $(this).val().replace(/\D/g, '');
-            // Limit to 10 digits
-            if (value.length > 10) {
-                value = value.slice(0, 10);
-            }
-            if (value.length > 0) {
-                if (value.length <= 3) {
-                    value = value;
-                } else if (value.length <= 6) {
-                    value = value.slice(0, 3) + '-' + value.slice(3);
-                } else {
-                    value = value.slice(0, 3) + '-' + value.slice(3, 6) + '-' + value.slice(6, 10);
-                }
-            }
-            $(this).val(value);
-        });
-        
-        // Password toggle functionality
-        $('.password-toggle').on('click', function() {
-            const targetId = $(this).data('target');
-            const $passwordField = $(targetId);
-            const $icon = $(this).find('i');
-            
-            if ($passwordField.attr('type') === 'password') {
-                $passwordField.attr('type', 'text');
-                $icon.removeClass('fa-eye').addClass('fa-eye-slash');
-            } else {
-                $passwordField.attr('type', 'password');
-                $icon.removeClass('fa-eye-slash').addClass('fa-eye');
-            }
-        });
-        
-        // Add accessibility improvements
-        $('.form-control').attr('autocomplete', function() {
-            const name = $(this).attr('name');
-            switch(name) {
-                case 'first_name': return 'given-name';
-                case 'last_name': return 'family-name';
-                case 'email': return 'email';
-                case 'phone_number': return 'tel';
-                case 'password1': return 'new-password';
-                case 'password2': return 'new-password';
-                default: return 'off';
-            }
-        });
+        input.setAttribute("autocomplete", getAutocomplete(inputId));
+      }
     });
+
+    function getAutocomplete(inputId) {
+      if (inputId.includes("first_name")) return "given-name";
+      if (inputId.includes("last_name")) return "family-name";
+      if (inputId.includes("email")) return "email";
+      if (inputId.includes("phone")) return "tel";
+      if (inputId.includes("password")) return "new-password";
+      return "off";
+    }
+
+    // Password strength checker
+    const password1 = document.getElementById(
+      "{{ form.password1.id_for_label }}"
+    );
+    const password2 = document.getElementById(
+      "{{ form.password2.id_for_label }}"
+    );
+    const strengthIndicator = document.getElementById("password-strength");
+    const strengthBar = document.getElementById("strength-bar");
+    const strengthText = document.getElementById("strength-text");
+    const matchIndicator = document.getElementById("password-match");
+    const matchText = document.getElementById("match-text");
+
+    if (password1) {
+      password1.addEventListener("input", function () {
+        const password = this.value;
+        if (password.length > 0) {
+          strengthIndicator.classList.remove("hidden");
+          updatePasswordStrength(password);
+        } else {
+          strengthIndicator.classList.add("hidden");
+        }
+        checkPasswordMatch();
+      });
+    }
+
+    if (password2) {
+      password2.addEventListener("input", checkPasswordMatch);
+    }
+
+    function updatePasswordStrength(password) {
+      let strength = 0;
+      let strengthLabel = "";
+      let strengthColor = "";
+
+      if (password.length >= 8) strength++;
+      if (/[a-z]/.test(password)) strength++;
+      if (/[A-Z]/.test(password)) strength++;
+      if (/[0-9]/.test(password)) strength++;
+      if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+      switch (strength) {
+        case 0:
+        case 1:
+          strengthLabel = "Very Weak";
+          strengthColor = "bg-red-500";
+          break;
+        case 2:
+          strengthLabel = "Weak";
+          strengthColor = "bg-orange-500";
+          break;
+        case 3:
+          strengthLabel = "Fair";
+          strengthColor = "bg-yellow-500";
+          break;
+        case 4:
+          strengthLabel = "Good";
+          strengthColor = "bg-blue-500";
+          break;
+        case 5:
+          strengthLabel = "Strong";
+          strengthColor = "bg-green-500";
+          break;
+      }
+
+      strengthBar.className = `h-2 rounded-full transition-all duration-300 ${strengthColor}`;
+      strengthBar.style.width = `${(strength / 5) * 100}%`;
+      strengthText.textContent = strengthLabel;
+      strengthText.className = `text-xs font-medium ${strengthColor.replace(
+        "bg-",
+        "text-"
+      )}`;
+    }
+
+    function checkPasswordMatch() {
+      if (password1 && password2 && password2.value.length > 0) {
+        matchIndicator.classList.remove("hidden");
+        if (password1.value === password2.value) {
+          matchText.textContent = "✓ Passwords match";
+          matchText.className = "text-green-600 font-medium";
+        } else {
+          matchText.textContent = "✗ Passwords do not match";
+          matchText.className = "text-red-600 font-medium";
+        }
+      } else {
+        matchIndicator.classList.add("hidden");
+      }
+    }
+
+    // Phone number formatting
+    const phoneInput = document.getElementById(
+      "{{ form.phone_number.id_for_label }}"
+    );
+    if (phoneInput) {
+      phoneInput.addEventListener("input", function () {
+        let value = this.value.replace(/\D/g, "");
+        if (value.length > 10) {
+          value = value.slice(0, 10);
+        }
+        if (value.length > 0) {
+          if (value.length <= 3) {
+            value = value;
+          } else if (value.length <= 6) {
+            value = value.slice(0, 3) + "-" + value.slice(3);
+          } else {
+            value =
+              value.slice(0, 3) +
+              "-" +
+              value.slice(3, 6) +
+              "-" +
+              value.slice(6, 10);
+          }
+        }
+        this.value = value;
+      });
+    }
+
+    // Form submission
+    const form = document.getElementById("registerForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const loadingSpinner = document.getElementById("loadingSpinner");
+
+    form.addEventListener("submit", function (e) {
+      // Validate terms checkbox
+      const termsCheckbox = document.getElementById("terms");
+      if (!termsCheckbox.checked) {
+        e.preventDefault();
+        alert(
+          "Please accept the Terms of Service and Privacy Policy to continue."
+        );
+        termsCheckbox.focus();
+        return;
+      }
+
+      // Show loading state
+      submitBtn.disabled = true;
+      submitBtn.querySelector("span").classList.add("opacity-0");
+      loadingSpinner.classList.remove("hidden");
+    });
+
+    // Real-time validation
+    const formInputs = form.querySelectorAll("input");
+    formInputs.forEach((input) => {
+      input.addEventListener("blur", function () {
+        validateField(this);
+      });
+
+      input.addEventListener("input", function () {
+        if (this.classList.contains("border-red-500")) {
+          validateField(this);
+        }
+      });
+    });
+
+    function validateField(field) {
+      const value = field.value.trim();
+      let isValid = true;
+
+      if (field.hasAttribute("required") && !value) {
+        isValid = false;
+      }
+
+      if (field.type === "email" && value && !isValidEmail(value)) {
+        isValid = false;
+      }
+
+      if (isValid) {
+        field.classList.remove("border-red-500", "ring-red-500");
+        field.classList.add("border-green-500", "ring-green-500");
+      } else {
+        field.classList.remove("border-green-500", "ring-green-500");
+        field.classList.add("border-red-500", "ring-red-500");
+      }
+    }
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+  });
+
+  // Password toggle function
+  function togglePassword(inputId, button) {
+    const input = document.getElementById(inputId);
+    const icon = button.querySelector("i");
+
+    if (input.type === "password") {
+      input.type = "text";
+      icon.className = "fas fa-eye-slash text-gray-400 hover:text-gray-600";
+    } else {
+      input.type = "password";
+      icon.className = "fas fa-eye text-gray-400 hover:text-gray-600";
+    }
+  }
 </script>
 {% endblock %}

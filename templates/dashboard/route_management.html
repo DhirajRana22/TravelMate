@@ -1,625 +1,304 @@
-{% extends 'base.html' %}
+{% extends "dashboard/base.html" %}
 {% load static %}
 
-{% block title %}Admin - Route Management{% endblock %}
+{% block title %}Route Management - Admin Dashboard{% endblock %}
 
-{% block extra_css %}
-<style>
-    .admin-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem 0;
-        margin-bottom: 2rem;
-    }
-    
-    .search-card {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .route-card {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        border: 1px solid #e9ecef;
-        transition: all 0.3s ease;
-    }
-    
-    .route-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
-    }
-    
-    .route-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1rem;
-    }
-    
-    .route-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.5rem;
-        margin-right: 1rem;
-    }
-    
-    .route-info {
-        flex: 1;
-    }
-    
-    .route-name {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.25rem;
-    }
-    
-    .route-path {
-        color: #6c757d;
-        font-size: 0.9rem;
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-    }
-    
-    .route-meta {
-        display: flex;
-        gap: 1rem;
-        font-size: 0.875rem;
-        color: #6c757d;
-        flex-wrap: wrap;
-    }
-    
-    .route-details {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-    
-    .detail-item {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-    }
-    
-    .detail-icon {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        background: #667eea;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 0.75rem;
-        flex-shrink: 0;
-        font-size: 0.875rem;
-    }
-    
-    .detail-content {
-        flex: 1;
-    }
-    
-    .detail-label {
-        font-size: 0.75rem;
-        color: #6c757d;
-        margin-bottom: 0.25rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .detail-value {
-        font-weight: 600;
-        color: #495057;
-        font-size: 0.875rem;
-    }
-    
-    .bus-list {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-        margin-bottom: 1rem;
-    }
-    
-    .bus-tag {
-        background: #e9ecef;
-        color: #495057;
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-    }
-    
-    .bus-tag.active {
-        background: #d4edda;
-        color: #155724;
-    }
-    
-    .route-actions {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-        justify-content: flex-end;
-        flex-wrap: wrap;
-    }
-    
-    .btn-action {
-        padding: 0.375rem 0.75rem;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        font-weight: 500;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
-    }
-    
-    .btn-primary {
-        background: #667eea;
-        color: white;
-    }
-    
-    .btn-primary:hover {
-        background: #5a6fd8;
-        color: white;
-    }
-    
-    .btn-outline {
-        background: transparent;
-        color: #667eea;
-        border: 1px solid #667eea;
-    }
-    
-    .btn-outline:hover {
-        background: #667eea;
-        color: white;
-    }
-    
-    .btn-success {
-        background: #28a745;
-        color: white;
-    }
-    
-    .btn-success:hover {
-        background: #218838;
-        color: white;
-    }
-    
-    .btn-warning {
-        background: #ffc107;
-        color: #212529;
-    }
-    
-    .btn-warning:hover {
-        background: #e0a800;
-        color: #212529;
-    }
-    
-    .btn-danger {
-        background: #dc3545;
-        color: white;
-    }
-    
-    .btn-danger:hover {
-        background: #c82333;
-        color: white;
-    }
-    
-    .status-badge {
-        display: inline-block;
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-    
-    .status-active {
-        background: #d4edda;
-        color: #155724;
-    }
-    
-    .status-inactive {
-        background: #f8d7da;
-        color: #721c24;
-    }
-    
-    .search-form {
-        display: flex;
-        gap: 1rem;
-        align-items: end;
-        flex-wrap: wrap;
-    }
-    
-    .form-group {
-        flex: 1;
-        min-width: 200px;
-    }
-    
-    .form-label {
-        font-weight: 500;
-        color: #495057;
-        margin-bottom: 0.5rem;
-    }
-    
-    .form-control {
-        border: 1px solid #ced4da;
-        border-radius: 6px;
-        padding: 0.5rem 0.75rem;
-        transition: border-color 0.3s ease;
-    }
-    
-    .form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    
-    .pagination-wrapper {
-        display: flex;
-        justify-content: center;
-        margin-top: 2rem;
-    }
-    
-    .pagination {
-        display: flex;
-        gap: 0.5rem;
-    }
-    
-    .page-item {
-        list-style: none;
-    }
-    
-    .page-link {
-        padding: 0.5rem 0.75rem;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        color: #667eea;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-    
-    .page-link:hover {
-        background: #667eea;
-        color: white;
-        border-color: #667eea;
-    }
-    
-    .page-item.active .page-link {
-        background: #667eea;
-        color: white;
-        border-color: #667eea;
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-        color: #6c757d;
-    }
-    
-    .empty-icon {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-    
-    @media (max-width: 768px) {
-        .route-card {
-            padding: 1rem;
-        }
-        
-        .route-header {
-            flex-direction: column;
-            text-align: center;
-        }
-        
-        .route-icon {
-            margin-right: 0;
-            margin-bottom: 1rem;
-        }
-        
-        .route-details {
-            grid-template-columns: 1fr;
-        }
-        
-        .route-actions {
-            justify-content: center;
-            flex-direction: column;
-        }
-        
-        .btn-action {
-            justify-content: center;
-        }
-        
-        .search-form {
-            flex-direction: column;
-        }
-        
-        .form-group {
-            min-width: auto;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<!-- Admin Header -->
-<section class="admin-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="mb-2"><i class="fas fa-route me-2"></i>Route Management</h1>
-                <p class="mb-0">Manage and monitor all bus routes</p>
+{% block dashboard_content %}
+<div class="container mx-auto px-4 sm:px-8">
+    <div class="py-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-2xl font-semibold leading-tight text-gray-800">
+                    <i class="fas fa-route mr-2"></i>Route Management
+                </h2>
+                <p class="text-gray-600">Manage and monitor all bus routes</p>
             </div>
-            <div class="col-md-4 text-md-end">
-                <a href="{% url 'dashboard:dashboard_home' %}" class="btn btn-light me-2">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            <div class="flex space-x-2">
+                <a href="{% url 'dashboard:dashboard_home' %}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
                 </a>
-                <a href="{% url 'dashboard:route_add' %}" class="btn btn-success">
-                    <i class="fas fa-plus me-2"></i>Add Route
+                <a href="{% url 'dashboard:route_add' %}" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                    <i class="fas fa-plus mr-2"></i>Add Route
                 </a>
             </div>
         </div>
-    </div>
-</section>
 
-<!-- Route Management Content -->
-<section class="py-4">
-    <div class="container">
-        <!-- Search and Filters -->
-        <div class="search-card">
-            <h5 class="mb-3"><i class="fas fa-search me-2"></i>Search Routes</h5>
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <i class="fas fa-route text-3xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold mb-1">{{ total_routes|default:0 }}</h4>
+                        <p class="text-sm opacity-90">Total Routes</p>
+                    </div>
+                </div>
+            </div>
             
-            <form method="get" class="search-form">
-                <div class="form-group">
-                    <label class="form-label">Search</label>
-                    <input type="text" name="search" class="form-control" 
-                           placeholder="Source, destination, route name..." 
-                           value="{{ form.search.value|default:'' }}">
+            <div class="bg-gradient-to-br from-green-500 to-teal-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <i class="fas fa-check-circle text-3xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold mb-1">{{ active_routes|default:0 }}</h4>
+                        <p class="text-sm opacity-90">Active Routes</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-yellow-500 to-orange-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <i class="fas fa-bus text-3xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold mb-1">{{ total_buses_assigned|default:0 }}</h4>
+                        <p class="text-sm opacity-90">Buses Assigned</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-purple-500 to-pink-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <i class="fas fa-ticket-alt text-3xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold mb-1">{{ total_bookings|default:0 }}</h4>
+                        <p class="text-sm opacity-90">Total Bookings</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                <i class="fas fa-search mr-2 text-blue-500"></i>Search Routes
+            </h3>
+            
+            <form method="get">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div class="lg:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                        <input type="text" name="search" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" 
+                               placeholder="Source, destination, route name..." 
+                               value="{{ form.search.value|default:'' }}">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Source</label>
+                        <input type="text" name="source" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" 
+                               placeholder="Enter source location" 
+                               value="{{ form.source.value|default:'' }}">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Destination</label>
+                        <input type="text" name="destination" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" 
+                               placeholder="Enter destination" 
+                               value="{{ form.destination.value|default:'' }}">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                        <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">All Status</option>
+                            <option value="active" {% if form.status.value == 'active' %}selected{% endif %}>Active</option>
+                            <option value="inactive" {% if form.status.value == 'inactive' %}selected{% endif %}>Inactive</option>
+                        </select>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Source</label>
-                    <input type="text" name="source" class="form-control"
-                           placeholder="Enter source location"
-                           value="{{ form.source.value|default:'' }}">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Destination</label>
-                    <input type="text" name="destination" class="form-control" 
-                           placeholder="Ending city" 
-                           value="{{ form.destination.value|default:'' }}">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <select name="status" class="form-control">
-                        <option value="">All Status</option>
-                        <option value="active" {% if form.status.value == 'active' %}selected{% endif %}>Active</option>
-                        <option value="inactive" {% if form.status.value == 'inactive' %}selected{% endif %}>Inactive</option>
-                    </select>
-                </div>
-                
-                <div class="form-group" style="flex: 0 0 auto;">
-                    <button type="submit" class="btn-action btn-primary">
-                        <i class="fas fa-search me-2"></i>Search
+                <div class="flex space-x-2 mt-4">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                        <i class="fas fa-search mr-2"></i>Search
                     </button>
-                </div>
-                
-                <div class="form-group" style="flex: 0 0 auto;">
-                    <a href="{% url 'dashboard:route_management' %}" class="btn-action btn-outline">
-                        <i class="fas fa-times me-2"></i>Clear
+                    <a href="{% url 'dashboard:route_management' %}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400">
+                        <i class="fas fa-times mr-2"></i>Clear
                     </a>
                 </div>
             </form>
         </div>
-        
+
         <!-- Routes List -->
         {% if routes %}
-            {% for route in routes %}
-            <div class="route-card">
-                <div class="route-header">
-                    <div class="route-icon">
-                        <i class="fas fa-route"></i>
-                    </div>
-                    
-                    <div class="route-info">
-                        <div class="route-name">
-                            {{ route.source }} → {{ route.destination }}
-                            <span class="status-badge status-{{ route.is_active|yesno:'active,inactive' }}">
-                                {% if route.is_active %}Active{% else %}Inactive{% endif %}
-                            </span>
+            <div class="space-y-4">
+                {% for route in routes %}
+                <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center">
+                                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-2xl mr-4">
+                                    <i class="fas fa-route"></i>
+                                </div>
+                                
+                                <div>
+                                    <div class="flex items-center mb-2">
+                                        <h3 class="text-xl font-semibold text-gray-800 mr-3">
+                                            {{ route.source }} → {{ route.destination }}
+                                        </h3>
+                                        <span class="px-3 py-1 rounded-full text-sm font-semibold {% if route.is_active %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                            {% if route.is_active %}Active{% else %}Inactive{% endif %}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="flex items-center text-gray-600 text-sm space-x-4">
+                                        <span><i class="fas fa-road mr-1"></i>{{ route.distance }} km</span>
+                                        <span><i class="fas fa-clock mr-1"></i>{{ route.travel_time }}</span>
+                                        <span><i class="fas fa-bus mr-1"></i>{{ route.assigned_buses_count|default:0 }} buses</span>
+                                        <span><i class="fas fa-ticket-alt mr-1"></i>{{ route.total_bookings|default:0 }} bookings</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <a href="{% url 'dashboard:route_detail' route.id %}" 
+                                   class="bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 text-sm">
+                                    <i class="fas fa-eye mr-1"></i>View
+                                </a>
+                                
+                                <button onclick="editRoute({{ route.id }})" 
+                                        class="bg-yellow-500 text-white px-3 py-2 rounded-lg hover:bg-yellow-600 text-sm">
+                                    <i class="fas fa-edit mr-1"></i>Edit
+                                </button>
+                                
+                                {% if route.is_active %}
+                                    <button onclick="toggleRouteStatus({{ route.id }}, false)" 
+                                            class="bg-orange-500 text-white px-3 py-2 rounded-lg hover:bg-orange-600 text-sm">
+                                        <i class="fas fa-pause mr-1"></i>Deactivate
+                                    </button>
+                                {% else %}
+                                    <button onclick="toggleRouteStatus({{ route.id }}, true)" 
+                                            class="bg-green-500 text-white px-3 py-2 rounded-lg hover:bg-green-600 text-sm">
+                                        <i class="fas fa-play mr-1"></i>Activate
+                                    </button>
+                                {% endif %}
+                                
+                                <button onclick="manageBuses({{ route.id }})" 
+                                        class="bg-purple-500 text-white px-3 py-2 rounded-lg hover:bg-purple-600 text-sm">
+                                    <i class="fas fa-bus mr-1"></i>Buses
+                                </button>
+                                
+                                <button onclick="deleteRoute({{ route.id }}, '{{ route.source }} → {{ route.destination }}')" 
+                                        class="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 text-sm">
+                                    <i class="fas fa-trash mr-1"></i>Delete
+                                </button>
+                            </div>
                         </div>
                         
-                        <div class="route-path">
-                            <i class="fas fa-map-marker-alt me-1"></i>
-                            {{ route.source }} 
-                            <i class="fas fa-arrow-right mx-2"></i>
-                            {{ route.destination }}
-                        </div>
-                        
-                        <div class="route-meta">
-                            <span><i class="fas fa-clock me-1"></i>{{ route.departure_time }} - {{ route.arrival_time }}</span>
-                            <span><i class="fas fa-road me-1"></i>{{ route.distance }} km</span>
-                            <span><i class="fas fa-hourglass-half me-1"></i>{{ route.duration }}</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="route-details">
-                    <div class="detail-item">
-                        <div class="detail-icon">
-                            <i class="fas fa-money-bill"></i>
-                        </div>
-                        <div class="detail-content">
-                            <div class="detail-label">Base Fare</div>
-                            <div class="detail-value">रू {{ route.base_fare }}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="detail-item">
-                        <div class="detail-icon">
-                            <i class="fas fa-bus"></i>
-                        </div>
-                        <div class="detail-content">
-                            <div class="detail-label">Assigned Buses</div>
-                            <div class="detail-value">{{ route.buses_count }} buses</div>
-                        </div>
-                    </div>
-                    
-                    <div class="detail-item">
-                        <div class="detail-icon">
-                            <i class="fas fa-ticket-alt"></i>
-                        </div>
-                        <div class="detail-content">
-                            <div class="detail-label">Total Bookings</div>
-                            <div class="detail-value">{{ route.total_bookings }}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="detail-item">
-                        <div class="detail-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="detail-content">
-                            <div class="detail-label">Revenue</div>
-                            <div class="detail-value">रू {{ route.total_revenue|floatformat:0 }}</div>
+                        <!-- Route Details -->
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div class="bg-gray-50 p-3 rounded-lg">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Distance</p>
+                                            <p class="font-semibold">{{ route.distance }} km</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-gray-50 p-3 rounded-lg">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-clock text-green-500 mr-2"></i>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Travel Time</p>
+                                            <p class="font-semibold">{{ route.travel_time }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-gray-50 p-3 rounded-lg">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-bus text-purple-500 mr-2"></i>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Assigned Buses</p>
+                                            <p class="font-semibold">{{ route.assigned_buses_count|default:0 }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-gray-50 p-3 rounded-lg">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar text-orange-500 mr-2"></i>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Created</p>
+                                            <p class="font-semibold">{{ route.created_at|date:"M d, Y" }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                {% if route.assigned_buses %}
-                <div class="bus-list">
-                    {% for bus in route.assigned_buses %}
-                        <span class="bus-tag {% if bus.status == 'active' %}active{% endif %}">
-                            <i class="fas fa-bus me-1"></i>{{ bus.bus_number }}
-                        </span>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                
-                <div class="route-actions">
-                    <a href="{% url 'dashboard:route_detail' route.id %}" class="btn-action btn-primary">
-                        <i class="fas fa-eye me-1"></i>View Details
-                    </a>
-                    
-                    <button class="btn-action btn-outline" onclick="editRoute({{ route.id }})">
-                        <i class="fas fa-edit me-1"></i>Edit
-                    </button>
-                    
-                    {% if route.is_active %}
-                        <button class="btn-action btn-warning" onclick="toggleRouteStatus({{ route.id }}, false)">
-                            <i class="fas fa-ban me-1"></i>Deactivate
-                        </button>
-                    {% else %}
-                        <button class="btn-action btn-success" onclick="toggleRouteStatus({{ route.id }}, true)">
-                            <i class="fas fa-check me-1"></i>Activate
-                        </button>
-                    {% endif %}
-                    
-                    <button class="btn-action btn-outline" onclick="manageBuses({{ route.id }})">
-                        <i class="fas fa-bus me-1"></i>Manage Buses
-                    </button>
-                    
-                    <button class="btn-action btn-danger" onclick="deleteRoute({{ route.id }}, '{{ route.source }} → {{ route.destination }}')">
-                        <i class="fas fa-trash me-1"></i>Delete
-                    </button>
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
             
             <!-- Pagination -->
             {% if is_paginated %}
-            <div class="pagination-wrapper">
-                <nav aria-label="Routes pagination">
-                    <ul class="pagination">
-                        {% if page_obj.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.source %}&source={{ request.GET.source }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">&laquo; First</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.source %}&source={{ request.GET.source }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">&lsaquo; Previous</a>
-                            </li>
-                        {% endif %}
-                        
-                        <li class="page-item active">
-                            <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-                        </li>
-                        
-                        {% if page_obj.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.source %}&source={{ request.GET.source }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Next &rsaquo;</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.source %}&source={{ request.GET.source }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Last &raquo;</a>
-                            </li>
-                        {% endif %}
-                    </ul>
+            <div class="mt-6 flex justify-center">
+                <nav class="flex space-x-2">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.source %}&source={{ request.GET.source }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                           class="px-3 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
+                            Previous
+                        </a>
+                    {% endif %}
+                    
+                    <span class="px-3 py-2 bg-blue-500 text-white rounded-lg">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.source %}&source={{ request.GET.source }}{% endif %}{% if request.GET.destination %}&destination={{ request.GET.destination }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                           class="px-3 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
+                            Next
+                        </a>
+                    {% endif %}
                 </nav>
             </div>
             {% endif %}
         {% else %}
-            <!-- Empty State -->
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <i class="fas fa-route"></i>
-                </div>
-                <h3>No Routes Found</h3>
-                <p class="text-muted">
-                    {% if request.GET.search or request.GET.source or request.GET.destination or request.GET.status %}
-                        No routes match your search criteria. Try adjusting your filters.
-                    {% else %}
-                        No routes are configured in the system yet.
-                    {% endif %}
-                </p>
+            <div class="text-center py-12">
+                <i class="fas fa-route text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">No Routes Found</h3>
                 {% if request.GET.search or request.GET.source or request.GET.destination or request.GET.status %}
-                <a href="{% url 'dashboard:route_management' %}" class="btn-action btn-primary">
-                    <i class="fas fa-times me-2"></i>Clear Filters
-                </a>
+                    <p class="text-gray-500 mb-4">No routes match your search criteria.</p>
+                    <a href="{% url 'dashboard:route_management' %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                        <i class="fas fa-times mr-2"></i>Clear Filters
+                    </a>
                 {% else %}
-                <a href="{% url 'dashboard:route_add' %}" class="btn-action btn-primary">
-                    <i class="fas fa-plus me-2"></i>Add First Route
-                </a>
+                    <p class="text-gray-500 mb-4">Start by adding your first route to connect different locations.</p>
+                    <a href="{% url 'dashboard:route_add' %}" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                        <i class="fas fa-plus mr-2"></i>Add First Route
+                    </a>
                 {% endif %}
             </div>
         {% endif %}
     </div>
-</section>
+</div>
 {% endblock %}
 
-{% block extra_js %}
+{% block dashboard_extra_js %}
 <script>
     function addNewRoute() {
-        // Redirect to add route form or open modal
         window.location.href = '/dashboard/routes/add/';
     }
     
     function editRoute(routeId) {
-        // Redirect to edit route form
         window.location.href = `/dashboard/routes/${routeId}/edit/`;
     }
     
     function manageBuses(routeId) {
-        // Redirect to manage buses for route
         window.location.href = `/dashboard/routes/${routeId}/buses/`;
     }
     

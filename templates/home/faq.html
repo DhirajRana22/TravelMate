@@ -3,477 +3,527 @@
 
 {% block title %}Frequently Asked Questions - TravelMate{% endblock %}
 
-{% block extra_css %}
-<style>
-    .faq-hero {
-        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{% static "img/faq-hero.jpg" %}') no-repeat center center;
-        background-size: cover;
-        color: white;
-        padding: 80px 0;
-        margin-top: -1.5rem;
-    }
-    .faq-category {
-        transition: transform 0.3s;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    .faq-category:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-    .category-icon {
-        font-size: 2.5rem;
-        color: #0d6efd;
-        margin-bottom: 1rem;
-    }
-    .accordion-button:not(.collapsed) {
-        background-color: #e7f1ff;
-        color: #0d6efd;
-    }
-    .accordion-button:focus {
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    }
-    .search-container {
-        max-width: 600px;
-        margin: 0 auto 2rem;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
 <!-- Hero Section -->
-<section class="faq-hero">
-    <div class="container text-center">
-        <h1 class="display-4 fw-bold mb-4">Frequently Asked Questions</h1>
-        <p class="lead mb-0">Find answers to common questions about TravelMate services</p>
+<section class="relative bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white py-24 overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-full h-full" style="background-image: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.1"><circle cx="30" cy="30" r="4"/></g></g></svg>');"></div>
+    </div>
+    
+    <!-- Animated Elements -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-white opacity-5 rounded-full animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-white opacity-5 rounded-full animate-pulse delay-1000"></div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-question-circle text-3xl"></i>
+        </div>
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            Frequently Asked <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">Questions</span>
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
+            Find answers to common questions about TravelMate services
+        </p>
     </div>
 </section>
 
 <!-- Search Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="search-container">
-            <div class="input-group">
-                <input type="text" id="faqSearch" class="form-control form-control-lg" placeholder="Search for questions...">
-                <button class="btn btn-primary" type="button"><i class="fas fa-search"></i></button>
+<section class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Search Bar -->
+        <div class="max-w-2xl mx-auto mb-12">
+            <div class="relative">
+                <input type="text" id="faqSearch" 
+                       class="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 pl-14"
+                       placeholder="Search for questions...">
+                <i class="fas fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
             </div>
+            <p class="text-center text-gray-600 mt-4">Type keywords to find specific answers quickly</p>
         </div>
         
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card faq-category h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="category-icon">
-                            <i class="fas fa-ticket-alt"></i>
-                        </div>
-                        <h4>Booking & Tickets</h4>
-                        <p>Questions about the booking process, ticket confirmation, and cancellations.</p>
-                        <a href="#bookingFAQ" class="btn btn-outline-primary">View Questions</a>
-                    </div>
+        <!-- FAQ Categories -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            <!-- Booking & Tickets -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-all duration-300 group border border-gray-100">
+                <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-ticket-alt text-3xl text-white"></i>
                 </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Booking & Tickets</h3>
+                <p class="text-gray-600 mb-6">Questions about the booking process, ticket confirmation, and cancellations.</p>
+                <a href="#bookingFAQ" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium">
+                    View Questions
+                </a>
             </div>
-            <div class="col-md-4">
-                <div class="card faq-category h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="category-icon">
-                            <i class="fas fa-money-bill-wave"></i>
-                        </div>
-                        <h4>Payments & Refunds</h4>
-                        <p>Information about payment methods, refund policies, and processing times.</p>
-                        <a href="#paymentFAQ" class="btn btn-outline-primary">View Questions</a>
-                    </div>
+            
+            <!-- Payments & Refunds -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-all duration-300 group border border-gray-100">
+                <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-money-bill-wave text-3xl text-white"></i>
                 </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Payments & Refunds</h3>
+                <p class="text-gray-600 mb-6">Information about payment methods, refund policies, and processing times.</p>
+                <a href="#paymentFAQ" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors font-medium">
+                    View Questions
+                </a>
             </div>
-            <div class="col-md-4">
-                <div class="card faq-category h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="category-icon">
-                            <i class="fas fa-bus"></i>
-                        </div>
-                        <h4>Bus Services</h4>
-                        <p>Details about bus types, amenities, schedules, and routes.</p>
-                        <a href="#busFAQ" class="btn btn-outline-primary">View Questions</a>
-                    </div>
+            
+            <!-- Bus Services -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-all duration-300 group border border-gray-100">
+                <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-bus text-3xl text-white"></i>
                 </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Bus Services</h3>
+                <p class="text-gray-600 mb-6">Details about bus types, amenities, schedules, and routes.</p>
+                <a href="#busFAQ" class="bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600 transition-colors font-medium">
+                    View Questions
+                </a>
             </div>
-            <div class="col-md-4">
-                <div class="card faq-category h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="category-icon">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <h4>Account & Profile</h4>
-                        <p>Help with account creation, login issues, and profile management.</p>
-                        <a href="#accountFAQ" class="btn btn-outline-primary">View Questions</a>
-                    </div>
+            
+            <!-- Account & Profile -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-all duration-300 group border border-gray-100">
+                <div class="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-user-circle text-3xl text-white"></i>
                 </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Account & Profile</h3>
+                <p class="text-gray-600 mb-6">Managing your account, profile settings, and personal information.</p>
+                <a href="#accountFAQ" class="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium">
+                    View Questions
+                </a>
             </div>
-            <div class="col-md-4">
-                <div class="card faq-category h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="category-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <h4>Mobile App</h4>
-                        <p>Information about our mobile application features and troubleshooting.</p>
-                        <a href="#appFAQ" class="btn btn-outline-primary">View Questions</a>
-                    </div>
+            
+            <!-- Mobile App -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-all duration-300 group border border-gray-100">
+                <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-mobile-alt text-3xl text-white"></i>
                 </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Mobile App</h3>
+                <p class="text-gray-600 mb-6">Questions about downloading and using the TravelMate mobile app.</p>
+                <a href="#appFAQ" class="bg-indigo-500 text-white px-6 py-3 rounded-lg hover:bg-indigo-600 transition-colors font-medium">
+                    View Questions
+                </a>
             </div>
-            <div class="col-md-4">
-                <div class="card faq-category h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="category-icon">
-                            <i class="fas fa-headset"></i>
-                        </div>
-                        <h4>Customer Support</h4>
-                        <p>Questions about contacting support, response times, and issue resolution.</p>
-                        <a href="#supportFAQ" class="btn btn-outline-primary">View Questions</a>
-                    </div>
+            
+            <!-- Customer Support -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-all duration-300 group border border-gray-100">
+                <div class="w-20 h-20 bg-gradient-to-br from-pink-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-headset text-3xl text-white"></i>
                 </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Customer Support</h3>
+                <p class="text-gray-600 mb-6">How to get help and contact our support team for assistance.</p>
+                <a href="#supportFAQ" class="bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors font-medium">
+                    View Questions
+                </a>
             </div>
         </div>
     </div>
 </section>
 
-<!-- FAQ Sections -->
-<section class="py-5">
-    <div class="container">
-        <!-- Booking & Tickets -->
-        <div id="bookingFAQ" class="mb-5">
-            <h2 class="mb-4">Booking & Tickets</h2>
-            <div class="accordion" id="accordionBooking">
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="bookingHeading1">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#bookingCollapse1" aria-expanded="true" aria-controls="bookingCollapse1">
-                            How do I book a bus ticket on TravelMate?
-                        </button>
-                    </h2>
-                    <div id="bookingCollapse1" class="accordion-collapse collapse show" aria-labelledby="bookingHeading1" data-bs-parent="#accordionBooking">
-                        <div class="accordion-body">
-                            <p>Booking a bus ticket on TravelMate is simple:</p>
-                            <ol>
-                                <li>Enter your source, destination, and travel date in the search form</li>
-                                <li>Browse the available buses and select one that suits your preferences</li>
-                                <li>Choose your preferred seat(s)</li>
+<!-- FAQ Content -->
+<section class="py-20 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Booking & Tickets FAQ -->
+        <div id="bookingFAQ" class="mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center">
+                <i class="fas fa-ticket-alt text-blue-500 mr-3"></i>Booking & Tickets
+            </h2>
+            
+            <div class="space-y-4">
+                <!-- FAQ Item 1 -->
+                <div class="faq-item bg-gray-50 rounded-xl border border-gray-200">
+                    <button class="faq-question w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-xl" onclick="toggleFAQ(this)">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-lg font-semibold text-gray-900">How do I book a bus ticket on TravelMate?</h4>
+                            <i class="fas fa-chevron-down text-gray-500 transform transition-transform duration-200"></i>
+                        </div>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-6">
+                        <div class="text-gray-600 leading-relaxed">
+                            <p class="mb-4">Booking a bus ticket on TravelMate is simple and straightforward:</p>
+                            <ol class="list-decimal list-inside space-y-2">
+                                <li>Visit our website or download the mobile app</li>
+                                <li>Enter your departure and destination cities</li>
+                                <li>Select your travel date</li>
+                                <li>Choose from available buses and timings</li>
+                                <li>Select your preferred seats</li>
                                 <li>Enter passenger details</li>
-                                <li>Select a payment method and complete the payment</li>
+                                <li>Make payment using your preferred method</li>
                                 <li>Receive your e-ticket via email and SMS</li>
                             </ol>
-                            <p>You can book tickets through our website or mobile app.</p>
                         </div>
                     </div>
                 </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="bookingHeading2">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bookingCollapse2" aria-expanded="false" aria-controls="bookingCollapse2">
-                            Can I book tickets for someone else?
-                        </button>
-                    </h2>
-                    <div id="bookingCollapse2" class="accordion-collapse collapse" aria-labelledby="bookingHeading2" data-bs-parent="#accordionBooking">
-                        <div class="accordion-body">
-                            <p>Yes, you can book tickets for friends, family members, or anyone else. During the booking process, you'll need to enter the passenger details including their name, age, gender, and contact information. The e-ticket will be issued in the passenger's name, but the booking confirmation will be sent to your email address and phone number.</p>
+                
+                <!-- FAQ Item 2 -->
+                <div class="faq-item bg-gray-50 rounded-xl border border-gray-200">
+                    <button class="faq-question w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-xl" onclick="toggleFAQ(this)">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-lg font-semibold text-gray-900">Can I cancel or modify my booking?</h4>
+                            <i class="fas fa-chevron-down text-gray-500 transform transition-transform duration-200"></i>
                         </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="bookingHeading3">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bookingCollapse3" aria-expanded="false" aria-controls="bookingCollapse3">
-                            How do I receive my ticket after booking?
-                        </button>
-                    </h2>
-                    <div id="bookingCollapse3" class="accordion-collapse collapse" aria-labelledby="bookingHeading3" data-bs-parent="#accordionBooking">
-                        <div class="accordion-body">
-                            <p>After completing your booking and payment, you will receive:</p>
-                            <ul>
-                                <li>An immediate booking confirmation on the website/app</li>
-                                <li>An e-ticket sent to your registered email address</li>
-                                <li>A text message with booking details and a ticket link to your registered mobile number</li>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-6">
+                        <div class="text-gray-600 leading-relaxed">
+                            <p class="mb-4">Yes, you can cancel or modify your booking subject to the cancellation policy:</p>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>Cancellations made 24+ hours before departure: 10% cancellation fee</li>
+                                <li>Cancellations made 12-24 hours before: 25% cancellation fee</li>
+                                <li>Cancellations made 6-12 hours before: 50% cancellation fee</li>
+                                <li>Cancellations made less than 6 hours before: No refund</li>
                             </ul>
-                            <p>You can also access your tickets anytime by logging into your TravelMate account and going to the "My Bookings" section.</p>
+                            <p class="mt-4">To cancel or modify, visit 'My Bookings' in your account or contact customer support.</p>
                         </div>
                     </div>
                 </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="bookingHeading4">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bookingCollapse4" aria-expanded="false" aria-controls="bookingCollapse4">
-                            How do I cancel my booking?
-                        </button>
-                    </h2>
-                    <div id="bookingCollapse4" class="accordion-collapse collapse" aria-labelledby="bookingHeading4" data-bs-parent="#accordionBooking">
-                        <div class="accordion-body">
-                            <p>To cancel your booking:</p>
-                            <ol>
-                                <li>Log in to your TravelMate account</li>
-                                <li>Go to "My Bookings"</li>
-                                <li>Select the booking you wish to cancel</li>
-                                <li>Click on the "Cancel Booking" button</li>
-                                <li>Confirm the cancellation</li>
-                                <li>Select a reason for cancellation</li>
-                                <li>Submit the cancellation request</li>
-                            </ol>
-                            <p>The refund amount will be calculated based on the cancellation policy of the bus operator and how close to the departure time you are cancelling. The refund will be processed to your original payment method.</p>
+                
+                <!-- FAQ Item 3 -->
+                <div class="faq-item bg-gray-50 rounded-xl border border-gray-200">
+                    <button class="faq-question w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-xl" onclick="toggleFAQ(this)">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-lg font-semibold text-gray-900">How will I receive my ticket?</h4>
+                            <i class="fas fa-chevron-down text-gray-500 transform transition-transform duration-200"></i>
                         </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="bookingHeading5">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bookingCollapse5" aria-expanded="false" aria-controls="bookingCollapse5">
-                            Can I modify my booking after confirmation?
-                        </button>
-                    </h2>
-                    <div id="bookingCollapse5" class="accordion-collapse collapse" aria-labelledby="bookingHeading5" data-bs-parent="#accordionBooking">
-                        <div class="accordion-body">
-                            <p>Partial modifications to bookings are not supported. If you need to change any details of your booking (such as travel date, passenger information, or seat selection), you will need to cancel your current booking and make a new one with the updated information. Please note that cancellation charges may apply based on the bus operator's policy.</p>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-6">
+                        <div class="text-gray-600 leading-relaxed">
+                            <p>After successful booking and payment, you will receive your e-ticket through:</p>
+                            <ul class="list-disc list-inside space-y-2 mt-4">
+                                <li>Email to your registered email address</li>
+                                <li>SMS to your registered mobile number</li>
+                                <li>Download from your account dashboard</li>
+                                <li>TravelMate mobile app</li>
+                            </ul>
+                            <p class="mt-4">Please ensure you carry a printed copy or show the digital ticket on your mobile device while boarding.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Payments & Refunds -->
-        <div id="paymentFAQ" class="mb-5">
-            <h2 class="mb-4">Payments & Refunds</h2>
-            <div class="accordion" id="accordionPayment">
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="paymentHeading1">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#paymentCollapse1" aria-expanded="true" aria-controls="paymentCollapse1">
-                            What payment methods are accepted?
-                        </button>
-                    </h2>
-                    <div id="paymentCollapse1" class="accordion-collapse collapse show" aria-labelledby="paymentHeading1" data-bs-parent="#accordionPayment">
-                        <div class="accordion-body">
-                            <p>TravelMate accepts the following payment methods:</p>
-                            <ul>
-                                <li><strong>Online Payment:</strong> eSewa, Khalti</li>
-                                <li><strong>Offline Payment:</strong> Pay to Bus Conductor (Cash payment when boarding)</li>
+        <!-- Payments & Refunds FAQ -->
+        <div id="paymentFAQ" class="mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center">
+                <i class="fas fa-money-bill-wave text-green-500 mr-3"></i>Payments & Refunds
+            </h2>
+            
+            <div class="space-y-4">
+                <!-- FAQ Item 1 -->
+                <div class="faq-item bg-gray-50 rounded-xl border border-gray-200">
+                    <button class="faq-question w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-xl" onclick="toggleFAQ(this)">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-lg font-semibold text-gray-900">What payment methods do you accept?</h4>
+                            <i class="fas fa-chevron-down text-gray-500 transform transition-transform duration-200"></i>
+                        </div>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-6">
+                        <div class="text-gray-600 leading-relaxed">
+                            <p class="mb-4">We accept multiple payment methods for your convenience:</p>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>Credit Cards (Visa, MasterCard, American Express)</li>
+                                <li>Debit Cards</li>
+                                <li>Mobile Banking</li>
+                                <li>Digital Wallets (eSewa, Khalti, IME Pay)</li>
+                                <li>Net Banking</li>
+                                <li>UPI Payments</li>
                             </ul>
-                            <p>All payment transactions are secure and encrypted to ensure your financial information is protected.</p>
+                            <p class="mt-4">All payments are processed securely with bank-level encryption.</p>
                         </div>
                     </div>
                 </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="paymentHeading2">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#paymentCollapse2" aria-expanded="false" aria-controls="paymentCollapse2">
-                            What is the refund policy?
-                        </button>
-                    </h2>
-                    <div id="paymentCollapse2" class="accordion-collapse collapse" aria-labelledby="paymentHeading2" data-bs-parent="#accordionPayment">
-                        <div class="accordion-body">
-                            <p>The refund policy varies depending on the bus operator and how close to the departure time you are cancelling. Generally:</p>
-                            <ul>
-                                <li>Cancellations made more than 48 hours before departure: 90% refund</li>
-                                <li>Cancellations made 24-48 hours before departure: 75% refund</li>
-                                <li>Cancellations made 12-24 hours before departure: 50% refund</li>
-                                <li>Cancellations made less than 12 hours before departure: 25% refund or no refund (depending on the operator)</li>
-                            </ul>
-                            <p>The exact refund amount will be displayed at the time of cancellation. TravelMate service fee is non-refundable in most cases.</p>
+                
+                <!-- FAQ Item 2 -->
+                <div class="faq-item bg-gray-50 rounded-xl border border-gray-200">
+                    <button class="faq-question w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-green-500 rounded-xl" onclick="toggleFAQ(this)">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-lg font-semibold text-gray-900">How long does it take to process refunds?</h4>
+                            <i class="fas fa-chevron-down text-gray-500 transform transition-transform duration-200"></i>
                         </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="paymentHeading3">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#paymentCollapse3" aria-expanded="false" aria-controls="paymentCollapse3">
-                            How long does it take to process refunds?
-                        </button>
-                    </h2>
-                    <div id="paymentCollapse3" class="accordion-collapse collapse" aria-labelledby="paymentHeading3" data-bs-parent="#accordionPayment">
-                        <div class="accordion-body">
-                            <p>Once your cancellation request is approved, the refund process begins immediately. The time it takes for the refund to reflect in your account depends on your payment method:</p>
-                            <ul>
-                                <li>TravelMate Wallet: Instant</li>
-                                <li>Credit/Debit Cards: 5-7 business days</li>
-                                <li>Online Banking: 3-5 business days</li>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-6">
+                        <div class="text-gray-600 leading-relaxed">
+                            <p class="mb-4">Refund processing times vary by payment method:</p>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>Digital Wallets (eSewa, Khalti): 1-2 business days</li>
+                                <li>Credit/Debit Cards: 3-7 business days</li>
+                                <li>Net Banking: 2-5 business days</li>
                                 <li>Mobile Banking: 1-3 business days</li>
-                                <li>Digital Wallets (eSewa, Khalti, IME Pay): 1-3 business days</li>
                             </ul>
-                            <p>If you haven't received your refund after the expected timeframe, please contact our customer support team.</p>
+                            <p class="mt-4">You will receive an email confirmation once the refund is processed. If you don't receive your refund within the specified time, please contact our customer support.</p>
                         </div>
                     </div>
                 </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="paymentHeading4">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#paymentCollapse4" aria-expanded="false" aria-controls="paymentCollapse4">
-                            Is there a service fee for bookings?
-                        </button>
-                    </h2>
-                    <div id="paymentCollapse4" class="accordion-collapse collapse" aria-labelledby="paymentHeading4" data-bs-parent="#accordionPayment">
-                        <div class="accordion-body">
-                            <p>Yes, TravelMate charges a small service fee for each booking. The service fee varies depending on the ticket price and is clearly displayed during the booking process before payment. This fee helps us maintain and improve our platform to provide you with the best booking experience.</p>
+            </div>
+        </div>
+        
+        <!-- Bus Services FAQ -->
+        <div id="busFAQ" class="mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center">
+                <i class="fas fa-bus text-purple-500 mr-3"></i>Bus Services
+            </h2>
+            
+            <div class="space-y-4">
+                <!-- FAQ Item 1 -->
+                <div class="faq-item bg-gray-50 rounded-xl border border-gray-200">
+                    <button class="faq-question w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-xl" onclick="toggleFAQ(this)">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-lg font-semibold text-gray-900">What types of buses are available?</h4>
+                            <i class="fas fa-chevron-down text-gray-500 transform transition-transform duration-200"></i>
+                        </div>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-6">
+                        <div class="text-gray-600 leading-relaxed">
+                            <p class="mb-4">We offer various types of buses to suit different preferences and budgets:</p>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>AC Buses:</strong> Air-conditioned comfort for hot weather travel</li>
+                                <li><strong>Non-AC Buses:</strong> Budget-friendly option with natural ventilation</li>
+                                <li><strong>Sleeper Buses:</strong> Comfortable beds for overnight journeys</li>
+                                <li><strong>Semi-Sleeper:</strong> Reclining seats for comfortable day travel</li>
+                                <li><strong>Luxury Buses:</strong> Premium amenities and extra comfort</li>
+                            </ul>
+                            <p class="mt-4">Each bus type comes with different amenities like WiFi, charging points, entertainment systems, and refreshments.</p>
                         </div>
                     </div>
                 </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="paymentHeading5">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#paymentCollapse5" aria-expanded="false" aria-controls="paymentCollapse5">
-                            What happens if my payment fails?
-                        </button>
-                    </h2>
-                    <div id="paymentCollapse5" class="accordion-collapse collapse" aria-labelledby="paymentHeading5" data-bs-parent="#accordionPayment">
-                        <div class="accordion-body">
-                            <p>If your payment fails during the booking process, your booking will not be confirmed. You can try the following:</p>
-                            <ol>
-                                <li>Check your internet connection and try again</li>
-                                <li>Try a different payment method</li>
-                                <li>Ensure you have sufficient funds in your account</li>
-                                <li>Check if your card is enabled for online transactions</li>
-                                <li>Contact your bank if the issue persists</li>
+            </div>
+        </div>
+        
+        <!-- Account & Profile FAQ -->
+        <div id="accountFAQ" class="mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center">
+                <i class="fas fa-user-circle text-orange-500 mr-3"></i>Account & Profile
+            </h2>
+            
+            <div class="space-y-4">
+                <!-- FAQ Item 1 -->
+                <div class="faq-item bg-gray-50 rounded-xl border border-gray-200">
+                    <button class="faq-question w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-xl" onclick="toggleFAQ(this)">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-lg font-semibold text-gray-900">How do I create an account?</h4>
+                            <i class="fas fa-chevron-down text-gray-500 transform transition-transform duration-200"></i>
+                        </div>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-6">
+                        <div class="text-gray-600 leading-relaxed">
+                            <p class="mb-4">Creating an account is quick and easy:</p>
+                            <ol class="list-decimal list-inside space-y-2">
+                                <li>Click on 'Sign Up' on our website or app</li>
+                                <li>Enter your email address and create a password</li>
+                                <li>Provide your basic information (name, phone number)</li>
+                                <li>Verify your email address</li>
+                                <li>Complete your profile setup</li>
                             </ol>
-                            <p>If money was deducted from your account but the booking was not confirmed, the amount will be automatically refunded within 5-7 business days. You can also contact our customer support team for assistance.</p>
+                            <p class="mt-4">Having an account allows you to track bookings, save payment methods, and receive personalized offers.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Bus Services -->
-        <div id="busFAQ" class="mb-5">
-            <h2 class="mb-4">Bus Services</h2>
-            <div class="accordion" id="accordionBus">
-                <!-- Add bus service FAQs here -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="busHeading1">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#busCollapse1" aria-expanded="true" aria-controls="busCollapse1">
-                            What types of buses are available on TravelMate?
-                        </button>
-                    </h2>
-                    <div id="busCollapse1" class="accordion-collapse collapse show" aria-labelledby="busHeading1" data-bs-parent="#accordionBus">
-                        <div class="accordion-body">
-                            <p>TravelMate offers various types of buses to suit different preferences and budgets:</p>
-                            <ul>
-                                <li><strong>Standard Buses:</strong> Basic comfortable seating with essential amenities</li>
-                                <li><strong>Deluxe Buses:</strong> Enhanced comfort with extra legroom and better amenities</li>
-                                <li><strong>Luxury Buses:</strong> Premium experience with plush seating, entertainment systems, and premium amenities</li>
-                                <li><strong>Sleeper Buses:</strong> Buses with berths for overnight journeys</li>
-                                <li><strong>Semi-Sleeper Buses:</strong> Reclining seats for comfortable overnight travel</li>
-                                <li><strong>AC Buses:</strong> Air-conditioned buses for comfortable travel in hot weather</li>
-                                <li><strong>Non-AC Buses:</strong> More economical option for short journeys</li>
+        <!-- Mobile App FAQ -->
+        <div id="appFAQ" class="mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center">
+                <i class="fas fa-mobile-alt text-indigo-500 mr-3"></i>Mobile App
+            </h2>
+            
+            <div class="space-y-4">
+                <!-- FAQ Item 1 -->
+                <div class="faq-item bg-gray-50 rounded-xl border border-gray-200">
+                    <button class="faq-question w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-xl" onclick="toggleFAQ(this)">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-lg font-semibold text-gray-900">Where can I download the TravelMate app?</h4>
+                            <i class="fas fa-chevron-down text-gray-500 transform transition-transform duration-200"></i>
+                        </div>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-6">
+                        <div class="text-gray-600 leading-relaxed">
+                            <p class="mb-4">The TravelMate mobile app is available for both Android and iOS devices:</p>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Android:</strong> Download from Google Play Store</li>
+                                <li><strong>iOS:</strong> Download from Apple App Store</li>
                             </ul>
-                            <p>You can filter buses by type during the search process to find the one that best suits your needs.</p>
+                            <p class="mt-4">You can also scan the QR code on our website to directly download the app on your device. The app offers all website features plus exclusive mobile-only deals and notifications.</p>
                         </div>
                     </div>
                 </div>
-                <!-- More bus service FAQs -->
             </div>
         </div>
         
-        <!-- Account & Profile -->
-        <div id="accountFAQ" class="mb-5">
-            <h2 class="mb-4">Account & Profile</h2>
-            <div class="accordion" id="accordionAccount">
-                <!-- Add account FAQs here -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="accountHeading1">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accountCollapse1" aria-expanded="true" aria-controls="accountCollapse1">
-                            How do I create an account on TravelMate?
-                        </button>
-                    </h2>
-                    <div id="accountCollapse1" class="accordion-collapse collapse show" aria-labelledby="accountHeading1" data-bs-parent="#accordionAccount">
-                        <div class="accordion-body">
-                            <p>Creating an account on TravelMate is simple:</p>
-                            <ol>
-                                <li>Click on the "Sign Up" or "Register" button on the top right corner of the website or app</li>
-                                <li>Enter your email address, phone number, and create a password</li>
-                                <li>Verify your email address and/or phone number</li>
-                                <li>Complete your profile by adding your name and other details</li>
-                                <li>Start booking your bus tickets!</li>
-                            </ol>
-                            <p>You can also sign up using your Google, Facebook, or Apple account for quicker registration.</p>
+        <!-- Customer Support FAQ -->
+        <div id="supportFAQ" class="mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center">
+                <i class="fas fa-headset text-pink-500 mr-3"></i>Customer Support
+            </h2>
+            
+            <div class="space-y-4">
+                <!-- FAQ Item 1 -->
+                <div class="faq-item bg-gray-50 rounded-xl border border-gray-200">
+                    <button class="faq-question w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-pink-500 rounded-xl" onclick="toggleFAQ(this)">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-lg font-semibold text-gray-900">How can I contact TravelMate customer support?</h4>
+                            <i class="fas fa-chevron-down text-gray-500 transform transition-transform duration-200"></i>
                         </div>
-                    </div>
-                </div>
-                <!-- More account FAQs -->
-            </div>
-        </div>
-        
-        <!-- Mobile App -->
-        <div id="appFAQ" class="mb-5">
-            <h2 class="mb-4">Mobile App</h2>
-            <div class="accordion" id="accordionApp">
-                <!-- Add mobile app FAQs here -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="appHeading1">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#appCollapse1" aria-expanded="true" aria-controls="appCollapse1">
-                            Where can I download the TravelMate mobile app?
-                        </button>
-                    </h2>
-                    <div id="appCollapse1" class="accordion-collapse collapse show" aria-labelledby="appHeading1" data-bs-parent="#accordionApp">
-                        <div class="accordion-body">
-                            <p>The TravelMate mobile app is available for both Android and iOS devices:</p>
-                            <ul>
-                                <li>For Android devices: Download from the Google Play Store</li>
-                                <li>For iOS devices: Download from the Apple App Store</li>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-6">
+                        <div class="text-gray-600 leading-relaxed">
+                            <p class="mb-4">You can contact our customer support team through multiple channels:</p>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Phone:</strong> +977 9847435111 (available 24/7)</li>
+                                <li><strong>Email:</strong> support@travelmate.com</li>
+                                <li><strong>Live Chat:</strong> Available on website and mobile app</li>
+                                <li><strong>Contact Form:</strong> Fill out the form on our Contact Us page</li>
+                                <li><strong>Social Media:</strong> Facebook, Twitter, Instagram</li>
                             </ul>
-                            <p>You can also scan the QR code on our website to directly download the app on your device.</p>
+                            <p class="mt-4">Our customer support team is available 24/7 to assist you with any queries or issues.</p>
                         </div>
                     </div>
                 </div>
-                <!-- More mobile app FAQs -->
-            </div>
-        </div>
-        
-        <!-- Customer Support -->
-        <div id="supportFAQ" class="mb-5">
-            <h2 class="mb-4">Customer Support</h2>
-            <div class="accordion" id="accordionSupport">
-                <!-- Add customer support FAQs here -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="supportHeading1">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#supportCollapse1" aria-expanded="true" aria-controls="supportCollapse1">
-                            How can I contact TravelMate customer support?
-                        </button>
-                    </h2>
-                    <div id="supportCollapse1" class="accordion-collapse collapse show" aria-labelledby="supportHeading1" data-bs-parent="#accordionSupport">
-                        <div class="accordion-body">
-                            <p>You can contact our customer support team through multiple channels:</p>
-                            <ul>
-                                <li><strong>Phone:</strong> Call us at +977 9847435111 (available 24/7)</li>
-                                <li><strong>Email:</strong> Send an email to support@travelmate.com</li>
-                                <li><strong>Live Chat:</strong> Use the chat feature on our website or mobile app</li>
-                                <li><strong>Contact Form:</strong> Fill out the contact form on our Contact Us page</li>
-                                <li><strong>Social Media:</strong> Message us on Facebook, Twitter, or Instagram</li>
-                            </ul>
-                            <p>Our customer support team is available 24/7 to assist you with any queries or issues.</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- More customer support FAQs -->
             </div>
         </div>
     </div>
 </section>
 
 <!-- Still Have Questions -->
-<section class="py-5 bg-light">
-    <div class="container text-center">
-        <h2 class="mb-4">Still Have Questions?</h2>
-        <p class="lead mb-4">If you couldn't find the answer to your question, please don't hesitate to contact our customer support team. We're here to help!</p>
-        <a href="{% url 'home:contact' %}" class="btn btn-primary btn-lg">Contact Us</a>
+<section class="py-20 bg-gradient-to-r from-blue-600 via-purple-700 to-blue-800 text-white relative overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-full h-full" style="background-image: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.1"><circle cx="30" cy="30" r="4"/></g></g></svg>');"></div>
+    </div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-4xl font-bold mb-6">Still Have Questions?</h2>
+        <p class="text-xl text-blue-100 mb-10 max-w-3xl mx-auto">
+            If you couldn't find the answer to your question, please don't hesitate to contact our customer support team. We're here to help 24/7!
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'home:contact' %}"
+               class="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <i class="fas fa-envelope mr-2"></i>Contact Support
+            </a>
+            <a href="tel:+9779847435111"
+               class="border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300">
+                <i class="fas fa-phone mr-2"></i>Call Now
+            </a>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 pt-16 border-t border-white/20">
+            <div class="text-center">
+                <div class="text-3xl font-bold text-white mb-2">24/7</div>
+                <div class="text-blue-200">Support Available</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-white mb-2">&lt;2hrs</div>
+                <div class="text-blue-200">Response Time</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-white mb-2">99%</div>
+                <div class="text-blue-200">Customer Satisfaction</div>
+            </div>
+        </div>
     </div>
 </section>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
         // FAQ search functionality
-        $('#faqSearch').on('keyup', function() {
-            var value = $(this).val().toLowerCase();
-            $('.accordion-item').filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        const searchInput = document.getElementById('faqSearch');
+        const faqItems = document.querySelectorAll('.faq-item');
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            faqItems.forEach(item => {
+                const questionText = item.querySelector('.faq-question').textContent.toLowerCase();
+                const answerText = item.querySelector('.faq-answer').textContent.toLowerCase();
+                
+                if (questionText.includes(searchTerm) || answerText.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = searchTerm === '' ? 'block' : 'none';
+                }
             });
         });
         
         // Smooth scroll to FAQ sections
-        $('a[href^="#"]').on('click', function(e) {
-            e.preventDefault();
-            var target = $(this.hash);
-            if (target.length) {
-                $('html, body').animate({
-                    scrollTop: target.offset().top - 100
-                }, 500);
-            }
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in-up');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe elements for animation
+        document.querySelectorAll('.group, .faq-item').forEach(el => {
+            observer.observe(el);
         });
     });
+    
+    // Toggle FAQ function
+    function toggleFAQ(button) {
+        const faqItem = button.closest('.faq-item');
+        const answer = faqItem.querySelector('.faq-answer');
+        const icon = button.querySelector('i');
+        
+        // Close all other FAQ items
+        document.querySelectorAll('.faq-item').forEach(item => {
+            if (item !== faqItem) {
+                const otherAnswer = item.querySelector('.faq-answer');
+                const otherIcon = item.querySelector('.faq-question i');
+                otherAnswer.classList.add('hidden');
+                otherIcon.style.transform = 'rotate(0deg)';
+            }
+        });
+        
+        // Toggle current FAQ item
+        if (answer.classList.contains('hidden')) {
+            answer.classList.remove('hidden');
+            icon.style.transform = 'rotate(180deg)';
+        } else {
+            answer.classList.add('hidden');
+            icon.style.transform = 'rotate(0deg)';
+        }
+    }
 </script>
+
+<style>
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+}
+</style>
 {% endblock %}

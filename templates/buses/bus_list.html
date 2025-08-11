@@ -3,377 +3,350 @@
 
 {% block title %}Available Buses - TravelMate{% endblock %}
 
-{% block extra_css %}
-<style>
-    .buses-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 3rem 0;
-        margin-top: -1.5rem;
-    }
-    .search-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
-        padding: 1.5rem;
-    }
-    .bus-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        margin-bottom: 1.5rem;
-        transition: all 0.3s ease;
-        overflow: hidden;
-    }
-    .bus-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    }
-    .bus-header {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        padding: 1.5rem;
-        border-bottom: 1px solid #dee2e6;
-    }
-    .bus-body {
-        padding: 1.5rem;
-    }
-    .bus-name {
-        font-size: 1.25rem;
-        font-weight: bold;
-        color: #495057;
-        margin-bottom: 0.5rem;
-    }
-    .bus-type {
-        background: #667eea;
-        color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.875rem;
-        display: inline-block;
-    }
-    .bus-info {
-        display: flex;
-        align-items: center;
-        margin-bottom: 0.75rem;
-    }
-    .bus-info i {
-        width: 20px;
-        color: #667eea;
-        margin-right: 0.5rem;
-    }
-    .amenities {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-    }
-    .amenity-tag {
-        background: #e3f2fd;
-        color: #1976d2;
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        display: flex;
-        align-items: center;
-    }
-    .amenity-tag i {
-        margin-right: 0.25rem;
-    }
-    .btn-book {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        border-radius: 8px;
-        padding: 10px 25px;
-        color: white;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-    .btn-book:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        color: white;
-        text-decoration: none;
-    }
-    .filter-section {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    .filter-title {
-        font-weight: bold;
-        margin-bottom: 1rem;
-        color: #495057;
-    }
-    .no-buses {
-        text-align: center;
-        padding: 3rem;
-        color: #6c757d;
-    }
-    .no-buses i {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-    .pagination-wrapper {
-        display: flex;
-        justify-content: center;
-        margin-top: 2rem;
-    }
-    .sort-options {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-    .sort-btn {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        padding: 0.5rem 1rem;
-        color: #495057;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-    .sort-btn:hover, .sort-btn.active {
-        background: #667eea;
-        color: white;
-        text-decoration: none;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<!-- Buses Header -->
-<section class="buses-header">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <h1 class="mb-2"><i class="fas fa-bus me-2"></i>Available Buses</h1>
-                <p class="mb-0">Find the perfect bus for your journey across Nepal</p>
-            </div>
+<!-- Header -->
+<section class="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-16 -mt-6">
+    <div class="container mx-auto px-4">
+        <div class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-2">Available Buses</h1>
+            <p class="text-xl opacity-90">Find the perfect bus for your journey</p>
         </div>
     </div>
 </section>
 
-<!-- Search and Filters -->
-<section class="py-5">
-    <div class="container">
-        <!-- Search Form -->
-        <div class="search-card">
-            <form method="get" class="row g-3">
-                <div class="col-md-3">
-                    <label class="form-label">Bus Name</label>
-                    <input type="text" name="search" class="form-control" placeholder="Search buses..." value="{{ request.GET.search }}">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Bus Type</label>
-                    <select name="bus_type" class="form-select">
-                        <option value="">All Types</option>
-                        {% for type in bus_types %}
-                            <option value="{{ type.id }}" {% if request.GET.bus_type == type.id|stringformat:'s' %}selected{% endif %}>
-                                {{ type.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Minimum Seats</label>
-                    <input type="number" name="min_seats" class="form-control" placeholder="Min seats" value="{{ request.GET.min_seats }}">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">&nbsp;</label>
-                    <button type="submit" class="btn btn-primary d-block w-100">
-                        <i class="fas fa-search me-2"></i>Search
+<!-- Bus Listing -->
+<section class="py-12 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- Search and Filters -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                    <i class="fas fa-search mr-2 text-blue-500"></i>Search & Filter Buses
+                </h3>
+                
+                <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                        <input type="text" name="search" value="{{ request.GET.search }}" 
+                               placeholder="Bus number, operator..." 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Bus Type</label>
+                        <select name="bus_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">All Types</option>
+                            <option value="ac" {% if request.GET.bus_type == 'ac' %}selected{% endif %}>AC</option>
+                            <option value="non_ac" {% if request.GET.bus_type == 'non_ac' %}selected{% endif %}>Non-AC</option>
+                            <option value="sleeper" {% if request.GET.bus_type == 'sleeper' %}selected{% endif %}>Sleeper</option>
+                            <option value="semi_sleeper" {% if request.GET.bus_type == 'semi_sleeper' %}selected{% endif %}>Semi-Sleeper</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Min Seats</label>
+                        <input type="number" name="min_seats" value="{{ request.GET.min_seats }}" 
+                               placeholder="Minimum seats" min="1" max="60"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                        <select name="sort" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Default</option>
+                            <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name</option>
+                            <option value="capacity" {% if request.GET.sort == 'capacity' %}selected{% endif %}>Capacity</option>
+                            <option value="type" {% if request.GET.sort == 'type' %}selected{% endif %}>Type</option>
+                        </select>
+                    </div>
+                </form>
+                
+                <div class="flex justify-between items-center mt-4">
+                    <button type="submit" form="filterForm" 
+                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-search mr-2"></i>Search Buses
                     </button>
+                    
+                    {% if request.GET.search or request.GET.bus_type or request.GET.min_seats or request.GET.sort %}
+                        <a href="{% url 'buses:bus_list' %}" 
+                           class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                            <i class="fas fa-times mr-2"></i>Clear Filters
+                        </a>
+                    {% endif %}
                 </div>
-            </form>
-        </div>
-        
-        <!-- Sort Options -->
-        <div class="sort-options">
-            <span class="fw-bold">Sort by:</span>
-            <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.bus_type %}bus_type={{ request.GET.bus_type }}&{% endif %}{% if request.GET.min_seats %}min_seats={{ request.GET.min_seats }}&{% endif %}sort=name" 
-               class="sort-btn {% if request.GET.sort == 'name' or not request.GET.sort %}active{% endif %}">
-                <i class="fas fa-sort-alpha-down me-1"></i>Name
-            </a>
-            <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.bus_type %}bus_type={{ request.GET.bus_type }}&{% endif %}{% if request.GET.min_seats %}min_seats={{ request.GET.min_seats }}&{% endif %}sort=seats" 
-               class="sort-btn {% if request.GET.sort == 'seats' %}active{% endif %}">
-                <i class="fas fa-sort-numeric-down me-1"></i>Seats
-            </a>
-            <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.bus_type %}bus_type={{ request.GET.bus_type }}&{% endif %}{% if request.GET.min_seats %}min_seats={{ request.GET.min_seats }}&{% endif %}sort=type" 
-               class="sort-btn {% if request.GET.sort == 'type' %}active{% endif %}">
-                <i class="fas fa-tags me-1"></i>Type
-            </a>
-        </div>
-        
-        <!-- Results Count -->
-        <div class="mb-3">
-            <p class="text-muted mb-0">
-                <i class="fas fa-info-circle me-1"></i>
-                Found {{ buses|length }} bus{{ buses|length|pluralize:"es" }}
-                {% if request.GET.search or request.GET.bus_type or request.GET.min_seats %}
-                    matching your criteria
-                {% endif %}
-            </p>
-        </div>
-        
-        <!-- Bus List -->
-        {% if buses %}
-            <div class="row">
-                {% for bus in buses %}
-                <div class="col-12">
-                    <div class="bus-card">
-                        <div class="bus-header">
-                            <div class="row align-items-center">
-                                <div class="col-md-8">
-                                    <div class="bus-name">{{ bus.bus_number }} - {{ bus.bus_name|default:"Bus" }}</div>
-                                    <span class="bus-type">{{ bus.bus_type.name }}</span>
+            </div>
+            
+            <!-- Results Summary -->
+            {% if buses %}
+                <div class="flex justify-between items-center mb-6">
+                    <div class="text-gray-600">
+                        <span class="font-semibold">{{ buses|length }}</span> bus{{ buses|length|pluralize:"es" }} found
+                        {% if request.GET.search or request.GET.bus_type or request.GET.min_seats %}
+                            matching your criteria
+                        {% endif %}
+                    </div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-600">View:</span>
+                        <button onclick="toggleView('grid')" id="gridViewBtn" 
+                                class="p-2 rounded bg-blue-500 text-white">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button onclick="toggleView('list')" id="listViewBtn" 
+                                class="p-2 rounded bg-gray-300 text-gray-600">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Bus Cards -->
+            {% if buses %}
+                <div id="busContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for bus in buses %}
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 bus-card">
+                        <!-- Bus Header -->
+                        <div class="bg-gradient-to-r from-gray-50 to-gray-100 p-6 border-b border-gray-200">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-800 mb-1">{{ bus.bus_number }}</h3>
+                                    <p class="text-gray-600">{{ bus.operator|default:"TravelMate" }}</p>
                                 </div>
-                                <div class="col-md-4 text-md-end">
-                                    <a href="{% url 'bus_detail' bus.id %}" class="btn-book">
-                                        <i class="fas fa-eye me-2"></i>View Details
-                                    </a>
-                                </div>
+                                <span class="px-3 py-1 bg-blue-500 text-white rounded-full text-sm font-medium">
+                                    {{ bus.bus_type|title }}
+                                </span>
                             </div>
                         </div>
-                        <div class="bus-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="bus-info">
-                                        <i class="fas fa-chair"></i>
-                                        <span><strong>{{ bus.total_seats }}</strong> Total Seats</span>
+                        
+                        <!-- Bus Details -->
+                        <div class="p-6">
+                            <!-- Bus Info Grid -->
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div class="flex items-center text-gray-600">
+                                    <i class="fas fa-users mr-2 text-blue-500"></i>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Capacity</p>
+                                        <p class="font-semibold">{{ bus.total_seats }} seats</p>
                                     </div>
-                                    {% if bus.driver %}
-                                    <div class="bus-info">
-                                        <i class="fas fa-user-tie"></i>
-                                        <span>Driver: <strong>{{ bus.driver.name }}</strong></span>
-                                    </div>
-                                    <div class="bus-info">
-                                        <i class="fas fa-phone"></i>
-                                        <span>{{ bus.driver.phone_number }}</span>
-                                    </div>
-                                    {% endif %}
                                 </div>
-                                <div class="col-md-6">
-                                    {% if bus.amenities.all %}
-                                    <div class="amenities">
-                                        {% for amenity in bus.amenities.all %}
-                                        <span class="amenity-tag">
-                                            <i class="fas fa-check"></i>
-                                            {{ amenity.name }}
-                                        </span>
-                                        {% endfor %}
+                                
+                                <div class="flex items-center text-gray-600">
+                                    <i class="fas fa-chair mr-2 text-green-500"></i>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Available</p>
+                                        <p class="font-semibold text-green-600">{{ bus.available_seats|default:bus.total_seats }}</p>
                                     </div>
-                                    {% else %}
-                                    <p class="text-muted"><i class="fas fa-info-circle me-1"></i>No amenities listed</p>
-                                    {% endif %}
                                 </div>
+                                
+                                {% if bus.route %}
+                                <div class="flex items-center text-gray-600 col-span-2">
+                                    <i class="fas fa-route mr-2 text-purple-500"></i>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Route</p>
+                                        <p class="font-semibold">{{ bus.route.source }} → {{ bus.route.destination }}</p>
+                                    </div>
+                                </div>
+                                {% endif %}
                             </div>
                             
-                            <!-- Available Routes -->
-                            {% if bus.busschedule_set.all %}
-                            <div class="mt-3">
-                                <h6 class="mb-2"><i class="fas fa-route me-1"></i>Available Routes:</h6>
-                                <div class="row">
-                                    {% for schedule in bus.busschedule_set.all|slice:":3" %}
-                                    <div class="col-md-4">
-                                        <div class="border rounded p-2 mb-2">
-                                            <small class="text-muted d-block">{{ schedule.route.source }} → {{ schedule.route.destination }}</small>
-                                            <small class="fw-bold">रू {{ schedule.base_fare }}</small>
-                                        </div>
-                                    </div>
+                            <!-- Amenities -->
+                            {% if bus.amenities %}
+                            <div class="mb-4">
+                                <h4 class="text-sm font-medium text-gray-700 mb-2">Amenities</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    {% for amenity in bus.amenities.all %}
+                                    <span class="inline-flex items-center px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">
+                                        <i class="fas fa-{{ amenity.icon|default:'check' }} mr-1"></i>
+                                        {{ amenity.name }}
+                                    </span>
                                     {% endfor %}
                                 </div>
                             </div>
                             {% endif %}
+                            
+                            <!-- Features -->
+                            <div class="mb-4">
+                                <div class="flex flex-wrap gap-2">
+                                    {% if bus.is_ac %}
+                                    <span class="inline-flex items-center px-2 py-1 bg-green-50 text-green-700 rounded-full text-xs">
+                                        <i class="fas fa-snowflake mr-1"></i>AC
+                                    </span>
+                                    {% endif %}
+                                    {% if bus.has_wifi %}
+                                    <span class="inline-flex items-center px-2 py-1 bg-purple-50 text-purple-700 rounded-full text-xs">
+                                        <i class="fas fa-wifi mr-1"></i>WiFi
+                                    </span>
+                                    {% endif %}
+                                    {% if bus.has_charging %}
+                                    <span class="inline-flex items-center px-2 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs">
+                                        <i class="fas fa-charging-station mr-1"></i>Charging
+                                    </span>
+                                    {% endif %}
+                                    {% if bus.has_entertainment %}
+                                    <span class="inline-flex items-center px-2 py-1 bg-red-50 text-red-700 rounded-full text-xs">
+                                        <i class="fas fa-tv mr-1"></i>Entertainment
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="flex space-x-2">
+                                <a href="{% url 'buses:bus_detail' bus.id %}" 
+                                   class="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors text-center font-medium">
+                                    <i class="fas fa-eye mr-2"></i>View Details
+                                </a>
+                                
+                                {% if bus.available_seats > 0 %}
+                                    <a href="{% url 'bookings:seat_selection' bus.id %}" 
+                                       class="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors text-center font-medium">
+                                        <i class="fas fa-ticket-alt mr-2"></i>Book Now
+                                    </a>
+                                {% else %}
+                                    <button disabled 
+                                            class="flex-1 bg-gray-300 text-gray-500 py-2 px-4 rounded-lg cursor-not-allowed text-center font-medium">
+                                        <i class="fas fa-times mr-2"></i>Sold Out
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if is_paginated %}
+                    <div class="flex justify-center mt-8">
+                        <nav class="flex space-x-2">
+                            {% if page_obj.has_previous %}
+                                <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.bus_type %}&bus_type={{ request.GET.bus_type }}{% endif %}{% if request.GET.min_seats %}&min_seats={{ request.GET.min_seats }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
+                                   class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.bus_type %}&bus_type={{ request.GET.bus_type }}{% endif %}{% if request.GET.min_seats %}&min_seats={{ request.GET.min_seats }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
+                                   class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            {% endif %}
+                            
+                            <span class="bg-blue-500 text-white px-3 py-2 rounded">
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                            </span>
+                            
+                            {% if page_obj.has_next %}
+                                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.bus_type %}&bus_type={{ request.GET.bus_type }}{% endif %}{% if request.GET.min_seats %}&min_seats={{ request.GET.min_seats }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
+                                   class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.bus_type %}&bus_type={{ request.GET.bus_type }}{% endif %}{% if request.GET.min_seats %}&min_seats={{ request.GET.min_seats }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
+                                   class="bg-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-400">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                {% endif %}
+            {% else %}
+                <!-- Empty State -->
+                <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                    <div class="max-w-md mx-auto">
+                        <i class="fas fa-bus text-6xl text-gray-300 mb-6"></i>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">No Buses Found</h3>
+                        <p class="text-gray-600 mb-6">
+                            {% if request.GET.search or request.GET.bus_type or request.GET.min_seats %}
+                                No buses match your current filters. Try adjusting your search criteria.
+                            {% else %}
+                                No buses are currently available. Please check back later.
+                            {% endif %}
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                            <a href="{% url 'buses:bus_list' %}" 
+                               class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                                <i class="fas fa-refresh mr-2"></i>View All Buses
+                            </a>
+                            {% if request.GET.search or request.GET.bus_type or request.GET.min_seats %}
+                                <a href="{% url 'buses:bus_list' %}" 
+                                   class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
+                                    <i class="fas fa-times mr-2"></i>Clear Filters
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-                {% endfor %}
-            </div>
-            
-            <!-- Pagination -->
-            {% if is_paginated %}
-            <div class="pagination-wrapper">
-                <nav aria-label="Bus pagination">
-                    <ul class="pagination">
-                        {% if page_obj.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.bus_type %}&bus_type={{ request.GET.bus_type }}{% endif %}{% if request.GET.min_seats %}&min_seats={{ request.GET.min_seats }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
-                                    <i class="fas fa-angle-double-left"></i>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.bus_type %}&bus_type={{ request.GET.bus_type }}{% endif %}{% if request.GET.min_seats %}&min_seats={{ request.GET.min_seats }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
-                                    <i class="fas fa-angle-left"></i>
-                                </a>
-                            </li>
-                        {% endif %}
-                        
-                        {% for num in page_obj.paginator.page_range %}
-                            {% if page_obj.number == num %}
-                                <li class="page-item active">
-                                    <span class="page-link">{{ num }}</span>
-                                </li>
-                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.bus_type %}&bus_type={{ request.GET.bus_type }}{% endif %}{% if request.GET.min_seats %}&min_seats={{ request.GET.min_seats }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ num }}</a>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                        
-                        {% if page_obj.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.bus_type %}&bus_type={{ request.GET.bus_type }}{% endif %}{% if request.GET.min_seats %}&min_seats={{ request.GET.min_seats }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
-                                    <i class="fas fa-angle-right"></i>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.bus_type %}&bus_type={{ request.GET.bus_type }}{% endif %}{% if request.GET.min_seats %}&min_seats={{ request.GET.min_seats }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
-                                    <i class="fas fa-angle-double-right"></i>
-                                </a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-            </div>
             {% endif %}
-        {% else %}
-            <div class="no-buses">
-                <i class="fas fa-bus"></i>
-                <h4>No buses found</h4>
-                <p>Try adjusting your search criteria or check back later for new buses.</p>
-                <a href="{% url 'buses:bus_list' %}" class="btn btn-primary">
-                    <i class="fas fa-refresh me-2"></i>View All Buses
-                </a>
-            </div>
-        {% endif %}
+        </div>
     </div>
 </section>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
         // Auto-submit form on select change
-        $('select[name="bus_type"]').change(function() {
-            $(this).closest('form').submit();
+        const selects = document.querySelectorAll('select[name="bus_type"], select[name="sort"]');
+        selects.forEach(select => {
+            select.addEventListener('change', function() {
+                this.closest('form').submit();
+            });
         });
         
         // Add loading state to search button
-        $('form').submit(function() {
-            $(this).find('button[type="submit"]').html('<i class="fas fa-spinner fa-spin me-2"></i>Searching...');
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', function() {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Searching...';
+                    submitBtn.disabled = true;
+                }
+            });
         });
         
         // Smooth scroll to results
         if (window.location.search) {
-            $('html, body').animate({
-                scrollTop: $('.sort-options').offset().top - 100
-            }, 500);
+            const resultsSection = document.querySelector('#busContainer');
+            if (resultsSection) {
+                setTimeout(() => {
+                    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
         }
+        
+        // Add smooth animations to bus cards
+        const busCards = document.querySelectorAll('.bus-card');
+        busCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
     });
+    
+    // View toggle functionality
+    function toggleView(viewType) {
+        const container = document.getElementById('busContainer');
+        const gridBtn = document.getElementById('gridViewBtn');
+        const listBtn = document.getElementById('listViewBtn');
+        
+        if (viewType === 'grid') {
+            container.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+            gridBtn.className = 'p-2 rounded bg-blue-500 text-white';
+            listBtn.className = 'p-2 rounded bg-gray-300 text-gray-600';
+        } else {
+            container.className = 'space-y-4';
+            gridBtn.className = 'p-2 rounded bg-gray-300 text-gray-600';
+            listBtn.className = 'p-2 rounded bg-blue-500 text-white';
+            
+            // Adjust card layout for list view
+            const cards = container.querySelectorAll('.bus-card');
+            cards.forEach(card => {
+                card.classList.add('flex', 'flex-col', 'md:flex-row');
+            });
+        }
+    }
 </script>
 {% endblock %}

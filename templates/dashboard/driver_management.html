@@ -1,199 +1,206 @@
-{% extends 'dashboard/base.html' %}
+{% extends "dashboard/base.html" %}
 {% load static %}
 
 {% block title %}Driver Management - Dashboard{% endblock %}
 
-{% block extra_css %}
-<style>
-    .stats-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-    .stats-number {
-        font-size: 2rem;
-        font-weight: bold;
-    }
-    .driver-table {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .btn-action {
-        margin: 2px;
-        padding: 5px 10px;
-        font-size: 0.8rem;
-    }
-    .status-badge {
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 500;
-    }
-    .status-assigned {
-        background-color: #d4edda;
-        color: #155724;
-    }
-    .status-unassigned {
-        background-color: #f8d7da;
-        color: #721c24;
-    }
-</style>
-{% endblock %}
+{% block dashboard_content %}
+<div class="container mx-auto px-4 sm:px-8">
+    <div class="py-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-2xl font-semibold leading-tight text-gray-800">
+                    <i class="fas fa-user-tie mr-2"></i>Driver Management
+                </h2>
+                <p class="text-gray-600">Manage drivers and their assignments</p>
+            </div>
+            <a href="{% url 'dashboard:driver_add' %}" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                <i class="fas fa-plus mr-2"></i>Add New Driver
+            </a>
+        </div>
 
-{% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="mb-4">Driver Management</h2>
-            
-            <!-- Statistics Cards -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="stats-card text-center">
-                        <div class="stats-number">{{ total_drivers }}</div>
-                        <div>Total Drivers</div>
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <i class="fas fa-users text-3xl"></i>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card text-center">
-                        <div class="stats-number">{{ assigned_drivers }}</div>
-                        <div>Assigned Drivers</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card text-center">
-                        <div class="stats-number">{{ unassigned_drivers }}</div>
-                        <div>Unassigned Drivers</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card text-center">
-                        <div class="stats-number">{{ drivers|length }}</div>
-                        <div>Showing Results</div>
+                    <div>
+                        <h4 class="text-2xl font-bold mb-1">{{ total_drivers }}</h4>
+                        <p class="text-sm opacity-90">Total Drivers</p>
                     </div>
                 </div>
             </div>
             
-            <!-- Search and Add Section -->
-            <div class="row mb-4">
-                <div class="col-md-8">
-                    <form method="get" class="d-flex">
-                        <input type="text" name="search" class="form-control me-2" 
-                               placeholder="Search by name, license, or contact..." 
-                               value="{{ search_query }}">
-                        <button type="submit" class="btn btn-outline-primary">Search</button>
-                        {% if search_query %}
-                            <a href="{% url 'dashboard:driver_management' %}" class="btn btn-outline-secondary ms-2">Clear</a>
-                        {% endif %}
-                    </form>
-                </div>
-                <div class="col-md-4 text-end">
-                    <a href="{% url 'dashboard:driver_add' %}" class="btn btn-success">
-                        <i class="fas fa-plus"></i> Add New Driver
-                    </a>
+            <div class="bg-gradient-to-br from-green-500 to-teal-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <i class="fas fa-check-circle text-3xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold mb-1">{{ assigned_drivers }}</h4>
+                        <p class="text-sm opacity-90">Assigned Drivers</p>
+                    </div>
                 </div>
             </div>
             
-            <!-- Drivers Table -->
-            <div class="driver-table">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Name</th>
-                                <th>License Number</th>
-                                <th>Contact</th>
-                                <th>Experience</th>
-                                <th>Assigned Bus</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for driver in drivers %}
-                            <tr>
-                                <td>
-                                    <strong>{{ driver.name }}</strong>
-                                </td>
-                                <td>
-                                    <code>{{ driver.license_number }}</code>
-                                </td>
-                                <td>
-                                    {% if driver.contact_number %}
-                                        {{ driver.contact_number }}
-                                    {% else %}
-                                        <span class="text-muted">Not provided</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {{ driver.experience_years }} year{{ driver.experience_years|pluralize }}
-                                </td>
-                                <td>
-                                    {% if driver.bus %}
-                                        <strong>{{ driver.bus.bus_number }}</strong><br>
-                                        <small class="text-muted">{{ driver.bus.route.name }}</small>
-                                    {% else %}
-                                        <span class="text-muted">Not assigned</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if driver.bus %}
-                                        <span class="status-badge status-assigned">Assigned</span>
-                                    {% else %}
-                                        <span class="status-badge status-unassigned">Unassigned</span>
-                                    {% endif %}
-                                </td>
-                                <td>
+            <div class="bg-gradient-to-br from-yellow-500 to-orange-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <i class="fas fa-clock text-3xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold mb-1">{{ unassigned_drivers }}</h4>
+                        <p class="text-sm opacity-90">Unassigned Drivers</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-purple-500 to-pink-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <i class="fas fa-list text-3xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold mb-1">{{ drivers|length }}</h4>
+                        <p class="text-sm opacity-90">Showing Results</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <form method="get" class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <input type="text" name="search" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" 
+                           placeholder="Search by name, license, or contact..." 
+                           value="{{ search_query }}">
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
+                        <i class="fas fa-search mr-2"></i>Search
+                    </button>
+                    {% if search_query %}
+                        <a href="{% url 'dashboard:driver_management' %}" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400">
+                            <i class="fas fa-times mr-2"></i>Clear
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Drivers Table -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-800 text-white">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">License Number</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Contact</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Experience</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Assigned Bus</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for driver in drivers %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                                        {{ driver.name|first|upper }}
+                                    </div>
+                                    <div class="font-medium text-gray-900">{{ driver.name }}</div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <code class="bg-gray-100 px-2 py-1 rounded text-sm">{{ driver.license_number }}</code>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if driver.contact_number %}
+                                    <div class="text-gray-900">{{ driver.contact_number }}</div>
+                                {% else %}
+                                    <span class="text-gray-400 italic">Not provided</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-gray-900">{{ driver.experience_years }} year{{ driver.experience_years|pluralize }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if driver.bus %}
+                                    <div>
+                                        <div class="font-medium text-gray-900">{{ driver.bus.bus_number }}</div>
+                                        <div class="text-sm text-gray-500">{{ driver.bus.route.name }}</div>
+                                    </div>
+                                {% else %}
+                                    <span class="text-gray-400 italic">Not assigned</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if driver.bus %}
+                                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Assigned</span>
+                                {% else %}
+                                    <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">Unassigned</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex space-x-2">
                                     <a href="{% url 'dashboard:driver_edit' driver.id %}" 
-                                       class="btn btn-sm btn-outline-primary btn-action">
-                                        <i class="fas fa-edit"></i> Edit
+                                       class="text-blue-600 hover:text-blue-800">
+                                        <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="{% url 'dashboard:driver_delete' driver.id %}" 
-                                       class="btn btn-sm btn-outline-danger btn-action">
-                                        <i class="fas fa-trash"></i> Delete
+                                       class="text-red-600 hover:text-red-800">
+                                        <i class="fas fa-trash"></i>
                                     </a>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="7" class="text-center py-4">
-                                    {% if search_query %}
-                                        <div class="text-muted">
-                                            <i class="fas fa-search fa-2x mb-2"></i><br>
-                                            No drivers found matching "{{ search_query }}"
-                                        </div>
-                                    {% else %}
-                                        <div class="text-muted">
-                                            <i class="fas fa-users fa-2x mb-2"></i><br>
-                                            No drivers found. <a href="{% url 'dashboard:driver_add' %}">Add the first driver</a>
-                                        </div>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-8 text-center">
+                                {% if search_query %}
+                                    <div class="text-gray-500">
+                                        <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
+                                        <p class="text-lg mb-2">No drivers found</p>
+                                        <p>No drivers match "{{ search_query }}"</p>
+                                    </div>
+                                {% else %}
+                                    <div class="text-gray-500">
+                                        <i class="fas fa-users text-6xl text-gray-300 mb-4"></i>
+                                        <p class="text-lg mb-2">No drivers found</p>
+                                        <p>Get started by <a href="{% url 'dashboard:driver_add' %}" class="text-blue-600 hover:text-blue-800">adding the first driver</a></p>
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block dashboard_extra_js %}
 <script>
     // Auto-submit search form on input (with debounce)
     let searchTimeout;
-    document.querySelector('input[name="search"]').addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            if (this.value.length >= 2 || this.value.length === 0) {
-                this.form.submit();
-            }
-        }, 500);
-    });
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                if (this.value.length >= 2 || this.value.length === 0) {
+                    this.form.submit();
+                }
+            }, 500);
+        });
+    }
 </script>
 {% endblock %}

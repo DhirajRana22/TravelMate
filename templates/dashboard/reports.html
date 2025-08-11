@@ -1,454 +1,373 @@
-{% extends 'base.html' %}
+{% extends "dashboard/base.html" %}
 {% load static %}
 
 {% block title %}Reports & Analytics - Admin Dashboard{% endblock %}
 
-{% block extra_css %}
-<style>
-    .report-card {
-        border-left: 4px solid #007bff;
-        transition: all 0.3s ease;
-    }
-    .report-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 10px;
-    }
-    .chart-container {
-        position: relative;
-        height: 300px;
-        background: #f8f9fa;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .trend-up { color: #28a745; }
-    .trend-down { color: #dc3545; }
-    .trend-neutral { color: #6c757d; }
-</style>
-{% endblock %}
+{% block dashboard_content %}
+<div class="container mx-auto px-4 sm:px-8">
+    <div class="py-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-2xl font-semibold leading-tight text-gray-800">
+                    <i class="fas fa-chart-bar mr-2"></i>Reports & Analytics
+                </h2>
+                <p class="text-gray-600">Comprehensive business insights and performance metrics</p>
+            </div>
+            <div class="flex space-x-2">
+                <a href="{% url 'dashboard:dashboard_home' %}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                </a>
+                <button onclick="window.print()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                    <i class="fas fa-print mr-2"></i>Print Report
+                </button>
+            </div>
+        </div>
 
-{% block content %}
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h2><i class="fas fa-chart-bar"></i> Reports & Analytics</h2>
-                    <p class="text-muted">Comprehensive business insights and performance metrics</p>
+        <!-- Date Range Filter -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                <i class="fas fa-calendar mr-2 text-blue-500"></i>Report Period
+            </h3>
+            <form method="get">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                        <input type="date" name="start_date" id="start_date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" value="{{ request.GET.start_date|default:default_start_date }}">
+                    </div>
+                    <div>
+                        <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                        <input type="date" name="end_date" id="end_date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" value="{{ request.GET.end_date|default:default_end_date }}">
+                    </div>
+                    <div>
+                        <label for="report_type" class="block text-sm font-medium text-gray-700 mb-2">Report Type</label>
+                        <select name="report_type" id="report_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <option value="overview" {% if request.GET.report_type == 'overview' %}selected{% endif %}>Overview</option>
+                            <option value="bookings" {% if request.GET.report_type == 'bookings' %}selected{% endif %}>Bookings</option>
+                            <option value="revenue" {% if request.GET.report_type == 'revenue' %}selected{% endif %}>Revenue</option>
+                            <option value="routes" {% if request.GET.report_type == 'routes' %}selected{% endif %}>Routes</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                            <i class="fas fa-sync mr-2"></i>Generate Report
+                        </button>
+                    </div>
                 </div>
-                <div>
-                    <a href="{% url 'dashboard:dashboard_home' %}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to Dashboard
-                    </a>
-                    <button class="btn btn-primary" onclick="window.print()">
-                        <i class="fas fa-print"></i> Print Report
-                    </button>
-                </div>
-            </div>
+            </form>
         </div>
-    </div>
 
-    <!-- Date Range Filter -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-calendar"></i> Report Period</h5>
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div class="bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <i class="fas fa-ticket-alt text-3xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold mb-1">{{ total_bookings|default:0 }}</h4>
+                        <p class="text-sm opacity-90">Total Bookings</p>
+                        <div class="mt-2">
+                            <span class="text-green-200 text-sm">
+                                <i class="fas fa-arrow-up"></i> +{{ booking_growth|default:0 }}%
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form method="get" class="row g-3">
-                        <div class="col-md-3">
-                            <label for="start_date" class="form-label">Start Date</label>
-                            <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request.GET.start_date|default:default_start_date }}">
+            </div>
+            
+            <div class="bg-gradient-to-br from-green-500 to-teal-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <i class="fas fa-money-bill-wave text-3xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold mb-1">रू{{ total_revenue|floatformat:0|default:0 }}</h4>
+                        <p class="text-sm opacity-90">Total Revenue</p>
+                        <div class="mt-2">
+                            <span class="text-green-200 text-sm">
+                                <i class="fas fa-arrow-up"></i> +{{ revenue_growth|default:0 }}%
+                            </span>
                         </div>
-                        <div class="col-md-3">
-                            <label for="end_date" class="form-label">End Date</label>
-                            <input type="date" name="end_date" id="end_date" class="form-control" value="{{ request.GET.end_date|default:default_end_date }}">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <i class="fas fa-users text-3xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold mb-1">{{ total_users|default:0 }}</h4>
+                        <p class="text-sm opacity-90">Total Users</p>
+                        <div class="mt-2">
+                            <span class="text-green-200 text-sm">
+                                <i class="fas fa-arrow-up"></i> +{{ user_growth|default:0 }}%
+                            </span>
                         </div>
-                        <div class="col-md-3">
-                            <label for="report_type" class="form-label">Report Type</label>
-                            <select name="report_type" id="report_type" class="form-select">
-                                <option value="overview" {% if request.GET.report_type == 'overview' %}selected{% endif %}>Overview</option>
-                                <option value="bookings" {% if request.GET.report_type == 'bookings' %}selected{% endif %}>Bookings</option>
-                                <option value="revenue" {% if request.GET.report_type == 'revenue' %}selected{% endif %}>Revenue</option>
-                                <option value="routes" {% if request.GET.report_type == 'routes' %}selected{% endif %}>Routes</option>
-                            </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-purple-500 to-pink-600 text-white rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <i class="fas fa-percentage text-3xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold mb-1">{{ occupancy_rate|floatformat:1|default:0 }}%</h4>
+                        <p class="text-sm opacity-90">Avg Occupancy</p>
+                        <div class="mt-2">
+                            <span class="text-yellow-200 text-sm">
+                                <i class="fas fa-minus"></i> {{ occupancy_change|default:0 }}%
+                            </span>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">&nbsp;</label>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-sync"></i> Generate Report
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Key Metrics -->
-    <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card metric-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="me-3">
-                            <i class="fas fa-ticket-alt fa-2x"></i>
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div class="lg:col-span-2 bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-chart-line mr-2 text-blue-500"></i>Revenue Trend
+                </h3>
+                <div class="h-80 bg-gray-50 rounded-lg flex items-center justify-center">
+                    <div class="text-center">
+                        <i class="fas fa-chart-line text-6xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500 mb-2">Revenue chart visualization would be displayed here</p>
+                        <small class="text-gray-400">Integration with Chart.js or similar library recommended</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-chart-pie mr-2 text-blue-500"></i>Booking Status
+                </h3>
+                <div class="h-80 flex flex-col justify-center">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-chart-pie text-6xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">Booking status distribution</p>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Confirmed</span>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">{{ confirmed_bookings|default:0 }}</span>
                         </div>
-                        <div>
-                            <h4 class="mb-0">{{ total_bookings|default:0 }}</h4>
-                            <small>Total Bookings</small>
-                            <div class="mt-1">
-                                <small class="trend-up">
-                                    <i class="fas fa-arrow-up"></i> +{{ booking_growth|default:0 }}%
-                                </small>
-                            </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Pending</span>
+                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">{{ pending_bookings|default:0 }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Cancelled</span>
+                            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">{{ cancelled_bookings|default:0 }}</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card metric-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="me-3">
-                            <i class="fas fa-money-bill-wave fa-2x"></i>
-                        </div>
-                        <div>
-                            <h4 class="mb-0">NPR {{ total_revenue|floatformat:0|default:0 }}</h4>
-                            <small>Total Revenue</small>
-                            <div class="mt-1">
-                                <small class="trend-up">
-                                    <i class="fas fa-arrow-up"></i> +{{ revenue_growth|default:0 }}%
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card metric-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="me-3">
-                            <i class="fas fa-users fa-2x"></i>
-                        </div>
-                        <div>
-                            <h4 class="mb-0">{{ total_users|default:0 }}</h4>
-                            <small>Total Users</small>
-                            <div class="mt-1">
-                                <small class="trend-up">
-                                    <i class="fas fa-arrow-up"></i> +{{ user_growth|default:0 }}%
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card metric-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="me-3">
-                            <i class="fas fa-percentage fa-2x"></i>
-                        </div>
-                        <div>
-                            <h4 class="mb-0">{{ occupancy_rate|floatformat:1|default:0 }}%</h4>
-                            <small>Avg Occupancy</small>
-                            <div class="mt-1">
-                                <small class="trend-neutral">
-                                    <i class="fas fa-minus"></i> {{ occupancy_change|default:0 }}%
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Charts Row -->
-    <div class="row mb-4">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Revenue Trend</h5>
+        <!-- Top Routes and Bus Performance -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-route mr-2 text-blue-500"></i>Top Routes by Bookings
+                    </h3>
                 </div>
-                <div class="card-body">
-                    <div class="chart-container">
-                        <div class="text-center">
-                            <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
-                            <p class="text-muted">Revenue chart visualization would be displayed here</p>
-                            <small class="text-muted">Integration with Chart.js or similar library recommended</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Booking Status</h5>
-                </div>
-                <div class="card-body">
-                    <div class="chart-container">
-                        <div class="text-center">
-                            <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
-                            <p class="text-muted">Booking status distribution</p>
-                            <div class="mt-3">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Confirmed</span>
-                                    <span class="badge bg-success">{{ confirmed_bookings|default:0 }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Pending</span>
-                                    <span class="badge bg-warning">{{ pending_bookings|default:0 }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <span>Cancelled</span>
-                                    <span class="badge bg-danger">{{ cancelled_bookings|default:0 }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Top Routes -->
-    <div class="row mb-4">
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-route"></i> Top Routes by Bookings</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Route</th>
-                                    <th>Bookings</th>
-                                    <th>Revenue</th>
-                                    <th>Avg Occupancy</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for route in top_routes|slice:":10" %}
-                                <tr>
-                                    <td>
-                                        <strong>{{ route.source }} → {{ route.destination }}</strong>
-                                        <br>
-                                        <small class="text-muted">{{ route.distance }} km</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary">{{ route.booking_count|default:0 }}</span>
-                                    </td>
-                                    <td>
-                                        <strong>NPR {{ route.total_revenue|floatformat:0|default:0 }}</strong>
-                                    </td>
-                                    <td>
-                                        <div class="progress" style="height: 20px;">
-                                            <div class="progress-bar" role="progressbar" style="width: {{ route.occupancy_rate|default:0 }}%">
-                                                {{ route.occupancy_rate|floatformat:1|default:0 }}%
-                                            </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Route</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bookings</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Occupancy</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for route in top_routes|slice:":10" %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div>
+                                        <div class="font-medium text-gray-900">{{ route.source }} → {{ route.destination }}</div>
+                                        <div class="text-sm text-gray-500">{{ route.distance }} km</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">{{ route.booking_count|default:0 }}</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="font-medium text-gray-900">रू{{ route.total_revenue|floatformat:0|default:0 }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="w-full bg-gray-200 rounded-full h-5">
+                                        <div class="bg-blue-500 h-5 rounded-full flex items-center justify-center text-white text-xs font-medium" style="width: {{ route.occupancy_rate|default:0 }}%">
+                                            {{ route.occupancy_rate|floatformat:1|default:0 }}%
                                         </div>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="4" class="text-center py-4">
-                                        <i class="fas fa-route fa-2x text-muted mb-2"></i>
-                                        <p class="text-muted">No route data available</p>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="px-6 py-8 text-center">
+                                    <i class="fas fa-route text-4xl text-gray-300 mb-2"></i>
+                                    <p class="text-gray-500">No route data available</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-bus mr-2 text-blue-500"></i>Bus Performance
+                    </h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bus</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trips</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for bus in top_buses|slice:":10" %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div>
+                                        <div class="font-medium text-gray-900">{{ bus.bus_number }}</div>
+                                        <div class="text-sm text-gray-500">{{ bus.bus_type }}</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">{{ bus.trip_count|default:0 }}</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="font-medium text-gray-900">रू{{ bus.total_revenue|floatformat:0|default:0 }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if bus.status == 'active' %}
+                                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Active</span>
+                                    {% elif bus.status == 'maintenance' %}
+                                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">Maintenance</span>
+                                    {% else %}
+                                        <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-semibold">{{ bus.status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="px-6 py-8 text-center">
+                                    <i class="fas fa-bus text-4xl text-gray-300 mb-2"></i>
+                                    <p class="text-gray-500">No bus data available</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-bus"></i> Bus Performance</h5>
+
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">
+                <i class="fas fa-clock mr-2 text-blue-500"></i>Recent Activity
+            </h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-4">Recent Bookings</h4>
+                    <div class="space-y-4">
+                        {% for booking in recent_bookings|slice:":5" %}
+                        <div class="border-b border-gray-100 pb-4 last:border-b-0 last:pb-0">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="font-medium text-gray-900">{{ booking.user.get_full_name|default:booking.user.username }}</div>
+                                    <div class="text-sm text-gray-500">{{ booking.bus_schedule.route.source }} → {{ booking.bus_schedule.route.destination }}</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm text-gray-500">{{ booking.created_at|timesince }} ago</div>
+                                    <div class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-semibold mt-1">रू{{ booking.total_amount }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-6">
+                            <p class="text-gray-500">No recent bookings</p>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Bus</th>
-                                    <th>Trips</th>
-                                    <th>Revenue</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for bus in top_buses|slice:":10" %}
-                                <tr>
-                                    <td>
-                                        <strong>{{ bus.bus_number }}</strong>
-                                        <br>
-                                        <small class="text-muted">{{ bus.bus_type }}</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info">{{ bus.trip_count|default:0 }}</span>
-                                    </td>
-                                    <td>
-                                        <strong>NPR {{ bus.total_revenue|floatformat:0|default:0 }}</strong>
-                                    </td>
-                                    <td>
-                                        {% if bus.status == 'active' %}
-                                            <span class="badge bg-success">Active</span>
-                                        {% elif bus.status == 'maintenance' %}
-                                            <span class="badge bg-warning">Maintenance</span>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-4">Recent Payments</h4>
+                    <div class="space-y-4">
+                        {% for payment in recent_payments|slice:":5" %}
+                        <div class="border-b border-gray-100 pb-4 last:border-b-0 last:pb-0">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="font-medium text-gray-900">{{ payment.booking.user.get_full_name|default:payment.booking.user.username }}</div>
+                                    <div class="text-sm text-gray-500">{{ payment.payment_id }}</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm text-gray-500">{{ payment.payment_date|timesince }} ago</div>
+                                    <div class="mt-1">
+                                        {% if payment.payment_status == 'completed' %}
+                                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-semibold">रू{{ payment.amount }}</span>
+                                        {% elif payment.payment_status == 'pending' %}
+                                            <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm font-semibold">रू{{ payment.amount }}</span>
                                         {% else %}
-                                            <span class="badge bg-secondary">{{ bus.status }}</span>
+                                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-semibold">रू{{ payment.amount }}</span>
                                         {% endif %}
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="4" class="text-center py-4">
-                                        <i class="fas fa-bus fa-2x text-muted mb-2"></i>
-                                        <p class="text-muted">No bus data available</p>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-6">
+                            <p class="text-gray-500">No recent payments</p>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Recent Activity -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-clock"></i> Recent Activity</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <h6>Recent Bookings</h6>
-                            <div class="list-group list-group-flush">
-                                {% for booking in recent_bookings|slice:":5" %}
-                                <div class="list-group-item border-0 px-0">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <strong>{{ booking.user.get_full_name|default:booking.user.username }}</strong>
-                                            <br>
-                                            <small class="text-muted">
-                                                {{ booking.bus_schedule.route.source }} → {{ booking.bus_schedule.route.destination }}
-                                            </small>
-                                        </div>
-                                        <div class="text-end">
-                                            <small class="text-muted">{{ booking.created_at|timesince }} ago</small>
-                                            <br>
-                                            <span class="badge bg-primary">NPR {{ booking.total_amount }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% empty %}
-                                <div class="text-center py-3">
-                                    <p class="text-muted">No recent bookings</p>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <h6>Recent Payments</h6>
-                            <div class="list-group list-group-flush">
-                                {% for payment in recent_payments|slice:":5" %}
-                                <div class="list-group-item border-0 px-0">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <strong>{{ payment.booking.user.get_full_name|default:payment.booking.user.username }}</strong>
-                                            <br>
-                                            <small class="text-muted">{{ payment.payment_id }}</small>
-                                        </div>
-                                        <div class="text-end">
-                                            <small class="text-muted">{{ payment.payment_date|timesince }} ago</small>
-                                            <br>
-                                            {% if payment.payment_status == 'completed' %}
-                                                <span class="badge bg-success">NPR {{ payment.amount }}</span>
-                                            {% elif payment.payment_status == 'pending' %}
-                                                <span class="badge bg-warning">NPR {{ payment.amount }}</span>
-                                            {% else %}
-                                                <span class="badge bg-danger">NPR {{ payment.amount }}</span>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                                {% empty %}
-                                <div class="text-center py-3">
-                                    <p class="text-muted">No recent payments</p>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Export Options -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-download"></i> Export Reports</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <button class="btn btn-outline-success w-100">
-                                <i class="fas fa-file-excel"></i> Export to Excel
-                            </button>
-                        </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-outline-danger w-100">
-                                <i class="fas fa-file-pdf"></i> Export to PDF
-                            </button>
-                        </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-outline-info w-100">
-                                <i class="fas fa-file-csv"></i> Export to CSV
-                            </button>
-                        </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-outline-primary w-100">
-                                <i class="fas fa-envelope"></i> Email Report
-                            </button>
-                        </div>
-                    </div>
-                </div>
+        <!-- Export Options -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">
+                <i class="fas fa-download mr-2 text-blue-500"></i>Export Reports
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <button class="border-2 border-green-200 text-green-700 hover:bg-green-50 px-4 py-3 rounded-lg transition-colors">
+                    <i class="fas fa-file-excel mr-2"></i>Export to Excel
+                </button>
+                <button class="border-2 border-red-200 text-red-700 hover:bg-red-50 px-4 py-3 rounded-lg transition-colors">
+                    <i class="fas fa-file-pdf mr-2"></i>Export to PDF
+                </button>
+                <button class="border-2 border-blue-200 text-blue-700 hover:bg-blue-50 px-4 py-3 rounded-lg transition-colors">
+                    <i class="fas fa-file-csv mr-2"></i>Export to CSV
+                </button>
+                <button class="border-2 border-purple-200 text-purple-700 hover:bg-purple-50 px-4 py-3 rounded-lg transition-colors">
+                    <i class="fas fa-envelope mr-2"></i>Email Report
+                </button>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block dashboard_extra_js %}
 <script>
 // Add any chart initialization or interactive features here
 document.addEventListener('DOMContentLoaded', function() {
