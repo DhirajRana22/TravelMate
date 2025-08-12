@@ -31,8 +31,7 @@ TravelMate{% endblock %} {% block content %}
         >
           <div>
             <h2 class="text-2xl font-bold mb-2 flex items-center">
-              <i class="fas fa-credit-card mr-3"></i>Payment #{{
-              payment.payment_id }}
+              <i class="fas fa-credit-card mr-3"></i>Payment #{{ payment.payment_id }}
               <button
                 onclick="copyToClipboard('{{ payment.payment_id }}')"
                 class="ml-2 text-white hover:text-gray-200 transition-colors"
@@ -218,10 +217,7 @@ TravelMate{% endblock %} {% block content %}
               <div class="p-3 bg-gray-50 rounded-lg">
                 <div class="flex justify-between items-center mb-2">
                   <span class="text-gray-600 font-medium">Seats</span>
-                  <span class="text-sm text-gray-500"
-                    >{{ booking.seats.count }} seat{{
-                    booking.seats.count|pluralize }}</span
-                  >
+                  <span class="text-sm text-gray-500">{{ booking.seats.count }} seat{{ booking.seats.count|pluralize }}</span>
                 </div>
                 <div class="flex flex-wrap gap-2">
                   {% for seat in booking.seats.all %}

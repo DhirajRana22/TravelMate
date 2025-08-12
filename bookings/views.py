@@ -35,14 +35,16 @@ def seat_selection(request, schedule_id):
     else:
         travel_date = timezone.now().date()
     
-    # Check if departure time is in the past (for today's bookings)
-    if travel_date == timezone.now().date():
-        current_time = timezone.now().time()
-        if schedule.departure_time < current_time:
-            messages.error(request, 'Cannot book a bus that has already departed.')
-            return redirect('routes:route_search')
-    elif travel_date < timezone.now().date():
+    # Check if departure time is in the past
+    current_datetime = timezone.now()
+    current_date = current_datetime.date()
+    current_time = current_datetime.time()
+    
+    if travel_date < current_date:
         messages.error(request, 'Cannot book a bus for past dates.')
+        return redirect('routes:route_search')
+    elif travel_date == current_date and schedule.departure_time <= current_time:
+        messages.error(request, 'Cannot book a bus that has already departed.')
         return redirect('routes:route_search')
     
     # Get or create seats for this bus schedule
@@ -321,13 +323,19 @@ def create_booking(request, schedule_id):
     else:
         travel_date = timezone.now().date()
     
-    # Get selected seats from request
+    # Only validate seats for GET requests if seats parameter is present
+    # This prevents the error banner on initial page loads
     seat_ids_str = request.GET.get('seats', '')
     selected_seat_ids = [int(sid) for sid in seat_ids_str.split(',') if sid.strip().isdigit()]
     
-    if not selected_seat_ids:
-        messages.error(request, 'No seats selected. Please select seats first.')
-        return redirect(reverse('bookings:seat_selection', args=[schedule_id]) + f'?date={travel_date}')
+    # For GET requests, only show error if seats parameter was provided but empty/invalid
+    if request.method == 'GET':
+        if 'seats' in request.GET and not selected_seat_ids:
+            messages.error(request, 'No seats selected. Please select seats first.')
+            return redirect(reverse('bookings:seat_selection', args=[schedule_id]) + f'?date={travel_date}')
+        elif not selected_seat_ids:
+            # No seats parameter at all - redirect silently to seat selection
+            return redirect(reverse('bookings:seat_selection', args=[schedule_id]) + f'?date={travel_date}')
     
     # Get selected seats
     selected_seats = Seat.objects.filter(id__in=selected_seat_ids, bus_schedule=schedule)
@@ -336,14 +344,15 @@ def create_booking(request, schedule_id):
         messages.error(request, 'Some selected seats are invalid.')
         return redirect(reverse('bookings:seat_selection', args=[schedule_id]) + f'?date={travel_date}')
     
-    # Check if departure time is in the past (for today's bookings)
-    if travel_date == timezone.now().date():
-        current_time = timezone.now().time()
-        if schedule.departure_time < current_time:
-            messages.error(request, 'Cannot book a bus that has already departed.')
-            return redirect('routes:route_search')
-    elif travel_date < timezone.now().date():
+    # Check if departure time is in the past
+    current_datetime = timezone.now()
+    current_date = current_datetime.date()
+    current_time = current_datetime.time()
+    if travel_date < current_date:
         messages.error(request, 'Cannot book a bus for past dates.')
+        return redirect('routes:route_search')
+    elif travel_date == current_date and schedule.departure_time <= current_time:
+        messages.error(request, 'Cannot book a bus that has already departed.')
         return redirect('routes:route_search')
     
     # Calculate total fare

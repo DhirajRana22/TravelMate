@@ -68,6 +68,12 @@ def route_search(request):
         except Location.DoesNotExist:
             messages.error(request, 'Please enter valid source and destination cities.')
             schedules = []
+    else:
+        # Handle form validation errors
+        if form.errors:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.title()}: {error}")
     
     # Get popular routes for suggestions
     popular_routes = Route.objects.filter(
@@ -203,6 +209,13 @@ def route_results(request):
             schedules = []
             source = None
             destination = None
+    else:
+        # Handle form validation errors
+        if form.errors:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.title()}: {error}")
+        return redirect('routes:route_search')
     
     # Get unique bus types for filtering
     from buses.models import BusType

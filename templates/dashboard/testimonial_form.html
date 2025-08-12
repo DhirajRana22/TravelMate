@@ -1,6 +1,7 @@
-{% extends "dashboard/base.html" %} {% load static %} {% block title %}{% if
-testimonial %}Edit Testimonial{% else %}Add New Testimonial{% endif %} -
-Dashboard{% endblock %} {% block dashboard_content %}
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block title %}{% if testimonial %}Edit Testimonial{% else %}Add New Testimonial{% endif %} - Dashboard{% endblock %}
+{% block dashboard_content %}
 <div class="container mx-auto px-4 sm:px-8">
   <div class="py-8">
     <div class="max-w-4xl mx-auto">
@@ -11,8 +12,7 @@ Dashboard{% endblock %} {% block dashboard_content %}
             <i
               class="fas fa-{% if testimonial %}edit{% else %}plus{% endif %} mr-2"
             ></i>
-            {% if testimonial %}Edit Testimonial{% else %}Add New Testimonial{%
-            endif %}
+            {% if testimonial %}Edit Testimonial{% else %}Add New Testimonial{% endif %}
           </h2>
           <p class="text-gray-600">
             {% if testimonial %}Update customer testimonial{% else %}Create a
@@ -272,12 +272,7 @@ Dashboard{% endblock %} {% block dashboard_content %}
                   id="id_is_active"
                   name="is_active"
                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  {%
-                  if
-                  form.is_active.value
-                  %}checked{%
-                  endif
-                  %}
+                  {% if form.is_active.value %}checked{% endif %}
                 />
                 <label
                   for="id_is_active"
@@ -355,15 +350,15 @@ Dashboard{% endblock %} {% block dashboard_content %}
             class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
           >
             <i class="fas fa-save mr-2"></i>
-            {% if testimonial %}Update Testimonial{% else %}Add Testimonial{%
-            endif %}
+            {% if testimonial %}Update Testimonial{% else %}Add Testimonial{% endif %}
           </button>
         </div>
       </form>
     </div>
   </div>
 </div>
-{% endblock %} {% block dashboard_extra_js %}
+{% endblock %}
+{% block dashboard_extra_js %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const stars = document.querySelectorAll(".rating-star");

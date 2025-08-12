@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone
 from .models import Location, Route, BusSchedule
 
 class LocationForm(forms.ModelForm):
@@ -64,6 +65,14 @@ class RouteSearchForm(forms.Form):
         })
     )
     travel_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    
+    def clean_travel_date(self):
+        travel_date = self.cleaned_data.get('travel_date')
+        if travel_date:
+            today = timezone.now().date()
+            if travel_date < today:
+                raise forms.ValidationError("Travel date cannot be in the past.")
+        return travel_date
     
     def clean(self):
         cleaned_data = super().clean()

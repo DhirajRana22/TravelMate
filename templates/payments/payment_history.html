@@ -237,7 +237,7 @@
                                 {% endif %}
                                 
                                 {% if payment.payment_status == 'completed' %}
-                                    <a href="{% url 'bookings:ticket' payment.booking.booking_id %}" 
+                                    <a href="{% url 'bookings:download_ticket' payment.booking.booking_id %}" 
                                        class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-center text-sm font-medium">
                                         <i class="fas fa-download mr-2"></i>Download Ticket
                                     </a>

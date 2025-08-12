@@ -428,7 +428,7 @@ TravelMate{% endblock %} {% block content %}
     <div class="flex flex-col sm:flex-row gap-4 mt-8 justify-center">
       {% if schedule.available_seats > 0 %}
       <a
-        href="{% url 'bookings:seat_selection' schedule.id %}"
+        href="{% url 'bookings:seat_selection' schedule.id %}?date={% now 'Y-m-d' %}"
         class="bg-green-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105 shadow-lg text-center"
       >
         <i class="fas fa-ticket-alt mr-2"></i>Book Now

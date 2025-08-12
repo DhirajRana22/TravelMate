@@ -198,7 +198,7 @@
                                 </a>
                                 
                                 {% if bus.available_seats > 0 %}
-                                    <a href="{% url 'bookings:seat_selection' bus.id %}" 
+                                    <a href="{% url 'bookings:seat_selection' bus.id %}?date={% now 'Y-m-d' %}" 
                                        class="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors text-center font-medium">
                                         <i class="fas fa-ticket-alt mr-2"></i>Book Now
                                     </a>

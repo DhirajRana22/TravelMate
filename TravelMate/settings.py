@@ -113,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kathmandu'
 
 USE_I18N = True
 
@@ -137,7 +137,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # Login URLs
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
-LOGIN_URL = 'login'
+LOGIN_URL = 'accounts:login'
 
 # Authentication backends
 AUTHENTICATION_BACKENDS = [

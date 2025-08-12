@@ -155,81 +155,94 @@ TravelMate{% endblock %} {% block content %}
                 </div>
               </div>
 
-              <!-- Bus Layout -->
-              <div
-                class="bg-gradient-to-b from-gray-100 to-gray-200 rounded-2xl p-6 max-w-md mx-auto border-2 border-gray-300"
-              >
+              <!-- Realistic Bus Layout -->
+              <div class="bg-gradient-to-b from-gray-100 to-gray-200 rounded-3xl p-6 max-w-sm mx-auto border-4 border-gray-400 shadow-2xl" style="background: linear-gradient(145deg, #f0f0f0, #d9d9d9);">
+                <!-- Front Windshield -->
+                <div class="bg-gradient-to-r from-blue-200 to-blue-300 rounded-t-2xl p-2 mb-4 border-2 border-blue-400">
+                  <div class="text-center text-blue-800 font-bold text-sm">
+                    <i class="fas fa-car-side mr-2"></i>FRONT
+                  </div>
+                </div>
+                
                 <!-- Driver Section -->
-                <div
-                  class="bg-gray-300 text-gray-700 p-3 rounded-lg text-center mb-4 border border-gray-400"
-                >
+                <div class="bg-gradient-to-r from-gray-400 to-gray-500 text-white p-3 rounded-xl text-center mb-6 border-2 border-gray-600 shadow-lg">
                   <i class="fas fa-steering-wheel mr-2"></i>Driver
                 </div>
 
-                <!-- Seat Map -->
-                <div class="space-y-2">
+                <!-- Seat Rows -->
+                <div class="space-y-3">
                   {% for row in seat_layout %}
-                  <div class="flex justify-center items-center gap-3">
-                    {% for seat_group in row %}
-                    <div class="flex gap-2">
-                      {% for seat in seat_group %}
-                      <div
-                        class="seat w-10 h-10 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all duration-200 text-xs font-semibold hover:scale-105 transform {% if seat.is_booked %}bg-red-500 border-red-600 text-white cursor-not-allowed {% elif seat.is_reserved %}bg-yellow-500 border-yellow-600 text-white cursor-not-allowed {% else %}bg-green-500 border-green-600 text-white hover:bg-green-600{% endif %}"
-                        data-seat-id="{{ seat.id }}"
-                        data-seat-number="{{ seat.number }}"
-                        data-seat-type="{{ seat.seat_type }}"
-                        {%
-                        if
-                        not
-                        seat.is_booked
-                        and
-                        not
-                        seat.is_reserved
-                        %}onclick="toggleSeat(this)"
-                        {%
-                        endif
-                        %}
-                      >
-                        {{ seat.number }}
+                    {% if row.left_seats or row.right_seats %}
+                      <!-- Regular 2x2 Row -->
+                      <div class="flex justify-between items-center">
+                        <!-- Left Side (A seats) -->
+                        <div class="flex gap-1">
+                          {% for seat in row.left_seats %}
+                            <div class="seat w-12 h-10 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all duration-300 text-xs font-bold shadow-md 
+                               {% if seat.status == 'booked' %}bg-red-500 border-red-700 text-white cursor-not-allowed
+                               {% elif seat.status == 'reserved' %}bg-yellow-500 border-yellow-700 text-white cursor-not-allowed
+                               {% else %}bg-green-500 border-green-700 text-white{% endif %}"
+                              data-seat-id="{{ seat.id }}"
+                              data-seat-number="{{ seat.seat_number }}"
+                              data-seat-price="{{ schedule.base_fare }}"
+                              {% if seat.status != 'booked' and seat.status != 'reserved' %}onclick="toggleSeat(this)"{% endif %}>
+                              {{ seat.seat_number }}
+                            </div>
+                          {% endfor %}
+                        </div>
+                        
+                        <!-- Aisle -->
+                        <div class="w-8 h-10 flex items-center justify-center">
+                          <div class="w-1 h-8 bg-gray-400 rounded-full"></div>
+                        </div>
+                        
+                        <!-- Right Side (B seats) -->
+                        <div class="flex gap-1">
+                          {% for seat in row.right_seats %}
+                            <div class="seat w-12 h-10 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all duration-300 text-xs font-bold shadow-md 
+                               {% if seat.status == 'booked' %}bg-red-500 border-red-700 text-white cursor-not-allowed
+                               {% elif seat.status == 'reserved' %}bg-yellow-500 border-yellow-700 text-white cursor-not-allowed
+                               {% else %}bg-green-500 border-green-700 text-white{% endif %}"
+                               data-seat-id="{{ seat.id }}"
+                               data-seat-number="{{ seat.seat_number }}"
+                               data-seat-price="{{ schedule.base_fare }}"
+                               {% if seat.status != 'booked' and seat.status != 'reserved' %}onclick="toggleSeat(this)"{% endif %}>
+                               {{ seat.seat_number }}
+                             </div>
+                          {% endfor %}
+                        </div>
                       </div>
-                      {% endfor %}
-                    </div>
-                    {% if not forloop.last and row|length > 1 %}
-                    <div class="w-8"></div>
-                    <!-- Aisle space -->
-                    {% endif %} {% endfor %}
-                  </div>
+                    {% endif %}
+                    
+                    {% if row.last_row_seats %}
+                      <!-- Back Row (5 seats) -->
+                      <div class="mt-6 pt-4 border-t-2 border-gray-400">
+                        <div class="text-center text-gray-600 text-xs mb-2 font-semibold">BACK ROW</div>
+                        <div class="flex justify-center gap-1">
+                          {% for seat in row.last_row_seats %}
+                            <div class="seat w-10 h-10 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all duration-300 text-xs font-bold shadow-md 
+                               {% if seat.status == 'booked' %}bg-red-500 border-red-700 text-white cursor-not-allowed
+                               {% elif seat.status == 'reserved' %}bg-yellow-500 border-yellow-700 text-white cursor-not-allowed
+                               {% else %}bg-green-500 border-green-700 text-white{% endif %}"
+                              data-seat-id="{{ seat.id }}"
+                              data-seat-number="{{ seat.seat_number }}"
+                              data-seat-price="{{ schedule.base_fare }}"
+                              {% if seat.status != 'booked' and seat.status != 'reserved' %}onclick="toggleSeat(this)"{% endif %}>
+                              {{ seat.seat_number }}
+                            </div>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    {% endif %}
                   {% endfor %}
                 </div>
-
-                <!-- Back Section -->
-                {% if back_row_seats %}
-                <div class="mt-4 pt-4 border-t border-gray-300">
-                  <div class="flex justify-center gap-2">
-                    {% for seat in back_row_seats %}
-                    <div
-                      class="seat w-10 h-10 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all duration-200 text-xs font-semibold hover:scale-105 transform {% if seat.is_booked %}bg-red-500 border-red-600 text-white cursor-not-allowed {% elif seat.is_reserved %}bg-yellow-500 border-yellow-600 text-white cursor-not-allowed {% else %}bg-green-500 border-green-600 text-white hover:bg-green-600{% endif %}"
-                      data-seat-id="{{ seat.id }}"
-                      data-seat-number="{{ seat.number }}"
-                      data-seat-type="{{ seat.seat_type }}"
-                      {%
-                      if
-                      not
-                      seat.is_booked
-                      and
-                      not
-                      seat.is_reserved
-                      %}onclick="toggleSeat(this)"
-                      {%
-                      endif
-                      %}
-                    >
-                      {{ seat.number }}
-                    </div>
-                    {% endfor %}
+                
+                <!-- Rear Section -->
+                <div class="bg-gradient-to-r from-gray-300 to-gray-400 rounded-b-2xl p-2 mt-4 border-2 border-gray-500">
+                  <div class="text-center text-gray-700 font-bold text-sm">
+                    <i class="fas fa-door-open mr-2"></i>EXIT
                   </div>
                 </div>
-                {% endif %}
               </div>
             </div>
           </div>
@@ -291,7 +304,7 @@ TravelMate{% endblock %} {% block content %}
 
               <form
                 method="post"
-                action="{% url 'bookings:create_booking' %}"
+                action="{% url 'bookings:create_booking' schedule.id %}"
                 id="seatSelectionForm"
               >
                 {% csrf_token %}
@@ -371,27 +384,30 @@ TravelMate{% endblock %} {% block content %}
   function toggleSeat(seatElement) {
       const seatId = seatElement.getAttribute('data-seat-id');
       const seatNumber = seatElement.getAttribute('data-seat-number');
-      const seatType = seatElement.getAttribute('data-seat-type');
+      const seatPrice = parseFloat(seatElement.getAttribute('data-seat-price')) || baseFare;
 
       if (seatElement.classList.contains('bg-red-500') || seatElement.classList.contains('bg-yellow-500')) {
           return; // Can't select booked or reserved seats
       }
 
+      // Check if seat is already selected
+      const existingIndex = selectedSeats.findIndex(seat => seat.id === seatId);
+
       if (seatElement.classList.contains('bg-blue-500')) {
           // Deselect seat
-          seatElement.classList.remove('bg-blue-500', 'border-blue-600');
-          seatElement.classList.add('bg-green-500', 'border-green-600');
+          seatElement.classList.remove('bg-blue-500', 'border-blue-700');
+          seatElement.classList.add('bg-green-500', 'border-green-700');
 
           selectedSeats = selectedSeats.filter(seat => seat.id !== seatId);
       } else {
           // Select seat
-          seatElement.classList.remove('bg-green-500', 'border-green-600');
-          seatElement.classList.add('bg-blue-500', 'border-blue-600');
+          seatElement.classList.remove('bg-green-500', 'border-green-700');
+          seatElement.classList.add('bg-blue-500', 'border-blue-700');
 
           selectedSeats.push({
               id: seatId,
               number: seatNumber,
-              type: seatType
+              price: seatPrice
           });
       }
 
@@ -415,7 +431,7 @@ TravelMate{% endblock %} {% block content %}
           proceedBtn.disabled = true;
           selectedSeatsInput.value = '';
       } else {
-          const seatNumbers = selectedSeats.map(seat => seat.number).sort((a, b) => a - b);
+          const seatNumbers = selectedSeats.map(seat => seat.number).sort();
           seatsList.innerHTML = seatNumbers.map(num =>
               `<span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium mr-1 mb-1">${num}</span>`
           ).join('');
@@ -429,7 +445,8 @@ TravelMate{% endblock %} {% block content %}
           subtotal.textContent = `रू${subtotalAmount}`;
           totalFare.textContent = `रू${totalAmount}`;
           proceedBtn.disabled = false;
-          selectedSeatsInput.value = selectedSeats.map(seat => seat.id).join(',');
+          const seatIds = selectedSeats.map(seat => seat.id).join(',');
+          selectedSeatsInput.value = seatIds;
       }
   }
 
@@ -442,7 +459,8 @@ TravelMate{% endblock %} {% block content %}
       }
 
       // Ensure the hidden input is updated with latest selection
-      document.getElementById('selectedSeatsInput').value = selectedSeats.map(seat => seat.id).join(',');
+      const seatIds = selectedSeats.map(seat => seat.id).join(',');
+      document.getElementById('selectedSeatsInput').value = seatIds;
 
       // Add loading state
       const proceedBtn = document.getElementById('proceedBtn');
@@ -465,8 +483,8 @@ TravelMate{% endblock %} {% block content %}
           savedSeats.forEach(seat => {
               const seatElement = document.querySelector(`[data-seat-id="${seat.id}"]`);
               if (seatElement && !seatElement.classList.contains('bg-red-500') && !seatElement.classList.contains('bg-yellow-500')) {
-                  seatElement.classList.remove('bg-green-500', 'border-green-600');
-                  seatElement.classList.add('bg-blue-500', 'border-blue-600');
+                  seatElement.classList.remove('bg-green-500', 'border-green-700');
+                  seatElement.classList.add('bg-blue-500', 'border-blue-700');
                   selectedSeats.push(seat);
               }
           });
@@ -476,27 +494,38 @@ TravelMate{% endblock %} {% block content %}
 
   // Load saved seats on page load
   document.addEventListener('DOMContentLoaded', function() {
-      // First, handle preselected seats from backend (form validation errors)
+      // Check if this is a fresh booking session (no form validation errors)
       const preselectedSeatIds = {{ preselected_seat_ids|default:'[]' }};
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFromFormError = preselectedSeatIds.length > 0;
+      const isFromSuccessfulBooking = urlParams.get('booking_success') === 'true';
+      
+      // Clear localStorage for fresh booking sessions (not form validation errors)
+      if (!isFromFormError && !isFromSuccessfulBooking) {
+          localStorage.removeItem('selectedSeats_{{ schedule.id }}');
+      }
+      
+      // First, handle preselected seats from backend (form validation errors)
       if (preselectedSeatIds.length > 0) {
           preselectedSeatIds.forEach(seatId => {
               const seatElement = document.querySelector(`[data-seat-id="${seatId}"]`);
               if (seatElement && !seatElement.classList.contains('bg-red-500') && !seatElement.classList.contains('bg-yellow-500')) {
                   const seatNumber = seatElement.getAttribute('data-seat-number');
-                  const seatType = seatElement.getAttribute('data-seat-type');
-                  seatElement.classList.remove('bg-green-500', 'border-green-600');
-                  seatElement.classList.add('bg-blue-500', 'border-blue-600');
+                  const seatPrice = parseFloat(seatElement.getAttribute('data-seat-price')) || baseFare;
+                  seatElement.classList.remove('bg-green-500', 'border-green-700');
+                  seatElement.classList.add('bg-blue-500', 'border-blue-700');
                   selectedSeats.push({
                       id: seatId.toString(),
                       number: seatNumber,
-                      type: seatType
+                      price: seatPrice
                   });
               }
           });
           updateBookingSummary();
           saveToLocalStorage();
       } else {
-          // If no preselected seats, load from localStorage
+          // If no preselected seats, load from localStorage (only for form validation scenarios)
+          // For fresh sessions, localStorage was already cleared above
           loadFromLocalStorage();
       }
 
