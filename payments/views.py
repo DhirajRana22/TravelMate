@@ -38,7 +38,7 @@ def process_payment(request, payment_id):
                     # Get payment method from POST data
                     payment_method = request.POST.get('payment_method')
                     
-                    # Handle eSewa payment
+                    # Handle eSewa payment (only supported method)
                     if payment_method == 'esewa':
                         # Update payment method
                         payment.payment_method = payment_method
@@ -55,31 +55,11 @@ def process_payment(request, payment_id):
                             'message': 'Redirecting to eSewa payment gateway...'
                         })
                     
-                    # Handle other payment methods (Khalti, Bus Conductor)
-                    else:
-                        with transaction.atomic():
-                            # Process payment for other methods
-                            payment.transaction_id = f'TX{uuid.uuid4().hex[:8].upper()}'
-                            payment.payment_date = timezone.now()
-                            payment.payment_method = payment_method
-                            payment.payment_status = 'completed'
-                            payment.save()
-                            
-                            # Update booking payment status and confirm booking
-                            booking.payment_status = 'paid'
-                            booking.booking_status = 'confirmed'
-                            booking.save()
-                            
-                            # Mark seats as unavailable now that payment is confirmed
-                            for seat in booking.seats.all():
-                                seat.is_available = False
-                                seat.save()
-                        
-                        return JsonResponse({
-                            'success': True,
-                            'message': 'Payment completed successfully!',
-                            'redirect_url': reverse('bookings:booking_confirmation', args=[booking.booking_id])
-                        })
+                    # If unsupported method is provided, return error
+                    return JsonResponse({
+                        'success': False,
+                        'error': 'Unsupported payment method. Only eSewa is accepted.'
+                    })
             except Exception as e:
                 return JsonResponse({
                     'success': False,
@@ -202,7 +182,7 @@ def request_refund(request, payment_id):
                     refund_status='pending'
                 )
                 
-                messages.success(request, 'Refund request submitted successfully. It will be processed within 7-10 business days.')
+                messages.success(request, 'Refund request submitted successfully. eSewa refunds are typically processed within 1-2 business days.')
                 return redirect('payment_detail', payment_id=payment_id)
             except Exception as e:
                 messages.error(request, f'Error requesting refund: {str(e)}')
@@ -395,12 +375,12 @@ def admin_process_refund(request, refund_id):
         action = request.POST.get('action')
         
         if action == 'approve':
-            refund.refund_status = 'COMPLETED'
+            refund.refund_status = 'processed'
             refund.processed_date = timezone.now()
             refund.save()
-            messages.success(request, f'Refund #{refund.id} has been approved and marked as completed.')
+            messages.success(request, f'Refund #{refund.id} has been approved and marked as processed.')
         elif action == 'reject':
-            refund.refund_status = 'REJECTED'
+            refund.refund_status = 'rejected'
             refund.processed_date = timezone.now()
             refund.save()
             messages.success(request, f'Refund #{refund.id} has been rejected.')
@@ -412,3 +392,43 @@ def admin_process_refund(request, refund_id):
     }
     
     return render(request, 'payments/admin_process_refund.html', context)
+
+
+@login_required
+def payment_form(request, booking_id):
+    """
+    Display a simple wrapper page for initiating or retrying a payment by booking_id.
+    This view will locate an existing pending/failed payment for the booking or
+    create a new pending Payment record and then render the payment_form.html
+    which posts to the process_payment endpoint.
+    """
+    booking = get_object_or_404(Booking, booking_id=booking_id)
+
+    # Ensure the booking belongs to the logged-in user
+    if booking.user != request.user:
+        messages.error(request, 'You do not have permission to access this booking payment.')
+        return redirect('accounts:booking_history')
+
+    # Try to find an existing payment that can be retried (pending or failed)
+    payment = (
+        booking.payments.filter(payment_status__in=['pending', 'failed'])
+        .order_by('-updated_at')
+        .first()
+    )
+
+    if not payment:
+        # If none exists, create a fresh pending payment
+        payment = Payment.objects.create(
+            booking=booking,
+            amount=booking.total_fare,
+            payment_method=booking.payment_method or 'esewa',
+            payment_status='pending',
+        )
+
+    context = {
+        'booking': booking,
+        'payment': payment,
+        'retry': request.GET.get('retry') == '1',
+    }
+
+    return render(request, 'payments/payment_form.html', context)

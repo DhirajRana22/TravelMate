@@ -193,7 +193,7 @@
                                     {% endif %}
                                     
                                     {% if booking.status == 'cancelled' and booking.refund_eligible %}
-                                        <a href="{% url 'payments:request_refund' booking.payment.id %}" 
+                                        <a href="{% url 'payments:request_refund' booking.payment.payment_id %}"
                                            class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors text-sm btn-action">
                                             <i class="fas fa-undo mr-1"></i>Request Refund
                                         </a>

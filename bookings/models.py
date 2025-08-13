@@ -35,8 +35,6 @@ class Booking(models.Model):
     
     PAYMENT_METHOD_CHOICES = (
         ('esewa', 'eSewa'),
-        ('khalti', 'Khalti'),
-        ('bus_conductor', 'Pay to Bus Conductor'),
     )
     
     booking_id = models.CharField(max_length=20, unique=True, blank=True)

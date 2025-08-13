@@ -977,7 +977,25 @@ def bus_edit(request, bus_id):
 @staff_member_required
 def bus_delete(request, bus_id):
     bus = get_object_or_404(Bus, id=bus_id)
-    if request.method == 'POST':
+    
+    if request.method == 'DELETE':
+        try:
+            import json
+            data = json.loads(request.body)
+            reason = data.get('reason', 'No reason provided')
+            
+            bus.delete()
+            return JsonResponse({
+                'success': True,
+                'message': 'Bus deleted successfully!'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    
+    elif request.method == 'POST':
         bus.delete()
         messages.success(request, 'Bus deleted successfully!')
         return redirect('dashboard:bus_management')
@@ -987,6 +1005,31 @@ def bus_delete(request, bus_id):
         'title': 'Delete Bus'
     }
     return render(request, 'dashboard/bus_confirm_delete.html', context)
+
+@staff_member_required
+def bus_status_update(request, bus_id):
+    if request.method == 'POST':
+        try:
+            import json
+            bus = get_object_or_404(Bus, id=bus_id)
+            data = json.loads(request.body)
+            active = data.get('active', True)
+            
+            bus.is_active = active
+            bus.save()
+            
+            status = 'activated' if active else 'deactivated'
+            return JsonResponse({
+                'success': True,
+                'message': f'Bus {status} successfully!'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 # Route CRUD Views
 @staff_member_required

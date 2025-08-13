@@ -105,9 +105,6 @@
                     <select name="method" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option value="">All Methods</option>
                         <option value="esewa" {% if request.GET.method == 'esewa' %}selected{% endif %}>eSewa</option>
-                        <option value="khalti" {% if request.GET.method == 'khalti' %}selected{% endif %}>Khalti</option>
-                        <option value="ime_pay" {% if request.GET.method == 'ime_pay' %}selected{% endif %}>IME Pay</option>
-                        <option value="bus_conductor" {% if request.GET.method == 'bus_conductor' %}selected{% endif %}>Bus Conductor</option>
                     </select>
                 </div>
                 
@@ -180,23 +177,9 @@
                             <div class="flex flex-col justify-between">
                                 <div>
                                     <div class="flex items-center mb-2">
-                                        {% if payment.payment_method == 'esewa' %}
-                                            <div class="w-6 h-6 bg-green-500 rounded flex items-center justify-center mr-2">
-                                                <i class="fas fa-mobile-alt text-white text-xs"></i>
-                                            </div>
-                                        {% elif payment.payment_method == 'khalti' %}
-                                            <div class="w-6 h-6 bg-purple-500 rounded flex items-center justify-center mr-2">
-                                                <i class="fas fa-wallet text-white text-xs"></i>
-                                            </div>
-                                        {% elif payment.payment_method == 'ime_pay' %}
-                                            <div class="w-6 h-6 bg-blue-500 rounded flex items-center justify-center mr-2">
-                                                <i class="fas fa-university text-white text-xs"></i>
-                                            </div>
-                                        {% else %}
-                                            <div class="w-6 h-6 bg-yellow-500 rounded flex items-center justify-center mr-2">
-                                                <i class="fas fa-money-bill text-white text-xs"></i>
-                                            </div>
-                                        {% endif %}
+                                        <div class="w-6 h-6 bg-green-500 rounded flex items-center justify-center mr-2">
+                                            <i class="fas fa-mobile-alt text-white text-xs"></i>
+                                        </div>
                                         <span class="font-medium text-gray-900">{{ payment.get_payment_method_display }}</span>
                                     </div>
                                     
@@ -230,7 +213,7 @@
                                 </a>
                                 
                                 {% if payment.payment_status == 'completed' and not payment.refund_requested %}
-                                    <button onclick="requestRefund({{ payment.id }})" 
+                                    <button onclick="requestRefund('{{ payment.payment_id }}')" 
                                             class="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium">
                                         <i class="fas fa-undo mr-2"></i>Request Refund
                                     </button>

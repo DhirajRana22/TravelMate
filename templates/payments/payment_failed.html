@@ -80,7 +80,7 @@ TravelMate{% endblock %} {% block content %}
                 <span class="text-gray-600 font-medium">Attempted Amount</span>
                 <span class="text-xl font-bold text-gray-900"
                   >रू{{
-                  attempted_amount|default:booking.total_amount|floatformat:2
+                  attempted_amount|default:booking.total_fare|floatformat:2
                   }}</span
                 >
               </div>

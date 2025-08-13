@@ -1,20 +1,13 @@
-{% extends 'base.html' %} {% load static %} {% block title %}Payment -
-TravelMate{% endblock %} {% block content %}
+{% extends 'base.html' %} {% load static %} {% block title %}Payment - TravelMate{% endblock %} {% block content %}
 <!-- Header -->
-<section
-  class="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-12 -mt-6"
->
+<section class="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-12 -mt-6">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center">
-      <div
-        class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4"
-      >
+      <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
         <i class="fas fa-credit-card text-2xl"></i>
       </div>
       <h1 class="text-3xl md:text-4xl font-bold mb-2">Secure Payment</h1>
-      <p class="text-xl opacity-90">
-        Complete your booking with our secure payment gateway
-      </p>
+      <p class="text-xl opacity-90">Complete your booking with our secure payment gateway</p>
     </div>
   </div>
 </section>
@@ -34,63 +27,36 @@ TravelMate{% endblock %} {% block content %}
           <div class="text-center mb-6">
             <div class="flex items-center justify-center">
               <div class="text-center">
-                <div class="text-lg font-bold text-gray-800">
-                  {{ booking.bus_schedule.route.source }}
-                </div>
-                <div class="text-sm text-gray-600">
-                  {{ booking.departure_time|time:"g:i A" }}
-                </div>
+                <div class="text-lg font-bold text-gray-800">{{ booking.bus_schedule.route.source }}</div>
+                <div class="text-sm text-gray-600">{{ booking.departure_time|time:"g:i A" }}</div>
               </div>
               <div class="mx-4">
                 <i class="fas fa-arrow-right text-green-500 text-2xl"></i>
               </div>
               <div class="text-center">
-                <div class="text-lg font-bold text-gray-800">
-                  {{ booking.bus_schedule.route.destination }}
-                </div>
-                <div class="text-sm text-gray-600">
-                  {{ booking.arrival_time|time:"g:i A" }}
-                </div>
+                <div class="text-lg font-bold text-gray-800">{{ booking.bus_schedule.route.destination }}</div>
+                <div class="text-sm text-gray-600">{{ booking.arrival_time|time:"g:i A" }}</div>
               </div>
             </div>
           </div>
 
           <!-- Booking Details -->
           <div class="space-y-4 mb-6">
-            <div
-              class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-            >
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
               <span class="text-gray-600">Bus Number</span>
-              <span class="font-semibold text-gray-800"
-                >{{ booking.bus_schedule.bus.bus_number }}</span
-              >
+              <span class="font-semibold text-gray-800">{{ booking.bus_schedule.bus.bus_number }}</span>
             </div>
-
-            <div
-              class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-            >
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
               <span class="text-gray-600">Travel Date</span>
-              <span class="font-semibold text-gray-800"
-                >{{ booking.travel_date|date:"M d, Y" }}</span
-              >
+              <span class="font-semibold text-gray-800">{{ booking.travel_date|date:"M d, Y" }}</span>
             </div>
-
-            <div
-              class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-            >
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
               <span class="text-gray-600">Passenger</span>
-              <span class="font-semibold text-gray-800"
-                >{{ booking.passenger_name }}</span
-              >
+              <span class="font-semibold text-gray-800">{{ booking.passenger_name }}</span>
             </div>
-
-            <div
-              class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-            >
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
               <span class="text-gray-600">Contact</span>
-              <span class="font-semibold text-gray-800"
-                >{{ booking.passenger_phone }}</span
-              >
+              <span class="font-semibold text-gray-800">{{ booking.passenger_phone }}</span>
             </div>
           </div>
 
@@ -101,11 +67,7 @@ TravelMate{% endblock %} {% block content %}
             </h3>
             <div class="flex flex-wrap gap-2">
               {% for seat in booking.seats.all %}
-              <span
-                class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
-              >
-                {{ seat.seat_number }}
-              </span>
+              <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">{{ seat.seat_number }}</span>
               {% endfor %}
             </div>
           </div>
@@ -113,237 +75,82 @@ TravelMate{% endblock %} {% block content %}
           <!-- Price Breakdown -->
           <div class="border-t border-gray-200 pt-4">
             <h3 class="font-semibold text-gray-800 mb-4">Price Breakdown</h3>
-
             <div class="space-y-2">
               <div class="flex justify-between">
-                <span class="text-gray-600"
-                  >Ticket Price ({{ booking.seats.count }} seat{{
-                  booking.seats.count|pluralize }})</span
-                >
+                <span class="text-gray-600">Ticket Price ({{ booking.seats.count }} seat{{ booking.seats.count|pluralize }})</span>
                 <span class="text-gray-800">रू{{ booking.subtotal }}</span>
               </div>
-
               {% if booking.service_fee %}
               <div class="flex justify-between">
                 <span class="text-gray-600">Service Fee</span>
                 <span class="text-gray-800">रू{{ booking.service_fee }}</span>
               </div>
-              {% endif %} {% if booking.discount %}
+              {% endif %}
+              {% if booking.discount %}
               <div class="flex justify-between text-green-600">
                 <span>Discount</span>
                 <span>-रू{{ booking.discount }}</span>
               </div>
               {% endif %}
-
               <div class="border-t border-gray-200 pt-2 mt-2">
                 <div class="flex justify-between text-lg font-bold">
                   <span class="text-gray-800">Total Amount</span>
-                  <span class="text-green-600"
-                    >रू{{ booking.total_amount }}</span
-                  >
+                  <span class="text-green-600">रू{{ booking.total_fare }}</span>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Session Timer -->
-          <div
-            class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
-          >
+          <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <div class="text-center">
               <div class="text-sm text-yellow-800 mb-1">Session expires in</div>
-              <div id="countdown" class="text-2xl font-bold text-yellow-600">
-                15:00
-              </div>
-              <div class="text-xs text-yellow-700 mt-1">
-                Complete payment before time runs out
-              </div>
+              <div id="countdown" class="text-2xl font-bold text-yellow-600">15:00</div>
+              <div class="text-xs text-yellow-700 mt-1">Complete payment before time runs out</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Payment Methods -->
+      <!-- Payment Method -->
       <div class="lg:col-span-2">
         <div class="bg-white rounded-2xl shadow-lg p-8">
           <h2 class="text-2xl font-bold text-gray-900 mb-6">
-            <i class="fas fa-wallet mr-2 text-green-500"></i>Choose Payment
-            Method
+            <i class="fas fa-wallet mr-2 text-green-500"></i>Payment Method
           </h2>
 
-          <form
-            id="paymentForm"
-            method="POST"
-            action="{% url 'payments:process_payment' booking.id %}"
-          >
+          <form id="paymentForm" method="POST" action="{% url 'payments:process_payment' payment.payment_id %}">
             {% csrf_token %}
 
-            <!-- Payment Methods Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <!-- eSewa -->
-              <div
-                class="payment-method border-2 border-gray-200 rounded-xl p-6 cursor-pointer hover:border-green-500 transition-all duration-300"
-                data-method="esewa"
-              >
+            <!-- eSewa Payment Option -->
+            <div class="mb-8">
+              <div class="payment-method border-2 border-green-500 rounded-xl p-6 cursor-pointer bg-green-50" data-method="esewa">
                 <div class="flex items-center justify-between mb-4">
                   <div class="flex items-center">
-                    <div
-                      class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4"
-                    >
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
                       <i class="fas fa-mobile-alt text-green-600 text-xl"></i>
                     </div>
                     <div>
-                      <h3 class="font-semibold text-gray-800">eSewa</h3>
-                      <p class="text-sm text-gray-600">
-                        Digital wallet payment
-                      </p>
+                      <h3 class="font-semibold text-gray-800 text-lg">eSewa</h3>
+                      <p class="text-sm text-gray-600">Digital wallet payment - Instant confirmation</p>
                     </div>
                   </div>
-                  <div
-                    class="method-radio w-5 h-5 border-2 border-gray-300 rounded-full"
-                  ></div>
+                  <div class="method-radio w-5 h-5 border-2 border-green-500 rounded-full bg-green-500"></div>
                 </div>
-
-                <div class="text-sm text-gray-600">
+                <div class="text-sm text-gray-700">
                   <div class="flex items-center mb-2">
-                    <i class="fas fa-check text-green-500 mr-2"></i>
-                    Instant payment confirmation
+                    <i class="fas fa-check text-green-600 mr-2"></i>
+                    <strong>Instant payment confirmation</strong>
                   </div>
-                  <div class="flex items-center">
-                    <i class="fas fa-shield-alt text-green-500 mr-2"></i>
+                  <div class="flex items-center mb-2">
+                    <i class="fas fa-shield-alt text-green-600 mr-2"></i>
                     Secure and encrypted
                   </div>
-                </div>
-              </div>
-
-              <!-- Khalti -->
-              <div
-                class="payment-method border-2 border-gray-200 rounded-xl p-6 cursor-pointer hover:border-purple-500 transition-all duration-300"
-                data-method="khalti"
-              >
-                <div class="flex items-center justify-between mb-4">
                   <div class="flex items-center">
-                    <div
-                      class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4"
-                    >
-                      <i class="fas fa-wallet text-purple-600 text-xl"></i>
-                    </div>
-                    <div>
-                      <h3 class="font-semibold text-gray-800">Khalti</h3>
-                      <p class="text-sm text-gray-600">
-                        Digital wallet payment
-                      </p>
-                    </div>
-                  </div>
-                  <div
-                    class="method-radio w-5 h-5 border-2 border-gray-300 rounded-full"
-                  ></div>
-                </div>
-
-                <div class="text-sm text-gray-600">
-                  <div class="flex items-center mb-2">
-                    <i class="fas fa-check text-green-500 mr-2"></i>
-                    Quick and easy payment
-                  </div>
-                  <div class="flex items-center">
-                    <i class="fas fa-mobile-alt text-green-500 mr-2"></i>
-                    Mobile-first experience
+                    <i class="fas fa-ticket-alt text-green-600 mr-2"></i>
+                    Ticket confirmed immediately after payment
                   </div>
                 </div>
-              </div>
-
-              <!-- IME Pay -->
-              <div
-                class="payment-method border-2 border-gray-200 rounded-xl p-6 cursor-pointer hover:border-blue-500 transition-all duration-300"
-                data-method="ime_pay"
-              >
-                <div class="flex items-center justify-between mb-4">
-                  <div class="flex items-center">
-                    <div
-                      class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4"
-                    >
-                      <i class="fas fa-university text-blue-600 text-xl"></i>
-                    </div>
-                    <div>
-                      <h3 class="font-semibold text-gray-800">IME Pay</h3>
-                      <p class="text-sm text-gray-600">Bank-backed payment</p>
-                    </div>
-                  </div>
-                  <div
-                    class="method-radio w-5 h-5 border-2 border-gray-300 rounded-full"
-                  ></div>
-                </div>
-
-                <div class="text-sm text-gray-600">
-                  <div class="flex items-center mb-2">
-                    <i class="fas fa-check text-green-500 mr-2"></i>
-                    Bank-grade security
-                  </div>
-                  <div class="flex items-center">
-                    <i class="fas fa-clock text-green-500 mr-2"></i>
-                    Real-time processing
-                  </div>
-                </div>
-              </div>
-
-              <!-- Pay to Conductor -->
-              <div
-                class="payment-method border-2 border-gray-200 rounded-xl p-6 cursor-pointer hover:border-yellow-500 transition-all duration-300"
-                data-method="bus_conductor"
-              >
-                <div class="flex items-center justify-between mb-4">
-                  <div class="flex items-center">
-                    <div
-                      class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4"
-                    >
-                      <i
-                        class="fas fa-money-bill-wave text-yellow-600 text-xl"
-                      ></i>
-                    </div>
-                    <div>
-                      <h3 class="font-semibold text-gray-800">
-                        Pay to Conductor
-                      </h3>
-                      <p class="text-sm text-gray-600">Cash payment on bus</p>
-                    </div>
-                  </div>
-                  <div
-                    class="method-radio w-5 h-5 border-2 border-gray-300 rounded-full"
-                  ></div>
-                </div>
-
-                <div class="text-sm text-gray-600">
-                  <div class="flex items-center mb-2">
-                    <i class="fas fa-check text-green-500 mr-2"></i>
-                    Pay directly to conductor
-                  </div>
-                  <div class="flex items-center">
-                    <i class="fas fa-ticket-alt text-green-500 mr-2"></i>
-                    Seat reserved for 2 hours
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Additional Payment Options -->
-            <div id="additionalOptions" class="hidden mb-8">
-              <!-- Bank Selection for Mobile Banking -->
-              <div id="bankSelection" class="hidden">
-                <label class="block text-sm font-semibold text-gray-700 mb-2"
-                  >Select Your Bank</label
-                >
-                <select
-                  name="bank_name"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                >
-                  <option value="">Choose your bank</option>
-                  <option value="nabil">Nabil Bank</option>
-                  <option value="nic">NIC Asia Bank</option>
-                  <option value="scb">Standard Chartered Bank</option>
-                  <option value="hbl">Himalayan Bank</option>
-                  <option value="nbl">Nepal Bank Limited</option>
-                  <option value="rbbl">Rastriya Banijya Bank</option>
-                </select>
               </div>
             </div>
 
@@ -352,18 +159,10 @@ TravelMate{% endblock %} {% block content %}
               <div class="flex items-start">
                 <i class="fas fa-shield-alt text-blue-500 mt-1 mr-3"></i>
                 <div>
-                  <h4 class="font-semibold text-blue-800 mb-2">
-                    Secure Payment Guarantee
-                  </h4>
+                  <h4 class="font-semibold text-blue-800 mb-2">Secure Payment Guarantee</h4>
                   <ul class="text-sm text-blue-700 space-y-1">
-                    <li>
-                      • All payments are processed through secure, encrypted
-                      channels
-                    </li>
-                    <li>
-                      • Your financial information is never stored on our
-                      servers
-                    </li>
+                    <li>• All payments are processed through secure, encrypted channels</li>
+                    <li>• Your financial information is never stored on our servers</li>
                     <li>• 100% refund guarantee for failed transactions</li>
                     <li>• 24/7 customer support for payment issues</li>
                   </ul>
@@ -374,47 +173,23 @@ TravelMate{% endblock %} {% block content %}
             <!-- Terms and Conditions -->
             <div class="mb-6">
               <label class="flex items-start">
-                <input
-                  type="checkbox"
-                  name="terms_accepted"
-                  required
-                  class="h-5 w-5 text-green-600 focus:ring-green-500 border-gray-300 rounded mt-1 mr-3"
-                />
+                <input type="checkbox" name="terms_accepted" required
+                  class="h-5 w-5 text-green-600 focus:ring-green-500 border-gray-300 rounded mt-1 mr-3" />
                 <span class="text-sm text-gray-600 leading-relaxed">
-                  I agree to the
-                  <a
-                    href="{% url 'home:terms' %}"
-                    class="text-green-600 hover:text-green-700 font-medium"
-                    target="_blank"
-                    >Terms and Conditions</a
-                  >
-                  and
-                  <a
-                    href="{% url 'home:privacy' %}"
-                    class="text-green-600 hover:text-green-700 font-medium"
-                    target="_blank"
-                    >Privacy Policy</a
-                  >. I understand that this booking is subject to the bus
-                  operator's terms and cancellation policy.
+                  I agree to the <a href="{% url 'home:terms' %}" class="text-green-600 hover:text-green-700 font-medium" target="_blank">Terms and Conditions</a>
+                  and <a href="{% url 'home:privacy' %}" class="text-green-600 hover:text-green-700 font-medium" target="_blank">Privacy Policy</a>.
+                  I understand that this booking is subject to the bus operator's terms and cancellation policy.
                 </span>
               </label>
             </div>
 
             <!-- Payment Button -->
-            <button
-              type="submit"
-              id="payButton"
-              disabled
-              class="w-full bg-green-500 text-white py-4 rounded-xl font-semibold text-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none"
-            >
-              <i class="fas fa-credit-card mr-2"></i>Select Payment Method
+            <button type="submit" id="payButton"
+              class="w-full bg-green-500 text-white py-4 rounded-xl font-semibold text-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105 shadow-lg">
+              <i class="fas fa-mobile-alt mr-2"></i>Pay with eSewa
             </button>
 
-            <input
-              type="hidden"
-              name="payment_method"
-              id="paymentMethodInput"
-            />
+            <input type="hidden" name="payment_method" value="esewa" />
           </form>
         </div>
       </div>
@@ -425,97 +200,29 @@ TravelMate{% endblock %} {% block content %}
 <!-- Help Section -->
 <section class="py-12 bg-white">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    <h3 class="text-2xl font-bold text-gray-900 mb-4">
-      Need Help with Payment?
-    </h3>
-    <p class="text-gray-600 mb-6">
-      Our customer support team is available 24/7 to assist you with any
-      payment-related questions.
-    </p>
+    <h3 class="text-2xl font-bold text-gray-900 mb-4">Need Help with Payment?</h3>
+    <p class="text-gray-600 mb-6">Our customer support team is available 24/7 to assist you with any payment-related questions.</p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a
-        href="tel:+9779847435111"
-        class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors"
-      >
+      <a href="tel:+9779847435111" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors">
         <i class="fas fa-phone mr-2"></i>Call Support
       </a>
-      <a
-        href="{% url 'home:contact' %}"
-        class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
-      >
+      <a href="{% url 'home:contact' %}" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
         <i class="fas fa-envelope mr-2"></i>Contact Us
       </a>
     </div>
   </div>
 </section>
-{% endblock %} {% block extra_js %}
+{% endblock %}
+
+{% block extra_js %}
 <script>
-  let selectedMethod = null;
   let countdownTimer = null;
   let timeLeft = 15 * 60; // 15 minutes in seconds
 
   document.addEventListener("DOMContentLoaded", function () {
-    // Payment method selection
-    document.querySelectorAll(".payment-method").forEach((method) => {
-      method.addEventListener("click", function () {
-        // Remove previous selection
-        document.querySelectorAll(".payment-method").forEach((m) => {
-          m.classList.remove("border-green-500", "bg-green-50");
-          m.querySelector(".method-radio").classList.remove(
-            "bg-green-500",
-            "border-green-500"
-          );
-          m.querySelector(".method-radio").classList.add("border-gray-300");
-        });
-
-        // Add selection to clicked method
-        this.classList.add("border-green-500", "bg-green-50");
-        const radio = this.querySelector(".method-radio");
-        radio.classList.remove("border-gray-300");
-        radio.classList.add("bg-green-500", "border-green-500");
-
-        // Update selected method
-        selectedMethod = this.dataset.method;
-        document.getElementById("paymentMethodInput").value = selectedMethod;
-
-        // Update pay button
-        updatePayButton(selectedMethod);
-
-        // Show additional options if needed
-        const additionalOptions = document.getElementById("additionalOptions");
-        const bankSelection = document.getElementById("bankSelection");
-
-        if (selectedMethod === "mobile_banking") {
-          additionalOptions.classList.remove("hidden");
-          bankSelection.classList.remove("hidden");
-        } else {
-          additionalOptions.classList.add("hidden");
-          bankSelection.classList.add("hidden");
-        }
-      });
-    });
-
     // Start countdown timer
     startCountdown();
   });
-
-  function updatePayButton(method) {
-    const payButton = document.getElementById("payButton");
-    payButton.disabled = false;
-    payButton.classList.remove("disabled:bg-gray-400");
-
-    const buttonTexts = {
-      esewa: '<i class="fas fa-mobile-alt mr-2"></i>Pay with eSewa',
-      khalti: '<i class="fas fa-wallet mr-2"></i>Pay with Khalti',
-      ime_pay: '<i class="fas fa-university mr-2"></i>Pay with IME Pay',
-      bus_conductor:
-        '<i class="fas fa-money-bill-wave mr-2"></i>Reserve & Pay to Conductor',
-    };
-
-    payButton.innerHTML =
-      buttonTexts[method] ||
-      '<i class="fas fa-credit-card mr-2"></i>Proceed to Pay';
-  }
 
   function startCountdown() {
     const countdownElement = document.getElementById("countdown");
@@ -524,24 +231,19 @@ TravelMate{% endblock %} {% block content %}
       const minutes = Math.floor(timeLeft / 60);
       const seconds = timeLeft % 60;
 
-      countdownElement.textContent = `${minutes
-        .toString()
-        .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+      countdownElement.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 
       if (timeLeft <= 0) {
         clearInterval(countdownTimer);
         alert("Session expired! Please select your seats again.");
-        window.location.href =
-          '{% url "bookings:seat_selection" booking.bus_schedule.id %}';
+        window.location.href = '{% url "bookings:seat_selection" booking.bus_schedule.id %}';
       }
 
       // Change color when time is running out
-      if (timeLeft <= 120) {
-        // Last 2 minutes
+      if (timeLeft <= 120) { // Last 2 minutes
         countdownElement.classList.add("text-red-600", "animate-pulse");
         countdownElement.classList.remove("text-yellow-600");
-      } else if (timeLeft <= 300) {
-        // Last 5 minutes
+      } else if (timeLeft <= 300) { // Last 5 minutes
         countdownElement.classList.add("text-orange-600");
         countdownElement.classList.remove("text-yellow-600");
       }
@@ -551,47 +253,17 @@ TravelMate{% endblock %} {% block content %}
   }
 
   // Form submission
-  document
-    .getElementById("paymentForm")
-    .addEventListener("submit", function (e) {
-      if (!selectedMethod) {
-        e.preventDefault();
-        alert("Please select a payment method.");
-        return;
-      }
-
-      // Add loading state
-      const payButton = document.getElementById("payButton");
-      payButton.innerHTML =
-        '<i class="fas fa-spinner fa-spin mr-2"></i>Processing Payment...';
-      payButton.disabled = true;
-
-      // For mobile banking, validate bank selection
-      if (selectedMethod === "mobile_banking") {
-        const bankSelect = document.querySelector('select[name="bank_name"]');
-        if (!bankSelect.value) {
-          e.preventDefault();
-          alert("Please select your bank.");
-          updatePayButton(selectedMethod);
-          return;
-        }
-      }
-    });
+  document.getElementById("paymentForm").addEventListener("submit", function (e) {
+    // Add loading state
+    const payButton = document.getElementById("payButton");
+    payButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing Payment...';
+    payButton.disabled = true;
+  });
 
   // Prevent page refresh/close during payment
   window.addEventListener("beforeunload", function (e) {
-    if (selectedMethod && selectedMethod !== "bus_conductor") {
-      e.preventDefault();
-      e.returnValue = "Payment is in progress. Are you sure you want to leave?";
-    }
+    e.preventDefault();
+    e.returnValue = "Payment is in progress. Are you sure you want to leave?";
   });
-
-  // Auto-select first payment method for better UX
-  setTimeout(() => {
-    const firstMethod = document.querySelector(".payment-method");
-    if (firstMethod && !selectedMethod) {
-      firstMethod.click();
-    }
-  }, 500);
 </script>
 {% endblock %}

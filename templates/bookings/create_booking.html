@@ -170,11 +170,11 @@ TravelMate{% endblock %} {% block content %}
 
             <!-- Hidden fields -->
             <input type="hidden" name="schedule_id" value="{{ schedule.id }}" />
-            <input type="hidden" name="travel_date" value="{{ travel_date }}" />
+            <input type="hidden" name="travel_date" value="{{ travel_date|date:'Y-m-d' }}" />
             <input
               type="hidden"
               name="selected_seats"
-              value="{{ selected_seats|join:',' }}"
+              value="{% for seat in selected_seats %}{{ seat.id }}{% if not forloop.last %},{% endif %}{% endfor %}"
             />
 
             <!-- Passenger Information -->
@@ -403,6 +403,44 @@ TravelMate{% endblock %} {% block content %}
               </div>
             </div>
 
+            <!-- Payment Method Selection -->
+            <div class="border border-gray-200 rounded-lg p-6">
+              <h4
+                class="text-lg font-semibold text-gray-800 mb-4 flex items-center"
+              >
+                <i class="fas fa-credit-card mr-3 text-blue-500"></i>
+                Payment Method
+              </h4>
+              <p class="text-sm text-gray-600 mb-4">
+                Choose your preferred payment method
+              </p>
+
+              <div class="space-y-3">
+                <label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                  <input
+                    type="radio"
+                    name="payment_method"
+                    value="esewa"
+                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                    required
+                    checked
+                  />
+                  <div class="ml-3 flex items-center">
+                    <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                      <i class="fas fa-mobile-alt text-green-600 text-sm"></i>
+                    </div>
+                    <div>
+                      <span class="text-sm font-medium text-gray-900">eSewa</span>
+                      <p class="text-xs text-gray-500">Digital wallet payment - Instant confirmation</p>
+                    </div>
+                  </div>
+                </label>
+
+                <!-- Removed other payment methods to enforce eSewa only -->
+                
+              </div>
+            </div>
+
             <!-- Terms and Conditions -->
             <div class="border border-gray-200 rounded-lg p-6">
               <div class="flex items-start">
@@ -436,7 +474,7 @@ TravelMate{% endblock %} {% block content %}
             <!-- Action Buttons -->
             <div class="flex flex-col sm:flex-row justify-between gap-4 pt-4">
               <a
-                href="{% url 'bookings:seat_selection' schedule.id %}?date={{ travel_date }}"
+                href="{% url 'bookings:seat_selection' schedule.id %}?date={{ travel_date|date:'Y-m-d' }}"
                 class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors text-center font-medium"
               >
                 <i class="fas fa-arrow-left mr-2"></i>Back to Seat Selection

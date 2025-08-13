@@ -13,6 +13,7 @@ from payments.models import Payment
 import qrcode
 from io import BytesIO
 import uuid
+import base64
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib import colors
 from reportlab.lib.units import inch
@@ -36,15 +37,10 @@ def seat_selection(request, schedule_id):
         travel_date = timezone.now().date()
     
     # Check if departure time is in the past
-    current_datetime = timezone.now()
-    current_date = current_datetime.date()
-    current_time = current_datetime.time()
+    current_date = timezone.now().date()
     
     if travel_date < current_date:
         messages.error(request, 'Cannot book a bus for past dates.')
-        return redirect('routes:route_search')
-    elif travel_date == current_date and schedule.departure_time <= current_time:
-        messages.error(request, 'Cannot book a bus that has already departed.')
         return redirect('routes:route_search')
     
     # Get or create seats for this bus schedule
@@ -328,14 +324,21 @@ def create_booking(request, schedule_id):
     seat_ids_str = request.GET.get('seats', '')
     selected_seat_ids = [int(sid) for sid in seat_ids_str.split(',') if sid.strip().isdigit()]
     
-    # For GET requests, only show error if seats parameter was provided but empty/invalid
+    # For GET requests, handle different scenarios for seat selection
     if request.method == 'GET':
-        if 'seats' in request.GET and not selected_seat_ids:
+        # If no seats in GET parameters at all, this is a normal page load
+        if 'seats' not in request.GET and 'selected_seats' not in request.GET:
+            pass  # Normal page load, continue to render
+        # If seats parameter is provided but empty/invalid
+        elif 'seats' in request.GET and not selected_seat_ids:
             messages.error(request, 'No seats selected. Please select seats first.')
             return redirect(reverse('bookings:seat_selection', args=[schedule_id]) + f'?date={travel_date}')
-        elif not selected_seat_ids:
-            # No seats parameter at all - redirect silently to seat selection
-            return redirect(reverse('bookings:seat_selection', args=[schedule_id]) + f'?date={travel_date}')
+        # If selected_seats parameter exists (from create_booking redirect), preserve seats but don't show error
+        elif 'selected_seats' in request.GET:
+            try:
+                selected_seat_ids = [int(sid) for sid in request.GET.get('selected_seats', '').split(',') if sid.strip().isdigit()]
+            except ValueError:
+                selected_seat_ids = []
     
     # Get selected seats
     selected_seats = Seat.objects.filter(id__in=selected_seat_ids, bus_schedule=schedule)
@@ -345,14 +348,10 @@ def create_booking(request, schedule_id):
         return redirect(reverse('bookings:seat_selection', args=[schedule_id]) + f'?date={travel_date}')
     
     # Check if departure time is in the past
-    current_datetime = timezone.now()
-    current_date = current_datetime.date()
-    current_time = current_datetime.time()
+    current_date = timezone.now().date()
+    
     if travel_date < current_date:
         messages.error(request, 'Cannot book a bus for past dates.')
-        return redirect('routes:route_search')
-    elif travel_date == current_date and schedule.departure_time <= current_time:
-        messages.error(request, 'Cannot book a bus that has already departed.')
         return redirect('routes:route_search')
     
     # Calculate total fare
@@ -455,9 +454,15 @@ def create_booking(request, schedule_id):
         else:
             print(f"DEBUG: Form is invalid. Errors: {booking_form.errors}")
             messages.error(request, 'Please correct the form errors and try again.')
-            # Preserve selected seats when form is invalid
-            selected_seats_param = ','.join(str(seat.id) for seat in selected_seats)
-            return redirect(reverse('bookings:seat_selection', args=[schedule_id]) + f'?date={travel_date}&selected_seats={selected_seats_param}')
+            # Re-render the create booking page with the same context so the user can fix inputs
+            context = {
+                'schedule': schedule,
+                'travel_date': travel_date,
+                'selected_seats': selected_seats,
+                'total_fare': total_fare,
+                'booking_form': booking_form,
+            }
+            return render(request, 'bookings/create_booking.html', context)
     else:
         booking_form = BookingForm()
     
@@ -475,8 +480,39 @@ def create_booking(request, schedule_id):
 def booking_detail(request, booking_id):
     booking = get_object_or_404(Booking, booking_id=booking_id, user=request.user)
     
+    # Generate QR code with booking information
+    seat_numbers = ', '.join([seat.seat_number for seat in booking.seats.all()])
+    qr_data = f"""TravelMate Booking
+ID: {booking.booking_id}
+Passenger: {booking.passenger_name}
+Contact: {booking.passenger_phone}
+Route: {booking.bus_schedule.route.source} to {booking.bus_schedule.route.destination}
+Bus: {booking.bus_schedule.bus.bus_number}
+Seats: {seat_numbers}
+Date: {booking.booking_date}
+Time: {booking.bus_schedule.departure_time.strftime('%H:%M')}
+Fare: Rs. {booking.total_fare}
+Status: {booking.get_booking_status_display()}"""
+    
+    # Create QR code
+    qr = qrcode.QRCode(
+        version=2,
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(qr_data)
+    qr.make(fit=True)
+    
+    # Generate QR code image
+    img = qr.make_image(fill_color="black", back_color="white")
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    qr_code_base64 = base64.b64encode(buffer.getvalue()).decode()
+    
     context = {
         'booking': booking,
+        'qr_code_base64': qr_code_base64,
     }
     
     return render(request, 'bookings/booking_detail.html', context)
@@ -714,9 +750,9 @@ def generate_ticket_pdf(booking):
     <b>Important Instructions:</b><br/>
     • Please arrive at the boarding point at least 15 minutes before departure<br/>
     • Carry a valid government-issued photo ID for verification<br/>
-    • Show this ticket (digital or printed) to the bus conductor<br/>
+    • Show this ticket (digital or printed) to the bus staff during boarding<br/>
     • Cancellation is allowed up to 2 hours before departure time<br/>
-    • Contact customer support for any assistance: +977-1-4567890
+    • Contact customer support for any assistance: +977-9847435111
     """
     
     notes = Paragraph(notes_text, normal_style)
@@ -782,7 +818,7 @@ def view_ticket(request, booking_id):
     return render(request, 'bookings/ticket.html', context)
 
 def verify_ticket(request, booking_id):
-    # This view would be used by bus conductors to verify tickets
+    # This view is intended for authorized bus staff to verify tickets
     # It could be protected by staff_member_required decorator in production
     
     try:

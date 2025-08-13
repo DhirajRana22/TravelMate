@@ -31,25 +31,30 @@ def route_search(request):
             # Find routes matching source and destination
             routes = Route.objects.filter(source=source_location, destination=destination_location, is_active=True)
             
-            # Find schedules for these routes (TimeField comparison)
-            # Since departure_time is TimeField, we filter by routes and check if travel_date is today or future
+            # Find schedules for these routes with proper datetime comparison
             from datetime import datetime
-            current_time = timezone.now().time()
-            is_today = travel_date == timezone.now().date()
+            current_datetime = timezone.now()
             
             schedules = BusSchedule.objects.filter(
                 route__in=routes,
                 is_active=True
             )
             
-            # If searching for today, only show schedules with departure time in the future
-            if is_today:
-                schedules = schedules.filter(departure_time__gt=current_time)
-            # If searching for past dates, show no results
-            elif travel_date < timezone.now().date():
-                schedules = BusSchedule.objects.none()
+            # Filter out schedules that have already departed
+            valid_schedules = []
+            for schedule in schedules:
+                departure_datetime = timezone.make_aware(datetime.combine(travel_date, schedule.departure_time))
+                if departure_datetime > current_datetime:
+                    valid_schedules.append(schedule)
             
-            schedules = schedules.order_by('departure_time')
+            schedules = valid_schedules
+            
+            # If searching for past dates, show no results
+            if travel_date < timezone.now().date():
+                schedules = []
+            
+            # Sort schedules by departure time
+            schedules = sorted(schedules, key=lambda x: x.departure_time)
             
             # Calculate available seats for each schedule on the specific travel date
             for schedule in schedules:
@@ -113,8 +118,8 @@ def route_results(request):
             
             # Get dynamic bus assignments for the travel date
             from .models import DynamicBusAssignment
-            current_time = timezone.now().time()
-            is_today = travel_date == timezone.now().date()
+            from datetime import datetime
+            current_datetime = timezone.now()
             
             # Get assignments for the travel date
             assignments = DynamicBusAssignment.objects.filter(
@@ -123,14 +128,21 @@ def route_results(request):
                 is_active=True
             )
             
-            # If searching for today, only show assignments with departure time in the future
-            if is_today:
-                assignments = assignments.filter(departure_time__gt=current_time)
-            # If searching for past dates, show no results
-            elif travel_date < timezone.now().date():
-                assignments = DynamicBusAssignment.objects.none()
+            # Filter out assignments that have already departed
+            valid_assignments = []
+            for assignment in assignments:
+                departure_datetime = timezone.make_aware(datetime.combine(travel_date, assignment.departure_time))
+                if departure_datetime > current_datetime:
+                    valid_assignments.append(assignment)
             
-            assignments = assignments.order_by('departure_time')
+            assignments = valid_assignments
+            
+            # If searching for past dates, show no results
+            if travel_date < timezone.now().date():
+                assignments = []
+            
+            # Sort assignments by departure time
+            assignments = sorted(assignments, key=lambda x: x.departure_time)
             
             # Convert assignments to schedule-like objects for template compatibility
             schedules = []
@@ -176,14 +188,14 @@ def route_results(request):
                     is_active=True
                 )
                 
-                # Filter schedules that are available on the travel date
+                # Filter schedules that are available on the travel date with proper datetime comparison
                 available_schedules = []
                 for schedule in base_schedules:
                     if schedule.is_available_on_date(travel_date):
-                        # If searching for today, only show schedules with departure time in the future
-                        if is_today and schedule.departure_time <= current_time:
-                            continue
-                        available_schedules.append(schedule)
+                        # Check if the departure has already passed
+                        departure_datetime = timezone.make_aware(datetime.combine(travel_date, schedule.departure_time))
+                        if departure_datetime > current_datetime:
+                            available_schedules.append(schedule)
                 
                 schedules = sorted(available_schedules, key=lambda x: x.departure_time)
                 

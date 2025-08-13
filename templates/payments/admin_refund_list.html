@@ -43,15 +43,15 @@
                 </div>
             </div>
             
-            <!-- Approved Refunds -->
-            <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-green-500">
+            <!-- Rejected Refunds -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-red-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <div class="text-2xl font-bold text-gray-800">{{ approved_count|default:0 }}</div>
-                        <div class="text-green-600 font-medium">Approved Refunds</div>
+                        <div class="text-2xl font-bold text-gray-800">{{ rejected_count|default:0 }}</div>
+                        <div class="text-red-600 font-medium">Rejected Refunds</div>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-check text-green-600 text-xl"></i>
+                    <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-times text-red-600 text-xl"></i>
                     </div>
                 </div>
             </div>
@@ -102,7 +102,6 @@
                     <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
                         <option value="">All Status</option>
                         <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
-                        <option value="approved" {% if request.GET.status == 'approved' %}selected{% endif %}>Approved</option>
                         <option value="rejected" {% if request.GET.status == 'rejected' %}selected{% endif %}>Rejected</option>
                         <option value="processed" {% if request.GET.status == 'processed' %}selected{% endif %}>Processed</option>
                     </select>
@@ -200,15 +199,11 @@
                                             <span class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">
                                                 <i class="fas fa-clock mr-1"></i>Pending Review
                                             </span>
-                                        {% elif refund.status == 'approved' %}
-                                            <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
-                                                <i class="fas fa-check mr-1"></i>Approved
-                                            </span>
-                                        {% elif refund.status == 'rejected' %}
+                                    {% elif refund.status == 'rejected' %}
                                             <span class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
                                                 <i class="fas fa-times mr-1"></i>Rejected
                                             </span>
-                                        {% elif refund.status == 'processed' %}
+                                     {% elif refund.status == 'processed' %}
                                             <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
                                                 <i class="fas fa-money-bill-wave mr-1"></i>Processed
                                             </span>
@@ -232,19 +227,14 @@
                                 </a>
                                 
                                 {% if refund.status == 'pending' %}
-                                    <button onclick="updateRefundStatus({{ refund.id }}, 'approved')" 
-                                            class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm font-medium">
-                                        <i class="fas fa-check mr-2"></i>Approve
+                                    <button onclick="processRefund({{ refund.id }})" 
+                                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium">
+                                        <i class="fas fa-money-bill-wave mr-2"></i>Process
                                     </button>
                                     
                                     <button onclick="updateRefundStatus({{ refund.id }}, 'rejected')" 
                                             class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors text-sm font-medium">
                                         <i class="fas fa-times mr-2"></i>Reject
-                                    </button>
-                                {% elif refund.status == 'approved' %}
-                                    <button onclick="processRefund({{ refund.id }})" 
-                                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium">
-                                        <i class="fas fa-money-bill-wave mr-2"></i>Process
                                     </button>
                                 {% endif %}
                             </div>

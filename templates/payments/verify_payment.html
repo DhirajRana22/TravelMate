@@ -108,31 +108,11 @@ TravelMate{% endblock %} {% block content %}
             >
               <span class="text-gray-600 font-medium">Payment Method</span>
               <div class="flex items-center">
-                {% if payment.payment_method == 'esewa' %}
                 <div
                   class="w-6 h-6 bg-green-500 rounded flex items-center justify-center mr-2"
                 >
                   <i class="fas fa-mobile-alt text-white text-xs"></i>
                 </div>
-                {% elif payment.payment_method == 'khalti' %}
-                <div
-                  class="w-6 h-6 bg-purple-500 rounded flex items-center justify-center mr-2"
-                >
-                  <i class="fas fa-wallet text-white text-xs"></i>
-                </div>
-                {% elif payment.payment_method == 'ime_pay' %}
-                <div
-                  class="w-6 h-6 bg-blue-500 rounded flex items-center justify-center mr-2"
-                >
-                  <i class="fas fa-university text-white text-xs"></i>
-                </div>
-                {% else %}
-                <div
-                  class="w-6 h-6 bg-yellow-500 rounded flex items-center justify-center mr-2"
-                >
-                  <i class="fas fa-money-bill text-white text-xs"></i>
-                </div>
-                {% endif %}
                 <span class="font-semibold text-gray-900"
                   >{{ payment.get_payment_method_display }}</span
                 >

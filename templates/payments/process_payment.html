@@ -179,7 +179,7 @@ TravelMate{% endblock %} {% block content %}
                     <div class="flex justify-between text-lg font-bold">
                       <span class="text-gray-800">Total Amount</span>
                       <span class="text-green-600"
-                        >रू{{ booking.total_amount }}</span
+                        >रू{{ booking.total_fare }}</span
                       >
                     </div>
                   </div>
@@ -204,7 +204,7 @@ TravelMate{% endblock %} {% block content %}
                   Select Payment Method
                 </h4>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 gap-4">
                   <!-- eSewa -->
                   <label class="payment-method-option cursor-pointer">
                     <input
@@ -213,168 +213,41 @@ TravelMate{% endblock %} {% block content %}
                       value="esewa"
                       class="sr-only"
                       required
+                      checked
                     />
                     <div
-                      class="border-2 border-gray-200 rounded-xl p-4 hover:border-green-500 transition-all duration-300"
+                      class="border-2 border-green-500 rounded-xl p-6 bg-green-50"
                     >
                       <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center">
                           <div
-                            class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3"
+                            class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mr-4"
                           >
-                            <i class="fas fa-mobile-alt text-white"></i>
+                            <i class="fas fa-mobile-alt text-white text-lg"></i>
                           </div>
                           <div>
-                            <div class="font-semibold text-gray-900">eSewa</div>
+                            <div class="font-semibold text-gray-900 text-lg">eSewa</div>
                             <div class="text-sm text-gray-600">
-                              Digital Wallet
+                              Digital Wallet - Instant Confirmation
                             </div>
                           </div>
                         </div>
                         <div
-                          class="method-radio w-5 h-5 border-2 border-gray-300 rounded-full"
+                          class="method-radio w-5 h-5 border-2 border-green-500 rounded-full bg-green-500"
                         ></div>
                       </div>
-                      <div class="text-sm text-gray-600">
-                        <div class="flex items-center mb-1">
-                          <i class="fas fa-check text-green-500 mr-2"></i>
-                          Instant payment confirmation
+                      <div class="text-sm text-gray-700">
+                        <div class="flex items-center mb-2">
+                          <i class="fas fa-check text-green-600 mr-2"></i>
+                          <strong>Instant payment confirmation</strong>
                         </div>
-                        <div class="flex items-center">
-                          <i class="fas fa-shield-alt text-green-500 mr-2"></i>
+                        <div class="flex items-center mb-2">
+                          <i class="fas fa-shield-alt text-green-600 mr-2"></i>
                           Secure and encrypted
                         </div>
-                      </div>
-                    </div>
-                  </label>
-
-                  <!-- Khalti -->
-                  <label class="payment-method-option cursor-pointer">
-                    <input
-                      type="radio"
-                      name="payment_method"
-                      value="khalti"
-                      class="sr-only"
-                    />
-                    <div
-                      class="border-2 border-gray-200 rounded-xl p-4 hover:border-purple-500 transition-all duration-300"
-                    >
-                      <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center">
-                          <div
-                            class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mr-3"
-                          >
-                            <i class="fas fa-wallet text-white"></i>
-                          </div>
-                          <div>
-                            <div class="font-semibold text-gray-900">
-                              Khalti
-                            </div>
-                            <div class="text-sm text-gray-600">
-                              Digital Wallet
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          class="method-radio w-5 h-5 border-2 border-gray-300 rounded-full"
-                        ></div>
-                      </div>
-                      <div class="text-sm text-gray-600">
-                        <div class="flex items-center mb-1">
-                          <i class="fas fa-check text-green-500 mr-2"></i>
-                          Quick and easy payment
-                        </div>
-                        <div class="flex items-center">
-                          <i class="fas fa-mobile-alt text-green-500 mr-2"></i>
-                          Mobile-first experience
-                        </div>
-                      </div>
-                    </div>
-                  </label>
-
-                  <!-- IME Pay -->
-                  <label class="payment-method-option cursor-pointer">
-                    <input
-                      type="radio"
-                      name="payment_method"
-                      value="ime_pay"
-                      class="sr-only"
-                    />
-                    <div
-                      class="border-2 border-gray-200 rounded-xl p-4 hover:border-blue-500 transition-all duration-300"
-                    >
-                      <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center">
-                          <div
-                            class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3"
-                          >
-                            <i class="fas fa-university text-white"></i>
-                          </div>
-                          <div>
-                            <div class="font-semibold text-gray-900">
-                              IME Pay
-                            </div>
-                            <div class="text-sm text-gray-600">
-                              Bank Payment
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          class="method-radio w-5 h-5 border-2 border-gray-300 rounded-full"
-                        ></div>
-                      </div>
-                      <div class="text-sm text-gray-600">
-                        <div class="flex items-center mb-1">
-                          <i class="fas fa-check text-green-500 mr-2"></i>
-                          Bank-grade security
-                        </div>
-                        <div class="flex items-center">
-                          <i class="fas fa-clock text-green-500 mr-2"></i>
-                          Real-time processing
-                        </div>
-                      </div>
-                    </div>
-                  </label>
-
-                  <!-- Cash Payment -->
-                  <label class="payment-method-option cursor-pointer">
-                    <input
-                      type="radio"
-                      name="payment_method"
-                      value="bus_conductor"
-                      class="sr-only"
-                    />
-                    <div
-                      class="border-2 border-gray-200 rounded-xl p-4 hover:border-yellow-500 transition-all duration-300"
-                    >
-                      <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center">
-                          <div
-                            class="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3"
-                          >
-                            <i class="fas fa-money-bill-wave text-white"></i>
-                          </div>
-                          <div>
-                            <div class="font-semibold text-gray-900">
-                              Pay to Conductor
-                            </div>
-                            <div class="text-sm text-gray-600">
-                              Cash Payment
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          class="method-radio w-5 h-5 border-2 border-gray-300 rounded-full"
-                        ></div>
-                      </div>
-                      <div class="text-sm text-gray-600">
-                        <div class="flex items-center mb-1">
-                          <i class="fas fa-check text-green-500 mr-2"></i>
-                          Pay directly on bus
-                        </div>
-                        <div class="flex items-center">
-                          <i class="fas fa-ticket-alt text-green-500 mr-2"></i>
-                          Seat reserved for 2 hours
+                          <i class="fas fa-ticket-alt text-green-600 mr-2"></i>
+                          Ticket confirmed immediately after payment
                         </div>
                       </div>
                     </div>
@@ -443,8 +316,7 @@ TravelMate{% endblock %} {% block content %}
                 disabled
                 class="w-full bg-green-500 text-white py-4 rounded-xl font-semibold text-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105 shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none"
               >
-                <i class="fas fa-lock mr-2"></i>Pay रू{{
-                booking.total_amount|floatformat:2 }}
+                <i class="fas fa-lock mr-2"></i>Pay रू{{ booking.total_fare|floatformat:2 }}
               </button>
             </form>
           </div>
@@ -485,6 +357,7 @@ TravelMate{% endblock %} {% block content %}
   document.addEventListener("DOMContentLoaded", function () {
     const payButton = document.getElementById("payButton");
     const paymentForm = document.getElementById("paymentForm");
+    const bookingFare = {{ booking.total_fare|floatformat:2 }};
     const paymentMethods = document.querySelectorAll(
       'input[name="payment_method"]'
     );
@@ -572,7 +445,7 @@ TravelMate{% endblock %} {% block content %}
       payButton.innerHTML =
         '<i class="fas fa-spinner fa-spin mr-2"></i>Processing Payment...';
 
-      fetch('{% url "payments:process_payment" payment.id %}', {
+      fetch('{% url "payments:process_payment" payment.payment_id %}', {
         method: "POST",
         body: formData,
         headers: {
@@ -587,11 +460,11 @@ TravelMate{% endblock %} {% block content %}
             if (data.payment_method === "esewa") {
               submitEsewaPayment(data.esewa_data, data.esewa_url);
             } else {
-              // Handle other payment methods
+              // Fallback just in case; redirect to success
               if (data.redirect_url) {
                 window.location.href = data.redirect_url;
               } else {
-                window.location.href = '{% url "payments:payment_success" %}';
+                window.location.href = '{% url "payments:payment_success" payment.payment_id %}';
               }
             }
           } else {
@@ -602,7 +475,7 @@ TravelMate{% endblock %} {% block content %}
             // Reset button
             payButton.disabled = false;
             payButton.innerHTML =
-              '<i class="fas fa-lock mr-2"></i>Pay रू{{ booking.total_amount|floatformat:2 }}';
+              `<i class="fas fa-lock mr-2"></i>Pay रू${bookingFare.toFixed(2)}`;
           }
         })
         .catch((error) => {
@@ -611,7 +484,7 @@ TravelMate{% endblock %} {% block content %}
           // Reset button
           payButton.disabled = false;
           payButton.innerHTML =
-            '<i class="fas fa-lock mr-2"></i>Pay रू{{ booking.total_amount|floatformat:2 }}';
+            `<i class="fas fa-lock mr-2"></i>Pay रू${bookingFare.toFixed(2)}`;
         });
     }
 

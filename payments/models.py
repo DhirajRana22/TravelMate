@@ -5,8 +5,6 @@ import uuid
 class Payment(models.Model):
     PAYMENT_METHOD_CHOICES = (
         ('esewa', 'eSewa'),
-        ('khalti', 'Khalti'),
-        ('bus_conductor', 'Pay to Bus Conductor'),
     )
     
     PAYMENT_STATUS_CHOICES = (

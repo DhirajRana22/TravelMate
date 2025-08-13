@@ -17,6 +17,7 @@ urlpatterns = [
     path('buses/<int:bus_id>/', views.bus_detail, name='bus_detail'),
     path('buses/<int:bus_id>/edit/', views.bus_edit, name='bus_edit'),
     path('buses/<int:bus_id>/delete/', views.bus_delete, name='bus_delete'),
+    path('buses/<int:bus_id>/status/', views.bus_status_update, name='bus_status_update'),
     path('routes/', views.route_management, name='route_management'),
     path('routes/', views.route_management, name='admin_routes'),
     path('routes/add/', views.route_add, name='route_add'),
