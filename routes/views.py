@@ -205,7 +205,7 @@ def route_results(request):
                     booked_seats_count = Booking.objects.filter(
                         bus_schedule=schedule,
                         booking_date=travel_date,
-                        booking_status__in=['confirmed', 'pending']
+                        booking_status='confirmed'
                     ).aggregate(
                         total_booked=Count('seats')
                     )['total_booked'] or 0

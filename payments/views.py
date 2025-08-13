@@ -66,27 +66,9 @@ def process_payment(request, payment_id):
                     'error': f'Error processing payment: {str(e)}'
                 })
         
-        # Handle regular form submission
-        form = PaymentForm(request.POST)
-        if form.is_valid():
-            try:
-                with transaction.atomic():
-                    # Update payment details
-                    payment.transaction_id = form.cleaned_data.get('transaction_id', f'TX{uuid.uuid4().hex[:8].upper()}')
-                    payment.payment_date = timezone.now()
-                    payment.payment_status = 'completed'
-                    payment.save()
-                    
-                    # Update booking payment status
-                    booking.payment_status = 'paid'
-                    booking.booking_status = 'confirmed'
-                    booking.save()
-                    
-                    messages.success(request, 'Payment completed successfully!')
-                    return redirect('bookings:booking_confirmation', booking_id=booking.booking_id)
-            except Exception as e:
-                messages.error(request, f'Error processing payment: {str(e)}')
-                return redirect('payments:process_payment', payment_id=payment_id)
+        # Disallow non-AJAX completion to enforce eSewa success validation
+        messages.error(request, 'Invalid payment submission. Please complete payment via eSewa.')
+        return redirect('payments:process_payment', payment_id=payment_id)
     else:
         form = PaymentForm(initial={'payment_method': payment.payment_method})
     

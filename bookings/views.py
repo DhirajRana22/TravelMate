@@ -80,7 +80,7 @@ def seat_selection(request, schedule_id):
     booked_seats = Booking.objects.filter(
         bus_schedule=schedule,
         booking_date=travel_date,
-        booking_status__in=['confirmed', 'pending']
+        booking_status='confirmed'
     ).values_list('seats__id', flat=True)
     
     # Update seat status based on bookings
@@ -234,7 +234,7 @@ def quick_booking(request, schedule_id):
     booked_seats = Booking.objects.filter(
         bus_schedule=schedule,
         booking_date=travel_date,
-        booking_status__in=['confirmed', 'pending']
+        booking_status='confirmed'
     ).values_list('seats__id', flat=True)
     
     # Update seat status
