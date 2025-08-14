@@ -1,0 +1,31 @@
+# Additional requirements for algorithm analysis and chart generation
+# Install with: pip install -r analysis_requirements.txt
+
+# Core data science libraries
+matplotlib>=3.7.0
+seaborn>=0.12.0
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Machine learning (already in main requirements.txt but ensuring version)
+scikit-learn>=1.3.0
+
+# Additional visualization libraries
+plotly>=5.15.0
+bokeh>=3.2.0
+
+# For advanced statistical analysis
+scipy>=1.10.0
+statsmodels>=0.14.0
+
+# For creating professional reports
+reportlab>=4.0.0
+
+# For interactive widgets (if needed)
+ipywidgets>=8.0.0
+
+# For better color palettes
+colorbrewer>=0.2.0
+
+# For saving high-quality images
+Pillow>=10.0.0
