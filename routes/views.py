@@ -215,6 +215,9 @@ def route_results(request):
             # Apply recommendation sorting if user is authenticated
             if request.user.is_authenticated:
                 schedules = sort_schedules_by_preferences(request.user, schedules, travel_date)
+            else:
+                # Sort by departure time for non-authenticated users
+                schedules = sorted(schedules, key=lambda x: x.departure_time)
                     
         except Location.DoesNotExist:
             messages.error(request, 'Please enter valid source and destination cities.')
@@ -227,7 +230,15 @@ def route_results(request):
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"{field.title()}: {error}")
-        return redirect('routes:route_search')
+        # Extract raw values from GET parameters for display even if form is invalid
+        source = request.GET.get('source', '')
+        destination = request.GET.get('destination', '')
+        travel_date_str = request.GET.get('travel_date', '')
+        try:
+            from datetime import datetime
+            travel_date = datetime.strptime(travel_date_str, '%Y-%m-%d').date() if travel_date_str else None
+        except ValueError:
+            travel_date = None
     
     # Get unique bus types for filtering
     from buses.models import BusType

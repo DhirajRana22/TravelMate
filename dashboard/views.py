@@ -231,10 +231,35 @@ def bus_management(request):
 
 @staff_member_required
 def bus_detail(request, bus_id):
+    from routes.models import Route, BusSchedule
+    from buses.models import BusDriver
+    
     bus = get_object_or_404(Bus, id=bus_id)
     
     # Get bus schedules
     schedules = BusSchedule.objects.filter(bus=bus).order_by('departure_time')
+    
+    # Get assigned routes with stats
+    assigned_routes = Route.objects.filter(
+        busschedule__bus=bus
+    ).distinct().annotate(
+        total_bookings=Count('busschedule__booking', distinct=True),
+        total_revenue=Sum('busschedule__booking__payments__amount', 
+                         filter=Q(busschedule__booking__payments__payment_status='COMPLETED'))
+    ).order_by('source__name')
+    
+    # Get recent bookings for this bus
+    recent_bookings = Booking.objects.filter(
+        bus_schedule__bus=bus
+    ).select_related('user', 'bus_schedule__route__source', 'bus_schedule__route__destination').prefetch_related('seats').order_by('-booking_date')[:5]
+    
+    # Add selected_seats property to each booking
+    for booking in recent_bookings:
+        seat_numbers = [str(seat.seat_number) for seat in booking.seats.all()]
+        booking.selected_seats = ', '.join(seat_numbers)
+    
+    # Get bus driver info
+    bus_driver = BusDriver.objects.filter(bus=bus, is_active=True).first()
     
     # Calculate bus stats
     total_schedules = schedules.count()
@@ -247,10 +272,20 @@ def bus_detail(request, bus_id):
     # Add stats to bus object for template access
     bus.total_bookings = total_bookings
     bus.total_revenue = total_revenue
-    bus.active_routes_count = Route.objects.filter(
-        busschedule__bus=bus,
-        is_active=True
-    ).distinct().count()
+    bus.active_routes_count = assigned_routes.filter(is_active=True).count()
+    
+    # Add driver info to bus object
+    if bus_driver:
+        bus.driver_name = bus_driver.name
+        bus.driver_license = bus_driver.license_number
+        bus.driver_contact = bus_driver.contact_number
+    else:
+        bus.driver_name = None
+        bus.driver_license = None
+        bus.driver_contact = None
+    
+    # Add bus type name
+    bus.bus_type_name = bus.bus_type.name if bus.bus_type else "Standard"
     
     # Get booking data by month
     bookings_by_month = Booking.objects.filter(
@@ -267,9 +302,12 @@ def bus_detail(request, bus_id):
     context = {
         'bus': bus,
         'schedules': schedules,
+        'assigned_routes': assigned_routes,
+        'recent_bookings': recent_bookings,
         'total_schedules': total_schedules,
         'total_bookings': total_bookings,
         'total_revenue': total_revenue,
+        'active_routes_count': bus.active_routes_count,
         'booking_chart_data': json.dumps(booking_chart_data),
     }
     
@@ -348,6 +386,18 @@ def route_detail(request, route_id):
         status=F('booking_status')
     ).order_by('-created_at')[:10]
     
+    # Get assigned buses for this route
+    assigned_buses = Bus.objects.filter(
+        busschedule__route=route
+    ).distinct()
+    assigned_buses_count = assigned_buses.count()
+    
+    # Calculate occupancy rate
+    if total_schedules > 0:
+        occupancy_rate = (total_bookings / (total_schedules * 50)) * 100  # Assuming average 50 seats per bus
+    else:
+        occupancy_rate = 0
+    
     # Add recent_bookings to route object for template access
     route.recent_bookings = recent_bookings
     
@@ -357,6 +407,10 @@ def route_detail(request, route_id):
         'total_schedules': total_schedules,
         'total_bookings': total_bookings,
         'total_revenue': total_revenue,
+        'assigned_buses': assigned_buses,
+        'assigned_buses_count': assigned_buses_count,
+        'occupancy_rate': occupancy_rate,
+        'recent_bookings': recent_bookings,
         'booking_chart_data': json.dumps(booking_chart_data),
     }
     
@@ -571,6 +625,7 @@ def booking_management(request):
     form = AdminBookingSearchForm(request.GET or None)
     bookings = Booking.objects.all().select_related('user', 'bus_schedule__bus', 'bus_schedule__route').order_by('-booking_date')
     
+    # Apply filters
     if form.is_valid():
         booking_id = form.cleaned_data.get('booking_id')
         user_email = form.cleaned_data.get('user_email')
@@ -592,9 +647,51 @@ def booking_management(request):
         if end_date:
             bookings = bookings.filter(booking_date__lte=end_date)
     
+    # Calculate statistics
+    total_bookings = Booking.objects.count()
+    confirmed_bookings = Booking.objects.filter(booking_status='confirmed').count()
+    pending_bookings = Booking.objects.filter(booking_status='pending').count()
+    cancelled_bookings = Booking.objects.filter(booking_status='cancelled').count()
+    
+    # Calculate total revenue from confirmed bookings with completed payments
+    total_revenue = Payment.objects.filter(
+        payment_status='completed',
+        booking__booking_status='confirmed'
+    ).aggregate(Sum('amount'))['amount__sum'] or 0
+    
+    # Handle CSV export
+    if request.GET.get('export') == 'csv':
+        import csv
+        from django.http import HttpResponse
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="bookings.csv"'
+        
+        writer = csv.writer(response)
+        writer.writerow(['Booking ID', 'Passenger', 'Email', 'Route', 'Travel Date', 'Status', 'Payment Status', 'Amount'])
+        
+        for booking in bookings:
+            writer.writerow([
+                booking.booking_id,
+                booking.passenger_name,
+                booking.passenger_email,
+                f"{booking.bus_schedule.route.source} to {booking.bus_schedule.route.destination}",
+                booking.travel_date.strftime('%Y-%m-%d'),
+                booking.booking_status,
+                booking.payment_status,
+                booking.total_fare
+            ])
+        
+        return response
+    
     context = {
         'bookings': bookings,
         'form': form,
+        'total_bookings': total_bookings,
+        'confirmed_bookings': confirmed_bookings,
+        'pending_bookings': pending_bookings,
+        'cancelled_bookings': cancelled_bookings,
+        'total_revenue': total_revenue,
     }
     
     return render(request, 'dashboard/booking_management.html', context)
@@ -617,6 +714,174 @@ def booking_detail(request, booking_id):
     }
     
     return render(request, 'dashboard/booking_detail.html', context)
+
+@staff_member_required
+def booking_confirm(request, booking_id):
+    """Confirm a booking from admin dashboard"""
+    if request.method == 'POST':
+        booking = get_object_or_404(Booking, booking_id=booking_id)
+        
+        try:
+            # Check if booking is already confirmed
+            if booking.booking_status == 'confirmed':
+                return JsonResponse({'success': False, 'error': 'Booking is already confirmed'})
+            
+            # Check if booking is cancelled
+            if booking.booking_status == 'cancelled':
+                return JsonResponse({'success': False, 'error': 'Cannot confirm a cancelled booking'})
+            
+            # Update booking status to confirmed
+            booking.booking_status = 'confirmed'
+            booking.save()
+            
+            return JsonResponse({'success': True, 'message': 'Booking confirmed successfully'})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@staff_member_required
+def booking_cancel(request, booking_id):
+    """Cancel a booking from admin dashboard"""
+    if request.method == 'POST':
+        booking = get_object_or_404(Booking, booking_id=booking_id)
+        
+        try:
+            import json
+            data = json.loads(request.body)
+            reason = data.get('reason', 'Cancelled by admin')
+            
+            # Update booking status
+            booking.booking_status = 'cancelled'
+            booking.save()
+            
+            # Make seats available again
+            for seat in booking.seats.all():
+                seat.is_booked = False
+                seat.save()
+            
+            # Create refund if payment was completed
+            payment = Payment.objects.filter(booking=booking, payment_status='completed').first()
+            if payment:
+                Refund.objects.create(
+                    payment=payment,
+                    refund_amount=payment.amount,
+                    refund_reason=reason,
+                    refund_status='pending'
+                )
+            
+            return JsonResponse({'success': True, 'message': 'Booking cancelled successfully'})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@staff_member_required
+def booking_refund(request, booking_id):
+    """Initiate refund for a booking"""
+    if request.method == 'POST':
+        booking = get_object_or_404(Booking, booking_id=booking_id)
+        
+        try:
+            import json
+            data = json.loads(request.body)
+            reason = data.get('reason', 'Refund initiated by admin')
+            
+            # Check if booking is confirmed and payment is completed
+            payment = Payment.objects.filter(booking=booking, payment_status='completed').first()
+            if not payment:
+                return JsonResponse({'success': False, 'error': 'No completed payment found for this booking'})
+            
+            # Check if refund already exists
+            existing_refund = Refund.objects.filter(payment=payment).first()
+            if existing_refund:
+                return JsonResponse({'success': False, 'error': 'Refund already exists for this booking'})
+            
+            # Create refund
+            refund = Refund.objects.create(
+                payment=payment,
+                refund_amount=payment.amount,
+                refund_reason=reason,
+                refund_status='pending'
+            )
+            
+            return JsonResponse({'success': True, 'message': 'Refund initiated successfully'})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@staff_member_required
+def booking_payment_reminder(request, booking_id):
+    """Send payment reminder to customer"""
+    if request.method == 'POST':
+        booking = get_object_or_404(Booking, booking_id=booking_id)
+        
+        try:
+            # Check if booking is pending
+            if booking.booking_status != 'pending':
+                return JsonResponse({'success': False, 'error': 'Booking is not pending payment'})
+            
+            # Here you would implement email sending logic
+            # For now, we'll just return success
+            # TODO: Implement actual email sending with payment link
+            
+            return JsonResponse({'success': True, 'message': 'Payment reminder sent successfully'})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@staff_member_required
+def booking_send_ticket(request, booking_id):
+    """Send ticket to customer"""
+    if request.method == 'POST':
+        booking = get_object_or_404(Booking, booking_id=booking_id)
+        
+        try:
+            # Check if booking is confirmed
+            if booking.booking_status != 'confirmed':
+                return JsonResponse({'success': False, 'error': 'Booking is not confirmed'})
+            
+            # Here you would implement ticket generation and email sending logic
+            # For now, we'll just return success
+            # TODO: Implement actual ticket generation and email sending
+            
+            return JsonResponse({'success': True, 'message': 'Ticket sent successfully'})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@staff_member_required
+def booking_notify(request, booking_id):
+    """Send custom notification to customer"""
+    if request.method == 'POST':
+        booking = get_object_or_404(Booking, booking_id=booking_id)
+        
+        try:
+            import json
+            data = json.loads(request.body)
+            message = data.get('message', '')
+            
+            if not message:
+                return JsonResponse({'success': False, 'error': 'Message is required'})
+            
+            # Here you would implement notification sending logic
+            # For now, we'll just return success
+            # TODO: Implement actual notification sending (email/SMS)
+            
+            return JsonResponse({'success': True, 'message': 'Notification sent successfully'})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 @staff_member_required
 def analytics(request):

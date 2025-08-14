@@ -25,6 +25,18 @@ class BusAmenityForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 3}),
         }
 
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if not name:
+            return name
+        # Case-insensitive uniqueness check
+        qs = BusAmenity.objects.filter(name__iexact=name)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError('An amenity with this name already exists (case-insensitive).')
+        return name
+
 class BusDriverForm(forms.ModelForm):
     class Meta:
         model = BusDriver

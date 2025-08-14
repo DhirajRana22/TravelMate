@@ -122,19 +122,44 @@
                                 </span>
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                <div class="flex space-x-2">
-                                    <a href="{% url 'dashboard:booking_detail' booking.booking_id %}" class="text-indigo-600 hover:text-indigo-900">Details</a>
+                                <div class="flex flex-wrap gap-2">
+                                    <a href="{% url 'dashboard:booking_detail' booking.booking_id %}" 
+                                       class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
+                                        <i class="fas fa-eye mr-1"></i>Details
+                                    </a>
                                     
                                     {% if booking.booking_status == 'pending' %}
-                                        <button onclick="confirmBooking('{{ booking.booking_id }}')" class="text-green-600 hover:text-green-900">Confirm</button>
-                                        <button onclick="cancelBooking('{{ booking.booking_id }}')" class="text-red-600 hover:text-red-900">Cancel</button>
+                                        <button onclick="cancelBooking('{{ booking.booking_id }}')" 
+                                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200 transition-colors">
+                                            <i class="fas fa-times mr-1"></i>Cancel
+                                        </button>
+                                        <button onclick="sendPaymentReminder('{{ booking.booking_id }}')" 
+                                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors">
+                                            <i class="fas fa-bell mr-1"></i>Payment Reminder
+                                        </button>
                                     {% endif %}
                                     
-                                    {% if booking.booking_status == 'confirmed' and booking.payment_status == 'paid' %}
-                                        <button onclick="initiateRefund('{{ booking.booking_id }}')" class="text-yellow-600 hover:text-yellow-900">Refund</button>
+                                    {% if booking.booking_status == 'confirmed' %}
+                                        <button onclick="initiateRefund('{{ booking.booking_id }}')" 
+                                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 hover:bg-orange-200 transition-colors">
+                                            <i class="fas fa-undo mr-1"></i>Refund
+                                        </button>
+                                        <button onclick="sendTicket('{{ booking.booking_id }}')" 
+                                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-colors">
+                                            <i class="fas fa-ticket-alt mr-1"></i>Send Ticket
+                                        </button>
                                     {% endif %}
                                     
-                                    <button onclick="sendNotification('{{ booking.booking_id }}')" class="text-blue-600 hover:text-blue-900">Notify</button>
+                                    {% if booking.booking_status == 'cancelled' %}
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                            <i class="fas fa-ban mr-1"></i>Cancelled
+                                        </span>
+                                    {% endif %}
+                                    
+                                    <button onclick="sendNotification('{{ booking.booking_id }}')" 
+                                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors">
+                                        <i class="fas fa-envelope mr-1"></i>Notify
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -172,13 +197,67 @@
         {% endif %}
     </div>
 </div>
-{% endblock %}
+
+<!-- Modal for confirmations -->
+<div id="confirmModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
+                <i class="fas fa-question-circle text-blue-600 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mt-4" id="confirmModalTitle">Confirm Action</h3>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-500" id="confirmModalMessage">Are you sure you want to proceed?</p>
+            </div>
+            <div class="items-center px-4 py-3">
+                <button id="confirmModalConfirm" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-24 mr-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    Yes
+                </button>
+                <button id="confirmModalCancel" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-24 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for input -->
+<div id="inputModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
+                <i class="fas fa-edit text-blue-600 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mt-4 text-center" id="inputModalTitle">Input Required</h3>
+            <div class="mt-4 px-7 py-3">
+                <p class="text-sm text-gray-500 mb-3" id="inputModalMessage">Please enter the required information:</p>
+                <textarea id="inputModalTextarea" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3" placeholder="Enter text here..."></textarea>
+            </div>
+            <div class="items-center px-4 py-3 text-center">
+                <button id="inputModalSubmit" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-24 mr-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    Submit
+                </button>
+                <button id="inputModalCancel" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-24 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+ </div>
+ 
+ <!-- Toast Container -->
+ <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-4"></div>
+ 
+ {% endblock %}
 
 {% block dashboard_extra_js %}
 <script>
-    function confirmBooking(bookingId) {
-        if (confirm('Are you sure you want to confirm this booking?')) {
-            fetch(`/dashboard/bookings/${bookingId}/confirm/`, {
+    function sendPaymentReminder(bookingId) {
+         showConfirmModal(
+             'Send Payment Reminder',
+             'Are you sure you want to send a payment reminder to the customer?',
+             function() {
+            fetch(`/dashboard/bookings/${bookingId}/payment-reminder/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': getCsrfToken(),
@@ -188,21 +267,53 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Error confirming booking: ' + data.error);
-                }
+                     showToast('Payment reminder sent successfully!', 'success');
+                 } else {
+                     showToast('Error sending payment reminder: ' + data.error, 'error');
+                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while confirming the booking.');
+                showToast('An error occurred while sending payment reminder.', 'error');
             });
-        }
+         }
+     );
+    }
+    
+    function sendTicket(bookingId) {
+         showConfirmModal(
+             'Send Ticket',
+             'Are you sure you want to send the ticket to the customer?',
+             function() {
+            fetch(`/dashboard/bookings/${bookingId}/send-ticket/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                     showToast('Ticket sent successfully!', 'success');
+                 } else {
+                     showToast('Error sending ticket: ' + data.error, 'error');
+                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('An error occurred while sending ticket.', 'error');
+            });
+         }
+     );
     }
     
     function cancelBooking(bookingId) {
-        const reason = prompt('Please enter a reason for cancellation:');
-        if (reason) {
+         showInputModal(
+             'Cancel Booking',
+             'Please enter a reason for cancellation:',
+             'Cancellation reason...',
+             function(reason) {
             fetch(`/dashboard/bookings/${bookingId}/cancel/`, {
                 method: 'POST',
                 headers: {
@@ -214,21 +325,26 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Error cancelling booking: ' + data.error);
-                }
+                     showToast('Booking cancelled successfully!', 'success');
+                     setTimeout(() => location.reload(), 1500);
+                 } else {
+                     showToast('Error cancelling booking: ' + data.error, 'error');
+                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while cancelling the booking.');
+                showToast('An error occurred while cancelling the booking.', 'error');
             });
-        }
+         }
+     );
     }
     
     function initiateRefund(bookingId) {
-        const reason = prompt('Please enter a reason for refund:');
-        if (reason) {
+         showInputModal(
+             'Initiate Refund',
+             'Please enter a reason for refund:',
+             'Refund reason...',
+             function(reason) {
             fetch(`/dashboard/bookings/${bookingId}/refund/`, {
                 method: 'POST',
                 headers: {
@@ -240,22 +356,26 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Refund initiated successfully.');
-                    location.reload();
-                } else {
-                    alert('Error initiating refund: ' + data.error);
-                }
+                     showToast('Refund initiated successfully!', 'success');
+                     setTimeout(() => location.reload(), 1500);
+                 } else {
+                     showToast('Error initiating refund: ' + data.error, 'error');
+                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while initiating the refund.');
+                showToast('An error occurred while initiating the refund.', 'error');
             });
-        }
+         }
+     );
     }
     
     function sendNotification(bookingId) {
-        const message = prompt('Enter notification message:');
-        if (message) {
+         showInputModal(
+             'Send Notification',
+             'Enter notification message:',
+             'Your message...',
+             function(message) {
             fetch(`/dashboard/bookings/${bookingId}/notify/`, {
                 method: 'POST',
                 headers: {
@@ -267,16 +387,17 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Notification sent successfully.');
-                } else {
-                    alert('Error sending notification: ' + data.error);
-                }
+                     showToast('Notification sent successfully!', 'success');
+                 } else {
+                     showToast('Error sending notification: ' + data.error, 'error');
+                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while sending the notification.');
+                showToast('An error occurred while sending the notification.', 'error');
             });
-        }
+         }
+     );
     }
     
     function exportBookings() {
@@ -286,8 +407,115 @@
     }
     
     function getCsrfToken() {
-        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}';
-    }
+         return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}';
+     }
+     
+     // Modal functions
+     function showConfirmModal(title, message, onConfirm) {
+         document.getElementById('confirmModalTitle').textContent = title;
+         document.getElementById('confirmModalMessage').textContent = message;
+         document.getElementById('confirmModal').classList.remove('hidden');
+         
+         document.getElementById('confirmModalConfirm').onclick = function() {
+             document.getElementById('confirmModal').classList.add('hidden');
+             onConfirm();
+         };
+         
+         document.getElementById('confirmModalCancel').onclick = function() {
+             document.getElementById('confirmModal').classList.add('hidden');
+         };
+     }
+     
+     function showInputModal(title, message, placeholder, onSubmit) {
+         document.getElementById('inputModalTitle').textContent = title;
+         document.getElementById('inputModalMessage').textContent = message;
+         document.getElementById('inputModalTextarea').placeholder = placeholder;
+         document.getElementById('inputModalTextarea').value = '';
+         document.getElementById('inputModal').classList.remove('hidden');
+         
+         document.getElementById('inputModalSubmit').onclick = function() {
+             const value = document.getElementById('inputModalTextarea').value.trim();
+             if (value) {
+                 document.getElementById('inputModal').classList.add('hidden');
+                 onSubmit(value);
+             } else {
+                  showToast('Please enter a value', 'warning');
+              }
+         };
+         
+         document.getElementById('inputModalCancel').onclick = function() {
+             document.getElementById('inputModal').classList.add('hidden');
+         };
+         
+         // Focus on textarea
+         setTimeout(() => {
+             document.getElementById('inputModalTextarea').focus();
+         }, 100);
+     }
+     
+     // Close modals when clicking outside
+      window.onclick = function(event) {
+          const confirmModal = document.getElementById('confirmModal');
+          const inputModal = document.getElementById('inputModal');
+          
+          if (event.target === confirmModal) {
+              confirmModal.classList.add('hidden');
+          }
+          if (event.target === inputModal) {
+              inputModal.classList.add('hidden');
+          }
+      }
+      
+      // Toast notification function
+      function showToast(message, type = 'info') {
+          const toastContainer = document.getElementById('toastContainer');
+          const toast = document.createElement('div');
+          
+          let bgColor, iconClass;
+          switch(type) {
+              case 'success':
+                  bgColor = 'bg-green-500';
+                  iconClass = 'fas fa-check-circle';
+                  break;
+              case 'error':
+                  bgColor = 'bg-red-500';
+                  iconClass = 'fas fa-exclamation-circle';
+                  break;
+              case 'warning':
+                  bgColor = 'bg-yellow-500';
+                  iconClass = 'fas fa-exclamation-triangle';
+                  break;
+              default:
+                  bgColor = 'bg-blue-500';
+                  iconClass = 'fas fa-info-circle';
+          }
+          
+          toast.className = `${bgColor} text-white px-6 py-4 rounded-lg shadow-lg mb-4 flex items-center transform transition-all duration-300 translate-x-full opacity-0`;
+          toast.innerHTML = `
+              <i class="${iconClass} mr-3"></i>
+              <span class="flex-1">${message}</span>
+              <button onclick="this.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                  <i class="fas fa-times"></i>
+              </button>
+          `;
+          
+          toastContainer.appendChild(toast);
+          
+          // Animate in
+          setTimeout(() => {
+              toast.classList.remove('translate-x-full', 'opacity-0');
+          }, 100);
+          
+          // Auto remove after 5 seconds
+          setTimeout(() => {
+              toast.classList.add('translate-x-full', 'opacity-0');
+              setTimeout(() => {
+                  if (toast.parentElement) {
+                      toast.remove();
+                  }
+              }, 300);
+          }, 5000);
+      }
     
     // Add CSRF token to page if not present
     document.addEventListener('DOMContentLoaded', function() {

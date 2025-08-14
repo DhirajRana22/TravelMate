@@ -76,9 +76,9 @@ class BusForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Enter amenities separated by commas (e.g., WiFi, AC, Charging Port)'
+            'placeholder': 'Enter amenities separated by commas (e.g., WiFi, Air Conditioning, Charging Port)'
         }),
-        help_text="Enter amenities separated by commas (will be created if they don't exist)"
+        help_text="Enter amenities separated by commas. Use standardized names: WiFi, Air Conditioning, Charging Port, Entertainment, Music System, Water Bottle, Meal Service, Blanket & Pillow, Reading Light, GPS Tracking, Emergency Kit, CCTV"
     )
     driver_name = forms.CharField(
         max_length=100,
@@ -161,10 +161,29 @@ class BusForm(forms.ModelForm):
                 # Parse comma-separated amenities
                 amenity_names = [name.strip() for name in amenities_list.split(',') if name.strip()]
                 
+                # Normalize amenity names to prevent duplicates
+                amenity_normalization = {
+                    'wifi': 'WiFi', 'wi-fi': 'WiFi', 'WIFI': 'WiFi',
+                    'ac': 'Air Conditioning', 'a/c': 'Air Conditioning', 'air conditioning': 'Air Conditioning',
+                    'charging': 'Charging Port', 'charger': 'Charging Port', 'charging port': 'Charging Port',
+                    'tv': 'Entertainment', 'television': 'Entertainment', 'entertainment': 'Entertainment',
+                    'music': 'Music System', 'music system': 'Music System',
+                    'water': 'Water Bottle', 'water bottle': 'Water Bottle',
+                    'meal': 'Meal Service', 'meal service': 'Meal Service', 'food': 'Meal Service',
+                    'blanket': 'Blanket & Pillow', 'pillow': 'Blanket & Pillow', 'blanket & pillow': 'Blanket & Pillow',
+                    'reading light': 'Reading Light', 'light': 'Reading Light',
+                    'gps': 'GPS Tracking', 'gps tracking': 'GPS Tracking',
+                    'emergency': 'Emergency Kit', 'emergency kit': 'Emergency Kit', 'first aid': 'Emergency Kit',
+                    'cctv': 'CCTV', 'camera': 'CCTV', 'security camera': 'CCTV'
+                }
+                
                 for amenity_name in amenity_names:
+                    # Normalize the name
+                    normalized_name = amenity_normalization.get(amenity_name.lower(), amenity_name)
+                    
                     amenity, created = BusAmenity.objects.get_or_create(
-                        name=amenity_name,
-                        defaults={'description': f'Bus amenity: {amenity_name}'}
+                        name=normalized_name,
+                        defaults={'description': f'Bus amenity: {normalized_name}'}
                     )
                     bus.amenities.add(amenity)
         

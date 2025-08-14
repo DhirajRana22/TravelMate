@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import BusType, BusAmenity, Bus, BusDriver, UserBusPreference, BusRecommendation
+from .forms import BusAmenityForm
 
 @admin.register(BusType)
 class BusTypeAdmin(admin.ModelAdmin):
@@ -10,6 +11,7 @@ class BusTypeAdmin(admin.ModelAdmin):
 class BusAmenityAdmin(admin.ModelAdmin):
     list_display = ('name', 'icon', 'description')
     search_fields = ('name',)
+    form = BusAmenityForm
 
 @admin.register(Bus)
 class BusAdmin(admin.ModelAdmin):

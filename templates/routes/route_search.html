@@ -50,7 +50,7 @@
                         <div class="relative">
                             <input type="text" id="source" name="source" required
                                    class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-lg"
-                                   placeholder="Enter departure city" autocomplete="off">
+                                   placeholder="Enter departure city" autocomplete="off" value="{{ request.GET.source|default:'' }}">
                             <div id="sourceSuggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-20 hidden max-h-48 overflow-y-auto">
                                 <!-- Suggestions will be populated by JavaScript -->
                             </div>
@@ -65,7 +65,7 @@
                         <div class="relative">
                             <input type="text" id="destination" name="destination" required
                                    class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-lg"
-                                   placeholder="Enter destination city" autocomplete="off">
+                                   placeholder="Enter destination city" autocomplete="off" value="{{ request.GET.destination|default:'' }}">
                             <div id="destinationSuggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-20 hidden max-h-48 overflow-y-auto">
                                 <!-- Suggestions will be populated by JavaScript -->
                             </div>
@@ -87,7 +87,8 @@
                         <i class="fas fa-calendar text-green-500 mr-2"></i>Travel Date
                     </label>
                     <input type="date" id="travel_date" name="travel_date" required
-                           class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-lg">
+                           class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-lg"
+                           value="{{ request.GET.travel_date|default:'' }}">
                 </div>
                 
                 <!-- Search Button -->

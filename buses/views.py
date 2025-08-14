@@ -36,7 +36,7 @@ def bus_list(request):
     
     # Get all bus types and amenities for filtering
     bus_types = BusType.objects.all()
-    amenities = BusAmenity.objects.all()
+    amenities = BusAmenity.objects.all().order_by('name')
     
     context = {
         'page_obj': page_obj,
@@ -96,7 +96,7 @@ def bus_preference(request):
     
     # Get all bus types and amenities for the template
     bus_types = BusType.objects.all()
-    amenities = BusAmenity.objects.all()
+    amenities = BusAmenity.objects.all().order_by('name')
     
     context = {
         'form': form,
@@ -110,12 +110,12 @@ def bus_preference(request):
 @login_required
 def bus_recommendations(request):
     # Get user's recommendations
-    recommendations = BusRecommendation.objects.filter(user=request.user)
+    recommendations = BusRecommendation.objects.filter(user=request.user).order_by('-score')
     
     # If no recommendations exist, generate them
     if not recommendations.exists():
         generate_bus_recommendations(request.user)
-        recommendations = BusRecommendation.objects.filter(user=request.user)
+        recommendations = BusRecommendation.objects.filter(user=request.user).order_by('-score')
     
     context = {
         'recommendations': recommendations,

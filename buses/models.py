@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.contrib.auth.models import User
+from django.db.models.functions import Lower
 
 class BusType(models.Model):
     name = models.CharField(max_length=50)  # Normal, AC/Deluxe, Sleeper, etc.
@@ -16,6 +17,14 @@ class BusAmenity(models.Model):
     
     def __str__(self):
         return self.name
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                Lower('name'),
+                name='unique_busamenity_name_ci',
+            )
+        ]
 
 class Bus(models.Model):
     bus_number = models.CharField(max_length=20, unique=True)

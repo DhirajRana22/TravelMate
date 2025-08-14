@@ -230,7 +230,7 @@ Details - {{ bus.bus_number }}{% endblock %} {% block dashboard_content %}
             </div>
           </div>
 
-          {% if bus.amenities_list %}
+          {% if bus.amenities.all|length %}
           <div class="mt-6">
             <label class="block text-sm font-medium text-gray-700 mb-2"
               >Amenities</label
@@ -252,8 +252,7 @@ Details - {{ bus.bus_number }}{% endblock %} {% block dashboard_content %}
           <h4
             class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2"
           >
-            <i class="fas fa-route mr-2 text-blue-500"></i>Assigned Routes ({{
-            assigned_routes.count|default:0 }})
+            <i class="fas fa-route mr-2 text-blue-500"></i>Assigned Routes ({{ assigned_routes|length }})
           </h4>
 
           {% if assigned_routes %}
@@ -294,10 +293,7 @@ Details - {{ bus.bus_number }}{% endblock %} {% block dashboard_content %}
                     </div>
                     <div>
                       <span class="text-gray-500">Revenue:</span>
-                      <span class="font-medium"
-                        >रू{{ route.total_revenue|floatformat:0|default:0
-                        }}</span
-                      >
+                      <span class="font-medium">रू{{ route.total_revenue|default:0|floatformat:0 }}</span>
                     </div>
                   </div>
                 </div>

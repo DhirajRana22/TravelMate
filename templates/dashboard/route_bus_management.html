@@ -1,6 +1,9 @@
-{% extends "dashboard/base.html" %} {% load static %} {% block title %}Manage
-Buses - {{ route.source.name }} to {{ route.destination.name }}{% endblock %} {%
-block dashboard_content %}
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Manage Buses - {{ route.source.name }} to {{ route.destination.name }}{% endblock %}
+
+{% block dashboard_content %}
 <div class="container mx-auto px-4 sm:px-8">
   <div class="py-8">
     <!-- Header -->
@@ -439,7 +442,9 @@ block dashboard_content %}
     </div>
   </div>
 </div>
-{% endblock %} {% block dashboard_extra_js %}
+{% endblock %}
+
+{% block dashboard_extra_js %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     // Form validation

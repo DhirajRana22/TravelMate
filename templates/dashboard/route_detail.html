@@ -1,6 +1,9 @@
-{% extends "dashboard/base.html" %} {% load static %} {% block title %}Route
-Details - {{ route.source }} → {{ route.destination }}{% endblock %} {% block
-dashboard_content %}
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Route Details - {{ route.source }} → {{ route.destination }}{% endblock %}
+
+{% block dashboard_content %}
 <div class="container mx-auto px-4 sm:px-8">
   <div class="py-8">
     <!-- Header -->
@@ -65,10 +68,7 @@ dashboard_content %}
               <span
                 ><i class="fas fa-clock mr-1"></i>{{ route.travel_time }}</span
               >
-              <span
-                ><i class="fas fa-calendar mr-1"></i>Created {{
-                route.created_at|date:"M d, Y" }}</span
-              >
+              <span><i class="fas fa-calendar mr-1"></i>Created {{ route.created_at|date:"M d, Y" }}</span>
             </div>
           </div>
         </div>
@@ -272,8 +272,7 @@ dashboard_content %}
         class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2"
       >
         <h3 class="text-lg font-semibold text-gray-800">
-          <i class="fas fa-bus mr-2 text-blue-500"></i>Assigned Buses ({{
-          assigned_buses.count|default:0 }})
+          <i class="fas fa-bus mr-2 text-blue-500"></i>Assigned Buses ({{ assigned_buses.count|default:0 }})
         </h3>
         <button
           onclick="manageBuses({{ route.id }})"
@@ -385,10 +384,7 @@ dashboard_content %}
               >
                 <div>
                   <span class="text-gray-500">Passenger:</span>
-                  <span class="font-medium"
-                    >{{ booking.user.get_full_name|default:booking.user.username
-                    }}</span
-                  >
+                  <span class="font-medium">{{ booking.user.get_full_name|default:booking.user.username }}</span>
                 </div>
                 <div>
                   <span class="text-gray-500">Date:</span>
@@ -423,8 +419,7 @@ dashboard_content %}
           href="{% url 'dashboard:booking_management' %}?route={{ route.id }}"
           class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
         >
-          <i class="fas fa-list mr-2"></i>View All Bookings ({{ total_bookings
-          }})
+          <i class="fas fa-list mr-2"></i>View All Bookings ({{ total_bookings }})
         </a>
       </div>
       {% else %}
@@ -441,12 +436,14 @@ dashboard_content %}
     </div>
   </div>
 </div>
-{% endblock %} {% block dashboard_extra_js %}
+{% endblock %}
+
+{% block dashboard_extra_js %}
 <script>
   function editRoute(routeId) {
     window.location.href = `/dashboard/routes/${routeId}/edit/`;
   }
-
+  
   function manageBuses(routeId) {
     window.location.href = `/dashboard/routes/${routeId}/buses/`;
   }
