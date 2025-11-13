@@ -35,7 +35,8 @@ def bus_list(request):
     page_obj = paginator.get_page(page_number)
     
     # Get all bus types and amenities for filtering
-    bus_types = BusType.objects.all()
+    # Exclude specific type per UI requirement
+    bus_types = BusType.objects.exclude(name__iexact='Volvo AC')
     amenities = BusAmenity.objects.all().order_by('name')
     
     context = {
@@ -94,15 +95,34 @@ def bus_preference(request):
     else:
         form = UserBusPreferenceForm(instance=preference)
     
-    # Get all bus types and amenities for the template
-    bus_types = BusType.objects.all()
+    # Limit bus types to the three allowed options for preferences
+    bus_types = BusType.objects.filter(name__in=['Normal', 'AC Deluxe', 'Premium Deluxe'])
     amenities = BusAmenity.objects.all().order_by('name')
+
+    # Amenity categories (by canonical names) for template rendering
+    comfort_names = ['Air Conditioning', 'Blanket & Pillow', 'Reading Light', 'Seat Reclining', 'Sofa Seats']
+    entertainment_names = ['Entertainment', 'Music System']
+    connectivity_names = ['WiFi', 'Charging Port', 'GPS Tracking']
+    safety_names = ['Emergency Kit', 'CCTV']
+    food_names = ['Meal Service', 'Water Bottle']
+
+    amenities_comfort = BusAmenity.objects.filter(name__in=comfort_names).order_by('name')
+    amenities_entertainment = BusAmenity.objects.filter(name__in=entertainment_names).order_by('name')
+    amenities_connectivity = BusAmenity.objects.filter(name__in=connectivity_names).order_by('name')
+    amenities_safety = BusAmenity.objects.filter(name__in=safety_names).order_by('name')
+    amenities_food = BusAmenity.objects.filter(name__in=food_names).order_by('name')
     
     context = {
         'form': form,
         'bus_types': bus_types,
         'amenities': amenities,
         'preference': preference,
+        # categorized amenities for template (avoid inline list literals in Jinja)
+        'amenities_comfort': amenities_comfort,
+        'amenities_entertainment': amenities_entertainment,
+        'amenities_connectivity': amenities_connectivity,
+        'amenities_safety': amenities_safety,
+        'amenities_food': amenities_food,
     }
     
     return render(request, 'buses/bus_preference.html', context)

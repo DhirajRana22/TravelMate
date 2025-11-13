@@ -62,23 +62,24 @@ class AdminBookingSearchForm(forms.Form):
     end_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
 
 class BusForm(forms.ModelForm):
-    bus_type_name = forms.CharField(
-        max_length=50,
+    # NOTE: We'll set the queryset dynamically in __init__ after ensuring types exist
+    bus_type = forms.ModelChoiceField(
+        queryset=BusType.objects.none(),
         required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Enter bus type (e.g., AC Deluxe, Sleeper)'
-        }),
-        help_text="Enter the type of bus (will be created if it doesn't exist)"
+        empty_label=None,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        help_text='Select one of: Normal, AC Deluxe, Premium Deluxe'
     )
-    amenities_list = forms.CharField(
-        max_length=500,
+    # Premium Deluxe feature selection (required when Premium Deluxe is chosen)
+    premium_features = forms.MultipleChoiceField(
+        choices=[
+            ('Sofa Seats', 'Sofa Seats'),
+            ('Semi Sleeper', 'Semi Sleeper'),
+            ('Sleeper', 'Sleeper'),
+        ],
         required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Enter amenities separated by commas (e.g., WiFi, Air Conditioning, Charging Port)'
-        }),
-        help_text="Enter amenities separated by commas. Use standardized names: WiFi, Air Conditioning, Charging Port, Entertainment, Music System, Water Bottle, Meal Service, Blanket & Pillow, Reading Light, GPS Tracking, Emergency Kit, CCTV"
+        widget=forms.CheckboxSelectMultiple,
+        help_text='For Premium Deluxe, Sofa Seats is mandatory; Semi Sleeper and Sleeper are optional.'
     )
     driver_name = forms.CharField(
         max_length=100,
@@ -121,71 +122,102 @@ class BusForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Ensure the three allowed bus types exist; create if missing
+        required_types = ['Normal', 'AC Deluxe', 'Premium Deluxe']
+        for name in required_types:
+            BusType.objects.get_or_create(name=name, defaults={'description': f'{name} bus type'})
+
+        # Set the dropdown queryset dynamically (order by name)
+        self.fields['bus_type'].queryset = BusType.objects.filter(name__in=required_types).order_by('name')
+
         # If editing existing bus, populate bus type, amenities, and driver fields
         if self.instance and self.instance.pk:
             if self.instance.bus_type:
-                self.fields['bus_type_name'].initial = self.instance.bus_type.name
-            
-            # Populate amenities list
-            amenities_names = [amenity.name for amenity in self.instance.amenities.all()]
-            self.fields['amenities_list'].initial = ', '.join(amenities_names)
+                self.fields['bus_type'].initial = self.instance.bus_type
             
             current_driver = self.instance.drivers.filter(is_active=True).first()
             if current_driver:
                 self.fields['driver_name'].initial = current_driver.name
                 self.fields['driver_license'].initial = current_driver.license_number
                 self.fields['driver_contact'].initial = current_driver.contact_number
+
+    def clean(self):
+        cleaned_data = super().clean()
+        bus_type = cleaned_data.get('bus_type')
+        premium_feats = cleaned_data.get('premium_features') or []
+
+        if bus_type and bus_type.name == 'Premium Deluxe':
+            # Enforce Sofa Seats as mandatory selection
+            if 'Sofa Seats' not in premium_feats:
+                raise forms.ValidationError('Sofa Seats is mandatory for Premium Deluxe. Please select it.')
+        return cleaned_data
     
     def save(self, commit=True):
         bus = super().save(commit=False)
-        
-        # Handle bus type creation/update
-        bus_type_name = self.cleaned_data.get('bus_type_name')
-        if bus_type_name:
-            bus_type, created = BusType.objects.get_or_create(
-                name=bus_type_name,
-                defaults={'description': f'Bus type: {bus_type_name}'}
-            )
+        # Assign selected bus type directly
+        bus_type = self.cleaned_data.get('bus_type')
+        if bus_type:
             bus.bus_type = bus_type
         
         if commit:
             bus.save()
             self.save_m2m()
             
-            # Handle amenities creation/update
-            amenities_list = self.cleaned_data.get('amenities_list')
-            if amenities_list:
-                # Clear existing amenities
-                bus.amenities.clear()
-                
-                # Parse comma-separated amenities
-                amenity_names = [name.strip() for name in amenities_list.split(',') if name.strip()]
-                
-                # Normalize amenity names to prevent duplicates
-                amenity_normalization = {
-                    'wifi': 'WiFi', 'wi-fi': 'WiFi', 'WIFI': 'WiFi',
-                    'ac': 'Air Conditioning', 'a/c': 'Air Conditioning', 'air conditioning': 'Air Conditioning',
-                    'charging': 'Charging Port', 'charger': 'Charging Port', 'charging port': 'Charging Port',
-                    'tv': 'Entertainment', 'television': 'Entertainment', 'entertainment': 'Entertainment',
-                    'music': 'Music System', 'music system': 'Music System',
-                    'water': 'Water Bottle', 'water bottle': 'Water Bottle',
-                    'meal': 'Meal Service', 'meal service': 'Meal Service', 'food': 'Meal Service',
-                    'blanket': 'Blanket & Pillow', 'pillow': 'Blanket & Pillow', 'blanket & pillow': 'Blanket & Pillow',
-                    'reading light': 'Reading Light', 'light': 'Reading Light',
-                    'gps': 'GPS Tracking', 'gps tracking': 'GPS Tracking',
-                    'emergency': 'Emergency Kit', 'emergency kit': 'Emergency Kit', 'first aid': 'Emergency Kit',
-                    'cctv': 'CCTV', 'camera': 'CCTV', 'security camera': 'CCTV'
-                }
-                
-                for amenity_name in amenity_names:
-                    # Normalize the name
-                    normalized_name = amenity_normalization.get(amenity_name.lower(), amenity_name)
-                    
-                    amenity, created = BusAmenity.objects.get_or_create(
-                        name=normalized_name,
-                        defaults={'description': f'Bus amenity: {normalized_name}'}
-                    )
-                    bus.amenities.add(amenity)
+            # Auto-assign amenities based on selected bus type
+            # Canonical amenity names used across the app
+            canonical_amenities = {
+                'WiFi': 'WiFi',
+                'Charging Port': 'Charging Port',
+                'GPS Tracking': 'GPS Tracking',
+                'Air Conditioning': 'Air Conditioning',
+                'Blanket & Pillow': 'Blanket & Pillow',
+                'Reading Light': 'Reading Light',
+                'Seat Reclining': 'Seat Reclining',
+                'Sofa Seats': 'Sofa Seats',
+                'Semi Sleeper': 'Semi Sleeper',
+                'Sleeper': 'Sleeper',
+                'Entertainment': 'Entertainment',
+                'Music System': 'Music System',
+                'Water Bottle': 'Water Bottle',
+                'Meal Service': 'Meal Service',
+                'Emergency Kit': 'Emergency Kit',
+                'CCTV': 'CCTV',
+            }
+
+            # Define amenity sets per bus type
+            normal_set = ['Charging Port', 'Water Bottle', 'Reading Light', 'Emergency Kit']
+            ac_deluxe_set = [
+                'Air Conditioning', 'Charging Port', 'WiFi', 'Entertainment', 'Music System',
+                'Water Bottle', 'Reading Light', 'Emergency Kit', 'GPS Tracking'
+            ]
+            # Base set contains all features except special Premium options
+            all_features = list(canonical_amenities.keys())
+            premium_special = ['Sofa Seats', 'Semi Sleeper', 'Sleeper']
+            premium_base_set = [name for name in all_features if name not in premium_special]
+
+            # Clear existing amenities and assign based on type
+            bus.amenities.clear()
+            selected_names = []
+            if bus_type and bus_type.name == 'Normal':
+                selected_names = normal_set
+            elif bus_type and bus_type.name == 'AC Deluxe':
+                selected_names = ac_deluxe_set
+            elif bus_type and bus_type.name == 'Premium Deluxe':
+                selected_names = premium_base_set
+                # Add the selected premium features
+                selected_names += self.cleaned_data.get('premium_features') or []
+                # Ensure mandatory features are present
+                if 'Sofa Seats' not in selected_names:
+                    selected_names.append('Sofa Seats')
+                if 'Blanket & Pillow' not in selected_names:
+                    selected_names.append('Blanket & Pillow')
+
+            for name in selected_names:
+                amenity, _ = BusAmenity.objects.get_or_create(
+                    name=name,
+                    defaults={'description': f'Bus amenity: {name}'}
+                )
+                bus.amenities.add(amenity)
         
         driver_name = self.cleaned_data.get('driver_name')
         driver_license = self.cleaned_data.get('driver_license')

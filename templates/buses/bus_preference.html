@@ -50,60 +50,168 @@
                     <form method="post" id="preferencesForm" class="space-y-8">
                         {% csrf_token %}
                         
-                        <!-- Bus Type Preferences -->
+                        <!-- Bus Type Preferences (cards matching amenities design) -->
                         <div class="preference-section bg-gray-50 p-6 rounded-xl border-l-4 border-blue-500">
                             <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                                <i class="fas fa-bus mr-3 text-blue-500"></i>Bus Type Preferences
+                                <i class="fas fa-bus mr-3 text-blue-500" aria-hidden="true"></i>
+                                <span>Select Bus Type</span>
                             </h3>
-                            
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {% for bus_type in bus_types %}
-                                <div class="preference-item bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:border-blue-500 hover:-translate-y-1 hover:shadow-lg" 
-                                     onclick="togglePreference(this)">
-                                    <input type="checkbox" name="preferred_bus_types" value="{{ bus_type.id }}" 
-                                           {% if preference and bus_type in preference.preferred_bus_types.all %}checked{% endif %} 
-                                           class="hidden">
-                                    <div class="text-center">
-                                        {% if 'AC' in bus_type.name or 'ac' in bus_type.name|lower %}
-                                            <i class="fas fa-snowflake text-3xl text-blue-500 mb-3"></i>
-                                        {% elif 'Sleeper' in bus_type.name or 'sleeper' in bus_type.name|lower %}
-                                            <i class="fas fa-bed text-3xl text-purple-500 mb-3"></i>
-                                        {% elif 'Semi' in bus_type.name or 'semi' in bus_type.name|lower %}
-                                            <i class="fas fa-chair text-3xl text-green-500 mb-3"></i>
-                                        {% else %}
-                                            <i class="fas fa-bus text-3xl text-gray-500 mb-3"></i>
-                                        {% endif %}
-                                        <h4 class="font-semibold text-gray-800">{{ bus_type.name }}</h4>
-                                        <p class="text-sm text-gray-600">{{ bus_type.description|default:"Comfortable travel" }}</p>
+                                {% for bt in bus_types %}
+                                    <div class="preference-item bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:border-blue-500 hover:-translate-y-1 hover:shadow-lg"
+                                         onclick="togglePreference(this)" tabindex="0" role="checkbox"
+                                         aria-label="{{ bt.name }}" aria-checked="{% if preference and bt in preference.preferred_bus_types.all %}true{% else %}false{% endif %}">
+                                        <input id="bustype-{{ bt.id }}" type="checkbox" name="preferred_bus_types" value="{{ bt.id }}"
+                                               {% if preference and bt in preference.preferred_bus_types.all %}checked{% endif %}
+                                               class="hidden">
+                                        <div class="text-center">
+                                            <i class="fas fa-bus text-2xl text-blue-500 mb-2" aria-hidden="true"></i>
+                                            <h4 class="font-semibold text-gray-800 text-sm">{{ bt.name }}</h4>
+                                        </div>
                                     </div>
-                                </div>
+                                {% empty %}
+                                    <p class="text-sm text-gray-500">No bus types configured.</p>
                                 {% endfor %}
                             </div>
                         </div>
                         
                         <!-- Amenity Preferences -->
+                        <!-- Updated: Organized into logical categories (Comfort, Entertainment, Connectivity, Safety, Food)
+                             We hide known duplicates by rendering canonical names only.
+                             Accessibility: focusable cards with aria-labels and role="checkbox". -->
                         <div class="preference-section bg-gray-50 p-6 rounded-xl border-l-4 border-green-500">
                             <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                                <i class="fas fa-star mr-3 text-green-500"></i>Preferred Amenities
+                                <i class="fas fa-star mr-3 text-green-500" aria-hidden="true"></i>Preferred Amenities
                             </h3>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                {% for amenity in amenities %}
-                                <div class="preference-item bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:border-green-500 hover:-translate-y-1 hover:shadow-lg" 
-                                     onclick="togglePreference(this)">
-                                    <input type="checkbox" name="preferred_amenities" value="{{ amenity.id }}" 
-                                           {% if preference and amenity in preference.preferred_amenities.all %}checked{% endif %} 
-                                           class="hidden">
-                                    <div class="text-center">
-                                        {% if amenity.icon %}
-                                            <i class="fas fa-{{ amenity.icon }} text-2xl text-green-500 mb-2"></i>
-                                        {% else %}
-                                            <i class="fas fa-check text-2xl text-green-500 mb-2"></i>
-                                        {% endif %}
-                                        <h4 class="font-semibold text-gray-800 text-sm">{{ amenity.name }}</h4>
-                                    </div>
+
+                            <!-- Comfort -->
+                            <div class="mb-6">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Comfort</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    {% for amenity in amenities_comfort %}
+                                        <div class="preference-item bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:border-green-500 hover:-translate-y-1 hover:shadow-lg" 
+                                             onclick="togglePreference(this)" tabindex="0" role="checkbox"
+                                             aria-label="{{ amenity.name }}" aria-checked="{% if preference and amenity in preference.preferred_amenities.all %}true{% else %}false{% endif %}">
+                                            <input id="amenity-{{ amenity.id }}" type="checkbox" name="preferred_amenities" value="{{ amenity.id }}" 
+                                                   {% if preference and amenity in preference.preferred_amenities.all %}checked{% endif %} 
+                                                   class="hidden">
+                                            <div class="text-center">
+                                                {% if amenity.icon %}
+                                                    <i class="fas fa-{{ amenity.icon }} text-2xl text-green-500 mb-2" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="fas fa-check text-2xl text-green-500 mb-2" aria-hidden="true"></i>
+                                                {% endif %}
+                                                <h4 class="font-semibold text-gray-800 text-sm">{{ amenity.name }}</h4>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p class="text-sm text-gray-500">No comfort amenities configured.</p>
+                                    {% endfor %}
                                 </div>
-                                {% endfor %}
+                            </div>
+
+                            <!-- Entertainment -->
+                            <div class="mb-6">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Entertainment</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    {% for amenity in amenities_entertainment %}
+                                        <div class="preference-item bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:border-green-500 hover:-translate-y-1 hover:shadow-lg" 
+                                             onclick="togglePreference(this)" tabindex="0" role="checkbox"
+                                             aria-label="{{ amenity.name }}" aria-checked="{% if preference and amenity in preference.preferred_amenities.all %}true{% else %}false{% endif %}">
+                                            <input id="amenity-{{ amenity.id }}" type="checkbox" name="preferred_amenities" value="{{ amenity.id }}" 
+                                                   {% if preference and amenity in preference.preferred_amenities.all %}checked{% endif %} 
+                                                   class="hidden">
+                                            <div class="text-center">
+                                                {% if amenity.icon %}
+                                                    <i class="fas fa-{{ amenity.icon }} text-2xl text-green-500 mb-2" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="fas fa-check text-2xl text-green-500 mb-2" aria-hidden="true"></i>
+                                                {% endif %}
+                                                <h4 class="font-semibold text-gray-800 text-sm">{{ amenity.name }}</h4>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p class="text-sm text-gray-500">No entertainment amenities configured.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Connectivity -->
+                            <div class="mb-6">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Connectivity</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    {% for amenity in amenities_connectivity %}
+                                        <div class="preference-item bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:border-green-500 hover:-translate-y-1 hover:shadow-lg" 
+                                             onclick="togglePreference(this)" tabindex="0" role="checkbox"
+                                             aria-label="{{ amenity.name }}" aria-checked="{% if preference and amenity in preference.preferred_amenities.all %}true{% else %}false{% endif %}">
+                                            <input id="amenity-{{ amenity.id }}" type="checkbox" name="preferred_amenities" value="{{ amenity.id }}" 
+                                                   {% if preference and amenity in preference.preferred_amenities.all %}checked{% endif %} 
+                                                   class="hidden">
+                                            <div class="text-center">
+                                                {% if amenity.icon %}
+                                                    <i class="fas fa-{{ amenity.icon }} text-2xl text-green-500 mb-2" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="fas fa-check text-2xl text-green-500 mb-2" aria-hidden="true"></i>
+                                                {% endif %}
+                                                <h4 class="font-semibold text-gray-800 text-sm">{{ amenity.name }}</h4>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p class="text-sm text-gray-500">No connectivity amenities configured.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Safety -->
+                            <div class="mb-6">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Safety</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    {% for amenity in amenities_safety %}
+                                        <div class="preference-item bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:border-green-500 hover:-translate-y-1 hover:shadow-lg" 
+                                             onclick="togglePreference(this)" tabindex="0" role="checkbox"
+                                             aria-label="{{ amenity.name }}" aria-checked="{% if preference and amenity in preference.preferred_amenities.all %}true{% else %}false{% endif %}">
+                                            <input id="amenity-{{ amenity.id }}" type="checkbox" name="preferred_amenities" value="{{ amenity.id }}" 
+                                                   {% if preference and amenity in preference.preferred_amenities.all %}checked{% endif %} 
+                                                   class="hidden">
+                                            <div class="text-center">
+                                                {% if amenity.icon %}
+                                                    <i class="fas fa-{{ amenity.icon }} text-2xl text-green-500 mb-2" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="fas fa-check text-2xl text-green-500 mb-2" aria-hidden="true"></i>
+                                                {% endif %}
+                                                <h4 class="font-semibold text-gray-800 text-sm">{{ amenity.name }}</h4>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p class="text-sm text-gray-500">No safety amenities configured.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Food & Refreshments -->
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800 mb-3">Food & Refreshments</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    {% for amenity in amenities_food %}
+                                        <div class="preference-item bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:border-green-500 hover:-translate-y-1 hover:shadow-lg" 
+                                             onclick="togglePreference(this)" tabindex="0" role="checkbox"
+                                             aria-label="{{ amenity.name }}" aria-checked="{% if preference and amenity in preference.preferred_amenities.all %}true{% else %}false{% endif %}">
+                                            <input id="amenity-{{ amenity.id }}" type="checkbox" name="preferred_amenities" value="{{ amenity.id }}" 
+                                                   {% if preference and amenity in preference.preferred_amenities.all %}checked{% endif %} 
+                                                   class="hidden">
+                                            <div class="text-center">
+                                                {% if amenity.icon %}
+                                                    <i class="fas fa-{{ amenity.icon }} text-2xl text-green-500 mb-2" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="fas fa-check text-2xl text-green-500 mb-2" aria-hidden="true"></i>
+                                                {% endif %}
+                                                <h4 class="font-semibold text-gray-800 text-sm">{{ amenity.name }}</h4>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p class="text-sm text-gray-500">No food & refreshments amenities configured.</p>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
                         
@@ -301,6 +409,9 @@
                 element.classList.remove('border-blue-500', 'bg-blue-50');
                 element.classList.add('border-gray-200');
             }
+
+            // Update ARIA state for accessibility
+            element.setAttribute('aria-checked', checkbox.checked ? 'true' : 'false');
         };
         
         // Set initial state for preference items
@@ -309,7 +420,16 @@
             if (checkbox && checkbox.checked) {
                 item.classList.add('border-blue-500', 'bg-blue-50');
                 item.classList.remove('border-gray-200');
+                item.setAttribute('aria-checked', 'true');
             }
+
+            // Keyboard support (Enter/Space)
+            item.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    togglePreference(item);
+                }
+            });
         });
         
         // Handle budget range slider

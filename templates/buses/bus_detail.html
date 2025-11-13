@@ -316,8 +316,8 @@
                     <i class="fas fa-phone mr-1"></i>{{ bus.driver.phone }}
                   </p>
                   {% endif %} {% if bus.driver.rating %}
-                  <div class="flex items-center mt-2">
-                    <div class="flex text-yellow-400">
+                    <div class="flex items-center mt-2">
+                      <div class="flex text-yellow-400">
                       {% for i in "12345"|make_list %}
                         {% if forloop.counter <= bus.driver.rating %}
                           <i class="fas fa-star"></i>
@@ -325,11 +325,11 @@
                           <i class="far fa-star"></i>
                         {% endif %}
                       {% endfor %}
+                      </div>
+                      <span class="text-sm text-gray-600 ml-2"
+                        >({{ bus.driver.rating }}/5)</span
+                      >
                     </div>
-                    <span class="text-sm text-gray-600 ml-2"
-                      >({{ bus.driver.rating }}/5)</span
-                    >
-                  </div>
                   {% endif %}
                 </div>
               </div>
@@ -431,10 +431,10 @@
             </p>
             <div class="space-y-2">
               <a
-                href="tel:+977-1-4567890"
+                href="tel:+977-9827460735"
                 class="block text-blue-600 hover:text-blue-700 font-medium text-sm"
               >
-                <i class="fas fa-phone mr-2"></i>+977-1-4567890
+                <i class="fas fa-phone mr-2"></i>+977-9827460735
               </a>
               <a
                 href="mailto:support@travelmate.com"
