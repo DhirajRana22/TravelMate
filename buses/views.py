@@ -189,20 +189,17 @@ def generate_bus_recommendations(user):
             bus_features.append(features)
             bus_ids.append(bus.id)
         
-        # Convert to numpy array
-        X = np.array(bus_features)
-        
-        # Fit KNN model
-        # Use min(n_buses, 5) as n_neighbors to handle cases with few buses
+        # Convert to numpy array with normalization and cosine distance
+        X = np.array(bus_features, dtype=float)
+        X_min = X.min(axis=0)
+        X_max = X.max(axis=0)
+        denom = (X_max - X_min) + 1e-9
+        X = (X - X_min) / denom
         n_neighbors = min(len(buses), 5)
-        knn = NearestNeighbors(n_neighbors=n_neighbors, algorithm='auto')
+        knn = NearestNeighbors(n_neighbors=n_neighbors, metric='cosine', algorithm='auto')
         knn.fit(X)
-        
-        # Create a query vector based on ideal preferences
-        # Ideal: bus_type_match=1, amenities_match_ratio=1, price_factor and comfort_factor from user preferences
-        query = np.array([[1, 1, price_factor, comfort_factor]])
-        
-        # Find nearest neighbors
+        query = np.array([[1, 1, price_factor, comfort_factor]], dtype=float)
+        query = (query - X_min) / denom
         distances, indices = knn.kneighbors(query)
         
         # Clear existing recommendations
@@ -213,9 +210,7 @@ def generate_bus_recommendations(user):
             bus_id = bus_ids[idx]
             bus = Bus.objects.get(id=bus_id)
             
-            # Convert distance to score (inverse relationship)
-            # Normalize to 0-100 scale where 100 is best match
-            score = 100 * (1 - distances[0][i] / np.max(distances))
+            score = max(0.0, 100.0 * (1.0 - float(distances[0][i])))
             
             BusRecommendation.objects.create(
                 user=user,

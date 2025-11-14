@@ -8,6 +8,7 @@ from .models import Location, Route, BusSchedule
 from .forms import RouteSearchForm, LocationForm, RouteForm, BusScheduleForm
 from bookings.models import Seat
 from buses.models import UserBusPreference
+import numpy as np
 
 def route_search(request):
     form = RouteSearchForm(request.GET or None)
@@ -59,11 +60,10 @@ def route_search(request):
             # Calculate available seats for each schedule on the specific travel date
             for schedule in schedules:
                 from bookings.models import Booking
-                # Count booked seats for this schedule on the travel date
                 booked_seats_count = Booking.objects.filter(
                     bus_schedule=schedule,
                     booking_date=travel_date,
-                    booking_status__in=['confirmed', 'pending']
+                    booking_status='confirmed'
                 ).aggregate(
                     total_booked=Count('seats')
                 )['total_booked'] or 0
@@ -335,59 +335,64 @@ def route_list(request):
 
 
 def sort_schedules_by_preferences(user, schedules, travel_date):
-    """Sort schedules based on user preferences, putting recommended buses at the top"""
     try:
         preference = UserBusPreference.objects.get(user=user)
     except UserBusPreference.DoesNotExist:
-        # If no preferences, return schedules sorted by departure time
         return sorted(schedules, key=lambda x: x.departure_time)
-    
-    def calculate_recommendation_score(schedule):
-        score = 0
-        
-        # Bus type preference (40% weight)
-        if schedule.bus.bus_type in preference.preferred_bus_types.all():
-            score += 40
-        
-        # Price preference (30% weight)
-        if float(schedule.base_fare) <= preference.max_budget:
-            # Higher score for lower prices if user is price sensitive
-            price_score = (preference.max_budget - float(schedule.base_fare)) / preference.max_budget * 30
-            score += price_score * (preference.price_sensitivity / 10)
-        
-        # Time preference (20% weight)
-        departure_hour = schedule.departure_time.hour
-        preferred_times = preference.get_preferred_times_list()
-        
-        for time_pref in preferred_times:
-            if time_pref == 'morning' and 6 <= departure_hour < 12:
-                score += 20
-            elif time_pref == 'afternoon' and 12 <= departure_hour < 18:
-                score += 20
-            elif time_pref == 'evening' and 18 <= departure_hour < 22:
-                score += 20
-            elif time_pref == 'night' and (departure_hour >= 22 or departure_hour < 6):
-                score += 20
-        
-        # Amenities preference (10% weight)
-        preferred_amenities = set(preference.preferred_amenities.all())
-        bus_amenities = set(schedule.bus.amenities.all())
-        
-        if preferred_amenities:
-            amenities_match_ratio = len(preferred_amenities.intersection(bus_amenities)) / len(preferred_amenities)
-            score += amenities_match_ratio * 10
-        
-        return score
-    
-    # Calculate scores and sort
-    schedule_scores = [(schedule, calculate_recommendation_score(schedule)) for schedule in schedules]
-    schedule_scores.sort(key=lambda x: (-x[1], x[0].departure_time))  # Sort by score desc, then by time
-    
-    # Add recommendation score to schedule objects for template use
-    sorted_schedules = []
-    for schedule, score in schedule_scores:
-        schedule.recommendation_score = score
-        schedule.is_recommended = score > 30  # Mark as recommended if score > 30
-        sorted_schedules.append(schedule)
-    
-    return sorted_schedules
+
+    preferred_types = set(preference.preferred_bus_types.all())
+    preferred_amenities = set(preference.preferred_amenities.all())
+    max_budget = float(getattr(preference, 'max_budget', 0) or 0)
+    price_sens = float(getattr(preference, 'price_sensitivity', 5)) / 10.0
+    time_prefs = preference.get_preferred_times_list()
+
+    def time_bin(h):
+        if 6 <= h < 12:
+            return 'morning'
+        if 12 <= h < 18:
+            return 'afternoon'
+        if 18 <= h < 22:
+            return 'evening'
+        return 'night'
+
+    def build_vec(s):
+        bt = 1.0 if s.bus.bus_type in preferred_types else 0.0
+        bus_amen = set(s.bus.amenities.all())
+        am = (len(preferred_amenities.intersection(bus_amen)) / len(preferred_amenities)) if preferred_amenities else 0.0
+        price = float(s.base_fare)
+        pr = 0.0
+        if max_budget > 0:
+            pr = max(0.0, min(1.0, (max_budget - price) / max_budget))
+        dep_h = s.departure_time.hour
+        t_pref = 1.0 if time_bin(dep_h) in time_prefs else 0.0
+        try:
+            total = s.bus.total_seats
+            avail = getattr(s, 'available_seats', total)
+            ar = max(0.0, min(1.0, (avail / total) if total else 0.0))
+        except Exception:
+            ar = 0.0
+        return np.array([bt, am, pr, t_pref, ar], dtype=float)
+
+    pref_vec = np.array([1.0, 1.0, price_sens, 1.0 if time_prefs else 0.0, 1.0], dtype=float)
+    weights = np.array([0.25, 0.15, 0.30, 0.20, 0.10], dtype=float)
+    weights = weights / weights.sum()
+
+    def cosine(a, b):
+        na = np.linalg.norm(a)
+        nb = np.linalg.norm(b)
+        if na == 0 or nb == 0:
+            return 0.0
+        return float(np.dot(a, b) / (na * nb))
+
+    scored = []
+    for s in schedules:
+        v = build_vec(s)
+        v_w = v * weights
+        p_w = pref_vec * weights
+        score = cosine(v_w, p_w) * 100.0
+        s.recommendation_score = score
+        s.is_recommended = score >= 60.0
+        scored.append((s, score))
+
+    scored.sort(key=lambda x: (-x[1], x[0].departure_time))
+    return [s for s, _ in scored]
