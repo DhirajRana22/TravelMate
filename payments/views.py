@@ -10,7 +10,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from .models import Payment, Refund
 from .forms import PaymentForm, RefundRequestForm, PaymentVerificationForm
-from .esewa_utils import prepare_esewa_payment_data, verify_esewa_payment, EsewaConfig
+from .esewa_utils import prepare_esewa_payment_data, verify_esewa_payment, EsewaConfig, query_esewa_status
+from django.core.mail import send_mail
+import logging
+
+logger = logging.getLogger(__name__)
 from bookings.models import Booking
 import uuid
 import json
@@ -46,6 +50,7 @@ def process_payment(request, payment_id):
                         
                         # Prepare eSewa payment data
                         esewa_data = prepare_esewa_payment_data(payment, booking)
+                        request.session['pending_payment_id'] = str(payment.payment_id)
                         
                         return JsonResponse({
                             'success': True,
@@ -211,70 +216,142 @@ def verify_payment(request):
     return render(request, 'payments/verify_payment.html', context)
 
 @csrf_exempt
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET", "POST"]) 
 def esewa_success(request):
     """
     Handle eSewa payment success callback
+    Ensure booking and payment status are updated correctly after payment verification.
     """
     try:
         # Get payment data from request
-        if request.method == 'POST':
-            payment_data = request.POST.dict()
-        else:
-            payment_data = request.GET.dict()
-        
-        # Extract transaction UUID (payment ID)
-        transaction_uuid = payment_data.get('transaction_uuid')
+        payment_data = request.POST.dict() if request.method == 'POST' else request.GET.dict()
+        transaction_uuid = payment_data.get('transaction_uuid') or request.session.get('pending_payment_id')
         if not transaction_uuid:
             messages.error(request, 'Invalid payment response from eSewa.')
+            logger.error('eSewa success missing transaction_uuid and session fallback.')
             return redirect('accounts:booking_history')
-        
-        # Get payment object
-        try:
-            payment = Payment.objects.get(payment_id=transaction_uuid)
-        except Payment.DoesNotExist:
-            messages.error(request, 'Payment not found.')
-            return redirect('accounts:booking_history')
-        
+
         # Verify payment signature
-        if verify_esewa_payment(payment_data):
+        signature_ok = verify_esewa_payment(payment_data)
+        # Fallback to querying status with known payment amount if total_amount is absent
+        payment_amount_for_status = payment_data.get('total_amount')
+        if not payment_amount_for_status:
+            try:
+                from .models import Payment as PaymentModel
+                pm = PaymentModel.objects.get(payment_id=transaction_uuid)
+                payment_amount_for_status = pm.amount
+            except Exception:
+                payment_amount_for_status = None
+        status_result = query_esewa_status(transaction_uuid, payment_amount_for_status) if payment_amount_for_status else {'verified': False}
+        status_ok = bool(status_result.get('verified'))
+        if signature_ok or status_ok:
             with transaction.atomic():
-                # Update payment status
-                payment.transaction_id = payment_data.get('transaction_code', f'ESW{uuid.uuid4().hex[:8].upper()}')
-                payment.payment_date = timezone.now()
-                payment.payment_status = 'completed'
-                payment.save()
-                
-                # Update booking status and reserve seats
+                # Look up the existing Payment by transaction_uuid
+                from .models import Payment
+                try:
+                    payment = Payment.objects.get(payment_id=transaction_uuid)
+                except Payment.DoesNotExist:
+                    messages.error(request, 'Payment record not found. Please contact support.')
+                    return redirect('accounts:booking_history')
+
+                # Use the associated Booking created earlier during create_booking
                 booking = payment.booking
-                booking.payment_status = 'paid'
-                booking.booking_status = 'confirmed'
-                booking.save()
-                
-                # Mark seats as unavailable now that payment is confirmed
+
+                if payment.payment_status == 'completed':
+                    messages.info(request, 'Payment already verified.')
+                    return redirect('bookings:booking_confirmation', booking_id=booking.booking_id)
+
+                try:
+                    from decimal import Decimal
+                    amount_ok = Decimal(str(payment_data.get('total_amount'))) == payment.amount
+                except Exception:
+                    amount_ok = True
+                if not amount_ok:
+                    messages.error(request, 'Payment amount mismatch detected. Verification failed.')
+                    return redirect('accounts:booking_history')
+
+                # Mark seats as unavailable and clear any holds
                 for seat in booking.seats.all():
                     seat.is_available = False
+                    seat.is_held = False
+                    seat.held_by = None
+                    seat.held_until = None
                     seat.save()
-                
+
+                # Update booking and payment statuses
+                booking.booking_status = 'confirmed'
+                booking.payment_status = 'paid'
+                booking.save()
+
+                # Persist gateway transaction code if provided and mark payment completed
+                gateway_txn_code = (
+                    payment_data.get('transaction_code')
+                    or payment_data.get('reference_id')
+                    or payment_data.get('ref_id')
+                    or payment_data.get('transaction_id')
+                    or f'ESW{uuid.uuid4().hex[:8].upper()}'
+                )
+                payment.transaction_id = gateway_txn_code
+                payment.payment_status = 'completed'
+                payment.save()
+
+                try:
+                    send_mail(
+                        'TravelMate Booking Confirmation',
+                        f'Your booking {booking.booking_id} is confirmed. Transaction: {gateway_txn_code}.',
+                        getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@travelmate.local'),
+                        [booking.user.email],
+                        fail_silently=True,
+                    )
+                except Exception as e:
+                    logger.warning(f"Email send failed for booking {booking.booking_id}: {e}")
+
+                # Clean up any stale session data (defensive)
+                if 'pending_booking_data' in request.session:
+                    try:
+                        del request.session['pending_booking_data']
+                    except Exception:
+                        pass
+                if 'pending_payment_id' in request.session:
+                    try:
+                        del request.session['pending_payment_id']
+                    except Exception:
+                        pass
+
                 messages.success(request, 'Payment completed successfully via eSewa!')
                 return redirect('bookings:booking_confirmation', booking_id=booking.booking_id)
         else:
             # Payment verification failed
-            with transaction.atomic():
-                payment.payment_status = 'failed'
-                payment.save()
-                
-                # Cancel the booking since payment failed
-                booking = payment.booking
-                booking.payment_status = 'failed'
-                booking.booking_status = 'cancelled'
-                booking.save()
-                
-                # Note: Seats remain available since they were never marked as unavailable
-                
-            messages.error(request, 'Payment verification failed. Your booking has been cancelled. Please try again.')
+            # Release held seats if any
+            form_data = request.session.get('pending_booking_data')
+            if form_data:
+                schedule_id = form_data.get('schedule_id') or form_data.get('bus_schedule')
+                selected_seats_str = form_data.get('selected_seats')
+                from bookings.models import Seat
+                from routes.models import BusSchedule
+                schedule = BusSchedule.objects.get(id=schedule_id)
+                selected_seat_ids = [int(sid) for sid in selected_seats_str.split(',') if sid.strip().isdigit()]
+                selected_seats = Seat.objects.filter(id__in=selected_seat_ids, bus_schedule=schedule)
+                for seat in selected_seats:
+                    seat.is_held = False
+                    seat.held_by = None
+                    seat.held_until = None
+                    seat.save()
+                del request.session['pending_booking_data']
+            logger.error(f"eSewa verification failed: data={payment_data}")
+            messages.error(request, 'Payment verification failed. Please try again or contact support.')
+            # Redirect to payment form with retry flag if we can resolve booking from session
+            booking_id_retry = None
+            try:
+                if 'pending_payment_id' in request.session:
+                    from .models import Payment as PaymentModel
+                    pay = PaymentModel.objects.get(payment_id=request.session['pending_payment_id'])
+                    booking_id_retry = pay.booking.booking_id
+            except Exception:
+                booking_id_retry = None
+            if booking_id_retry:
+                return redirect(reverse('payments:payment_form', args=[booking_id_retry]) + '?retry=1')
             return redirect('accounts:booking_history')
-            
     except Exception as e:
         messages.error(request, f'Error processing eSewa payment: {str(e)}')
         return redirect('accounts:booking_history')

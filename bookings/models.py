@@ -12,6 +12,10 @@ class Seat(models.Model):
     seat_number = models.CharField(max_length=10)
     is_available = models.BooleanField(default=True)
     is_window = models.BooleanField(default=False)
+    # New fields for seat holding
+    is_held = models.BooleanField(default=False)
+    held_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='held_seats')
+    held_until = models.DateTimeField(null=True, blank=True)
     
     def __str__(self):
         return f"{self.bus_schedule.bus.bus_name} - {self.seat_number}"

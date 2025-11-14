@@ -165,7 +165,7 @@
                     </div>
                     
                     <!-- Payment Information -->
-                    {% if booking.payment %}
+                    {% if payment %}
                     <div class="mb-8">
                         <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
                             <i class="fas fa-credit-card mr-2 text-indigo-500"></i>Payment Information
@@ -177,21 +177,21 @@
                                     <i class="fas fa-money-check-alt text-indigo-500 mr-3"></i>
                                     <div>
                                         <div class="text-xs text-gray-500">Payment Method</div>
-                                        <div class="font-semibold">{{ booking.payment.payment_method|title }}</div>
+                                        <div class="font-semibold">{{ payment.payment_method|title }}</div>
                                     </div>
                                 </div>
                                 <div class="flex items-center">
                                     <i class="fas fa-check-circle text-green-500 mr-3"></i>
                                     <div>
                                         <div class="text-xs text-gray-500">Payment Status</div>
-                                        <div class="font-semibold text-green-600">{{ booking.payment.status|title }}</div>
+                                        <div class="font-semibold text-green-600">{{ payment.payment_status|title }}</div>
                                     </div>
                                 </div>
                                 <div class="flex items-center">
                                     <i class="fas fa-hashtag text-gray-500 mr-3"></i>
                                     <div>
                                         <div class="text-xs text-gray-500">Transaction ID</div>
-                                        <div class="font-semibold font-mono text-sm">{{ booking.payment.transaction_id }}</div>
+                                        <div class="font-semibold font-mono text-sm">{{ payment.transaction_id }}</div>
                                     </div>
                                 </div>
                             </div>

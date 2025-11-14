@@ -77,18 +77,38 @@ def seat_selection(request, schedule_id):
     
     # Check seat availability for the specific travel date
     from .models import Booking
-    booked_seats = Booking.objects.filter(
-        bus_schedule=schedule,
-        booking_date=travel_date,
-        booking_status='confirmed'
-    ).values_list('seats__id', flat=True)
-    
-    # Update seat status based on bookings
+    # Consider a seat booked when booking is confirmed for the selected travel date
+    booked_seat_ids = (
+        Booking.objects.filter(
+            bus_schedule=schedule,
+            booking_date=travel_date,
+            booking_status='confirmed'
+        )
+        .values_list('seats__id', flat=True)
+        .distinct()
+    )
+
+    # Seats currently held (reserved) by someone else for a short time window
+    held_seat_ids = (
+        Seat.objects.filter(
+            bus_schedule=schedule,
+            is_held=True,
+            held_until__gt=timezone.now()
+        )
+        .values_list('id', flat=True)
+    )
+
+    # Update seat status based on bookings and holds
     for seat in seats:
-        if seat.id in booked_seats:
+        if seat.id in booked_seat_ids:
             seat.status = 'booked'
+            seat.is_available = False
+        elif seat.id in held_seat_ids:
+            seat.status = 'reserved'
+            seat.is_available = False
         else:
             seat.status = 'available'
+            seat.is_available = True
     
     # Create dynamic seat layout based on actual seat count
     seat_layout = []
@@ -177,6 +197,8 @@ def seat_selection(request, schedule_id):
         'seat_layout': seat_layout,
         'seats': seats,
         'preselected_seat_ids': preselected_seat_ids,
+        # Display available seats count in the header
+        'available_seats_count': seats.count() - len(list(booked_seat_ids)) - len(list(held_seat_ids)),
     }
     
     return render(request, 'bookings/seat_selection.html', context)
@@ -282,7 +304,7 @@ def quick_booking(request, schedule_id):
                         emergency_contact=emergency_contact or '',
                         total_fare=total_fare,
                         booking_status='confirmed',
-                        payment_status='completed'
+                        payment_status='paid'
                     )
                     
                     # Associate seats with booking
@@ -425,6 +447,20 @@ def create_booking(request, schedule_id):
                     booking.seats.add(*selected_seats)
                     print(f"DEBUG: Added {len(selected_seats)} seats to booking")
                     
+                    # Hold selected seats for this user to prevent double booking while payment completes
+                    from datetime import timedelta
+                    hold_until = timezone.now() + timedelta(minutes=15)
+                    for seat in selected_seats:
+                        seat.is_held = True
+                        seat.held_by = request.user
+                        seat.held_until = hold_until
+                        seat.save()
+                    # Persist minimal data for failure cleanup
+                    request.session['pending_booking_data'] = {
+                        'schedule_id': schedule.id,
+                        'selected_seats': ','.join([str(s.id) for s in selected_seats])
+                    }
+
                     # Generate QR code after seats are associated
                     booking.generate_qr_code()
                     print("DEBUG: Generated QR code with seat information")

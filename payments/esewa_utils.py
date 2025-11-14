@@ -14,6 +14,7 @@ class EsewaConfig:
     PAYMENT_URL = "https://rc-epay.esewa.com.np/api/epay/main/v2/form"
     SUCCESS_URL = "http://localhost:8000/payments/esewa/success/"
     FAILURE_URL = "http://localhost:8000/payments/esewa/failure/"
+    STATUS_URL = "https://rc-epay.esewa.com.np/api/epay/payment/status/"
     
     @classmethod
     def get_merchant_code(cls):
@@ -34,6 +35,10 @@ class EsewaConfig:
     @classmethod
     def get_failure_url(cls):
         return getattr(settings, 'ESEWA_FAILURE_URL', cls.FAILURE_URL)
+
+    @classmethod
+    def get_status_url(cls):
+        return getattr(settings, 'ESEWA_STATUS_URL', cls.STATUS_URL)
 
 def generate_esewa_signature(total_amount, transaction_uuid, product_code):
     """
@@ -124,3 +129,33 @@ def verify_esewa_payment(payment_data):
     except Exception as e:
         print(f"Error verifying eSewa payment: {e}")
         return False
+
+def query_esewa_status(transaction_uuid, total_amount):
+    try:
+        import json
+        from urllib import request
+        from urllib.error import URLError, HTTPError
+        url = EsewaConfig.get_status_url()
+        product_code = EsewaConfig.get_merchant_code()
+        signature = generate_esewa_signature(str(total_amount), str(transaction_uuid), product_code)
+        payload = {
+            'total_amount': str(total_amount),
+            'transaction_uuid': str(transaction_uuid),
+            'product_code': product_code,
+            'signature': signature,
+        }
+        data = json.dumps(payload).encode('utf-8')
+        req = request.Request(url, data=data, headers={'Content-Type': 'application/json'})
+        with request.urlopen(req, timeout=10) as resp:
+            body = resp.read().decode('utf-8')
+            try:
+                parsed = json.loads(body)
+            except Exception:
+                parsed = {'raw': body}
+            status = str(parsed.get('status', '')).upper()
+            verified = status in ['COMPLETE', 'COMPLETED', 'SUCCESS']
+            return {'verified': verified, 'response': parsed}
+    except (URLError, HTTPError) as e:
+        return {'verified': False, 'error': str(e)}
+    except Exception as e:
+        return {'verified': False, 'error': str(e)}

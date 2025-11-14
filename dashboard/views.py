@@ -623,7 +623,8 @@ def update_schedule(request, schedule_id):
 @staff_member_required
 def booking_management(request):
     form = AdminBookingSearchForm(request.GET or None)
-    bookings = Booking.objects.all().select_related('user', 'bus_schedule__bus', 'bus_schedule__route').order_by('-booking_date')
+    # Default: show only confirmed bookings to avoid clutter from pending/unpaid
+    bookings = Booking.objects.filter(booking_status='confirmed').select_related('user', 'bus_schedule__bus', 'bus_schedule__route').order_by('-booking_date')
     
     # Apply filters
     if form.is_valid():
@@ -639,6 +640,7 @@ def booking_management(request):
         if user_email:
             bookings = bookings.filter(user__email__icontains=user_email)
         if booking_status:
+            bookings = Booking.objects.all().select_related('user', 'bus_schedule__bus', 'bus_schedule__route').order_by('-booking_date')
             bookings = bookings.filter(booking_status=booking_status)
         if payment_status:
             bookings = bookings.filter(payment_status=payment_status)
@@ -701,7 +703,18 @@ def booking_detail(request, booking_id):
     booking = get_object_or_404(Booking, booking_id=booking_id)
     
     # Get payment information
-    payment = Payment.objects.filter(booking=booking).first()
+    # Prefer showing a completed payment; fall back to the most recent one
+    payment = (
+        Payment.objects.filter(booking=booking, payment_status='completed')
+        .order_by('-updated_at')
+        .first()
+    )
+    if not payment:
+        payment = (
+            Payment.objects.filter(booking=booking)
+            .order_by('-updated_at')
+            .first()
+        )
     refund = None
     if payment:
         refund = Refund.objects.filter(payment=payment).first()
