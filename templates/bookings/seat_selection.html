@@ -401,6 +401,10 @@ TravelMate{% endblock %} {% block content %}
           selectedSeats = selectedSeats.filter(seat => seat.id !== seatId);
       } else {
           // Select seat
+          if (selectedSeats.length >= 6) {
+              alert('You can select maximum 6 seats.');
+              return;
+          }
           seatElement.classList.remove('bg-green-500', 'border-green-700');
           seatElement.classList.add('bg-blue-500', 'border-blue-700');
 

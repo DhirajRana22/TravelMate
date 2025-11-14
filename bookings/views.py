@@ -280,6 +280,9 @@ def quick_booking(request, schedule_id):
         else:
             try:
                 selected_seat_ids = [int(sid.strip()) for sid in selected_seats_str.split(',') if sid.strip()]
+                if len(selected_seat_ids) > 6:
+                    messages.error(request, 'You can select maximum 6 seats.')
+                    return redirect(reverse('bookings:seat_selection', args=[schedule_id]) + f'?date={travel_date}')
                 selected_seats = Seat.objects.filter(
                     id__in=selected_seat_ids,
                     bus_schedule=schedule
@@ -361,6 +364,10 @@ def create_booking(request, schedule_id):
                 selected_seat_ids = [int(sid) for sid in request.GET.get('selected_seats', '').split(',') if sid.strip().isdigit()]
             except ValueError:
                 selected_seat_ids = []
+            # Enforce maximum 6 seats
+            if len(selected_seat_ids) > 6:
+                messages.error(request, 'You can select maximum 6 seats.')
+                return redirect(reverse('bookings:seat_selection', args=[schedule_id]) + f'?date={travel_date}')
     
     # Get selected seats
     selected_seats = Seat.objects.filter(id__in=selected_seat_ids, bus_schedule=schedule)
@@ -399,6 +406,9 @@ def create_booking(request, schedule_id):
         selected_seat_ids = [int(sid) for sid in selected_seats_str.split(',') if sid.strip().isdigit()]
         if not selected_seat_ids:
             messages.error(request, 'No seats selected.')
+            return redirect(reverse('bookings:seat_selection', args=[schedule_id]) + f'?date={travel_date}')
+        if len(selected_seat_ids) > 6:
+            messages.error(request, 'You can select maximum 6 seats.')
             return redirect(reverse('bookings:seat_selection', args=[schedule_id]) + f'?date={travel_date}')
         
         # Get selected seats

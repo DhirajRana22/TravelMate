@@ -119,7 +119,7 @@ $(document).ready(function() {
     $('.seat.available').click(function() {
         var seat = $(this);
         var seatNumber = seat.data('seat');
-        var maxSeats = parseInt($('#max-seats').val()) || 4;
+        var maxSeats = parseInt($('#max-seats').val()) || 6;
         var selectedSeats = $('.seat.selected').length;
         
         if (seat.hasClass('selected')) {
