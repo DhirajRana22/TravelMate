@@ -105,7 +105,7 @@
           <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <div class="text-center">
               <div class="text-sm text-yellow-800 mb-1">Session expires in</div>
-              <div id="countdown" class="text-2xl font-bold text-yellow-600">15:00</div>
+              <div id="countdown" class="text-2xl font-bold text-yellow-600">10:00</div>
               <div class="text-xs text-yellow-700 mt-1">Complete payment before time runs out</div>
             </div>
           </div>
@@ -189,6 +189,12 @@
               <i class="fas fa-mobile-alt mr-2"></i>Pay with eSewa
             </button>
 
+            <!-- Cancel Payment Button -->
+            <button type="button" id="cancelPaymentBtn"
+              class="w-full mt-3 bg-red-500 text-white py-3 rounded-xl font-semibold text-lg hover:bg-red-600 transition-all">
+              <i class="fas fa-times-circle mr-2"></i>Cancel Payment
+            </button>
+
             <input type="hidden" name="payment_method" value="esewa" />
           </form>
         </div>
@@ -217,7 +223,7 @@
 {% block extra_js %}
 <script>
   let countdownTimer = null;
-  let timeLeft = 15 * 60; // 15 minutes in seconds
+  let timeLeft = 10 * 60; // 10 minutes in seconds
 
   document.addEventListener("DOMContentLoaded", function () {
     // Start countdown timer
@@ -259,6 +265,39 @@
     payButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing Payment...';
     payButton.disabled = true;
   });
+
+  // Cancel payment handler
+  document.getElementById("cancelPaymentBtn").addEventListener("click", function () {
+    const btn = this;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Cancelling...';
+    fetch('{% url "payments:cancel_payment" payment.payment_id %}', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCsrfToken(), 'Accept': 'application/json' }
+    }).then(r => r.json()).then(data => {
+      if (data.success && data.redirect_url) {
+        window.location.href = data.redirect_url;
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-times-circle mr-2"></i>Cancel Payment';
+        alert(data.error || 'Failed to cancel payment.');
+      }
+    }).catch(() => {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-times-circle mr-2"></i>Cancel Payment';
+      alert('Network error while cancelling payment.');
+    });
+  });
+
+  function getCsrfToken() {
+    const name = 'csrftoken=';
+    const cookies = document.cookie.split(';');
+    for (let c of cookies) {
+      c = c.trim();
+      if (c.startsWith(name)) return decodeURIComponent(c.substring(name.length));
+    }
+    return '';
+  }
 
   // Prevent page refresh/close during payment
   window.addEventListener("beforeunload", function (e) {

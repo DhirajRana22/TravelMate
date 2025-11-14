@@ -6,6 +6,7 @@ app_name = 'payments'
 urlpatterns = [
     path('form/<str:booking_id>/', views.payment_form, name='payment_form'),
     path('process/<uuid:payment_id>/', views.process_payment, name='process_payment'),
+    path('cancel/<uuid:payment_id>/', views.cancel_payment, name='cancel_payment'),
     path('success/<uuid:payment_id>/', views.payment_success, name='payment_success'),
     path('history/', views.payment_history, name='payment_history'),
     path('detail/<uuid:payment_id>/', views.payment_detail, name='payment_detail'),

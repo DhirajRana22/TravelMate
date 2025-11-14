@@ -459,7 +459,7 @@ def create_booking(request, schedule_id):
                     
                     # Hold selected seats for this user to prevent double booking while payment completes
                     from datetime import timedelta
-                    hold_until = timezone.now() + timedelta(minutes=15)
+                    hold_until = timezone.now() + timedelta(minutes=10)
                     for seat in selected_seats:
                         seat.is_held = True
                         seat.held_by = request.user

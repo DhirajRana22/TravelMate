@@ -222,7 +222,7 @@
         <i class="fas fa-plus mr-2 text-green-500"></i>Assign New Bus
       </h3>
 
-      <form method="post" class="space-y-6">
+      <form method="post" class="space-y-6" data-travel-minutes="{{ travel_minutes }}">
         {% csrf_token %}
         <input type="hidden" name="action" value="assign_bus" />
 
@@ -292,13 +292,14 @@
               class="block text-sm font-medium text-gray-700 mb-2"
               >Arrival Time <span class="text-red-500">*</span></label
             >
-            <input
-              type="time"
-              name="arrival_time"
-              id="arrival_time"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
+          <input
+            type="time"
+            name="arrival_time"
+            id="arrival_time"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+          <p id="nextDayHint" class="text-xs text-yellow-600 mt-1 hidden">Arrival next day</p>
           </div>
         </div>
 
@@ -468,10 +469,14 @@
           return;
         }
 
-        // Validate time logic
-        if (departureTime.value >= arrivalTime.value) {
+        // Validate time logic allowing overnight arrivals
+        const toMinutes = (t) => { const [h,m] = t.split(":").map(Number); return h*60 + m; };
+        const depMin = toMinutes(departureTime.value);
+        const arrMin = toMinutes(arrivalTime.value);
+        const effectiveArrMin = arrMin <= depMin ? arrMin + 1440 : arrMin; // wrap to next day if needed
+        if (effectiveArrMin === depMin) {
           e.preventDefault();
-          alert("Arrival time must be after departure time.");
+          alert("Arrival time cannot be the same as departure time.");
           return;
         }
 
@@ -489,19 +494,30 @@
     const arrivalInput = document.getElementById("arrival_time");
 
     if (departureInput && arrivalInput) {
-      departureInput.addEventListener("change", function () {
-        if (this.value && !arrivalInput.value) {
-          // Add route travel time to departure time
-          const departure = new Date("2000-01-01 " + this.value);
-          // Assuming route travel time is available, add it
-          // For now, add 6 hours as default
-          departure.setHours(departure.getHours() + 6);
+      const formEl = document.querySelector('form[method="post"]');
+      const travelMinutes = parseInt(formEl ? formEl.getAttribute('data-travel-minutes') || '360' : '360', 10);
+      const toMinutes = (t) => { const [h,m] = t.split(':').map(Number); return h*60+m; };
+      const hint = document.getElementById('nextDayHint');
 
-          const hours = departure.getHours().toString().padStart(2, "0");
-          const minutes = departure.getMinutes().toString().padStart(2, "0");
-          arrivalInput.value = `${hours}:${minutes}`;
+      const updateHint = () => {
+        if (!departureInput.value || !arrivalInput.value) { if (hint) hint.classList.add('hidden'); return; }
+        const dep = toMinutes(departureInput.value);
+        const arr = toMinutes(arrivalInput.value);
+        if (hint) { if (arr <= dep) hint.classList.remove('hidden'); else hint.classList.add('hidden'); }
+      };
+
+      departureInput.addEventListener("change", function () {
+        if (this.value) {
+          const [h, m] = this.value.split(":").map(Number);
+          let minutes = h * 60 + m + travelMinutes;
+          minutes = minutes % 1440;
+          const hh = String(Math.floor(minutes / 60)).padStart(2, '0');
+          const mm = String(minutes % 60).padStart(2, '0');
+          arrivalInput.value = `${hh}:${mm}`;
+          updateHint();
         }
       });
+      arrivalInput.addEventListener('change', updateHint);
     }
 
     // Days of week helper

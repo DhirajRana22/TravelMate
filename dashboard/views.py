@@ -557,6 +557,7 @@ def route_bus_management(request, route_id):
         'route': route,
         'current_schedules': current_schedules,
         'available_buses': available_buses,
+        'travel_minutes': int(route.travel_time.total_seconds() // 60),
     }
     
     return render(request, 'dashboard/route_bus_management.html', context)
@@ -616,6 +617,7 @@ def update_schedule(request, schedule_id):
     context = {
         'schedule': schedule,
         'route': route,
+        'travel_minutes': int(route.travel_time.total_seconds() // 60),
     }
     
     return render(request, 'dashboard/update_schedule.html', context)

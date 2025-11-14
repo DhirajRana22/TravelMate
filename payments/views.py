@@ -20,6 +20,41 @@ import uuid
 import json
 
 @login_required
+@require_http_methods(["POST"])
+def cancel_payment(request, payment_id):
+    payment = get_object_or_404(Payment, payment_id=payment_id)
+    booking = payment.booking
+    if booking.user != request.user:
+        return JsonResponse({'success': False, 'error': 'Permission denied'}, status=403)
+    try:
+        with transaction.atomic():
+            payment.payment_status = 'failed'
+            payment.save()
+            booking.payment_status = 'failed'
+            booking.booking_status = 'cancelled'
+            booking.save()
+            for seat in booking.seats.all():
+                seat.is_held = False
+                seat.held_by = None
+                seat.held_until = None
+                seat.is_available = True
+                seat.save()
+            if 'pending_booking_data' in request.session:
+                try:
+                    del request.session['pending_booking_data']
+                except Exception:
+                    pass
+            if 'pending_payment_id' in request.session:
+                try:
+                    del request.session['pending_payment_id']
+                except Exception:
+                    pass
+        redirect_url = reverse('bookings:seat_selection', args=[booking.bus_schedule.id]) + f'?date={booking.booking_date}'
+        return JsonResponse({'success': True, 'released': True, 'redirect_url': redirect_url})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+@login_required
 def process_payment(request, payment_id):
     payment = get_object_or_404(Payment, payment_id=payment_id)
     booking = payment.booking
@@ -392,13 +427,15 @@ def esewa_failure(request):
     Handle eSewa payment failure callback
     """
     try:
-        # Get payment data from request
-        if request.method == 'POST':
-            payment_data = request.POST.dict()
-        else:
-            payment_data = request.GET.dict()
-        
-        # Extract transaction UUID (payment ID)
+        payment_data = request.POST.dict() if request.method == 'POST' else request.GET.dict()
+        if payment_data.get('data'):
+            try:
+                import base64, json
+                decoded = base64.b64decode(payment_data['data']).decode('utf-8')
+                parsed = json.loads(decoded)
+                payment_data.update(parsed)
+            except Exception:
+                pass
         transaction_uuid = payment_data.get('transaction_uuid') or payment_data.get('oid')
         if transaction_uuid:
             try:
@@ -406,25 +443,32 @@ def esewa_failure(request):
                     payment = Payment.objects.get(payment_id=transaction_uuid)
                     payment.payment_status = 'failed'
                     payment.save()
-                    
-                    # Cancel the booking since payment failed
                     booking = payment.booking
                     booking.payment_status = 'failed'
                     booking.booking_status = 'cancelled'
                     booking.save()
-                    
-                    # Note: Seats remain available since they were never marked as unavailable
+                    for seat in booking.seats.all():
+                        seat.is_held = False
+                        seat.held_by = None
+                        seat.held_until = None
+                        seat.is_available = True
+                        seat.save()
+                    if 'pending_booking_data' in request.session:
+                        try:
+                            del request.session['pending_booking_data']
+                        except Exception:
+                            pass
+                    if 'pending_payment_id' in request.session:
+                        try:
+                            del request.session['pending_payment_id']
+                        except Exception:
+                            pass
             except Payment.DoesNotExist:
                 pass
-        
-        messages.error(request, 'Payment was cancelled or failed. Please try again.')
-        
-        # Redirect to payment page if payment ID is available
+        messages.error(request, 'Payment was cancelled or failed. Seats released.')
         if transaction_uuid:
             return redirect('payments:process_payment', payment_id=transaction_uuid)
-        else:
-            return redirect('accounts:booking_history')
-            
+        return redirect('accounts:booking_history')
     except Exception as e:
         messages.error(request, f'Error handling payment failure: {str(e)}')
         return redirect('accounts:booking_history')
