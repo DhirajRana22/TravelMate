@@ -67,6 +67,27 @@ def generate_esewa_signature(total_amount, transaction_uuid, product_code):
     # Encode to base64
     return base64.b64encode(signature).decode('utf-8')
 
+def generate_esewa_signature_from_payload(payload: dict) -> str:
+    """Generate signature using the fields specified by 'signed_field_names'.
+    Falls back to the standard triple if 'signed_field_names' is missing.
+    """
+    secret_key = EsewaConfig.get_secret_key()
+    signed = payload.get('signed_field_names')
+    if signed:
+        names = [n.strip() for n in str(signed).split(',') if n.strip()]
+        message = ','.join(f"{name}={str(payload.get(name, ''))}" for name in names)
+    else:
+        total_amount = str(payload.get('total_amount'))
+        transaction_uuid = str(payload.get('transaction_uuid'))
+        product_code = str(payload.get('product_code'))
+        message = f"total_amount={total_amount},transaction_uuid={transaction_uuid},product_code={product_code}"
+    signature = hmac.new(
+        secret_key.encode('utf-8'),
+        message.encode('utf-8'),
+        hashlib.sha256,
+    ).digest()
+    return base64.b64encode(signature).decode('utf-8')
+
 def prepare_esewa_payment_data(payment, booking):
     """
     Prepare payment data for eSewa form submission
@@ -111,21 +132,25 @@ def verify_esewa_payment(payment_data):
         bool: True if payment is verified, False otherwise
     """
     try:
-        # Extract required fields
-        total_amount = payment_data.get('total_amount')
-        transaction_uuid = payment_data.get('transaction_uuid')
-        product_code = payment_data.get('product_code')
-        received_signature = payment_data.get('signature')
-        
-        if not all([total_amount, transaction_uuid, product_code, received_signature]):
+        payload = dict(payment_data or {})
+        # Support eSewa responses that wrap fields in a base64 'data' envelope
+        raw = payload.get('data')
+        if raw:
+            import base64, json
+            try:
+                decoded = base64.b64decode(raw).decode('utf-8')
+                payload = json.loads(decoded)
+            except Exception:
+                # If decoding fails, keep original payload
+                pass
+
+        received_signature = payload.get('signature')
+        if not received_signature:
             return False
-        
-        # Generate expected signature
-        expected_signature = generate_esewa_signature(total_amount, transaction_uuid, product_code)
-        
-        # Compare signatures
+
+        expected_signature = generate_esewa_signature_from_payload(payload)
         return hmac.compare_digest(expected_signature, received_signature)
-        
+
     except Exception as e:
         print(f"Error verifying eSewa payment: {e}")
         return False
@@ -137,6 +162,8 @@ def query_esewa_status(transaction_uuid, total_amount):
         from urllib.error import URLError, HTTPError
         url = EsewaConfig.get_status_url()
         product_code = EsewaConfig.get_merchant_code()
+
+        # Build payload using canonical fields expected by eSewa
         signature = generate_esewa_signature(str(total_amount), str(transaction_uuid), product_code)
         payload = {
             'total_amount': str(total_amount),
@@ -145,6 +172,7 @@ def query_esewa_status(transaction_uuid, total_amount):
             'signature': signature,
         }
         data = json.dumps(payload).encode('utf-8')
+
         req = request.Request(url, data=data, headers={'Content-Type': 'application/json'})
         with request.urlopen(req, timeout=10) as resp:
             body = resp.read().decode('utf-8')
@@ -152,8 +180,15 @@ def query_esewa_status(transaction_uuid, total_amount):
                 parsed = json.loads(body)
             except Exception:
                 parsed = {'raw': body}
-            status = str(parsed.get('status', '')).upper()
-            verified = status in ['COMPLETE', 'COMPLETED', 'SUCCESS']
+
+            # Normalize status across possible response shapes
+            status = str(
+                parsed.get('status')
+                or parsed.get('result')
+                or parsed.get('message')
+                or parsed.get('raw', '')
+            ).upper()
+            verified = any(s in status for s in ['COMPLETE', 'COMPLETED', 'SUCCESS', 'SUCCESSFUL', 'APPROVED'])
             return {'verified': verified, 'response': parsed}
     except (URLError, HTTPError) as e:
         return {'verified': False, 'error': str(e)}

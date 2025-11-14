@@ -225,33 +225,62 @@ def esewa_success(request):
     try:
         # Get payment data from request
         payment_data = request.POST.dict() if request.method == 'POST' else request.GET.dict()
-        transaction_uuid = payment_data.get('transaction_uuid') or request.session.get('pending_payment_id')
+        # Decode eSewa's base64 'data' envelope if present
+        if payment_data.get('data'):
+            try:
+                import base64, json
+                decoded = base64.b64decode(payment_data['data']).decode('utf-8')
+                parsed = json.loads(decoded)
+                payment_data.update(parsed)
+            except Exception:
+                pass
+        transaction_uuid = payment_data.get('oid') or payment_data.get('transaction_uuid') or request.session.get('pending_payment_id')
         if not transaction_uuid:
             messages.error(request, 'Invalid payment response from eSewa.')
             logger.error('eSewa success missing transaction_uuid and session fallback.')
             return redirect('accounts:booking_history')
 
-        # Verify payment signature
+        # --- ROBUST PAYMENT VERIFICATION ---
+        # We perform two checks: a reliable server-to-server query and a secondary local signature check.
+        status_ok = False
+        payment = None
+        
+        try:
+            # Use our database as the source of truth for the payment object.
+            from .models import Payment
+            payment = Payment.objects.get(payment_id=transaction_uuid)
+            
+            # Perform the server-to-server query using the amount from our database.
+            status_result = query_esewa_status(transaction_uuid, payment.amount)
+            status_ok = bool(status_result.get('verified'))
+            
+            if not status_ok:
+                logger.warning(f"eSewa server-to-server check failed for {transaction_uuid}. Response: {status_result.get('response')}")
+
+        except Payment.DoesNotExist:
+            messages.error(request, 'Payment record not found for verification. Please contact support.')
+            logger.error(f"eSewa success callback for non-existent payment_id: {transaction_uuid}")
+            return redirect('accounts:booking_history')
+        except Exception as e:
+            logger.error(f"Error during server-to-server eSewa status query: {e}")
+            status_ok = False # Ensure it's false on exception
+
+        # Also verify the signature from the callback data as a secondary check.
         signature_ok = verify_esewa_payment(payment_data)
-        # Fallback to querying status with known payment amount if total_amount is absent
-        payment_amount_for_status = payment_data.get('total_amount')
-        if not payment_amount_for_status:
-            try:
-                from .models import Payment as PaymentModel
-                pm = PaymentModel.objects.get(payment_id=transaction_uuid)
-                payment_amount_for_status = pm.amount
-            except Exception:
-                payment_amount_for_status = None
-        status_result = query_esewa_status(transaction_uuid, payment_amount_for_status) if payment_amount_for_status else {'verified': False}
-        status_ok = bool(status_result.get('verified'))
-        if signature_ok or status_ok:
+        if not signature_ok:
+            logger.warning(f"eSewa local signature verification failed for {transaction_uuid}.")
+
+        # If signature verifies and status field indicates success, treat as verified
+        status_field = str(payment_data.get('status', '')).upper()
+        if signature_ok and status_field in ['COMPLETE', 'COMPLETED', 'SUCCESS', 'SUCCESSFUL', 'APPROVED']:
+            status_ok = True
+
+        if status_ok or signature_ok:
             with transaction.atomic():
-                # Look up the existing Payment by transaction_uuid
-                from .models import Payment
-                try:
-                    payment = Payment.objects.get(payment_id=transaction_uuid)
-                except Payment.DoesNotExist:
-                    messages.error(request, 'Payment record not found. Please contact support.')
+                # We have already fetched the payment object. Proceed with updating the status.
+                if not payment:
+                     # This case should not be reached if the above logic is sound, but as a safeguard:
+                    messages.error(request, 'Could not resolve payment record. Please contact support.')
                     return redirect('accounts:booking_history')
 
                 # Use the associated Booking created earlier during create_booking
@@ -263,7 +292,7 @@ def esewa_success(request):
 
                 try:
                     from decimal import Decimal
-                    amount_ok = Decimal(str(payment_data.get('total_amount'))) == payment.amount
+                    amount_ok = Decimal(str(payment_data.get('total_amount') or payment_data.get('amt'))) == payment.amount
                 except Exception:
                     amount_ok = True
                 if not amount_ok:
@@ -370,7 +399,7 @@ def esewa_failure(request):
             payment_data = request.GET.dict()
         
         # Extract transaction UUID (payment ID)
-        transaction_uuid = payment_data.get('transaction_uuid')
+        transaction_uuid = payment_data.get('transaction_uuid') or payment_data.get('oid')
         if transaction_uuid:
             try:
                 with transaction.atomic():
@@ -468,15 +497,14 @@ def payment_form(request, booking_id):
         messages.error(request, 'You do not have permission to access this booking payment.')
         return redirect('accounts:booking_history')
 
-    # Try to find an existing payment that can be retried (pending or failed)
-    payment = (
-        booking.payments.filter(payment_status__in=['pending', 'failed'])
-        .order_by('-updated_at')
-        .first()
-    )
+    payment = None
+    # If this is a retry, we must create a new payment object to avoid duplicate transaction UUIDs.
+    if request.GET.get('retry') != '1':
+        # If not a retry, try to find an existing payment to resume.
+        payment = booking.payments.filter(payment_status__in=['pending', 'failed']).order_by('-updated_at').first()
 
     if not payment:
-        # If none exists, create a fresh pending payment
+        # If no suitable payment exists, or if this is a retry, create a new one.
         payment = Payment.objects.create(
             booking=booking,
             amount=booking.total_fare,
