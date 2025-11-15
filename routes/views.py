@@ -190,6 +190,50 @@ def route_results(request):
                     route__in=routes,
                     is_active=True
                 )
+                if not base_schedules.exists():
+                    try:
+                        target_route = routes.first()
+                        reverse_route = Route.objects.filter(source=destination, destination=source, is_active=True).first()
+                        if target_route and reverse_route:
+                            forward_schedules = BusSchedule.objects.filter(route=reverse_route, is_active=True)
+                            from datetime import time as dtime
+                            def to_minutes(t):
+                                return int(t.hour) * 60 + int(t.minute)
+                            def from_minutes(m):
+                                m = m % 1440
+                                return dtime(m // 60, m % 60)
+                            travel_min_reverse = int(target_route.travel_time.total_seconds() // 60)
+                            for fs in forward_schedules:
+                                dep_minutes = to_minutes(fs.departure_time)
+                                if fs.schedule_type in ['night', 'evening'] or dep_minutes >= 18*60 or dep_minutes < 6*60:
+                                    window_start = 18 * 60
+                                elif fs.schedule_type == 'morning':
+                                    window_start = 6 * 60
+                                elif fs.schedule_type == 'afternoon':
+                                    window_start = 12 * 60
+                                else:
+                                    window_start = 18 * 60
+                                ret_departure = from_minutes(window_start)
+                                ret_arrival = from_minutes(window_start + travel_min_reverse)
+                                conflict = BusSchedule.objects.filter(bus=fs.bus, route=target_route, departure_time=ret_departure).exists()
+                                if not conflict:
+                                    BusSchedule.objects.create(
+                                        bus=fs.bus,
+                                        route=target_route,
+                                        departure_time=ret_departure,
+                                        arrival_time=ret_arrival,
+                                        base_fare=fs.base_fare,
+                                        is_active=True,
+                                        schedule_type=fs.schedule_type,
+                                        buffer_hours=fs.buffer_hours,
+                                        return_schedule_enabled=True,
+                                        effective_from=fs.effective_from,
+                                        effective_until=fs.effective_until,
+                                        days_of_week=fs.days_of_week
+                                    )
+                            base_schedules = BusSchedule.objects.filter(route__in=routes, is_active=True)
+                    except Exception:
+                        pass
                 
                 # Filter schedules that are available on the travel date with proper datetime comparison
                 available_schedules = []
