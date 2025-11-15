@@ -183,7 +183,7 @@
                 onsubmit="return confirm('Are you sure you want to remove this bus assignment?')"
               >
                 {% csrf_token %}
-                <input type="hidden" name="action" value="remove_schedule" />
+                <input type="hidden" name="action" value="remove_bus" />
                 <input
                   type="hidden"
                   name="schedule_id"
@@ -222,7 +222,7 @@
         <i class="fas fa-plus mr-2 text-green-500"></i>Assign New Bus
       </h3>
 
-      <form method="post" class="space-y-6" data-travel-minutes="{{ travel_minutes }}">
+      <form id="assignBusForm" method="post" class="space-y-6" data-travel-minutes="{{ travel_minutes }}">
         {% csrf_token %}
         <input type="hidden" name="action" value="assign_bus" />
 
@@ -355,22 +355,38 @@
         <!-- Advanced Settings -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label
-              for="days_of_week"
-              class="block text-sm font-medium text-gray-700 mb-2"
-              >Days of Week</label
-            >
-            <input
-              type="text"
-              name="days_of_week"
-              id="days_of_week"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              placeholder="1234567"
-              value="1234567"
-            />
-            <p class="text-sm text-gray-500 mt-1">
-              1=Monday, 2=Tuesday, ..., 7=Sunday (e.g., 1234567 for all days)
-            </p>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Days of Week</label>
+            <div class="grid grid-cols-3 gap-2" id="days_group">
+              <label class="inline-flex items-center space-x-2">
+                <input type="checkbox" name="days" value="1" class="rounded" checked>
+                <span>Mon</span>
+              </label>
+              <label class="inline-flex items-center space-x-2">
+                <input type="checkbox" name="days" value="2" class="rounded" checked>
+                <span>Tue</span>
+              </label>
+              <label class="inline-flex items-center space-x-2">
+                <input type="checkbox" name="days" value="3" class="rounded" checked>
+                <span>Wed</span>
+              </label>
+              <label class="inline-flex items-center space-x-2">
+                <input type="checkbox" name="days" value="4" class="rounded" checked>
+                <span>Thu</span>
+              </label>
+              <label class="inline-flex items-center space-x-2">
+                <input type="checkbox" name="days" value="5" class="rounded" checked>
+                <span>Fri</span>
+              </label>
+              <label class="inline-flex items-center space-x-2">
+                <input type="checkbox" name="days" value="6" class="rounded" checked>
+                <span>Sat</span>
+              </label>
+              <label class="inline-flex items-center space-x-2">
+                <input type="checkbox" name="days" value="7" class="rounded" checked>
+                <span>Sun</span>
+              </label>
+            </div>
+            <p class="text-sm text-gray-500 mt-1">Select operating days for this bus.</p>
           </div>
 
           <div>
@@ -449,7 +465,7 @@
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     // Form validation
-    const form = document.querySelector('form[method="post"]');
+    const form = document.getElementById('assignBusForm');
     if (form) {
       form.addEventListener("submit", function (e) {
         const busSelect = document.getElementById("bus_id");
@@ -494,7 +510,7 @@
     const arrivalInput = document.getElementById("arrival_time");
 
     if (departureInput && arrivalInput) {
-      const formEl = document.querySelector('form[method="post"]');
+      const formEl = document.getElementById('assignBusForm');
       const travelMinutes = parseInt(formEl ? formEl.getAttribute('data-travel-minutes') || '360' : '360', 10);
       const toMinutes = (t) => { const [h,m] = t.split(':').map(Number); return h*60+m; };
       const hint = document.getElementById('nextDayHint');
@@ -520,14 +536,14 @@
       arrivalInput.addEventListener('change', updateHint);
     }
 
-    // Days of week helper
-    const daysInput = document.getElementById("days_of_week");
-    if (daysInput) {
-      daysInput.addEventListener("input", function () {
-        // Validate days format
-        const value = this.value.replace(/[^1-7]/g, "");
-        if (value !== this.value) {
-          this.value = value;
+    // Days of week validation: ensure at least one selected
+    const dayChecks = () => Array.from(document.querySelectorAll('input[name="days"]:checked'));
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        if (dayChecks().length === 0) {
+          e.preventDefault();
+          alert('Please select at least one day of week.');
+          return;
         }
       });
     }

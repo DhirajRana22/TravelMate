@@ -35,6 +35,7 @@
                     <i class="fas fa-edit mr-2"></i>Modify Search
                 </button>
             </div>
+            
         </div>
         
         <!-- Modify Search Form (Hidden by default) -->
@@ -279,10 +280,16 @@
                                 
                                 <!-- Action Buttons -->
                                 <div class="flex flex-col sm:flex-row gap-3">
+                                    {% if schedule.booking_open %}
                                     <a href="{% url 'bookings:seat_selection' schedule.id %}?date={{ travel_date|date:'Y-m-d' }}" 
                                        class="flex-1 bg-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-600 transition-colors font-semibold text-center btn-book">
                                         <i class="fas fa-ticket-alt mr-2"></i>Book Now
                                     </a>
+                                    {% else %}
+                                    <span class="flex-1 bg-gray-300 text-gray-600 py-3 px-6 rounded-lg font-semibold text-center cursor-not-allowed">
+                                        Booking Closed
+                                    </span>
+                                    {% endif %}
                                     
                                     <a href="{% url 'routes:schedule_detail' schedule.id %}" 
                                        class="flex-1 bg-blue-500 text-white py-3 px-6 rounded-lg hover:bg-blue-600 transition-colors font-semibold text-center btn-view-seats">

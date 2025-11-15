@@ -42,6 +42,15 @@ def seat_selection(request, schedule_id):
     if travel_date < current_date:
         messages.error(request, 'Cannot book a bus for past dates.')
         return redirect('routes:route_search')
+
+    # Enforce booking cut-off: 2 hours before departure
+    from datetime import datetime, timedelta
+    departure_dt = timezone.make_aware(datetime.combine(travel_date, schedule.departure_time))
+    now_dt = timezone.now()
+    if departure_dt - now_dt < timedelta(hours=2):
+        query = f"?source={schedule.route.source.name}&destination={schedule.route.destination.name}&travel_date={travel_date.strftime('%Y-%m-%d')}"
+        messages.error(request, 'Bookings close 2 hours before departure.')
+        return redirect(reverse('routes:route_results') + query)
     
     # Get or create seats for this bus schedule
     seats = Seat.objects.filter(bus_schedule=schedule)

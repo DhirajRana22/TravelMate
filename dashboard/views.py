@@ -423,11 +423,11 @@ def route_bus_management(request, route_id):
     # Get current bus schedules for this route
     current_schedules = BusSchedule.objects.filter(route=route).select_related('bus')
     assigned_buses = [schedule.bus for schedule in current_schedules]
-    
-    # Get available buses (not assigned to this route)
-    available_buses = Bus.objects.filter(is_active=True).exclude(
-        id__in=[bus.id for bus in assigned_buses]
-    )
+
+    # Exclude buses that are currently scheduled on any route (active), to prevent multi-route assignment
+    from django.db.models import Q
+    busy_bus_ids = BusSchedule.objects.filter(is_active=True).exclude(route=route).values_list('bus_id', flat=True).distinct()
+    available_buses = Bus.objects.filter(is_active=True).exclude(id__in=busy_bus_ids).exclude(id__in=[bus.id for bus in assigned_buses])
     
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -442,7 +442,12 @@ def route_bus_management(request, route_id):
             return_schedule_enabled = request.POST.get('return_schedule_enabled') == 'on'
             effective_from = request.POST.get('effective_from')
             effective_until = request.POST.get('effective_until')
-            days_of_week = request.POST.get('days_of_week', '1234567')
+            # New: parse days checkboxes -> compact string
+            days_selected = request.POST.getlist('days')
+            if days_selected:
+                days_of_week = ''.join(sorted(days_selected, key=lambda x: int(x)))
+            else:
+                days_of_week = '1234567'
             
             if bus_id and departure_time_str and arrival_time_str and base_fare:
                 try:
@@ -463,15 +468,27 @@ def route_bus_management(request, route_id):
                     if effective_until:
                         effective_until_date = datetime.strptime(effective_until, '%Y-%m-%d').date()
                     
+                    # Prevent assigning the same bus to multiple routes during overlapping effective periods
+                    from datetime import date
+                    new_from = effective_from_date or date.today()
+                    new_until = effective_until_date or date(9999, 12, 31)
+                    overlapping = BusSchedule.objects.filter(bus=bus).exclude(route=route).filter(is_active=True).filter(
+                        Q(effective_from__lte=new_until) & (Q(effective_until__isnull=True) | Q(effective_until__gte=new_from))
+                    )
+                    if overlapping.exists():
+                        other = overlapping.first()
+                        messages.error(request, f'Bus {bus.bus_number} is already assigned to {other.route} during {other.effective_from} to {other.effective_until or "ongoing"}. Unassign it first.')
+                        raise Exception('Bus already assigned to another route')
+
                     # Check if this bus is already assigned to this route with same schedule
                     existing_schedule = BusSchedule.objects.filter(
-                        route=route, 
-                        bus=bus, 
+                        route=route,
+                        bus=bus,
                         departure_time=departure_time
                     ).first()
                     
                     if not existing_schedule:
-                        BusSchedule.objects.create(
+                        created_schedule = BusSchedule.objects.create(
                             bus=bus,
                             route=route,
                             departure_time=departure_time,
@@ -486,6 +503,65 @@ def route_bus_management(request, route_id):
                             days_of_week=days_of_week
                         )
                         messages.success(request, f'Bus {bus.bus_number} has been assigned to this route with enhanced scheduling.')
+                        if return_schedule_enabled:
+                            try:
+                                from datetime import time
+                                reverse_route = Route.objects.filter(source=route.destination, destination=route.source, is_active=True).first()
+                                if not reverse_route:
+                                    # Auto-create reverse route using same distance and travel_time
+                                    try:
+                                        reverse_route = Route.objects.create(
+                                            source=route.destination,
+                                            destination=route.source,
+                                            distance=route.distance,
+                                            travel_time=route.travel_time,
+                                            is_active=True,
+                                        )
+                                        messages.success(request, 'Reverse route created automatically.')
+                                    except Exception:
+                                        reverse_route = None
+                                if reverse_route:
+                                    def to_minutes(t):
+                                        return int(t.hour) * 60 + int(t.minute)
+                                    def from_minutes(m):
+                                        m = m % 1440
+                                        return time(m // 60, m % 60)
+                                    travel_min_forward = int(route.travel_time.total_seconds() // 60)
+                                    travel_min_reverse = int(reverse_route.travel_time.total_seconds() // 60)
+                                    next_available = to_minutes(arrival_time) + int(buffer_hours) * 60
+                                    if schedule_type in ['night', 'evening'] or to_minutes(departure_time) >= 18*60 or to_minutes(departure_time) < 6*60:
+                                        window_start = 18 * 60
+                                    elif schedule_type == 'morning':
+                                        window_start = 6 * 60
+                                    elif schedule_type == 'afternoon':
+                                        window_start = 12 * 60
+                                    else:
+                                        window_start = 18 * 60
+                                    ret_dep_minutes = window_start if next_available <= window_start else window_start + 1440
+                                    ret_arr_minutes = ret_dep_minutes + travel_min_reverse
+                                    ret_departure = from_minutes(ret_dep_minutes)
+                                    ret_arrival = from_minutes(ret_arr_minutes)
+                                    conflict = BusSchedule.objects.filter(bus=bus, route=reverse_route, departure_time=ret_departure).exists()
+                                    if not conflict:
+                                        BusSchedule.objects.create(
+                                            bus=bus,
+                                            route=reverse_route,
+                                            departure_time=ret_departure,
+                                            arrival_time=ret_arrival,
+                                            base_fare=base_fare,
+                                            is_active=True,
+                                            schedule_type=schedule_type,
+                                            buffer_hours=int(buffer_hours),
+                                            return_schedule_enabled=True,
+                                            effective_from=effective_from_date,
+                                            effective_until=effective_until_date,
+                                            days_of_week=days_of_week
+                                        )
+                                        messages.success(request, f'Return schedule created on {reverse_route} at {ret_departure}.')
+                                else:
+                                    messages.warning(request, 'Reverse route not found; return schedule not created.')
+                            except Exception as e:
+                                messages.error(request, f'Error creating return schedule: {str(e)}')
                     else:
                         messages.error(request, f'Bus {bus.bus_number} is already assigned to this route at {departure_time}.')
                 except ValueError as e:
@@ -548,6 +624,65 @@ def route_bus_management(request, route_id):
                     schedule.save()
                     
                     messages.success(request, f'Schedule for bus {schedule.bus.bus_number} has been updated successfully!')
+
+                    # Auto-create or update return schedule if enabled
+                    if schedule.return_schedule_enabled:
+                        try:
+                            from datetime import time
+                            reverse_route = Route.objects.filter(source=route.destination, destination=route.source, is_active=True).first()
+                            if not reverse_route:
+                                try:
+                                    reverse_route = Route.objects.create(
+                                        source=route.destination,
+                                        destination=route.source,
+                                        distance=route.distance,
+                                        travel_time=route.travel_time,
+                                        is_active=True,
+                                    )
+                                    messages.success(request, 'Reverse route created automatically.')
+                                except Exception:
+                                    reverse_route = None
+                            if reverse_route:
+                                def to_minutes(t):
+                                    return int(t.hour) * 60 + int(t.minute)
+                                def from_minutes(m):
+                                    m = m % 1440
+                                    return time(m // 60, m % 60)
+                                travel_min_reverse = int(reverse_route.travel_time.total_seconds() // 60)
+                                next_available = to_minutes(arrival_time) + int(buffer_hours) * 60
+                                if schedule.schedule_type in ['night', 'evening'] or to_minutes(departure_time) >= 18*60 or to_minutes(departure_time) < 6*60:
+                                    window_start = 18 * 60
+                                elif schedule.schedule_type == 'morning':
+                                    window_start = 6 * 60
+                                elif schedule.schedule_type == 'afternoon':
+                                    window_start = 12 * 60
+                                else:
+                                    window_start = 18 * 60
+                                ret_dep_minutes = window_start if next_available <= window_start else window_start + 1440
+                                ret_arr_minutes = ret_dep_minutes + travel_min_reverse
+                                ret_departure = from_minutes(ret_dep_minutes)
+                                ret_arrival = from_minutes(ret_arr_minutes)
+                                conflict = BusSchedule.objects.filter(bus=schedule.bus, route=reverse_route, departure_time=ret_departure).exists()
+                                if not conflict:
+                                    BusSchedule.objects.create(
+                                        bus=schedule.bus,
+                                        route=reverse_route,
+                                        departure_time=ret_departure,
+                                        arrival_time=ret_arrival,
+                                        base_fare=base_fare,
+                                        is_active=True,
+                                        schedule_type=schedule.schedule_type,
+                                        buffer_hours=int(buffer_hours),
+                                        return_schedule_enabled=True,
+                                        effective_from=effective_from_date,
+                                        effective_until=effective_until_date,
+                                        days_of_week=days_of_week
+                                    )
+                                    messages.success(request, f'Return schedule created on {reverse_route} at {ret_departure}.')
+                            else:
+                                messages.warning(request, 'Reverse route not found; return schedule not created.')
+                        except Exception as e:
+                            messages.error(request, f'Error creating return schedule: {str(e)}')
                 except Exception as e:
                     messages.error(request, f'Error updating schedule: {str(e)}')
         
@@ -579,7 +714,14 @@ def update_schedule(request, schedule_id):
         return_schedule_enabled = request.POST.get('return_schedule_enabled') == 'on'
         effective_from = request.POST.get('effective_from')
         effective_until = request.POST.get('effective_until')
-        days_of_week = request.POST.get('days_of_week', '1234567')
+        days_list = request.POST.getlist('days')
+        if days_list:
+            try:
+                days_of_week = ''.join(sorted(days_list, key=lambda d: int(d)))
+            except Exception:
+                days_of_week = ''.join(days_list)
+        else:
+            days_of_week = request.POST.get('days_of_week', '1234567')
         is_active = request.POST.get('is_active') == 'on'
         
         if departure_time_str and arrival_time_str and base_fare:
@@ -1317,7 +1459,24 @@ def route_add(request):
     if request.method == 'POST':
         form = RouteForm(request.POST)
         if form.is_valid():
-            form.save()
+            route = form.save()
+            create_reverse = request.POST.get('create_reverse') == 'on'
+            if create_reverse:
+                try:
+                    exists = Route.objects.filter(source=route.destination, destination=route.source).exists()
+                    if not exists:
+                        Route.objects.create(
+                            source=route.destination,
+                            destination=route.source,
+                            distance=route.distance,
+                            travel_time=route.travel_time,
+                            is_active=route.is_active,
+                        )
+                        messages.success(request, 'Reverse route created automatically.')
+                    else:
+                        messages.info(request, 'Reverse route already exists.')
+                except Exception as e:
+                    messages.warning(request, f'Could not create reverse route: {str(e)}')
             messages.success(request, 'Route added successfully!')
             return redirect('dashboard:route_management')
     else:
@@ -1336,7 +1495,24 @@ def route_edit(request, route_id):
     if request.method == 'POST':
         form = RouteForm(request.POST, instance=route)
         if form.is_valid():
-            form.save()
+            updated_route = form.save()
+            create_reverse = request.POST.get('create_reverse') == 'on'
+            if create_reverse:
+                try:
+                    exists = Route.objects.filter(source=updated_route.destination, destination=updated_route.source).exists()
+                    if not exists:
+                        Route.objects.create(
+                            source=updated_route.destination,
+                            destination=updated_route.source,
+                            distance=updated_route.distance,
+                            travel_time=updated_route.travel_time,
+                            is_active=updated_route.is_active,
+                        )
+                        messages.success(request, 'Reverse route created automatically.')
+                    else:
+                        messages.info(request, 'Reverse route already exists.')
+                except Exception as e:
+                    messages.warning(request, f'Could not create reverse route: {str(e)}')
             messages.success(request, 'Route updated successfully!')
             return redirect('dashboard:route_detail', route_id=route.id)
     else:

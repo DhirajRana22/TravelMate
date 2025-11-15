@@ -178,6 +178,9 @@ def route_results(request):
                         total_booked=Count('seats')
                     )['total_booked'] or 0
                     
+                    from datetime import timedelta
+                    departure_datetime = timezone.make_aware(datetime.combine(travel_date, assignment.departure_time))
+                    schedule_obj.booking_open = (departure_datetime - current_datetime) >= timedelta(hours=2)
                     schedule_obj.available_seats = assignment.bus.total_seats - booked_seats_count
                     schedules.append(schedule_obj)
             
@@ -192,11 +195,9 @@ def route_results(request):
                 available_schedules = []
                 for schedule in base_schedules:
                     if schedule.is_available_on_date(travel_date):
-                        # Check if the departure has already passed
                         departure_datetime = timezone.make_aware(datetime.combine(travel_date, schedule.departure_time))
                         if departure_datetime > current_datetime:
                             available_schedules.append(schedule)
-                
                 schedules = sorted(available_schedules, key=lambda x: x.departure_time)
                 
                 # Calculate available seats for base schedules
@@ -210,6 +211,9 @@ def route_results(request):
                         total_booked=Count('seats')
                     )['total_booked'] or 0
                     
+                    from datetime import timedelta
+                    departure_datetime = timezone.make_aware(datetime.combine(travel_date, schedule.departure_time))
+                    schedule.booking_open = (departure_datetime - current_datetime) >= timedelta(hours=2)
                     schedule.available_seats = schedule.bus.total_seats - booked_seats_count
             
             # Apply recommendation sorting if user is authenticated
